@@ -1,0 +1,116 @@
+div.dt-container .dt-search input:focus {
+    border-color: #A1CB21 !important;
+    outline: 2px solid transparent !important;
+    outline-offset: 2px !important;
+    --tw-ring-inset: var(--tw-empty,
+            /*!*/
+            /*!*/
+        );
+    --tw-ring-offset-width: 0px;
+    --tw-ring-offset-color: #fff;
+    --tw-ring-color: #A1CB21;
+    --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+    --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+    box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow) !important;
+}
+
+div.dt-container .dt-search input {
+    border-radius: 0.375rem !important;
+    --tw-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow) !important;
+    --tw-border-opacity: 1;
+    border-color: rgb(209 213 219 / var(--tw-border-opacity)) !important;
+    padding: 8px 10px 8px 12px !important;
+}
+
+td.dt-type-numeric {
+    text-align: left !important;
+}
+
+div.dt-container .dt-paging .dt-paging-button {
+    background-color: #F0F0F0 !important;
+    border: none !important;
+    border-radius: 0.375rem !important;
+}
+
+div.dt-container .dt-paging .dt-paging-button.disabled:hover {
+    background: #F0F0F0 !important;
+}
+
+div.dt-container .dt-paging .dt-paging-button:hover {
+    --tw-bg-opacity: 1;
+    background: rgb(193 214 49 / var(--tw-bg-opacity)) !important;
+    border: none !important;
+}
+
+div.dt-container .dt-paging .dt-paging-button.current {
+    --tw-text-opacity: 1;
+    color: rgb(255 255 255 / var(--tw-text-opacity)) !important;
+    border: none !important;
+    --tw-bg-opacity: 1;
+    background-color: rgb(193 214 49 / var(--tw-bg-opacity)) !important;
+    border-radius: 0.375rem !important;
+    --tw-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow) !important;
+}
+
+div.dt-container .dt-paging .dt-paging-button.current:hover {
+    --tw-bg-opacity: 1;
+    background-color: rgb(138 150 34 / var(--tw-bg-opacity)) !important;
+    color: rgb(255 255 255 / var(--tw-text-opacity)) !important;
+    border: none !important;
+}
+
+:root {
+    --dt-row-selected: 195, 215, 48 !important;
+}
+
+.active>.page-link,
+.page-link.active {
+    background-color: #A1CB21 !important;
+    border-color: #A1CB21 !important;
+    color: white !important;
+}
+
+.page-link {
+    color: black !important;
+}
+
+table {
+    width: 100% !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    margin-top: 1rem !important;
+}
+
+table thead {
+    background-color: #f8f9fa !important;
+}
+
+table th {
+    text-align: center !important;
+}
+
+table th,
+table td {
+    border-bottom: 1px solid #e0e0e0 !important;
+}
+
+table tbody tr:hover {
+    background-color: #f1f3f5 !important;
+    transition: background-color 0.3s ease !important;
+}
+
+table.dataTable {
+    width: 100% !important;
+}
+
+div.dt-processing {
+    border-radius: 0.375rem !important;
+    background-color: white !important;
+    --tw-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow) !important;
+}

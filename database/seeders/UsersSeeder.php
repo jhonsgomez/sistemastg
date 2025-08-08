@@ -1,0 +1,152 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\Nivel;
+use App\Models\TipoDocumento;
+use App\Models\User;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
+use League\Csv\Reader;
+
+class UsersSeeder extends Seeder
+{
+    public $nombre_programa;
+    public $correo_programa;
+    public $correo_coordinacion;
+
+    public function __construct()
+    {
+        $this->nombre_programa = env('NOMBRE_PROGRAMA');
+        $this->correo_programa = env('CORREO_SISTEMAS');
+        $this->correo_coordinacion = env('CORREO_COORDINACION');
+    }
+
+    public function run(): void
+    {
+        $super_admin = User::create([
+            'name' => 'Super Admin',
+            'email' => 'superadmintrabajosdegrado@correo.uts.edu.co',
+            'password' => Hash::make('SuperAdmin@@0907***'),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $super_admin->assignRole('super_admin');
+
+        $admin = User::create([
+            'name' => 'Comité - ' . ucwords($this->nombre_programa),
+            'email' => $this->correo_programa,
+            'password' => Hash::make('123456782025***'),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $admin->assignRole('admin');
+
+        $coordinador = User::create([
+            'name' => 'Coordinador - ' . ucwords($this->nombre_programa),
+            'email' => $this->correo_coordinacion,
+            'password' => Hash::make('123456782025***'),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $coordinador->assignRole('coordinador');
+
+        $tipo_documento = TipoDocumento::findOrFail(2);
+
+        // ======= DOCENTES =======
+
+        // Cargar el archivo Excel
+        $filePath = public_path('formatos/listado_docentes.csv');
+
+        // Leer el archivo CSV usando League CSV
+        $csv = Reader::createFromPath($filePath, 'r');
+        $csv->setDelimiter(';');
+        $csv->setHeaderOffset(0);
+
+        // Obtener todas las filas como un array asociativo
+        $records = $csv->getRecords();
+
+        foreach ($records as $row) {
+            $nombre = $row['Nombre'];
+            $correo = $row['Correo'];
+            $documento = $row['Documento'];
+
+            // Crear el usuario
+            $docente = User::create([
+                'name' => $nombre,
+                'email' => $correo,
+                'tipo_documento_id' => $tipo_documento->id,
+                'nro_documento' => $documento,
+                'password' => Hash::make($documento),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            // Asignar el rol de 'docente'
+            $docente->assignRole('docente');
+        }
+
+        // ======= ESTUDIANTES =======
+        $tecnologico = Nivel::findOrFail(1);
+        $profesional = Nivel::findOrFail(2);
+
+        $estudiante = User::create([
+            'name' => 'Jhon Sebastián Gómez Sierra',
+            'email' => 'jhonsebastiangomez@uts.edu.co',
+            'tipo_documento_id' => $tipo_documento->id,
+            'nro_documento' => '1005152835',
+            'nivel_id' => $profesional->id,
+            'nro_celular' => '3175442189',
+            'password' => Hash::make('12345678'),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $estudiante->assignRole('estudiante');
+
+        $estudiante = User::create([
+            'name' => 'Andrés Camilo Pabón Ravelo',
+            'email' => 'andrescpabon@uts.edu.co',
+            'tipo_documento_id' => $tipo_documento->id,
+            'nro_documento' => '1006582622',
+            'nivel_id' => $profesional->id,
+            'nro_celular' => '3185745213',
+            'password' => Hash::make('12345678'),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $estudiante->assignRole('estudiante');
+
+        $estudiante = User::create([
+            'name' => 'Maria Juanita Tamayo',
+            'email' => 'juanita@uts.edu.co',
+            'tipo_documento_id' => $tipo_documento->id,
+            'nro_documento' => '1003478963',
+            'nivel_id' => $tecnologico->id,
+            'nro_celular' => '3164796317',
+            'password' => Hash::make('12345678'),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $estudiante->assignRole('estudiante');
+
+        $estudiante = User::create([
+            'name' => 'Juan Felipe Contreras',
+            'email' => 'contreras@uts.edu.co',
+            'tipo_documento_id' => $tipo_documento->id,
+            'nro_documento' => '1008647251',
+            'nivel_id' => $tecnologico->id,
+            'nro_celular' => '3149872654',
+            'password' => Hash::make('12345678'),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $estudiante->assignRole('estudiante');
+    }
+}
