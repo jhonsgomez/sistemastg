@@ -90,7 +90,6 @@ class UsersSeeder extends Seeder
         }
 
         // ======= ESTUDIANTES =======
-        $tecnologico = Nivel::findOrFail(1);
         $profesional = Nivel::findOrFail(2);
 
         $estudiante = User::create([
@@ -114,34 +113,6 @@ class UsersSeeder extends Seeder
             'nro_documento' => '1006582622',
             'nivel_id' => $profesional->id,
             'nro_celular' => '3185745213',
-            'password' => Hash::make('12345678'),
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        $estudiante->assignRole('estudiante');
-
-        $estudiante = User::create([
-            'name' => 'Maria Juanita Tamayo',
-            'email' => 'juanita@uts.edu.co',
-            'tipo_documento_id' => $tipo_documento->id,
-            'nro_documento' => '1003478963',
-            'nivel_id' => $tecnologico->id,
-            'nro_celular' => '3164796317',
-            'password' => Hash::make('12345678'),
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        $estudiante->assignRole('estudiante');
-
-        $estudiante = User::create([
-            'name' => 'Juan Felipe Contreras',
-            'email' => 'contreras@uts.edu.co',
-            'tipo_documento_id' => $tipo_documento->id,
-            'nro_documento' => '1008647251',
-            'nivel_id' => $tecnologico->id,
-            'nro_celular' => '3149872654',
             'password' => Hash::make('12345678'),
             'created_at' => now(),
             'updated_at' => now(),

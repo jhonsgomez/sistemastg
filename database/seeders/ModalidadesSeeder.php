@@ -17,6 +17,7 @@ class ModalidadesSeeder extends Seeder
             'Proyecto de investigación',
             'Desarrollo tecnológico',
             'Monografía',
+            'Emprendimiento',
             'Seminario'
         ];
 

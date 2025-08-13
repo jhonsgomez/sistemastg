@@ -582,7 +582,7 @@
                             @if (auth()->user()->hasRole(['estudiante']))
                                 @if(isset($fecha_minima_informe) && isset($fecha_maxima_informe))
                                     <!-- AQUI SE REALIZA EL CAMBIO DE FECHAS PARA 90 DIAS MINIMOS -->
-                                    @if ($fechaActual <= $fecha_maxima_informe && !auth()->user()->hasRole(['super_admin', 'admin']))
+                                    @if ($fechaActual >= $fecha_minima_informe && $fechaActual <= $fecha_maxima_informe && !auth()->user()->hasRole(['super_admin', 'admin']))
                                         <button type="button" id="fase4-estudiante-button" onclick="openFase4EstudianteModal()"
                                             class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white px-3 py-1 rounded-lg relative">
                                             <i class="fa-solid fa-user-pen"></i>
@@ -2147,7 +2147,7 @@
                             <label for="doc_respuesta_fase5" class="block font-medium text-sm text-gray-700">
                                 <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
                                 <span class="text-red-600 mr-1 text-lg">*</span>
-                                Propuesta (F-DC-125) con comentarios:
+                                Informe (F-DC-125) con comentarios:
                             </label>
                             <div class="w-full mt-2 relative py-9 bg-gray-50 rounded-2xl border border-2 border-gray-300 gap-3 grid border-dashed" id="dropzone_respuesta_fase5">
                                 <div class="grid gap-1">
@@ -2506,8 +2506,8 @@
                             @csrf
                             <p class="text-2xl font-bold" style="margin: 0.8rem 0 1.5rem 0;" id="configModalTitle"></p>
                             <input type="hidden" name="solicitud_id" value="{{ $solicitud->id }}">
-                            
-                            @if (isset($director_actual) && isset($evaluador_actual))
+
+                            @if ($estado >= 2 && $estado <= 5 && isset($director_actual) && isset($evaluador_actual))
                                 <div class="mb-4">
                                     <label for="director_id" class="block font-medium text-sm text-gray-700">
                                         <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
