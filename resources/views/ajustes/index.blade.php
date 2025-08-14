@@ -209,7 +209,7 @@
                             </div>
                         </div>
 
-                        <p class="mt-6 mb-4 text-gray-700 font-medium"><i class="fa-solid fa-calendar-days mr-2 text-gray-700"></i> Procedmientos de grado</p>
+                        <p class="mt-6 mb-4 text-gray-700 font-medium"><i class="fa-solid fa-calendar-days mr-2 text-gray-700"></i> Procedimientos de grado</p>
 
                         <div class="mb-6 flex flex-col sm:flex-row sm:items-center gap-4">
                             <label for="fecha_aprobacion_propuesta" class="font-medium text-sm text-gray-700 flex items-center">

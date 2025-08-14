@@ -83,11 +83,15 @@ class SolicitudBancoController extends Controller
             if (auth()->user()->hasRole(['super_admin', 'admin', 'coordinador', 'lider_investigacion'])) {
                 $solicitudes = Solicitud::query()
                     ->where('tipo_solicitud_id', '=', $type->id)
+                    ->orderByRaw("FIELD(estado, 'Pendiente') DESC")
+                    ->orderBy('id', 'desc')
                     ->selectRaw('*, CONCAT("BAN-00", id) as formatted_id');
             } else {
                 $solicitudes = Solicitud::query()
                     ->where('tipo_solicitud_id', '=', $type->id)
                     ->where('user_id', '=', auth()->user()->id)
+                    ->orderByRaw("FIELD(estado, 'Pendiente') DESC")
+                    ->orderBy('id', 'desc')
                     ->selectRaw('*, CONCAT("BAN-00", id) as formatted_id');
             }
 

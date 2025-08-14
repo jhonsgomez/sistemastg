@@ -445,7 +445,7 @@
     @if ($tipo_correo === 'fase_1')
     <p>Estimado usuario, en este correo se le informa el envío de su proyecto en <strong>FASE 1</strong>:</p>
     <ul>
-        <li><strong>Titúlo: </strong>{{ $cuerpo_correo['titulo'] }}</li>
+        <li><strong>Título: </strong>{{ $cuerpo_correo['titulo'] }}</li>
         <li><strong>Objetivo: </strong> {{ $cuerpo_correo['objetivo'] }}</li>
         <li><strong>Línea de investigacion: </strong> {{ $cuerpo_correo['linea_investigacion'] }}</li>
         <li><strong>Descripción: </strong> @if (isset($cuerpo_correo['descripcion'])) {{ $cuerpo_correo['descripcion'] }} @else No Aplica @endif</li>
@@ -466,7 +466,7 @@
             <p>Estimado usuario, en este correo se le informa que su proyecto titulado "<strong class="uppercase">{{ $cuerpo_correo['titulo'] }}</strong>", {!! $cuerpo_correo['estado'] == 'Aprobado' ? 'ha pasado a <strong class="uppercase">FASE 2</strong>:' : 'ha sido <strong class="uppercase">APLAZADO</strong>:' !!}</p>
         @endif
         <ul>
-            <li><strong>Titúlo: </strong>{{ $cuerpo_correo['titulo'] }}</li>
+            <li><strong>Título: </strong>{{ $cuerpo_correo['titulo'] }}</li>
             <li><strong>Objetivo: </strong> {{ $cuerpo_correo['objetivo'] }}</li>
             <li><strong>Línea de investigacion: </strong> {{ $cuerpo_correo['linea_investigacion'] }}</li>
             <li><strong>Descripción: </strong> @if (isset($cuerpo_correo['descripcion'])) {{ $cuerpo_correo['descripcion'] }} @else No Aplica @endif</li>

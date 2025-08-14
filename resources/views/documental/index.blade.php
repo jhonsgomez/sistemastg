@@ -35,25 +35,25 @@
             <a href="https://www.dropbox.com/scl/fo/pudgcaq639agy7t06ahjs/AEsdfx-BCJKzfEs37G82Bzk/2.%20MISIONALES/DOCENCIA/2.%20DOCUMENTOS%20DEL%20PROCESO/REQUISITOS%20RELACIONADOS%20ESTUDIANTE/PROCEDIMIENTOS?e=5&preview=P-DC-28+Presentaci%C3%B3n+de+la+propuesta+de+trabajo+de+grado+V3.pdf&rlkey=6s0b9ajweteyx2ang7ywvk6xm&subfolder_nav_tracking=1&dl=0" target="_blank" class="border bg-white p-6 text-gray-600 rounded-lg shadow-lg hover:bg-uts-500 hover:text-white transition ease-in-out duration-200 flex flex-col items-center justify-center">
                 <i class="fa-solid fa-book-atlas text-4xl mb-4"></i>
                 <span class="text-center font-bold text-lg">Presentación de propuesta</span>
-                <p class="text-center mt-2 text-sm">Procedmimiento a seguir para la presentación del la propuesta.</p>
+                <p class="text-center mt-2 text-sm">Procedimiento a seguir para la presentación del la propuesta.</p>
             </a>
 
             <a href="https://www.dropbox.com/scl/fo/pudgcaq639agy7t06ahjs/AEsdfx-BCJKzfEs37G82Bzk/2.%20MISIONALES/DOCENCIA/2.%20DOCUMENTOS%20DEL%20PROCESO/REQUISITOS%20RELACIONADOS%20ESTUDIANTE/PROCEDIMIENTOS?e=5&preview=P-DC-28+Presentaci%C3%B3n+de+la+propuesta+de+trabajo+de+grado+V3.pdf&rlkey=6s0b9ajweteyx2ang7ywvk6xm&subfolder_nav_tracking=1&dl=0" target="_blank" class="border bg-white p-6 text-gray-600 rounded-lg shadow-lg hover:bg-uts-500 hover:text-white transition ease-in-out duration-200 flex flex-col items-center justify-center">
                 <i class="fa-solid fa-file-invoice text-4xl mb-4"></i>
                 <span class="text-center font-bold text-lg">Presentación de informe final</span>
-                <p class="text-center mt-2 text-sm">Procedmimiento a seguir para la presentación del informe final.</p>
+                <p class="text-center mt-2 text-sm">Procedimiento a seguir para la presentación del informe final.</p>
             </a>
 
             <a href="https://www.uts.edu.co/sitio/normatividad/" target="_blank" class="border bg-white p-6 text-gray-600 rounded-lg shadow-lg hover:bg-uts-500 hover:text-white transition ease-in-out duration-200 flex flex-col items-center justify-center">
                 <i class="fa-solid fa-trophy text-4xl mb-4"></i>
                 <span class="text-center font-bold text-lg">Reglamento de estímulos</span>
-                <p class="text-center mt-2 text-sm">Procedmimiento a obtener distinciones o estímulos en un proyecto.</p>
+                <p class="text-center mt-2 text-sm">Procedimiento a obtener distinciones o estímulos en un proyecto.</p>
             </a>
 
             <a href="https://www.uts.edu.co/sitio/normatividad/" target="_blank" class="border bg-white p-6 text-gray-600 rounded-lg shadow-lg hover:bg-uts-500 hover:text-white transition ease-in-out duration-200 flex flex-col items-center justify-center">
                 <i class="fa-solid fa-list-check text-4xl mb-4"></i>
                 <span class="text-center font-bold text-lg">Reglamento de trabajos de grado</span>
-                <p class="text-center mt-2 text-sm">Procedmimiento para elaborar un trabajo de grado.</p>
+                <p class="text-center mt-2 text-sm">Procedimiento para elaborar un trabajo de grado.</p>
             </a>
         </div>
     </div>

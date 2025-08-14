@@ -211,7 +211,7 @@ class ProyectoGradoController extends Controller
 
                             $acceso = self::esBeneficiarioIcfesLista($solicitud);
 
-                            if (!$acceso) {
+                            if (!$acceso || str_contains($solicitud->estado, 'Finalizado')) {
                                 $buttons .= '
                                     <form class="roadMapForm flex" id="roadmapForm-' . $solicitud->id . '" method="POST" onsubmit="openRoadMap(event, ' . $solicitud->id . ', \'' . self::getActionFormRoadMap() . '\')">
                                         ' . csrf_field() . '
