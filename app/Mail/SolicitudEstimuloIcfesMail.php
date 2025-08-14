@@ -7,12 +7,13 @@ use App\Models\Nivel;
 use App\Models\Solicitud;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
+use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class SolicitudEstimuloIcfesMail extends BaseMailable
+class SolicitudEstimuloIcfesMail extends Mailable
 {
     use Queueable, SerializesModels;
 

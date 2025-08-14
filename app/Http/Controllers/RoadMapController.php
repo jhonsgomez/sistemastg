@@ -805,11 +805,14 @@ class RoadMapController extends Controller
                         'estado_fase2' => 'required',
                         'doc_turnitin_fase2' => 'required',
                         'doc_turnitin_fase2.*' => 'required|max:15360',
+                        'doc_firmado_fase2' => 'required',
+                        'doc_firmado_fase2.*' => 'required|max:15360',
                         'respuesta_fase2' => 'required',
                         'solicitud_id' => 'required',
                     ], [
                         'estado_fase2.required' => 'El estado es obligatorio.',
                         'doc_turnitin_fase2.required' => 'El informe de plagio es obligatorio.',
+                        'doc_firmado_fase2.required' => 'El documento firmado es obligatorio.',
                         'respuesta_fase2.required' => 'La descripción de la respuesta es obligatoria.'
                     ]);
                 } else {
@@ -905,7 +908,30 @@ class RoadMapController extends Controller
                         );
                     }
 
-                    // 4. Enviar correo a evaluador para que lo revise
+                    // 4. Guardar documento firmado
+                    $campo_doc_propuesta = Campo::where('name', '=', 'doc_propuesta')->firstOrFail();
+
+                    if ($request->hasFile('doc_firmado_fase2')) {
+                        $nombresArchivos = [];
+                        foreach ($request->file('doc_firmado_fase2') as $archivo) {
+                            $extension = $archivo->getClientOriginalExtension();
+                            $nombreUnico = uniqid() . '_' . time() . '.' . $extension;
+                            $archivo->storeAs('documentos_proyectos/proyecto-00' . $request->input('solicitud_id'), $nombreUnico, 'public');
+                            $nombresArchivos[] = $nombreUnico;
+                        }
+
+                        ValorCampo::updateOrCreate(
+                            [
+                                'solicitud_id' => $request->input('solicitud_id'),
+                                'campo_id' => $campo_doc_propuesta->id,
+                            ],
+                            [
+                                'valor' => json_encode($nombresArchivos)
+                            ]
+                        );
+                    }
+
+                    // 5. Enviar correo a evaluador para que lo revise
                     self::sendEmailFase2Response($request);
                 } else {
                     $type = self::getType('fase_2');
@@ -1051,7 +1077,7 @@ class RoadMapController extends Controller
             $cuerpo_correo['titulo'] = $titulo;
             $cuerpo_correo['estado'] = $estado;
             $cuerpo_correo['fecha_aprobacion'] = $fechas_proyecto['fecha_aprobacion_propuesta'];
-            $cuerpo_correo['adjunto'] = $adjunto;
+            $cuerpo_correo['adjunto'] = [$adjunto] ?? [];
 
             $integrante_1 = User::query()->where('id', self::findCampoByName($campos_proyecto, 'id_integrante_1'))->first();
             $integrante_2 = User::query()->where('id', self::findCampoByName($campos_proyecto, 'id_integrante_2'))->first();
@@ -1097,11 +1123,14 @@ class RoadMapController extends Controller
                 if ($request->estado_fase3 === 'Aprobado') {
                     $validator = Validator::make($request->all(), [
                         'estado_fase3' => 'required',
+                        'doc_firmado_fase3' => 'required',
+                        'doc_firmado_fase3.*' => 'required|max:15360',
                         'respuesta_fase3' => 'required',
                         'solicitud_id' => 'required',
                         'remitente' => 'required',
                     ], [
                         'estado_fase3.required' => 'El estado es obligatorio.',
+                        'doc_firmado_fase3.required' => 'El documento firmado es obligatorio.',
                         'respuesta_fase3.required' => 'La descripción de la respuesta es obligatoria.'
                     ]);
                 } else {
@@ -1194,6 +1223,29 @@ class RoadMapController extends Controller
                             }
                         }
 
+                        // Actualizar el valor del campo doc_propuesta
+                        $campo_doc_propuesta = Campo::where('name', '=', 'doc_propuesta')->firstOrFail();
+
+                        if ($request->hasFile('doc_firmado_fase3')) {
+                            $nombresArchivos = [];
+                            foreach ($request->file('doc_firmado_fase3') as $archivo) {
+                                $extension = $archivo->getClientOriginalExtension();
+                                $nombreUnico = uniqid() . '_' . time() . '.' . $extension;
+                                $archivo->storeAs('documentos_proyectos/proyecto-00' . $request->solicitud_id, $nombreUnico, 'public');
+                                $nombresArchivos[] = $nombreUnico;
+                            }
+
+                            ValorCampo::updateOrCreate(
+                                [
+                                    'solicitud_id' => $request->input('solicitud_id'),
+                                    'campo_id' => $campo_doc_propuesta->id,
+                                ],
+                                [
+                                    'valor' => json_encode($nombresArchivos)
+                                ]
+                            );
+                        }
+
                         // Crear acta de aprobación de fase 3:
                         $acta = Acta::create([
                             'numero' => $request->input('nro_acta_fase3'),
@@ -1221,6 +1273,29 @@ class RoadMapController extends Controller
                                     'valor' => 'true'
                                 ]);
                             }
+                        }
+
+                        // Actualizar el valor del campo doc_propuesta
+                        $campo_doc_propuesta = Campo::where('name', '=', 'doc_propuesta')->firstOrFail();
+
+                        if ($request->hasFile('doc_firmado_fase3')) {
+                            $nombresArchivos = [];
+                            foreach ($request->file('doc_firmado_fase3') as $archivo) {
+                                $extension = $archivo->getClientOriginalExtension();
+                                $nombreUnico = uniqid() . '_' . time() . '.' . $extension;
+                                $archivo->storeAs('documentos_proyectos/proyecto-00' . $request->solicitud_id, $nombreUnico, 'public');
+                                $nombresArchivos[] = $nombreUnico;
+                            }
+
+                            ValorCampo::updateOrCreate(
+                                [
+                                    'solicitud_id' => $request->input('solicitud_id'),
+                                    'campo_id' => $campo_doc_propuesta->id,
+                                ],
+                                [
+                                    'valor' => json_encode($nombresArchivos)
+                                ]
+                            );
                         }
 
                         // Enviar correo a estudiantes, director indicando la aprobación.
@@ -1320,7 +1395,7 @@ class RoadMapController extends Controller
             $cuerpo_correo['fecha_aprobacion'] = $fechas_proyecto['fecha_aprobacion_propuesta'];
             $cuerpo_correo['fecha_maxima_informe'] = $request->fecha_maxima_informe;
             $cuerpo_correo['fecha_minima_informe'] = $request->fecha_minima_informe;
-            $cuerpo_correo['adjunto'] = $adjunto;
+            $cuerpo_correo['adjunto'] = [$adjunto] ?? [];
             $cuerpo_correo['remitente'] = $request->remitente;
 
             $cuerpo_correo['nro_acta'] = $request->acta->numero ?? null;
@@ -1477,6 +1552,8 @@ class RoadMapController extends Controller
                 if ($request->estado_fase4 === 'Aprobado') {
                     $validator = Validator::make($request->all(), [
                         'estado_fase4' => 'required',
+                        'doc_firmado_fase4' => 'required',
+                        'doc_firmado_fase4.*' => 'required|max:15360',
                         'doc_turnitin_fase4' => 'required',
                         'doc_turnitin_fase4.*' => 'required|max:15360',
                         'doc_rejilla_fase4' => 'required',
@@ -1485,6 +1562,7 @@ class RoadMapController extends Controller
                         'solicitud_id' => 'required',
                     ], [
                         'estado_fase4.required' => 'El estado es obligatorio.',
+                        'doc_firmado_fase4.required' => 'El documento firmado es obligatorio.',
                         'doc_turnitin_fase4.required' => 'El informe de plagio es obligatorio.',
                         'doc_rejilla_fase4.required' => 'El documento de la rejilla es obligatorio.',
                         'respuesta_fase4.required' => 'La descripción de la respuesta es obligatoria.'
@@ -1603,6 +1681,29 @@ class RoadMapController extends Controller
                             'valor' => $fecha_recordatorio
                         ]
                     );
+
+                    // Se actualiza el campo doc_informe
+                    $campo_doc_informe = Campo::where('name', '=', 'doc_informe')->firstOrFail();
+
+                    if ($request->hasFile('doc_firmado_fase4')) {
+                        $nombresArchivos = [];
+                        foreach ($request->file('doc_firmado_fase4') as $archivo) {
+                            $extension = $archivo->getClientOriginalExtension();
+                            $nombreUnico = uniqid() . '_' . time() . '.' . $extension;
+                            $archivo->storeAs('documentos_proyectos/proyecto-00' . $request->solicitud_id, $nombreUnico, 'public');
+                            $nombresArchivos[] = $nombreUnico;
+                        }
+
+                        ValorCampo::updateOrCreate(
+                            [
+                                'solicitud_id' => $request->input('solicitud_id'),
+                                'campo_id' => $campo_doc_informe->id
+                            ],
+                            [
+                                'valor' => json_encode($nombresArchivos)
+                            ]
+                        );
+                    }
 
                     // Se actualiza el estado de la solicitud a FASE 5
                     $solicitud->update(['estado' => 'Fase 5']);
@@ -1735,7 +1836,7 @@ class RoadMapController extends Controller
             $cuerpo_correo['titulo'] = $titulo;
             $cuerpo_correo['estado'] = $estado;
             $cuerpo_correo['fecha_maxima_informe'] = self::findCampoByName($campos_proyecto, 'fecha_maxima_informe');
-            $cuerpo_correo['adjunto'] = $adjunto;
+            $cuerpo_correo['adjunto'] = [$adjunto] ?? [];
 
             $integrante_1 = User::query()->where('id', self::findCampoByName($campos_proyecto, 'id_integrante_1'))->first();
             $integrante_2 = User::query()->where('id', self::findCampoByName($campos_proyecto, 'id_integrante_2'))->first();
@@ -1781,6 +1882,8 @@ class RoadMapController extends Controller
                 if ($request->estado_fase5 === 'Aprobado') {
                     $validator = Validator::make($request->all(), [
                         'estado_fase5' => 'required',
+                        'doc_firmado_fase5' => 'required',
+                        'doc_firmado_fase5.*' => 'required|max:15360',
                         'doc_rejilla_fase5' => 'required',
                         'doc_rejilla_fase5.*' => 'required|max:15360',
                         'respuesta_fase5' => 'required',
@@ -1788,6 +1891,7 @@ class RoadMapController extends Controller
                         'remitente' => 'required',
                     ], [
                         'estado_fase5.required' => 'El estado es obligatorio.',
+                        'doc_firmado_fase5.required' => 'El documento firmado es obligatorio.',
                         'doc_rejilla_fase5.required' => 'El documento de la rejilla es obligatorio.',
                         'respuesta_fase5.required' => 'La descripción de la respuesta es obligatoria.'
                     ]);
@@ -1880,6 +1984,29 @@ class RoadMapController extends Controller
                         // 1. Actualizar estado a Finalizado:
                         $solicitud->update(['estado' => 'Finalizado']);
 
+                        // Guardar el doc_firmado
+                        $campo_doc_informe = Campo::where('name', '=', 'doc_informe')->firstOrFail();
+
+                        if ($request->hasFile('doc_firmado_fase5')) {
+                            $nombresArchivos = [];
+                            foreach ($request->file('doc_firmado_fase5') as $archivo) {
+                                $extension = $archivo->getClientOriginalExtension();
+                                $nombreUnico = uniqid() . '_' . time() . '.' . $extension;
+                                $archivo->storeAs('documentos_proyectos/proyecto-00' . $request->solicitud_id, $nombreUnico, 'public');
+                                $nombresArchivos[] = $nombreUnico;
+                            }
+
+                            ValorCampo::updateOrCreate(
+                                [
+                                    'solicitud_id' => $request->input('solicitud_id'),
+                                    'campo_id' => $campo_doc_informe->id
+                                ],
+                                [
+                                    'valor' => json_encode($nombresArchivos)
+                                ]
+                            );
+                        }
+
                         // Generar acta de aprobación de fase 5:
                         $acta = Acta::create([
                             'numero' => $request->input('nro_acta_fase5'),
@@ -1907,6 +2034,29 @@ class RoadMapController extends Controller
                                     'valor' => 'true'
                                 ]);
                             }
+                        }
+
+                        // Guardar el doc_firmado
+                        $campo_doc_informe = Campo::where('name', '=', 'doc_informe')->firstOrFail();
+
+                        if ($request->hasFile('doc_firmado_fase5')) {
+                            $nombresArchivos = [];
+                            foreach ($request->file('doc_firmado_fase5') as $archivo) {
+                                $extension = $archivo->getClientOriginalExtension();
+                                $nombreUnico = uniqid() . '_' . time() . '.' . $extension;
+                                $archivo->storeAs('documentos_proyectos/proyecto-00' . $request->solicitud_id, $nombreUnico, 'public');
+                                $nombresArchivos[] = $nombreUnico;
+                            }
+
+                            ValorCampo::updateOrCreate(
+                                [
+                                    'solicitud_id' => $request->input('solicitud_id'),
+                                    'campo_id' => $campo_doc_informe->id
+                                ],
+                                [
+                                    'valor' => json_encode($nombresArchivos)
+                                ]
+                            );
                         }
 
                         // 2. Enviar correo a estudiantes y director indicando la aprobación:
@@ -2000,7 +2150,7 @@ class RoadMapController extends Controller
             $cuerpo_correo['titulo'] = $titulo;
             $cuerpo_correo['estado'] = $estado;
             $cuerpo_correo['fecha_maxima_informe'] = self::findCampoByName($campos_proyecto, 'fecha_maxima_informe');
-            $cuerpo_correo['adjunto'] = $adjunto;
+            $cuerpo_correo['adjunto'] = [$adjunto] ?? [];
             $cuerpo_correo['remitente'] = $request->remitente;
 
             $cuerpo_correo['nro_acta'] = $request->acta->numero ?? null;

@@ -12,7 +12,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class HabilitarProyectoMail extends BaseMailable
+class HabilitarProyectoMail extends Mailable
 {
     use Queueable, SerializesModels;
 

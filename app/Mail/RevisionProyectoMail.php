@@ -8,11 +8,12 @@ use App\Models\Nivel;
 use App\Models\Solicitud;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
+use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class RevisionProyectoMail extends BaseMailable
+class RevisionProyectoMail extends Mailable
 {
     use Queueable, SerializesModels;
 

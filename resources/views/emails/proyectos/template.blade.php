@@ -402,7 +402,7 @@
     <p>Estimado usuario, en este correo se le informa que su solicitud para iniciar un proyecto de grado <span>{!! $cuerpo_correo['estado'] === 'Aprobada' ? 'ha pasado a <strong>FASE 1</strong>' : 'ha sido <strong>RECHAZADA</strong>' !!}</span>:</p>
 
     <ul>
-        <li><strong>Tipo de solicitud:</strong> NUEVO POYECTO DE GRADO {{ $cuerpo_correo['periodo'] }}</li>
+        <li><strong>Tipo de solicitud:</strong> NUEVO PROYECTO DE GRADO {{ $cuerpo_correo['periodo'] }}</li>
         <li><strong>Modalidad del proyecto:</strong> {{ $cuerpo_correo['modalidad'] }}</li>
         <li><strong>Nivel académico:</strong> {{ $cuerpo_correo['nivel'] }}</li>
     </ul>

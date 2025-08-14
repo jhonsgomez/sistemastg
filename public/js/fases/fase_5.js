@@ -121,6 +121,7 @@ function closeFase5DetailsModal() {
 function openFase5AprobarModal() {
     new fileInput('doc_respuesta_fase5', 'dropzone_respuesta_fase5', 'word', 1, 4, 'file-list-respuesta-fase5', 'files-size-respuesta-fase5');
     new fileInput('doc_rejilla_fase5', 'dropzone_rejilla_fase5', 'word', 1, 4, 'file-list-rejilla-fase5', 'files-size-rejilla-fase5');
+    new fileInput('doc_firmado_fase5', 'dropzone_firmado_fase5', 'word', 1, 4, 'file-list-firmado-fase5', 'files-size-firmado-fase5');
 
     initQuillEditor(undefined, "Describa los detalles de la respuesta para el estudiante.", 'txt-editor-fase5', 'respuesta_fase5');
 
@@ -128,6 +129,7 @@ function openFase5AprobarModal() {
 
     // Campos del formulario
     $('#estado_fase5').val('').trigger('change');
+    $('#doc_firmado_fase5').val('');
     $('#doc_respuesta_fase5').val('');
     $('#doc_rejilla_fase5').val('');
     $('#nro_acta_fase5').val('');
@@ -136,6 +138,7 @@ function openFase5AprobarModal() {
 
     // Campos para mostrar errores
     $('#estado_fase5Error').text('');
+    $('#doc_firmado_fase5Error').text('');
     $('#doc_respuesta_fase5Error').text('');
     $('#doc_rejilla_fase5Error').text('');
     $('#nro_acta_fase5Error').text('');
@@ -154,9 +157,11 @@ $(document).ready(function () {
         if ($('#estado_fase5').val() === 'Aprobado') {
             $('#container-doc_respuesta_fase5').addClass('hidden');
             $('#required-rejilla').removeClass('hidden');
+            $('#container-doc_firmado_fase5').removeClass('hidden');
         } else if ($('#estado_fase5').val() === 'Rechazado') {
             $('#container-doc_respuesta_fase5').removeClass('hidden');
             $('#required-rejilla').addClass('hidden');
+            $('#container-doc_firmado_fase5').addClass('hidden');
         }
     }
 
@@ -208,6 +213,7 @@ $('#fase5AprobarForm').on('submit', function (e) {
                     const errors = xhr.responseJSON.errors;
 
                     $('#estado_fase5Error').text(errors?.estado_fase5?.[0] || '');
+                    $('#doc_firmado_fase5Error').text(errors?.doc_firmado_fase5?.[0] || '');
                     $('#doc_respuesta_fase5Error').text(errors?.doc_respuesta_fase5?.[0] || '');
                     $('#doc_rejilla_fase5Error').text(errors?.doc_rejilla_fase5?.[0] || '');
                     $('#nro_acta_fase5Error').text(errors?.nro_acta_fase5?.[0] || '');

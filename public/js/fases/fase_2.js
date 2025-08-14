@@ -23,6 +23,8 @@ function closeFase2EstudianteModal() {
 function openFase2AdminModal() {
     new fileInput('doc_turnitin_fase2', 'dropzone_turnitin_fase2', 'pdf', 1, 4, 'file-list-turnitin-fase2', 'files-size-turnitin-fase2');
     new fileInput('doc_respuesta_fase2', 'dropzone_respuesta_fase2', 'word', 1, 4, 'file-list-respuesta-fase2', 'files-size-respuesta-fase2');
+    new fileInput('doc_firmado_fase2', 'dropzone_firmado_fase2', 'word', 1, 4, 'file-list-firmado-fase2', 'files-size-firmado-fase2');
+
     initQuillEditor(undefined, "Describa los detalles de la respuesta para el estudiante.", 'txt-editor-fase2', 'respuesta_fase2');
 
     $('#fase2AdminTitle').html(`Proyecto de grado <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Fase 2</span>`);
@@ -30,12 +32,14 @@ function openFase2AdminModal() {
     // Campos del formulario
     $('#estado_fase2').val('').trigger('change');
     $('#doc_respuesta_fase2').val('');
+    $('#doc_firmado_fase2').val('');
     $('#doc_turnitin_fase2').val('');
     $('#respuesta_fase2').val('');
 
     // Campos para mostrar errores
     $('#estado_fase2Error').text('');
     $('#doc_respuesta_fase2Error').text('');
+    $('#doc_firmado_fase2Error').text('');
     $('#doc_turnitin_fase2Error').val('');
     $('#respuesta_fase2Error').text('');
 
@@ -51,9 +55,11 @@ $(document).ready(function () {
         if ($('#estado_fase2').val() === 'Aprobado') {
             $('#required-turnitin').removeClass('hidden');
             $('#container-doc_respuesta_fase2').addClass('hidden');
+            $('#container-doc_firmado_fase2').removeClass('hidden');
         } else if ($('#estado_fase2').val() === 'Rechazado') {
             $('#required-turnitin').addClass('hidden');
             $('#container-doc_respuesta_fase2').removeClass('hidden');
+            $('#container-doc_firmado_fase2').addClass('hidden');
         }
     }
 
@@ -235,6 +241,7 @@ $('#fase2AdminForm').on('submit', function (e) {
                     const errors = xhr.responseJSON.errors;
                     $('#estado_fase2Error').text(errors?.estado_fase2?.[0] || '');
                     $('#doc_respuesta_fase2Error').text(errors?.doc_respuesta_fase2?.[0] || '');
+                    $('#doc_firmado_fase2Error').text(errors?.doc_firmado_fase2?.[0] || '');
                     $('#doc_turnitin_fase2Error').text(errors?.doc_turnitin_fase2?.[0] || '');
                     $('#respuesta_fase2Error').text(errors?.respuesta_fase2?.[0] || '');
                 },

@@ -82,21 +82,23 @@ function closeFase3DetailsModal() {
 
 function openFase3AprobarModal() {
     new fileInput('doc_respuesta_fase3', 'dropzone_respuesta_fase3', 'word', 1, 4, 'file-list-respuesta-fase3', 'files-size-respuesta-fase3');
+    new fileInput('doc_firmado_fase3', 'dropzone_firmado_fase3', 'word', 1, 4, 'file-list-firmado-fase3', 'files-size-firmado-fase3');
+
     initQuillEditor(undefined, "Describa los detalles de la respuesta para el estudiante.", 'txt-editor-fase3', 'respuesta_fase3');
 
     $('#fase3AprobarTitle').html(`Proyecto de grado <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Fase 3</span>`);
 
     // Campos del formulario
     $('#estado_fase3').val('').trigger('change');
+    $('#doc_firmado_fase3').val('');
     $('#doc_respuesta_fase3').val('');
-
     $('#nro_acta_fase3').val('');
     $('#fecha_acta_fase3').val('');
-
     $('#respuesta_fase3').val('');
 
     // Campos para mostrar errores
     $('#estado_fase3Error').text('');
+    $('#doc_firmado_fase3Error').text('');
     $('#doc_respuesta_fase3Error').text('');
     $('#nro_acta_fase3Error').text('');
     $('#fecha_acta_fase3Error').text('');
@@ -113,8 +115,10 @@ $(document).ready(function () {
     function toggleEstadoFase3() {
         if ($('#estado_fase3').val() === 'Aprobado') {
             $('#container-doc_respuesta_fase3').addClass('hidden');
+            $('#container-doc_firmado_fase3').removeClass('hidden');
         } else if ($('#estado_fase3').val() === 'Rechazado') {
             $('#container-doc_respuesta_fase3').removeClass('hidden');
+            $('#container-doc_firmado_fase3').addClass('hidden');
         }
     }
 
@@ -166,6 +170,7 @@ $('#fase3AprobarForm').on('submit', function (e) {
                     const errors = xhr.responseJSON.errors;
 
                     $('#estado_fase3Error').text(errors?.estado_fase3?.[0] || '');
+                    $('#doc_firmado_fase3Error').text(errors?.doc_firmado_fase3?.[0] || '');
                     $('#doc_respuesta_fase3Error').text(errors?.doc_respuesta_fase3?.[0] || '');
                     $('#nro_acta_fase3Error').text(errors?.nro_acta_fase3?.[0] || '');
                     $('#fecha_acta_fase3Error').text(errors?.fecha_acta_fase3?.[0] || '');

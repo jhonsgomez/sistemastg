@@ -1528,6 +1528,35 @@
                             <span id="files-size-respuesta-fase2" class="text-gray-800 text-sm"></span>
                         </div>
 
+                        <div class="grid grid-cols-1 mb-4 hidden" id="container-doc_firmado_fase2">
+                            <label for="doc_firmado_fase2" class="block font-medium text-sm text-gray-700">
+                                <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                                <span class="text-red-600 mr-1 text-lg">*</span>
+                                Propuesta (F-DC-124) firmada:
+                            </label>
+                            <div class="w-full mt-2 relative py-9 bg-gray-50 rounded-2xl border border-2 border-gray-300 gap-3 grid border-dashed" id="dropzone_firmado_fase2">
+                                <div class="grid gap-1">
+                                    <i class="mx-auto text-4xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                    <h2 class="text-center text-gray-400   text-xs leading-4">Solo archivos de Word de máximo 4MB</h2>
+                                </div>
+                                <div class="grid gap-2">
+                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
+                                    <div class="flex items-center justify-center">
+                                        <input
+                                            type="file"
+                                            name="doc_firmado_fase2[]"
+                                            id="doc_firmado_fase2"
+                                            class="absolute inset-0 opacity-0 cursor-pointer"
+                                            accept=".doc,.docx" />
+                                        <div class="flex w-28 h-9 px-1 flex-col bg-uts-500 rounded-full shadow text-white text-sm font-semibold leading-4 items-center justify-center cursor-pointer focus:outline-none">Cargar</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <span id="doc_firmado_fase2Error" class="text-red-500 text-sm"></span>
+                            <ul id="file-list-firmado-fase2" class="mt-4 text-gray-600 text-sm list-disc pl-5"></ul>
+                            <span id="files-size-firmado-fase2" class="text-gray-800 text-sm"></span>
+                        </div>
+
                         <div class="grid grid-cols-1 mb-4">
                             <label for="doc_turnitin_fase2" class="block font-medium text-sm text-gray-700">
                                 <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
@@ -1648,6 +1677,35 @@
                                 <option value="Rechazado">Rechazado</option>
                             </select>
                             <span id="estado_fase3Error" class="text-red-500 text-sm"></span>
+                        </div>
+
+                        <div class="grid grid-cols-1 mb-4 hidden" id="container-doc_firmado_fase3">
+                            <label for="doc_firmado_fase3" class="block font-medium text-sm text-gray-700">
+                                <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                                <span class="text-red-600 mr-1 text-lg">*</span>
+                                Propuesta (F-DC-124) firmada:
+                            </label>
+                            <div class="w-full mt-2 relative py-9 bg-gray-50 rounded-2xl border border-2 border-gray-300 gap-3 grid border-dashed" id="dropzone_firmado_fase3">
+                                <div class="grid gap-1">
+                                    <i class="mx-auto text-4xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                    <h2 class="text-center text-gray-400   text-xs leading-4">Solo archivos de Word de máximo 4MB</h2>
+                                </div>
+                                <div class="grid gap-2">
+                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
+                                    <div class="flex items-center justify-center">
+                                        <input
+                                            type="file"
+                                            name="doc_firmado_fase3[]"
+                                            id="doc_firmado_fase3"
+                                            class="absolute inset-0 opacity-0 cursor-pointer"
+                                            accept=".doc,.docx" />
+                                        <div class="flex w-28 h-9 px-1 flex-col bg-uts-500 rounded-full shadow text-white text-sm font-semibold leading-4 items-center justify-center cursor-pointer focus:outline-none">Cargar</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <span id="doc_firmado_fase3Error" class="text-red-500 text-sm"></span>
+                            <ul id="file-list-firmado-fase3" class="mt-4 text-gray-600 text-sm list-disc pl-5"></ul>
+                            <span id="files-size-firmado-fase3" class="text-gray-800 text-sm"></span>
                         </div>
 
                         <div class="grid grid-cols-1 mb-4 hidden" id="container-doc_respuesta_fase3">
@@ -1964,6 +2022,35 @@
                             <span id="estado_fase4Error" class="text-red-500 text-sm"></span>
                         </div>
 
+                        <div class="grid grid-cols-1 mb-4 hidden" id="container-doc_firmado_fase4">
+                            <label for="doc_firmado_fase4" class="block font-medium text-sm text-gray-700">
+                                <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                                <span class="text-red-600 mr-1 text-lg">*</span>
+                                Informe (F-DC-125) firmado:
+                            </label>
+                            <div class="w-full mt-2 relative py-9 bg-gray-50 rounded-2xl border border-2 border-gray-300 gap-3 grid border-dashed" id="dropzone_firmado_fase4">
+                                <div class="grid gap-1">
+                                    <i class="mx-auto text-4xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                    <h2 class="text-center text-gray-400   text-xs leading-4">Solo archivos de Word de máximo 4MB</h2>
+                                </div>
+                                <div class="grid gap-2">
+                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
+                                    <div class="flex items-center justify-center">
+                                        <input
+                                            type="file"
+                                            name="doc_firmado_fase4[]"
+                                            id="doc_firmado_fase4"
+                                            class="absolute inset-0 opacity-0 cursor-pointer"
+                                            accept=".doc,.docx" />
+                                        <div class="flex w-28 h-9 px-1 flex-col bg-uts-500 rounded-full shadow text-white text-sm font-semibold leading-4 items-center justify-center cursor-pointer focus:outline-none">Cargar</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <span id="doc_firmado_fase4Error" class="text-red-500 text-sm"></span>
+                            <ul id="file-list-firmado-fase4" class="mt-4 text-gray-600 text-sm list-disc pl-5"></ul>
+                            <span id="files-size-firmado-fase4" class="text-gray-800 text-sm"></span>
+                        </div>
+
                         <div class="grid grid-cols-1 mb-4 hidden" id="container-doc_rejilla_fase4">
                             <label for="doc_rejilla_fase4" class="block font-medium text-sm text-gray-700">
                                 <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
@@ -2141,6 +2228,35 @@
                                 <option value="Rechazado">Rechazado</option>
                             </select>
                             <span id="estado_fase5Error" class="text-red-500 text-sm"></span>
+                        </div>
+
+                        <div class="grid grid-cols-1 mb-4 hidden" id="container-doc_firmado_fase5">
+                            <label for="doc_firmado_fase5" class="block font-medium text-sm text-gray-700">
+                                <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                                <span class="text-red-600 mr-1 text-lg">*</span>
+                                Informe (F-DC-125) firmado:
+                            </label>
+                            <div class="w-full mt-2 relative py-9 bg-gray-50 rounded-2xl border border-2 border-gray-300 gap-3 grid border-dashed" id="dropzone_firmado_fase5">
+                                <div class="grid gap-1">
+                                    <i class="mx-auto text-4xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                    <h2 class="text-center text-gray-400   text-xs leading-4">Solo archivos de Word de máximo 4MB</h2>
+                                </div>
+                                <div class="grid gap-2">
+                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
+                                    <div class="flex items-center justify-center">
+                                        <input
+                                            type="file"
+                                            name="doc_firmado_fase5[]"
+                                            id="doc_firmado_fase5"
+                                            class="absolute inset-0 opacity-0 cursor-pointer"
+                                            accept=".doc,.docx" />
+                                        <div class="flex w-28 h-9 px-1 flex-col bg-uts-500 rounded-full shadow text-white text-sm font-semibold leading-4 items-center justify-center cursor-pointer focus:outline-none">Cargar</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <span id="doc_firmado_fase5Error" class="text-red-500 text-sm"></span>
+                            <ul id="file-list-firmado-fase5" class="mt-4 text-gray-600 text-sm list-disc pl-5"></ul>
+                            <span id="files-size-firmado-fase5" class="text-gray-800 text-sm"></span>
                         </div>
 
                         <div class="grid grid-cols-1 mb-4 hidden" id="container-doc_respuesta_fase5">

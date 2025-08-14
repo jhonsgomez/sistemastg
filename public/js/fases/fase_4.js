@@ -146,6 +146,7 @@ function openFase4AdminModal() {
     new fileInput('doc_rejilla_fase4', 'dropzone_rejilla_fase4', 'word', 1, 4, 'file-list-rejilla-fase4', 'files-size-rejilla-fase4');
     new fileInput('doc_respuesta_fase4', 'dropzone_respuesta_fase4', 'word', 1, 4, 'file-list-respuesta-fase4', 'files-size-respuesta-fase4');
     new fileInput('doc_turnitin_fase4', 'dropzone_turnitin_fase4', 'pdf', 1, 4, 'file-list-turnitin-fase4', 'files-size-turnitin-fase4');
+    new fileInput('doc_firmado_fase4', 'dropzone_firmado_fase4', 'word', 1, 4, 'file-list-firmado-fase4', 'files-size-firmado-fase4');
 
     initQuillEditor(undefined, "Describa los detalles de la respuesta para el estudiante.", 'txt-editor-fase4', 'respuesta_fase4');
 
@@ -154,12 +155,14 @@ function openFase4AdminModal() {
     // Campos del formulario
     $('#estado_fase4').val('').trigger('change');
     $('#doc_rejilla_fase4').val('');
+    $('#doc_firmado_fase4').val('');
     $('#doc_respuesta_fase4').val('');
     $('#doc_turnitin_fase4').val('');
     $('#respuesta_fase4').val('');
 
     // Campos para mostrar errores
     $('#estado_fase4Error').text('');
+    $('#doc_firmado_fase4Error').text('');
     $('#doc_rejilla_fase4Error').text('');
     $('#doc_respuesta_fase4Error').text('');
     $('#doc_turnitin_fase4Error').val('');
@@ -178,10 +181,12 @@ $(document).ready(function () {
             $('#required-turnitin_fase4').removeClass('hidden');
             $('#container-doc_respuesta_fase4').addClass('hidden');
             $('#container-doc_rejilla_fase4').removeClass('hidden');
+            $('#container-doc_firmado_fase4').removeClass('hidden');
         } else if ($('#estado_fase4').val() === 'Rechazado') {
             $('#required-turnitin_fase4').addClass('hidden');
             $('#container-doc_respuesta_fase4').removeClass('hidden');
             $('#container-doc_rejilla_fase4').addClass('hidden');
+            $('#container-doc_firmado_fase4').addClass('hidden');
         }
     }
 
@@ -284,6 +289,7 @@ $('#fase4AdminForm').on('submit', function (e) {
                     const errors = xhr.responseJSON.errors;
 
                     $('#estado_fase4Error').text(errors?.estado_fase4?.[0] || '');
+                    $('#doc_firmado_fase4Error').text(errors?.doc_firmado_fase4?.[0] || '');
                     $('#doc_rejilla_fase4Error').text(errors?.doc_rejilla_fase4?.[0] || '');
                     $('#doc_respuesta_fase4Error').text(errors?.doc_respuesta_fase4?.[0] || '');
                     $('#doc_turnitin_fase4Error').text(errors?.doc_turnitin_fase4?.[0] || '');
