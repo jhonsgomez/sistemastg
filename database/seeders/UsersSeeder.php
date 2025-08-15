@@ -94,11 +94,11 @@ class UsersSeeder extends Seeder
 
         $estudiante = User::create([
             'name' => 'Jhon Sebastián Gómez Sierra',
-            'email' => 'jhonsebastiangomez@uts.edu.co',
+            'email' => '',
             'tipo_documento_id' => $tipo_documento->id,
-            'nro_documento' => '1005152835',
+            'nro_documento' => '',
             'nivel_id' => $profesional->id,
-            'nro_celular' => '3175442189',
+            'nro_celular' => '',
             'password' => Hash::make(''),
             'created_at' => now(),
             'updated_at' => now(),
