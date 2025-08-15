@@ -1494,7 +1494,8 @@
                                 class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full focus:ring-uts-500 focus:border-uts-500">
                                 <option value="" selected disabled>Selecciona una opción</option>
                                 <option value="Aprobado">Aprobado</option>
-                                <option value="Rechazado">Rechazado</option>
+                                <option value="Rechazado">Aplazado</option>
+                                <option value="Rechazado">No Aprobado</option>
                             </select>
                             <span id="estado_fase2Error" class="text-red-500 text-sm"></span>
                         </div>
@@ -1674,7 +1675,8 @@
                                 class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full focus:ring-uts-500 focus:border-uts-500">
                                 <option value="" selected disabled>Selecciona una opción</option>
                                 <option value="Aprobado">Aprobado</option>
-                                <option value="Rechazado">Rechazado</option>
+                                <option value="Rechazado">Aplazado</option>
+                                <option value="Rechazado">No Aprobado</option>
                             </select>
                             <span id="estado_fase3Error" class="text-red-500 text-sm"></span>
                         </div>
@@ -2017,7 +2019,8 @@
                                 class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full focus:ring-uts-500 focus:border-uts-500">
                                 <option value="" selected disabled>Selecciona una opción</option>
                                 <option value="Aprobado">Aprobado</option>
-                                <option value="Rechazado">Rechazado</option>
+                                <option value="Rechazado">Aplazado</option>
+                                <option value="Rechazado">No Aprobado</option>
                             </select>
                             <span id="estado_fase4Error" class="text-red-500 text-sm"></span>
                         </div>
@@ -2225,7 +2228,8 @@
                                 class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full focus:ring-uts-500 focus:border-uts-500">
                                 <option value="" selected disabled>Selecciona una opción</option>
                                 <option value="Aprobado">Aprobado</option>
-                                <option value="Rechazado">Rechazado</option>
+                                <option value="Rechazado">Aplazado</option>
+                                <option value="Rechazado">No Aprobado</option>
                             </select>
                             <span id="estado_fase5Error" class="text-red-500 text-sm"></span>
                         </div>

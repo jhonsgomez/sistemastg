@@ -27,7 +27,7 @@ class UsersSeeder extends Seeder
         $super_admin = User::create([
             'name' => 'Super Admin',
             'email' => 'superadmintrabajosdegrado@correo.uts.edu.co',
-            'password' => Hash::make('SuperAdmin@@0907***'),
+            'password' => Hash::make(''),
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -37,7 +37,7 @@ class UsersSeeder extends Seeder
         $admin = User::create([
             'name' => 'Comité - ' . ucwords($this->nombre_programa),
             'email' => $this->correo_programa,
-            'password' => Hash::make('123456782025***'),
+            'password' => Hash::make(''),
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -47,7 +47,7 @@ class UsersSeeder extends Seeder
         $coordinador = User::create([
             'name' => 'Coordinador - ' . ucwords($this->nombre_programa),
             'email' => $this->correo_coordinacion,
-            'password' => Hash::make('123456782025***'),
+            'password' => Hash::make(''),
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -80,7 +80,7 @@ class UsersSeeder extends Seeder
                 'email' => $correo,
                 'tipo_documento_id' => $tipo_documento->id,
                 'nro_documento' => $documento,
-                'password' => Hash::make($documento),
+                'password' => Hash::make(),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -99,21 +99,7 @@ class UsersSeeder extends Seeder
             'nro_documento' => '1005152835',
             'nivel_id' => $profesional->id,
             'nro_celular' => '3175442189',
-            'password' => Hash::make('12345678'),
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        $estudiante->assignRole('estudiante');
-
-        $estudiante = User::create([
-            'name' => 'Andrés Camilo Pabón Ravelo',
-            'email' => 'andrescpabon@uts.edu.co',
-            'tipo_documento_id' => $tipo_documento->id,
-            'nro_documento' => '1006582622',
-            'nivel_id' => $profesional->id,
-            'nro_celular' => '3185745213',
-            'password' => Hash::make('12345678'),
+            'password' => Hash::make(''),
             'created_at' => now(),
             'updated_at' => now(),
         ]);
