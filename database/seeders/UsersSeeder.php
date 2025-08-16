@@ -88,22 +88,5 @@ class UsersSeeder extends Seeder
             // Asignar el rol de 'docente'
             $docente->assignRole('docente');
         }
-
-        // ======= ESTUDIANTES =======
-        $profesional = Nivel::findOrFail(2);
-
-        $estudiante = User::create([
-            'name' => 'Jhon Sebastián Gómez Sierra',
-            'email' => '',
-            'tipo_documento_id' => $tipo_documento->id,
-            'nro_documento' => '',
-            'nivel_id' => $profesional->id,
-            'nro_celular' => '',
-            'password' => Hash::make(''),
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        $estudiante->assignRole('estudiante');
     }
 }

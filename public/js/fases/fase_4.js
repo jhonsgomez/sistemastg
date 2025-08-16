@@ -1,7 +1,7 @@
 // Estudiante Modal
 
 function openFase4EstudianteModal() {
-    new fileInput('doc_informe_fase4', 'dropzone_doc_informe_fase4', 'word', 1, 4, 'doc_informe-file-list-fase4', 'doc_informe-files-size-fase4');
+    new fileInput('doc_informe_fase4', 'dropzone_doc_informe_fase4', 'word', 1, 8, 'doc_informe-file-list-fase4', 'doc_informe-files-size-fase4');
     new fileInput('doc_rejilla_fase4', 'dropzone_doc_rejilla_fase4', 'word', 1, 4, 'doc_rejilla-file-list-fase4', 'doc_rejilla-files-size-fase4');
 
     $('#fase4EstudianteTitle').html(`Proyecto de grado <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Fase 4</span>`);
@@ -144,9 +144,9 @@ function closeFase4DetailsModal() {
 
 function openFase4AdminModal() {
     new fileInput('doc_rejilla_fase4', 'dropzone_rejilla_fase4', 'word', 1, 4, 'file-list-rejilla-fase4', 'files-size-rejilla-fase4');
-    new fileInput('doc_respuesta_fase4', 'dropzone_respuesta_fase4', 'word', 1, 4, 'file-list-respuesta-fase4', 'files-size-respuesta-fase4');
-    new fileInput('doc_turnitin_fase4', 'dropzone_turnitin_fase4', 'pdf', 1, 4, 'file-list-turnitin-fase4', 'files-size-turnitin-fase4');
-    new fileInput('doc_firmado_fase4', 'dropzone_firmado_fase4', 'word', 1, 4, 'file-list-firmado-fase4', 'files-size-firmado-fase4');
+    new fileInput('doc_respuesta_fase4', 'dropzone_respuesta_fase4', 'word', 1, 8, 'file-list-respuesta-fase4', 'files-size-respuesta-fase4');
+    new fileInput('doc_turnitin_fase4', 'dropzone_turnitin_fase4', 'pdf', 1, 8, 'file-list-turnitin-fase4', 'files-size-turnitin-fase4');
+    new fileInput('doc_firmado_fase4', 'dropzone_firmado_fase4', 'word', 1, 8, 'file-list-firmado-fase4', 'files-size-firmado-fase4');
 
     initQuillEditor(undefined, "Describa los detalles de la respuesta para el estudiante.", 'txt-editor-fase4', 'respuesta_fase4');
 
