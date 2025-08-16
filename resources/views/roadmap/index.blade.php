@@ -1819,7 +1819,7 @@
                             @csrf
                             <p class="text-2xl font-bold" style="margin: 0.8rem 0 1.5rem 0;" id="fase4EstudianteTitle"></p>
                             <p class="font-medium text-sm text-gray-700">En este formulario el estudiante deberá cargar el informe final de trabajo de grado (F-DC-125) completo y la rejilla de evaluación (F-DC-129) diligenciada en el apartado de "Información general del proyecto". Todos los documentos deben ir en formato de word.</p>
-                            <p class="font-medium text-sm text-gray-700 mt-5"><strong>NOTA: </strong>Se deberá cargar el <a href="https://www.dropbox.com/scl/fo/pudgcaq639agy7t06ahjs/AF-dMByc71OWsxcfY2dLe3A?rlkey=6s0b9ajweteyx2ang7ywvk6xm&e=1&dl=0" target="_blank" class="text-blue-500 underline uppercase">Informe</a> y la <a href="https://www.dropbox.com/scl/fo/pudgcaq639agy7t06ahjs/AF-dMByc71OWsxcfY2dLe3A?rlkey=6s0b9ajweteyx2ang7ywvk6xm&e=1&dl=0" target="_blank" class="text-blue-500 underline uppercase">Rejilla</a> en formato de Word.</p>
+                            <p class="font-medium text-sm text-gray-700 mt-5"><strong>NOTA: </strong>Se deberá cargar el <a href="https://www.dropbox.com/scl/fo/pudgcaq639agy7t06ahjs/AF-dMByc71OWsxcfY2dLe3A?rlkey=6s0b9ajweteyx2ang7ywvk6xm&e=1&dl=0" target="_blank" class="text-blue-500 underline uppercase">Informe</a> y la <a href="https://www.dropbox.com/scl/fo/pudgcaq639agy7t06ahjs/AF-dMByc71OWsxcfY2dLe3A?rlkey=6s0b9ajweteyx2ang7ywvk6xm&e=1&dl=0" target="_blank" class="text-blue-500 underline uppercase">Rejilla</a> en formato de Word. Tenga en cuenta el tamaño máximo del archivo que puede cargar en cada campo, se le recomienda reducir o comprimir el peso del archivo antes de cargarlo (Puede usar herramientas online para ello o en su defecto la opción "Comprimir imágenes" del Word).</p>
                             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6">
                                 <input type="hidden" name="solicitud_id" id="solicitud_id" value="{{ $solicitud->id }}">
                                 @foreach($campos as $campo)
@@ -1906,7 +1906,7 @@
                                                         <div class="w-full mt-2 relative py-9 bg-gray-50 rounded-2xl border border-2 border-gray-300 gap-3 grid border-dashed" id="dropzone_{{ $campo->name }}_fase4">
                                                                 <div class="grid gap-1">
                                                                     <i class="mx-auto text-4xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                                                    <h2 class="text-center text-gray-400   text-xs leading-4">Solo archivos de Word de máximo 8MB</h2>
+                                                                    <h2 class="text-center text-gray-400   text-xs leading-4">Solo archivos de Word de máximo @if($campo->name == 'doc_informe') 8MB @else 4MB @endif</h2>
                                                                 </div>
                                                                 <div class="grid gap-2">
                                                                     <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
