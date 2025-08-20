@@ -362,7 +362,7 @@
     <p>Estimado usuario, en este correo se le informa que se ha realizado la carga de una nueva solicitud para iniciar un proyecto de grado con la siguiente información:</p>
 
     <ul>
-        <li><strong>Tipo de solicitud:</strong> NUEVO POYECTO DE GRADO {{ $cuerpo_correo['periodo'] }}</li>
+        <li><strong>Tipo de solicitud:</strong> NUEVO PROYECTO DE GRADO {{ $cuerpo_correo['periodo'] }}</li>
         <li><strong>Modalidad del proyecto:</strong> {{ $cuerpo_correo['modalidad'] }}</li>
         <li><strong>Nivel académico:</strong> {{ $cuerpo_correo['nivel'] }}</li>
     </ul>
