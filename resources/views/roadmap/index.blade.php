@@ -1013,6 +1013,15 @@
                                                     <a href="{{ asset('ejemplos/fase_1-2.pdf') }}" target="_blank" class="text-blue-500 underline">ABRIR ARCHIVO</a>
                                                 </li>
                                             </ul>
+                                            <div class="flex items-start mb-4 mt-6">
+                                                <p class="font-medium text-sm text-gray-700 mb-6">
+                                                    <span class="mr-1 mt-1 inline-block align-middle">
+                                                        <i class="fa-solid fa-circle-info text-uts-500 text-xl"></i>
+                                                    </span>
+                                                    <strong>NOTA:</strong>
+                                                    <span class="text-gray-500">En caso de que el estudiante desee sugerir un director de trabajo de grado, deberá adjuntar una página adicional en el archivo PDF correspondiente a los pagos de la modalidad, indicando de manera formal el nombre del docente que desea sugerir como director de trabajo de grado. El comité evaluará la sugerencia y responderá al estudiante.</span>
+                                                </p>
+                                            </div>
                                         </div>
 
                                         <div class="w-full mt-2 relative py-9 bg-gray-50 rounded-2xl border border-2 border-gray-300 gap-3 grid border-dashed" id="dropzone">
@@ -1906,7 +1915,7 @@
                                                         <div class="w-full mt-2 relative py-9 bg-gray-50 rounded-2xl border border-2 border-gray-300 gap-3 grid border-dashed" id="dropzone_{{ $campo->name }}_fase4">
                                                                 <div class="grid gap-1">
                                                                     <i class="mx-auto text-4xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                                                    <h2 class="text-center text-gray-400   text-xs leading-4">Solo archivos de Word de máximo @if($campo->name == 'doc_informe') 8MB @else 4MB @endif</h2>
+                                                                    <h2 class="text-center text-gray-400   text-xs leading-4">Solo archivos de Word de máximo {{ env('PESO_MAXIMO_INFORME') }}MB</h2>
                                                                 </div>
                                                                 <div class="grid gap-2">
                                                                     <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
@@ -2034,7 +2043,7 @@
                             <div class="w-full mt-2 relative py-9 bg-gray-50 rounded-2xl border border-2 border-gray-300 gap-3 grid border-dashed" id="dropzone_firmado_fase4">
                                 <div class="grid gap-1">
                                     <i class="mx-auto text-4xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                    <h2 class="text-center text-gray-400   text-xs leading-4">Solo archivos de Word de máximo 8MB</h2>
+                                    <h2 class="text-center text-gray-400   text-xs leading-4">Solo archivos de Word de máximo {{ env('PESO_MAXIMO_INFORME') }}MB</h2>
                                 </div>
                                 <div class="grid gap-2">
                                     <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
@@ -2063,7 +2072,7 @@
                             <div class="w-full mt-2 relative py-9 bg-gray-50 rounded-2xl border border-2 border-gray-300 gap-3 grid border-dashed" id="dropzone_rejilla_fase4">
                                 <div class="grid gap-1">
                                     <i class="mx-auto text-4xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                    <h2 class="text-center text-gray-400 text-xs leading-4">Solo archivos de Word de máximo 4MB</h2>
+                                    <h2 class="text-center text-gray-400 text-xs leading-4">Solo archivos de Word de máximo {{ env('PESO_MAXIMO_INFORME') }}MB</h2>
                                 </div>
                                 <div class="grid gap-2">
                                     <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
@@ -2092,7 +2101,7 @@
                             <div class="w-full mt-2 relative py-9 bg-gray-50 rounded-2xl border border-2 border-gray-300 gap-3 grid border-dashed" id="dropzone_respuesta_fase4">
                                 <div class="grid gap-1">
                                     <i class="mx-auto text-4xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                    <h2 class="text-center text-gray-400   text-xs leading-4">Solo archivos de Word de máximo 8MB</h2>
+                                    <h2 class="text-center text-gray-400   text-xs leading-4">Solo archivos de Word de máximo {{ env('PESO_MAXIMO_INFORME') }}MB</h2>
                                 </div>
                                 <div class="grid gap-2">
                                     <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
@@ -2121,7 +2130,7 @@
                             <div class="w-full mt-2 relative py-9 bg-gray-50 rounded-2xl border border-2 border-gray-300 gap-3 grid border-dashed" id="dropzone_turnitin_fase4">
                                 <div class="grid gap-1">
                                     <i class="mx-auto text-4xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                    <h2 class="text-center text-gray-400 text-xs leading-4">Solo archivos pdf de máximo 8MB</h2>
+                                    <h2 class="text-center text-gray-400 text-xs leading-4">Solo archivos pdf de máximo {{ env('PESO_MAXIMO_INFORME') }}MB</h2>
                                 </div>
                                 <div class="grid gap-2">
                                     <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
@@ -2243,7 +2252,7 @@
                             <div class="w-full mt-2 relative py-9 bg-gray-50 rounded-2xl border border-2 border-gray-300 gap-3 grid border-dashed" id="dropzone_firmado_fase5">
                                 <div class="grid gap-1">
                                     <i class="mx-auto text-4xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                    <h2 class="text-center text-gray-400   text-xs leading-4">Solo archivos de Word de máximo 8MB</h2>
+                                    <h2 class="text-center text-gray-400   text-xs leading-4">Solo archivos de Word de máximo {{ env('PESO_MAXIMO_INFORME') }}MB</h2>
                                 </div>
                                 <div class="grid gap-2">
                                     <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
@@ -2272,7 +2281,7 @@
                             <div class="w-full mt-2 relative py-9 bg-gray-50 rounded-2xl border border-2 border-gray-300 gap-3 grid border-dashed" id="dropzone_respuesta_fase5">
                                 <div class="grid gap-1">
                                     <i class="mx-auto text-4xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                    <h2 class="text-center text-gray-400   text-xs leading-4">Solo archivos de Word de máximo 8MB</h2>
+                                    <h2 class="text-center text-gray-400   text-xs leading-4">Solo archivos de Word de máximo {{ env('PESO_MAXIMO_INFORME') }}MB</h2>
                                 </div>
                                 <div class="grid gap-2">
                                     <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
@@ -2301,7 +2310,7 @@
                             <div class="w-full mt-2 relative py-9 bg-gray-50 rounded-2xl border border-2 border-gray-300 gap-3 grid border-dashed" id="dropzone_rejilla_fase5">
                                 <div class="grid gap-1">
                                     <i class="mx-auto text-4xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                    <h2 class="text-center text-gray-400   text-xs leading-4">Solo archivos de Word de máximo 4MB</h2>
+                                    <h2 class="text-center text-gray-400   text-xs leading-4">Solo archivos de Word de máximo {{ env('PESO_MAXIMO_INFORME') }}MB</h2>
                                 </div>
                                 <div class="grid gap-2">
                                     <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
@@ -2923,6 +2932,9 @@
     </div>
 
     @push('scripts')
+    <script>
+        let peso_maximo_informe = Number("{{ env('PESO_MAXIMO_INFORME') }}") || 8;
+    </script>
     <script src="{{ asset('js/options/warning.js') }}"></script>
     <script src="{{ asset('js/options/calendar.js') }}"></script>
     <script src="{{ asset('js/fases/fase_1.js') }}"></script>

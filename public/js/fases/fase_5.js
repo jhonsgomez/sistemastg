@@ -119,9 +119,9 @@ function closeFase5DetailsModal() {
 // Aprobar Modal:
 
 function openFase5AprobarModal() {
-    new fileInput('doc_respuesta_fase5', 'dropzone_respuesta_fase5', 'word', 1, 8, 'file-list-respuesta-fase5', 'files-size-respuesta-fase5');
-    new fileInput('doc_rejilla_fase5', 'dropzone_rejilla_fase5', 'word', 1, 4, 'file-list-rejilla-fase5', 'files-size-rejilla-fase5');
-    new fileInput('doc_firmado_fase5', 'dropzone_firmado_fase5', 'word', 1, 8, 'file-list-firmado-fase5', 'files-size-firmado-fase5');
+    new fileInput('doc_respuesta_fase5', 'dropzone_respuesta_fase5', 'word', 1, peso_maximo_informe, 'file-list-respuesta-fase5', 'files-size-respuesta-fase5');
+    new fileInput('doc_rejilla_fase5', 'dropzone_rejilla_fase5', 'word', 1, peso_maximo_informe, 'file-list-rejilla-fase5', 'files-size-rejilla-fase5');
+    new fileInput('doc_firmado_fase5', 'dropzone_firmado_fase5', 'word', 1, peso_maximo_informe, 'file-list-firmado-fase5', 'files-size-firmado-fase5');
 
     initQuillEditor(undefined, "Describa los detalles de la respuesta para el estudiante.", 'txt-editor-fase5', 'respuesta_fase5');
 
