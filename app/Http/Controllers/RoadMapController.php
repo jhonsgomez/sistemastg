@@ -1198,9 +1198,9 @@ class RoadMapController extends Controller
                         $fase_4 = self::getType('fase_4');
                         $campos_fase_4 = Campo::query()->where('tipo_solicitud_id', '=', $fase_4->id)->where('deleted_at', '=', NULL)->get();
 
-                        $fecha_inicio_informe = Carbon::now()->format('Y-m-d');
-                        $fecha_minima_informe = Carbon::now()->addDays(env('DIAS_MINIMOS_INFORME'))->format('Y-m-d');
-                        $fecha_maxima_informe = Carbon::now()->addDays(env('DIAS_MAXIMOS_INFORME'))->format('Y-m-d');
+                        $fecha_inicio_informe = Carbon::parse($request->input('fecha_acta_fase3'))->format('Y-m-d');
+                        $fecha_minima_informe = Carbon::parse($fecha_inicio_informe)->addDays(env('DIAS_MINIMOS_INFORME'))->format('Y-m-d');
+                        $fecha_maxima_informe = Carbon::parse($fecha_inicio_informe)->addDays(env('DIAS_MAXIMOS_INFORME'))->format('Y-m-d');
 
                         $request->request->add(['fecha_minima_informe' => $fecha_minima_informe]);
                         $request->request->add(['fecha_maxima_informe' => $fecha_maxima_informe]);
