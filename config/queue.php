@@ -38,8 +38,8 @@ return [
             'driver' => 'database',
             'table' => 'jobs',
             'queue' => 'default',
-            'timeout' => 10800,
-            'retry_after' => 10860,
+            'timeout' => 300,
+            'retry_after' => 420,
             'after_commit' => false,
         ],
 
