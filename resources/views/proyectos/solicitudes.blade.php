@@ -927,8 +927,15 @@ $mes_actual = Carbon::now()->month;
             let detailsHtml = ``;
             let nivel, modalidad, periodo, integrante_1, integrante_2, integrante_3;
 
-            $.get(`/proyectos/${id}/campos`, async function(data) {
+            let titulo = await getTitulo(id);
+            let director = await getDocentes(id, 'director');
+            let codirector = await getDocentes(id, 'codirector');
+            let evaluador = await getDocentes(id, 'evaluador');
 
+            let fechas_propuesta = await getFechasEnvioPropuesta(id);
+            let fechas_informe = await getFechasEnvioInforme(id);
+
+            $.get(`/proyectos/${id}/campos`, async function(data) {
                 for (let item of data.campos) {
                     switch (item.campo.name) {
                         case "nivel":
@@ -955,6 +962,20 @@ $mes_actual = Carbon::now()->month;
                 }
 
                 detailsHtml += `
+                    <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
+                        <p class="items-details font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Título del proyecto:</p>
+                        <span class="items-details text-gray-800 w-full sm:flex-1 sm:ml-2">${titulo}</span>
+                    </div>
+                    <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
+                        <p class="items-details font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Docentes:</p>
+                        <span class="items-details text-gray-800 w-full sm:flex-1 sm:ml-2">
+                            <span><b>Director:</b> ${(director && Object.keys(director).length > 0) ? capitalizeName(director.name) : 'No asignado'}</span><br>
+                            @if(auth()->user()->hasRole(['super_admin', 'admin', 'coordinador', 'director', 'evaluador']))
+                                <span><b>Evaluador:</b> ${(evaluador && Object.keys(evaluador).length > 0) ? capitalizeName(evaluador.name) : 'No asignado'}</span><br>
+                            @endif
+                            <span><b>Codirector:</b> ${(codirector && Object.keys(codirector).length > 0) ? capitalizeName(codirector.name) : 'No asignado'}</span>
+                        </span>
+                    </div>
                     <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
                         <p class="items-details font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Nivel académico:</p>
                         <span class="items-details text-gray-800 w-full sm:flex-1 sm:ml-2">${nivel.nombre}</span>
@@ -1011,6 +1032,32 @@ $mes_actual = Carbon::now()->month;
                     `;
                 }
 
+                if (fechas_propuesta) {
+                    detailsHtml += `
+                        <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
+                            <p class="items-details font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Fechas propuesta:</p>
+                            <span class="items-details text-gray-800 w-full sm:flex-1 sm:ml-2">
+                                <span><b>Envío de propuesta:</b> ${(fechas_propuesta.envio_estudiante && fechas_propuesta.envio_estudiante !== '') ? formatDate(fechas_propuesta.envio_estudiante) : 'No disponible'}</span><br>
+                                <span><b>Revisión director:</b> ${(fechas_propuesta.revision_director && fechas_propuesta.revision_director !== '') ? formatDate(fechas_propuesta.revision_director) : 'No disponible'}</span><br>
+                                <span><b>Revisión evaluador:</b> ${(fechas_propuesta.revision_evaluador && fechas_propuesta.revision_evaluador !== '') ? formatDate(fechas_propuesta.revision_evaluador) : 'No disponible'}</span>
+                            </span>
+                        </div>
+                    `;
+                }
+
+                if (fechas_informe) {
+                    detailsHtml += `
+                        <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
+                            <p class="items-details font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Fechas informe:</p>
+                            <span class="items-details text-gray-800 w-full sm:flex-1 sm:ml-2">
+                                <span><b>Envío de informe:</b> ${(fechas_informe.envio_estudiante && fechas_informe.envio_estudiante !== '') ? formatDate(fechas_informe.envio_estudiante) : 'No disponible'}</span><br>
+                                <span><b>Revisión director:</b> ${(fechas_informe.revision_director && fechas_informe.revision_director !== '') ? formatDate(fechas_informe.revision_director) : 'No disponible'}</span><br>
+                                <span><b>Revisión evaluador:</b> ${(fechas_informe.revision_evaluador && fechas_informe.revision_evaluador !== '') ? formatDate(fechas_informe.revision_evaluador) : 'No disponible'}</span>
+                            </span>
+                        </div>
+                    `;
+                }
+
                 $('#content-details').html(detailsHtml);
                 $('#detailsModal').addClass('show');
 
@@ -1019,6 +1066,52 @@ $mes_actual = Carbon::now()->month;
             });
 
             document.querySelectorAll('.dtr-hidden [id]').forEach(el => el.id = el.id.replace('-hidden', ''));
+        }
+
+        function capitalizeName(name) {
+            return name
+                .toLowerCase()
+                .split(/\s+/)
+                .map(word => 
+                    word.charAt(0).toLocaleUpperCase() + word.slice(1)
+                )
+                .join(' ');
+        }
+
+        function formatDate(date) {
+            return new Date(date).toLocaleString('es-ES', {
+                timeZone: 'America/Bogota',
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            });
+        }
+
+        function getFechasEnvioPropuesta(id) {
+            return new Promise((resolve, reject) => {
+                $.get(`/fechas-propuesta/${id}`, function(data) {
+                    if (data) {
+                        resolve(data);
+                    } else {
+                        reject("No se encontraron las fechas");
+                    }
+                });
+            });
+        }
+
+        function getFechasEnvioInforme(id) {
+            return new Promise((resolve, reject) => {
+                $.get(`/fechas-informe/${id}`, function(data) {
+                    if (data) {
+                        resolve(data);
+                    } else {
+                        reject("No se encontraron las fechas");
+                    }
+                });
+            });
         }
 
         function getUser(id) {
@@ -1030,6 +1123,50 @@ $mes_actual = Carbon::now()->month;
                         reject("No se encontró el usuario");
                     }
                 });
+            });
+        }
+
+        function getTitulo(id) {
+            return new Promise((resolve, reject) => {
+                $.get(`/titulo/${id}`, function(data) {
+                    if (data) {
+                        resolve(data);
+                    } else {
+                        reject("No se encontró el título");
+                    }
+                });
+            });
+        }
+
+        function getDocentes(id, tipo) {
+            return new Promise((resolve, reject) => {
+                if (tipo === 'director') {
+                    $.get(`/director/${id}`, function(data) {
+                        if (data) {
+                            resolve(data);
+                        } else {
+                            reject("No se encontró el director");
+                        }
+                    });
+                } else if (tipo === 'codirector') {
+                    $.get(`/codirector/${id}`, function(data) {
+                        if (data) {
+                            resolve(data);
+                        } else {
+                            reject("No se encontró el codirector");
+                        }
+                    });
+                } else if (tipo === 'evaluador') {
+                    $.get(`/evaluador/${id}`, function(data) {
+                        if (data) {
+                            resolve(data);
+                        } else {
+                            reject("No se encontró el evaluador");
+                        }
+                    });
+                } else {
+                    reject("Tipo de docente no válido");
+                }
             });
         }
 

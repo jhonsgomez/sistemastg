@@ -1923,7 +1923,7 @@ class ProyectoGradoController extends Controller
         $check_idea_banco = $this->findCampoByName($campos, 'check_idea_banco');
         $titulo = null;
 
-        if ($check_idea_banco == 'true') {
+        if (isset($check_idea_banco) && $check_idea_banco == 'true') {
             $idea_banco = Solicitud::query()->where('id', $this->findCampoByName($campos, 'idea_banco'))->first();
             $campos_idea = $idea_banco->camposConValores();
             $titulo = $this->findCampoByName($campos_idea, 'titulo');
@@ -1932,6 +1932,148 @@ class ProyectoGradoController extends Controller
         }
 
         return $titulo;
+    }
+
+    public function getTituloById($id)
+    {
+        $proyecto = Solicitud::findOrFail($id);
+        $titulo = $this->getTituloProyecto($proyecto);
+
+        if (!$titulo) {
+            $titulo = 'No disponible';
+        } else {
+            $titulo = mb_strtoupper($titulo);
+        }
+
+        return response()->json($titulo);
+    }
+
+    public function getDirector($id)
+    {
+        $proyecto = Solicitud::findOrFail($id);
+        $campos = $proyecto->camposConValores();
+        $director_id = $this->findCampoByName($campos, 'director_id');
+        $director = null;
+
+        if (isset($director_id) && $director_id) {
+            $director = User::query()->where('id', $director_id)->first();
+        }
+
+        return response()->json($director);
+    }
+
+    public function getCodirector($id)
+    {
+        $proyecto = Solicitud::findOrFail($id);
+        $campos = $proyecto->camposConValores();
+        $codirector_id = $this->findCampoByName($campos, 'codirector_id');
+        $codirector = null;
+
+        if (isset($codirector_id) && $codirector_id) {
+            $codirector = User::query()->where('id', $codirector_id)->first();
+        }
+
+        return response()->json($codirector);
+    }
+
+    public function getEvaluador($id)
+    {
+        $proyecto = Solicitud::findOrFail($id);
+        $campos = $proyecto->camposConValores();
+        $evaluador_id = $this->findCampoByName($campos, 'evaluador_id');
+        $evaluador = null;
+
+        if (isset($evaluador_id) && $evaluador_id) {
+            $evaluador = User::query()->where('id', $evaluador_id)->first();
+        }
+
+        return response()->json($evaluador);
+    }
+
+    public function getFechasEnvioPropuesta($id)
+    {
+        $proyecto = Solicitud::findOrFail($id);
+        $campos = $proyecto->camposConValores();
+
+        $submited_fase2 = $this->findCampo($campos, 'submited_fase2');
+        $submited_fase3_director = $this->findCampo($campos, 'submited_fase3_director');
+        $submited_fase3_evaluador = $this->findCampo($campos, 'submited_fase3_evaluador');
+
+        $envio_estudiante = null;
+        $revision_director = null;
+        $revision_evaluador = null;
+
+        if (isset($submited_fase2['id'])) {
+            $envio_estudiante = ValorCampo::query()
+                ->where('solicitud_id', '=', $proyecto->id)
+                ->where('campo_id', '=', $submited_fase2['id'])
+                ->first();
+        }
+
+        if (isset($submited_fase3_director['id'])) {
+            $revision_director = ValorCampo::query()
+                ->where('solicitud_id', '=', $proyecto->id)
+                ->where('campo_id', '=', $submited_fase3_director['id'])
+                ->first();
+        }
+
+        if (isset($submited_fase3_evaluador['id'])) {
+            $revision_evaluador = ValorCampo::query()
+                ->where('solicitud_id', '=', $proyecto->id)
+                ->where('campo_id', '=', $submited_fase3_evaluador['id'])
+                ->first();
+        }
+
+        $fechas = [
+            'envio_estudiante' => $envio_estudiante->updated_at ?? null,
+            'revision_director' => $revision_director->updated_at ?? null,
+            'revision_evaluador' => $revision_evaluador->updated_at ?? null,
+        ];
+
+        return response()->json($fechas);
+    }
+
+    public function getFechasEnvioInforme($id)
+    {
+        $proyecto = Solicitud::findOrFail($id);
+        $campos = $proyecto->camposConValores();
+
+        $submited_fase4 = $this->findCampo($campos, 'submited_fase4');
+        $submited_fase5_director = $this->findCampo($campos, 'submited_fase5_director');
+        $submited_fase5_evaluador = $this->findCampo($campos, 'submited_fase5_evaluador');
+
+        $envio_estudiante = null;
+        $revision_director = null;
+        $revision_evaluador = null;
+
+        if (isset($submited_fase4['id'])) {
+            $envio_estudiante = ValorCampo::query()
+                ->where('solicitud_id', '=', $proyecto->id)
+                ->where('campo_id', '=', $submited_fase4['id'])
+                ->first();
+        }
+
+        if (isset($submited_fase5_director['id'])) {
+            $revision_director = ValorCampo::query()
+                ->where('solicitud_id', '=', $proyecto->id)
+                ->where('campo_id', '=', $submited_fase5_director['id'])
+                ->first();
+        }
+
+        if (isset($submited_fase5_evaluador['id'])) {
+            $revision_evaluador = ValorCampo::query()
+                ->where('solicitud_id', '=', $proyecto->id)
+                ->where('campo_id', '=', $submited_fase5_evaluador['id'])
+                ->first();
+        }
+
+        $fechas = [
+            'envio_estudiante' => $envio_estudiante->updated_at ?? null,
+            'revision_director' => $revision_director->updated_at ?? null,
+            'revision_evaluador' => $revision_evaluador->updated_at ?? null,
+        ];
+
+        return response()->json($fechas);
     }
 
     public function getLineaInvestigacion($proyecto)

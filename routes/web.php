@@ -79,6 +79,36 @@ Route::middleware([
         Route::get('/{id}', [UserController::class, 'edit'])->name('users.edit');
     });
 
+    // Ruta para obtener titulos
+    Route::prefix('titulo')->group(function () {
+        Route::get('/{id}', [ProyectoGradoController::class, 'getTituloById'])->name('proyectos.titulo');
+    });
+
+    // Ruta para obtener directores
+    Route::prefix('director')->group(function () {
+        Route::get('/{id}', [ProyectoGradoController::class, 'getDirector'])->name('proyectos.director');
+    });
+
+    // Ruta para obtener codirectores
+    Route::prefix('codirector')->group(function () {
+        Route::get('/{id}', [ProyectoGradoController::class, 'getCodirector'])->name('proyectos.codirector');
+    });
+
+    // Ruta para obtener evaluadores
+    Route::prefix('evaluador')->group(function () {
+        Route::get('/{id}', [ProyectoGradoController::class, 'getEvaluador'])->name('proyectos.evaluador');
+    });
+
+    // Ruta para obtener fechas de un proyecto
+    Route::prefix('fechas-propuesta')->group(function () {
+        Route::get('/{id}', [ProyectoGradoController::class, 'getFechasEnvioPropuesta'])->name('proyectos.fechas-propuesta');
+    });
+
+    // Ruta para obtener fechas de informes de un proyecto
+    Route::prefix('fechas-informe')->group(function () {
+        Route::get('/{id}', [ProyectoGradoController::class, 'getFechasEnvioInforme'])->name('proyectos.fechas-informe');
+    });
+
     // Rutas para modalidades
     Route::prefix('modalidades')->group(function () {
         Route::get('/{id}', [ModalidadController::class, 'getModalidad'])->name('modalidades.info');
@@ -185,7 +215,7 @@ Route::middleware([
         Route::get('/{id}', [HistoricoController::class, 'edit'])->name('historico.edit');
         Route::put('/{id}', [HistoricoController::class, 'update'])->name('historico.update');
         Route::delete('/{id}', [HistoricoController::class, 'destroy'])->name('historico.destroy');
-        
+
         Route::prefix('reporte')->group(function () {
             Route::post('/', [HistoricoController::class, 'generarReporte'])->name('historico.reporte');
         });
