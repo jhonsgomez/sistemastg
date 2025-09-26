@@ -81,8 +81,8 @@ function closeFase3DetailsModal() {
 // Aprobar Modal
 
 function openFase3AprobarModal() {
-    new fileInput('doc_respuesta_fase3', 'dropzone_respuesta_fase3', 'word', 1, 4, 'file-list-respuesta-fase3', 'files-size-respuesta-fase3');
-    new fileInput('doc_firmado_fase3', 'dropzone_firmado_fase3', 'word', 1, 4, 'file-list-firmado-fase3', 'files-size-firmado-fase3');
+    new fileInput('doc_respuesta_fase3', 'dropzone_respuesta_fase3', 'word', 1, peso_maximo_propuesta, 'file-list-respuesta-fase3', 'files-size-respuesta-fase3');
+    new fileInput('doc_firmado_fase3', 'dropzone_firmado_fase3', 'word', 1, peso_maximo_propuesta, 'file-list-firmado-fase3', 'files-size-firmado-fase3');
 
     initQuillEditor(undefined, "Describa los detalles de la respuesta para el estudiante.", 'txt-editor-fase3', 'respuesta_fase3');
 

@@ -1027,7 +1027,7 @@
                                         <div class="w-full mt-2 relative py-9 bg-gray-50 rounded-2xl border border-2 border-gray-300 gap-3 grid border-dashed" id="dropzone">
                                             <div class="grid gap-1">
                                                 <i class="mx-auto text-4xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                                <h2 class="text-center text-gray-400 text-xs leading-4">Solo archivos PDF cuyo peso máximo sea 4MB</h2>
+                                                <h2 class="text-center text-gray-400 text-xs leading-4">Solo archivos PDF cuyo peso máximo sea {{ env('PESO_MAXIMO_PAGO') }}MB</h2>
                                             </div>
                                             <div class="grid gap-2">
                                                 <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
@@ -1383,7 +1383,7 @@
                                                         <div class="w-full mt-2 relative py-9 bg-gray-50 rounded-2xl border border-2 border-gray-300 gap-3 grid border-dashed" id="dropzone_fase2">
                                                                 <div class="grid gap-1">
                                                                     <i class="mx-auto text-4xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                                                    <h2 class="text-center text-gray-400   text-xs leading-4">Solo archivos de Word de máximo 4MB</h2>
+                                                                    <h2 class="text-center text-gray-400   text-xs leading-4">Solo archivos de Word de máximo {{ env('PESO_MAXIMO_PROPUESTA') }}MB</h2>
                                                                 </div>
                                                                 <div class="grid gap-2">
                                                                     <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
@@ -1518,7 +1518,7 @@
                             <div class="w-full mt-2 relative py-9 bg-gray-50 rounded-2xl border border-2 border-gray-300 gap-3 grid border-dashed" id="dropzone_respuesta_fase2">
                                 <div class="grid gap-1">
                                     <i class="mx-auto text-4xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                    <h2 class="text-center text-gray-400   text-xs leading-4">Solo archivos de Word de máximo 4MB</h2>
+                                    <h2 class="text-center text-gray-400   text-xs leading-4">Solo archivos de Word de máximo {{ env('PESO_MAXIMO_PROPUESTA') }}MB</h2>
                                 </div>
                                 <div class="grid gap-2">
                                     <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
@@ -1547,7 +1547,7 @@
                             <div class="w-full mt-2 relative py-9 bg-gray-50 rounded-2xl border border-2 border-gray-300 gap-3 grid border-dashed" id="dropzone_firmado_fase2">
                                 <div class="grid gap-1">
                                     <i class="mx-auto text-4xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                    <h2 class="text-center text-gray-400   text-xs leading-4">Solo archivos de Word de máximo 4MB</h2>
+                                    <h2 class="text-center text-gray-400   text-xs leading-4">Solo archivos de Word de máximo {{ env('PESO_MAXIMO_PROPUESTA') }}MB</h2>
                                 </div>
                                 <div class="grid gap-2">
                                     <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
@@ -1576,7 +1576,7 @@
                             <div class="w-full mt-2 relative py-9 bg-gray-50 rounded-2xl border border-2 border-gray-300 gap-3 grid border-dashed" id="dropzone_turnitin_fase2">
                                 <div class="grid gap-1">
                                     <i class="mx-auto text-4xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                    <h2 class="text-center text-gray-400 text-xs leading-4">Solo archivos pdf de máximo 4MB</h2>
+                                    <h2 class="text-center text-gray-400 text-xs leading-4">Solo archivos pdf de máximo {{ env('PESO_MAXIMO_PROPUESTA') }}MB</h2>
                                 </div>
                                 <div class="grid gap-2">
                                     <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
@@ -1699,7 +1699,7 @@
                             <div class="w-full mt-2 relative py-9 bg-gray-50 rounded-2xl border border-2 border-gray-300 gap-3 grid border-dashed" id="dropzone_firmado_fase3">
                                 <div class="grid gap-1">
                                     <i class="mx-auto text-4xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                    <h2 class="text-center text-gray-400   text-xs leading-4">Solo archivos de Word de máximo 4MB</h2>
+                                    <h2 class="text-center text-gray-400   text-xs leading-4">Solo archivos de Word de máximo {{ env('PESO_MAXIMO_PROPUESTA') }}MB</h2>
                                 </div>
                                 <div class="grid gap-2">
                                     <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
@@ -1728,7 +1728,7 @@
                             <div class="w-full mt-2 relative py-9 bg-gray-50 rounded-2xl border border-2 border-gray-300 gap-3 grid border-dashed" id="dropzone_respuesta_fase3">
                                 <div class="grid gap-1">
                                     <i class="mx-auto text-4xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                    <h2 class="text-center text-gray-400   text-xs leading-4">Solo archivos de Word de máximo 4MB</h2>
+                                    <h2 class="text-center text-gray-400   text-xs leading-4">Solo archivos de Word de máximo {{ env('PESO_MAXIMO_PROPUESTA') }}MB</h2>
                                 </div>
                                 <div class="grid gap-2">
                                     <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
@@ -2933,6 +2933,8 @@
 
     @push('scripts')
     <script>
+        let peso_maximo_pago = Number("{{ env('PESO_MAXIMO_PAGO') }}") || 8;
+        let peso_maximo_propuesta = Number("{{ env('PESO_MAXIMO_PROPUESTA') }}") || 8;
         let peso_maximo_informe = Number("{{ env('PESO_MAXIMO_INFORME') }}") || 8;
     </script>
     <script src="{{ asset('js/options/warning.js') }}"></script>

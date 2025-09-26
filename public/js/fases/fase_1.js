@@ -80,7 +80,7 @@ $(document).ready(function () {
 });
 
 function openFase1EstudianteModal() {
-    new fileInput('soporte_pago', 'dropzone', 'pdf', 4, 4, 'file-list', 'files-size');
+    new fileInput('soporte_pago', 'dropzone', 'pdf', 2, peso_maximo_pago, 'file-list', 'files-size');
     $('#fase1EstudianteTitle').html(`Proyecto de grado <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Fase 1</span>`);
 
     $('#check_idea_banco').val('');

@@ -1,7 +1,7 @@
 // Estudiante Modal
 
 function openFase2EstudianteModal() {
-    new fileInput('doc_propuesta_fase2', 'dropzone_fase2', 'word', 1, 4, 'file-list-fase2', 'files-size-fase2');
+    new fileInput('doc_propuesta_fase2', 'dropzone_fase2', 'word', 1, peso_maximo_propuesta, 'file-list-fase2', 'files-size-fase2');
     $('#fase2EstudianteTitle').html(`Proyecto de grado <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Fase 2</span>`);
 
     // Campos del formulario
@@ -21,9 +21,9 @@ function closeFase2EstudianteModal() {
 // Admin Modal
 
 function openFase2AdminModal() {
-    new fileInput('doc_turnitin_fase2', 'dropzone_turnitin_fase2', 'pdf', 1, 4, 'file-list-turnitin-fase2', 'files-size-turnitin-fase2');
-    new fileInput('doc_respuesta_fase2', 'dropzone_respuesta_fase2', 'word', 1, 4, 'file-list-respuesta-fase2', 'files-size-respuesta-fase2');
-    new fileInput('doc_firmado_fase2', 'dropzone_firmado_fase2', 'word', 1, 4, 'file-list-firmado-fase2', 'files-size-firmado-fase2');
+    new fileInput('doc_turnitin_fase2', 'dropzone_turnitin_fase2', 'pdf', 1, peso_maximo_propuesta, 'file-list-turnitin-fase2', 'files-size-turnitin-fase2');
+    new fileInput('doc_respuesta_fase2', 'dropzone_respuesta_fase2', 'word', 1, peso_maximo_propuesta, 'file-list-respuesta-fase2', 'files-size-respuesta-fase2');
+    new fileInput('doc_firmado_fase2', 'dropzone_firmado_fase2', 'word', 1, peso_maximo_propuesta, 'file-list-firmado-fase2', 'files-size-firmado-fase2');
 
     initQuillEditor(undefined, "Describa los detalles de la respuesta para el estudiante.", 'txt-editor-fase2', 'respuesta_fase2');
 
