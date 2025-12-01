@@ -132,6 +132,10 @@ Route::middleware([
         Route::get('/{id}/campos', [SolicitudBancoController::class, 'getValorCampos'])->name('propuestas.campos');
         Route::post('/responder', [SolicitudBancoController::class, 'responderSolicitud'])->name('propuestas.responder');
         Route::post('/publicar', [SolicitudBancoController::class, 'repostSolicitud'])->name('propuestas.publicar');
+
+        Route::prefix('reporte')->group(function () {
+            Route::post('/', [SolicitudBancoController::class, 'generarReportePropuestas'])->name('propuestas.reporte');
+        });
     });
 
     // Rutas para el banco de ideas

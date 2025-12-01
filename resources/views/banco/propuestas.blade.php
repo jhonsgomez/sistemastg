@@ -1,7 +1,10 @@
 @php
-use Carbon\Carbon;
+    use Carbon\Carbon;
 
-$fechaActual = Carbon::now()->format('Y-m-d');
+    $fechaActual = Carbon::now()->format('Y-m-d');
+    $anio_inicio = 2025;
+    $anio_actual = Carbon::now()->year;
+    $mes_actual = Carbon::now()->month;
 @endphp
 <x-app-layout>
     <x-slot name="header">
@@ -64,7 +67,8 @@ $fechaActual = Carbon::now()->format('Y-m-d');
         #detailsModal,
         #replySolicitudModal,
         #calendarModal,
-        #warningModal {
+        #warningModal,
+        #reporteModal {
             visibility: hidden;
             opacity: 0;
             transform: translateY(-10px);
@@ -76,7 +80,8 @@ $fechaActual = Carbon::now()->format('Y-m-d');
         #detailsModal.show,
         #replySolicitudModal.show,
         #calendarModal.show,
-        #warningModal.show {
+        #warningModal.show,
+        #reporteModal.show {
             visibility: visible;
             opacity: 1;
             transform: translateY(0);
@@ -94,6 +99,10 @@ $fechaActual = Carbon::now()->format('Y-m-d');
             background-color: white !important;
             border-radius: 8px !important;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        #reporteModal .modal-content {
+            max-width: 500px !important;
         }
 
         .modal-close-btn {
@@ -180,6 +189,14 @@ $fechaActual = Carbon::now()->format('Y-m-d');
                     </path>
                 </svg>
             </button>
+
+            @if (auth()->user()->hasRole(['super_admin', 'admin', 'coordinador']))
+                <button type="button" id="reporte" onclick="openReporteModal()"
+                    class="btn-action shadow bg-green-700 hover:bg-green-800 text-white px-3 py-1 rounded-lg relative">
+                    <i class="fa-solid fa-download"></i>
+                </button>
+            @endif
+
             @if ($fechaActual >= $fechas['fecha_inicio_banco'] && $fechaActual <= $fechas['fecha_fin_banco'])
                 @can('create_propuesta_banco')
                 <button
@@ -681,9 +698,87 @@ $fechaActual = Carbon::now()->format('Y-m-d');
     </div>
     @endif
 
+    <!-- Modal para generar reporte -->
+    <div id="reporteModal" class="fixed z-50 inset-0 overflow-y-auto">
+        <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeReporteModal()">
+            <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative" onclick="event.stopPropagation()">
+                    <button class="modal-close-btn-custom" onclick="closeReporteModal()">
+                        &times;
+                    </button>
+                    <form action="{{ route('propuestas.reporte') }}" method="POST" id="reporteForm" class="p-6 mt-2">
+                        @csrf
+                        <p class="text-2xl font-bold" style="margin: 0.8rem 0 1.5rem 0;" id="reporteTitle"></p>
+                        <div class="mb-4">
+                            <label for="periodo_reporte" class="block font-medium text-md text-gray-700 mb-4">
+                                Periodo académico:
+                            </label>
+                            <select name="periodo_reporte" id="periodo_reporte"
+                                class="border-gray-300 rounded-md shadow-sm mt-1 block w-full focus:ring-uts-500 focus:border-uts-500" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                @for ($anio = $anio_actual; $anio >= $anio_inicio; $anio--)
+                                @if ($anio == $anio_actual)
+                                @if ($mes_actual > 6)
+                                <option value="{{ $anio }}-2">{{ $anio }}-2</option>
+                                @endif
+                                <option value="{{ $anio }}-1">{{ $anio }}-1</option>
+                                @else
+                                <option value="{{ $anio }}-2">{{ $anio }}-2</option>
+                                <option value="{{ $anio }}-1">{{ $anio }}-1</option>
+                                @endif
+                                @endfor
+                            </select>
+                            <span id="periodo_reporteError" class="text-red-500 text-sm"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="tipo_reporte" class="block font-medium text-md text-gray-700 mb-4">
+                                Tipo de reporte:
+                            </label>
+                            <select name="tipo_reporte" id="tipo_reporte"
+                                class="border-gray-300 rounded-md shadow-sm mt-1 block w-full focus:ring-uts-500 focus:border-uts-500" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="aprobadas">Propuestas aprobadas</option>
+                                <option value="pendientes">Propuestas pendientes</option>
+                                <option value="todas">Todas las propuestas</option>
+                            </select>
+                            <span id="tipo_reporteError" class="text-red-500 text-sm"></span>
+                        </div>
+
+                        <div class="flex justify-end space-x-2 mt-8">
+                            <button
+                                type="button"
+                                onclick="closeReporteModal()"
+                                class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">
+                                Cancelar
+                            </button>
+                            <button
+                                type="submit"
+                                id="reporteSubmitButton"
+                                class="flex bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg">
+                                <svg id="loadingSpinner-reporte" style="margin: 4px 10px 4px 0" class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                                    <path
+                                        d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
+                                        stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    <path
+                                        d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
+                                        stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white">
+                                    </path>
+                                </svg>
+                                Enviar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @push('scripts')
     <script src="{{ asset('js/options/warning.js') }}"></script>
     <script src="{{ asset('js/options/calendar.js') }}"></script>
+    <script src="{{ asset('js/options/reportev2.js') }}"></script>
     <script>
         $(document).ready(function() {
             initializeDataTable('#propuestasTable', '{{ route("propuestas.data") }}',

@@ -668,4 +668,109 @@ class SolicitudBancoController extends Controller
             return response()->json(['message' => 'Ha ocurrido un error. Por favor, inténtelo de nuevo.'], 500);
         }
     }
+
+    public function generarReportePropuestas(Request $request)
+    {
+        $type = null;
+        $periodo = null;
+        $formato_reporte = null;
+        $ideas = null;
+        $validator = null;
+
+        try {
+            $validator = Validator::make($request->all(), [
+                'periodo_reporte' => 'required',
+                'tipo_reporte' => 'required',
+            ], [
+                'periodo_reporte.required' => 'El campo periodo es obligatorio',
+                'tipo_reporte.required' => 'El campo tipo de reporte es obligatorio',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
+            $type = self::getType('solicitud_banco');
+            $periodo = $request->periodo_reporte;
+            $tipo_reporte = $request->tipo_reporte;
+            $estado = ['Aprobada', 'Pendiente'];
+
+            if ($tipo_reporte === 'aprobadas') {
+                $estado = ['Aprobada'];
+            } elseif ($tipo_reporte === 'pendientes') {
+                $estado = ['Pendiente'];
+            } elseif ($tipo_reporte === 'todas') {
+                $estado = ['Aprobada', 'Pendiente'];
+            }
+
+            $formato_reporte = public_path('formatos/informe_ideas.xlsx');
+
+            // Cargar el archivo de Excel existente
+            $spreadsheet = IOFactory::load($formato_reporte);
+            $sheet = $spreadsheet->getActiveSheet();
+            $fila = 3;
+
+            $ideas = Solicitud::query()
+                ->where('tipo_solicitud_id', $type->id)
+                ->whereIn('estado', $estado)
+                ->whereHas('valoresCampos', function ($q) use ($periodo) {
+                    $q->whereHas('campo', function ($q) use ($periodo) {
+                        $q->where(function ($q) use ($periodo) {
+                            $q->where('name', 'periodo')
+                                ->where('valores_campos.valor', $periodo);
+                        });
+                    });
+                })
+                ->get();
+
+            foreach ($ideas as $idea) {
+                $campos = $idea->camposConValores();
+
+                $id = 'BAN-00' . $idea->id;
+                $periodo_academico = self::findCampoByName($campos, 'periodo');
+                $titulo = mb_strtoupper(self::findCampoByName($campos, 'titulo'));
+                $modalidad = Modalidad::findOrFail(self::findCampoByName($campos, 'modalidad'))->nombre;
+                $nivel = Nivel::findOrFail(self::findCampoByName($campos, 'nivel'))->nombre;
+                $linea_investigacion = LineaInvestigacion::findOrFail(self::findCampoByName($campos, 'linea_investigacion'))->nombre;
+                $disponible = self::findCampoByName($campos, 'disponible') === 'true' ? 'Sí' : 'No';
+                $objetivo = ucfirst(strtolower(self::findCampoByName($campos, 'objetivo')));
+                $docente = mb_strtoupper(User::findOrFail($idea->user_id)->name);
+
+                // Insertar valores
+                $sheet->setCellValue("A{$fila}", $id);
+                $sheet->setCellValue("B{$fila}", $periodo_academico);
+                $sheet->setCellValue("C{$fila}", $titulo);
+                $sheet->setCellValue("D{$fila}", $modalidad);
+                $sheet->setCellValue("E{$fila}", $nivel);
+                $sheet->setCellValue("F{$fila}", $linea_investigacion);
+                $sheet->setCellValue("G{$fila}", $disponible);
+                $sheet->setCellValue("H{$fila}", $objetivo);
+                $sheet->setCellValue("I{$fila}", $docente);
+
+                // Aplicar bordes a cada celda de la fila
+                foreach (range('A', 'I') as $col) {
+                    $sheet->getStyle("{$col}{$fila}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+                    $sheet->getStyle("{$col}{$fila}")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+                }
+
+                $fila++;
+            }
+
+            // Definir el nombre del archivo a descargar
+            $fileName = "Informe - Propuestas del banco ({$periodo}).xlsx";
+
+            // Guardar en un stream para descargar sin escribir en disco
+            $response = new StreamedResponse(function () use ($spreadsheet) {
+                $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+                $writer->save('php://output');
+            });
+
+            $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            $response->headers->set('Content-Disposition', "attachment; filename=\"{$fileName}\"");
+
+            return $response;
+        } catch (Exception $e) {
+            return response()->json(['message' => 'Ha ocurrido un error. Por favor, inténtelo de nuevo.'], 500);
+        }
+    }
 }
