@@ -840,7 +840,7 @@ $mes_actual = Carbon::now()->month;
             const button = document.getElementById(`guardarModalButton`);
             const loadingSpinner = document.getElementById(`loadingSpinner-guardar`);
 
-            const url = `/proyectos`;
+            const url = "{{  route('proyectos.store') }}";
             const method = 'POST';
 
             Swal.fire({
@@ -935,7 +935,9 @@ $mes_actual = Carbon::now()->month;
             let fechas_propuesta = await getFechasEnvioPropuesta(id);
             let fechas_informe = await getFechasEnvioInforme(id);
 
-            $.get(`/proyectos/${id}/campos`, async function(data) {
+            const route = "{{ route('proyectos.campos', ['id' => ':id']) }}".replace(':id', id);
+
+            $.get(route, async function(data) {
                 for (let item of data.campos) {
                     switch (item.campo.name) {
                         case "nivel":
@@ -1091,8 +1093,10 @@ $mes_actual = Carbon::now()->month;
         }
 
         function getFechasEnvioPropuesta(id) {
+            const route = "{{ route('proyectos.fechas-propuesta', ['id' => ':id']) }}".replace(':id', id);
+
             return new Promise((resolve, reject) => {
-                $.get(`/fechas-propuesta/${id}`, function(data) {
+                $.get(route, function(data) {
                     if (data) {
                         resolve(data);
                     } else {
@@ -1103,8 +1107,10 @@ $mes_actual = Carbon::now()->month;
         }
 
         function getFechasEnvioInforme(id) {
+            const route = "{{ route('proyectos.fechas-informe', ['id' => ':id']) }}".replace(':id', id);
+
             return new Promise((resolve, reject) => {
-                $.get(`/fechas-informe/${id}`, function(data) {
+                $.get(route, function(data) {
                     if (data) {
                         resolve(data);
                     } else {
@@ -1115,8 +1121,10 @@ $mes_actual = Carbon::now()->month;
         }
 
         function getUser(id) {
+            const route = "{{ route('users.edit', ['id' => ':id']) }}".replace(':id', id);
+
             return new Promise((resolve, reject) => {
-                $.get(`/users/${id}`, function(data) {
+                $.get(route, function(data) {
                     if (data) {
                         resolve(data);
                     } else {
@@ -1127,8 +1135,10 @@ $mes_actual = Carbon::now()->month;
         }
 
         function getTitulo(id) {
+            const route = "{{ route('proyectos.titulo', ['id' => ':id']) }}".replace(':id', id);
+
             return new Promise((resolve, reject) => {
-                $.get(`/titulo/${id}`, function(data) {
+                $.get(route, function(data) {
                     if (data) {
                         resolve(data);
                     } else {
@@ -1141,7 +1151,9 @@ $mes_actual = Carbon::now()->month;
         function getDocentes(id, tipo) {
             return new Promise((resolve, reject) => {
                 if (tipo === 'director') {
-                    $.get(`/director/${id}`, function(data) {
+                    const route = "{{ route('proyectos.director', ['id' => ':id']) }}".replace(':id', id);
+
+                    $.get(route, function(data) {
                         if (data) {
                             resolve(data);
                         } else {
@@ -1149,7 +1161,9 @@ $mes_actual = Carbon::now()->month;
                         }
                     });
                 } else if (tipo === 'codirector') {
-                    $.get(`/codirector/${id}`, function(data) {
+                    const route = "{{ route('proyectos.codirector', ['id' => ':id']) }}".replace(':id', id);
+
+                    $.get(route, function(data) {
                         if (data) {
                             resolve(data);
                         } else {
@@ -1157,7 +1171,9 @@ $mes_actual = Carbon::now()->month;
                         }
                     });
                 } else if (tipo === 'evaluador') {
-                    $.get(`/evaluador/${id}`, function(data) {
+                    const route = "{{ route('proyectos.evaluador', ['id' => ':id']) }}".replace(':id', id);
+
+                    $.get(route, function(data) {
                         if (data) {
                             resolve(data);
                         } else {
@@ -1171,8 +1187,10 @@ $mes_actual = Carbon::now()->month;
         }
 
         function getModalidad(id) {
+            const route = "{{ route('modalidades.info', ['id' => ':id']) }}".replace(':id', id);
+
             return new Promise((resolve, reject) => {
-                $.get(`/modalidades/${id}`, function(data) {
+                $.get(route, function(data) {
                     if (data) {
                         resolve(data);
                     } else {
@@ -1183,8 +1201,10 @@ $mes_actual = Carbon::now()->month;
         }
 
         function getNivel(id) {
+            const route = "{{ route('niveles.info', ['id' => ':id']) }}".replace(':id', id);
+
             return new Promise((resolve, reject) => {
-                $.get(`/niveles/${id}`, function(data) {
+                $.get(route, function(data) {
                     if (data) {
                         resolve(data);
                     } else {
@@ -1218,7 +1238,7 @@ $mes_actual = Carbon::now()->month;
 
             const loadingSpinner = document.getElementById(`loadingSpinner-replyProyectos`);
 
-            const url = `/proyectos/responder`;
+            const url = "{{  route('proyectos.responder') }}";
             const method = 'POST';
 
             Swal.fire({
@@ -1287,7 +1307,7 @@ $mes_actual = Carbon::now()->month;
 
             const loadingSpinner = document.getElementById(`loadingSpinner-desactivarProyecto`);
 
-            const url = `/proyectos/deshabilitar`;
+            const url = "{{  route('proyectos.deshabilitar') }}";
             const method = 'POST';
 
             const formData = new FormData(this);
@@ -1364,7 +1384,7 @@ $mes_actual = Carbon::now()->month;
 
             const loadingSpinner = document.getElementById(`loadingSpinner-activarProyecto`);
 
-            const url = `/proyectos/habilitar`;
+            const url = "{{  route('proyectos.habilitar') }}";
             const method = 'POST';
 
             const formData = new FormData(this);
@@ -1398,7 +1418,7 @@ $mes_actual = Carbon::now()->month;
                         error: function(xhr) {
                             const errors = xhr.responseJSON?.errors;
 
-                            $('#proyecto_idError').text(errors?.proyecto_id?.[0] || '');
+                            $('#proyecto_id_activarError').text(errors?.proyecto_id_activar?.[0] || '');
                             $('#nro_acta_activarError').text(errors?.nro_acta_activar?.[0] || '');
                             $('#fecha_acta_activarError').text(errors?.fecha_acta_activar?.[0] || '');
                             $('#descripcion_activarError').text(errors?.descripcion_activar?.[0] || '');

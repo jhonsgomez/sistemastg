@@ -150,7 +150,7 @@ async function openFase1AdminDetailsModal(id) {
     let info = {};
 
     async function obtenerCamposProyecto(id) {
-        let response = await fetch(`/proyectos/${id}/campos`);
+        let response = await fetch(`${window.APP_URL}/proyectos/${id}/campos`);
         let data = await response.json();
 
         return data.campos;
@@ -158,7 +158,7 @@ async function openFase1AdminDetailsModal(id) {
 
     async function getLinea(id) {
         return new Promise((resolve, reject) => {
-            $.get(`/lineas-investigacion/${id}`, function (data) {
+            $.get(`${window.APP_URL}/lineas-investigacion/${id}`, function (data) {
                 if (data) {
                     resolve(data);
                 } else {
@@ -172,7 +172,7 @@ async function openFase1AdminDetailsModal(id) {
         let soportes = ``;
 
         info.soporte_pago.forEach((soporte, index) => {
-            soportes += `<a target="_blank" class="text-red-600 text-sm underline" href="/storage/documentos_proyectos/proyecto-00${id}/${soporte}"><i class="fa-solid fa-file-pdf text-red-600 mr-1"></i>Documento ${index + 1}</a><br>`;
+            soportes += `<a target="_blank" class="text-red-600 text-sm underline" href="${window.APP_URL}/storage/documentos_proyectos/proyecto-00${id}/${soporte}"><i class="fa-solid fa-file-pdf text-red-600 mr-1"></i>Documento ${index + 1}</a><br>`;
         });
 
         detailsHtml += `<div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">

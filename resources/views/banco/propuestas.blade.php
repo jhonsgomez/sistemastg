@@ -848,7 +848,9 @@
 
             const docente = await getDocente(solicitud.user_id);
 
-            $.get(`/propuestas-banco/${solicitud.id}/campos`, async function(data) {
+            const route = "{{ route('propuestas.campos', ['id' => 'ID_PROPUESTA']) }}".replace('ID_PROPUESTA', solicitud.id);
+
+            $.get(route, async function(data) {
 
                 let detailsHtml = `
                 <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
@@ -925,7 +927,9 @@
             let nivel;
             let periodo_academico = await getPeriodoActual();
 
-            $.get(`/propuestas-banco/${solicitud.id}/campos`, async function(data) {
+            const route = "{{ route('propuestas.campos', ['id' => 'ID_PROPUESTA']) }}".replace('ID_PROPUESTA', solicitud.id);
+
+            $.get(route, async function(data) {
 
                 for (let item of data.campos) {
                     switch (item.campo.name) {
@@ -979,8 +983,10 @@
         }
 
         function getDocente(id) {
+            const route = "{{ route('users.edit', ['id' => 'ID_USER']) }}".replace('ID_USER', id);
+
             return new Promise((resolve, reject) => {
-                $.get(`/users/${id}`, function(data) {
+                $.get(route, function(data) {
                     if (data) {
                         resolve(data);
                     } else {
@@ -991,8 +997,10 @@
         }
 
         function getModalidad(id) {
+            const route = "{{ route('modalidades.info', ['id' => 'ID_MODALIDAD']) }}".replace('ID_MODALIDAD', id);
+
             return new Promise((resolve, reject) => {
-                $.get(`/modalidades/${id}`, function(data) {
+                $.get(route, function(data) {
                     if (data) {
                         resolve(data);
                     } else {
@@ -1003,8 +1011,10 @@
         }
 
         function getNivel(id) {
+            const route = "{{ route('niveles.info', ['id' => 'ID_NIVEL']) }}".replace('ID_NIVEL', id);
+
             return new Promise((resolve, reject) => {
-                $.get(`/niveles/${id}`, function(data) {
+                $.get(route, function(data) {
                     if (data) {
                         resolve(data);
                     } else {
@@ -1015,8 +1025,10 @@
         }
 
         function getLinea(id) {
+            const route = "{{ route('lineas_investigacion.info', ['id' => 'ID_LINEA']) }}".replace('ID_LINEA', id);
+
             return new Promise((resolve, reject) => {
-                $.get(`/lineas-investigacion/${id}`, function(data) {
+                $.get(route, function(data) {
                     if (data) {
                         resolve(data);
                     } else {
@@ -1068,7 +1080,7 @@
             const button = document.getElementById(`guardarModalButton`);
             const loadingSpinner = document.getElementById(`loadingSpinner-guardar`);
 
-            const url = `/propuestas-banco`;
+            const url = "{{ route('propuestas.store') }}";
             const method = 'POST';
 
             Swal.fire({
@@ -1121,7 +1133,7 @@
             const button = document.getElementById(`editarModalButton`);
             const loadingSpinner = document.getElementById(`loadingSpinner-editar`);
 
-            const url = `/propuestas-banco`;
+            const url = "{{ route('propuestas.store') }}";
             const method = 'POST';
 
             Swal.fire({
@@ -1187,7 +1199,7 @@
         $('#replySolicitudForm').on('submit', function(e) {
             e.preventDefault();
 
-            const url = `/propuestas-banco/responder`;
+            const url = "{{ route('propuestas.responder') }}";
             const method = 'POST';
 
             const loadingSpinner = document.getElementById(`loadingSpinner-reply`);
@@ -1252,7 +1264,7 @@
 
             const periodo_actual = getPeriodoActual();
 
-            const url = `/propuestas-banco/publicar`;
+            const url = "{{ route('propuestas.publicar') }}";
             const method = 'POST';
 
             Swal.fire({

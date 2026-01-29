@@ -3115,7 +3115,7 @@
                 const button = document.getElementById(`configAdminModalButton`);
                 const loadingSpinner = document.getElementById(`loadingSpinner-configAdminModalResponse`);
 
-                const url = `/proyectos/configurar/admin`;
+                const url = "{{ route('proyectos.configurar_admin') }}";
                 const method = 'POST';
 
                 const formData = new FormData(this);
@@ -3174,7 +3174,7 @@
                 const button = document.getElementById(`fase1EstudianteButton`);
                 const loadingSpinner = document.getElementById(`loadingSpinner-configModalResponse`);
 
-                const url = `/proyectos/configurar`;
+                const url = "{{ route('proyectos.configurar_estudiante') }}";
                 const method = 'POST';
 
                 const formData = new FormData(this);
@@ -3228,7 +3228,7 @@
             const button = document.getElementById(`configModalButton`);
             const loadingSpinner = document.getElementById(`loadingSpinner-fase1Estudiante`);
 
-            const url = `/proyectos/fase1`;
+            const url = "{{ route('roadmap.fase_1') }}";
             const method = 'POST';
 
             const formData = new FormData(this);
@@ -3284,7 +3284,7 @@
             const button = document.getElementById(`fase1AdminButton`);
             const loadingSpinner = document.getElementById(`loadingSpinner-fase1AdminResponse`);
 
-            const url = `/proyectos/fase1/responder`;
+            const url = "{{ route('roadmap.reply_fase1') }}";
             const method = 'POST';
 
             const formData = new FormData(this);

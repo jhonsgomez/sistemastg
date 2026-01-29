@@ -276,7 +276,9 @@
         }
 
         function editRole(id) {
-            $.get(`/roles/${id}`, function(data) {
+            const route = "{{ route('roles.edit', ['id' => ':id']) }}".replace(':id', id);
+
+            $.get(route, function(data) {
                 $('#formTitle').html(`Editar rol <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">` + data.name + `</span>`);
                 $('#roleId').val(data.id);
                 $('#name').val(data.name);
@@ -289,7 +291,7 @@
 
         $('#roleForm').on('submit', function(e) {
             e.preventDefault();
-            const url = $('#roleId').val() ? `/roles/${$('#roleId').val()}` : '/roles';
+            const url = $('#roleId').val() ? "{{ route('roles.update', ['id' => ':id']) }}".replace(':id', $('#roleId').val()) : '{{ route("roles.store") }}';
             const method = $('#roleId').val() ? 'PUT' : 'POST';
             const loadingSpinner = document.getElementById(`loadingSpinner-guardar`);
             loadingSpinner.classList.remove('hidden');
@@ -331,8 +333,10 @@
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
                 if (result.isConfirmed) {
+                    const route = "{{ route('roles.destroy', ['id' => ':id']) }}".replace(':id', id);
+
                     $.ajax({
-                        url: `/roles/${id}`,
+                        url: route,
                         method: 'DELETE',
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -350,7 +354,7 @@
         }
 
         function managePermissions(id) {
-            window.location.href = `/roles/${id}/permissions`;
+            window.location.href = "{{ route('roles.permissions', ['id' => ':id']) }}".replace(':id', id);
         }
     </script>
     @endpush

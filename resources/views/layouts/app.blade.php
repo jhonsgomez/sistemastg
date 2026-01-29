@@ -327,6 +327,8 @@
     <script>
         const loaderGeneral = document.getElementById(`loaderGeneralOverlay`);
         const tooltipManager = new TooltipManager();
+
+        window.APP_URL = "{{ config('app.url') }}";
     </script>
 
     @stack('scripts')

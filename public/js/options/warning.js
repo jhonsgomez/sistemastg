@@ -13,7 +13,7 @@ $('#warningForm').on('submit', function (e) {
     const button = document.getElementById(`warningModalButton`);
     const loadingSpinner = document.getElementById(`loadingSpinner-warning`);
 
-    const url = `/reportes/enviar`;
+    const url = `${window.APP_URL}/reportes/enviar`;
     const method = 'POST';
 
     const formData = new FormData(this);

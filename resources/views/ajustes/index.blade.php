@@ -324,6 +324,8 @@
 
         async function openSettingFechasModal() {
             let periodo_academico = getPeriodoActual();
+            let route = "{{ route('fechas.info', ['periodo' => 'PERIODO_ACADEMICO']) }}";
+            route = route.replace('PERIODO_ACADEMICO', periodo_academico);
 
             const button = document.getElementById(`setting-fechas`);
             const loadingSpinner = document.getElementById(`loadingSpinner-setting-fechas`);
@@ -333,7 +335,7 @@
 
             $('#settingFechasTitle').html(`Fechas del periodo <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">${periodo_academico}</span>`);
 
-            $.get(`/fechas/${periodo_academico}`, async function(data) {
+            $.get(route, async function(data) {
                 $('#periodo_academico').val(periodo_academico);
                 $('#fecha_inicio_banco').val(data?.fecha_inicio_banco || '');
                 $('#fecha_fin_banco').val(data?.fecha_fin_banco || '') || '';
@@ -360,7 +362,7 @@
             const button = document.getElementById(`settingFechasButton`);
             const loadingSpinner = document.getElementById(`loadingSpinner-settingFechas`);
 
-            const url = `/ajustes/fechas`;
+            const url = "{{ route('ajustes.fechas') }}";
             const method = 'POST';
 
             Swal.fire({

@@ -272,7 +272,7 @@ $('#proyectosMasiveCreateForm').on('submit', function(e) {
     const button = document.getElementById(`crearMasiveProyectoModalButton`);
     const loadingSpinner = document.getElementById(`loadingSpinner-crearMasiveProyecto`);
 
-    const url = '/historico/masivo';
+    const url = `${window.APP_URL}/historico/masivo`;
     const method = 'POST';
 
     Swal.fire({

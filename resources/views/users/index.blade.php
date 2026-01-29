@@ -341,7 +341,9 @@
         }
 
         function editUser(id) {
-            $.get(`/users/${id}`, function(data) {
+            const route = "{{ route('users.edit', ['id' => ':id']) }}".replace(':id', id);
+
+            $.get(route, function(data) {
                 $('#formTitle').html(`Editar <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Usuario</span>`);
                 $('#userId').val(data.id);
                 $('#name').val(data.name);
@@ -355,7 +357,8 @@
         }
 
         function viewRoles(id) {
-            $.get(`/users/${id}/roles`, function(data) {
+            const route = "{{ route('users.roles', ['id' => ':id']) }}".replace(':id', id);
+            $.get(route, function(data) {
                 let rolesHtml = '';
                 data.roles.forEach(role => {
                     const checked = data.userRoles.includes(role.id) ? 'checked' : '';
@@ -376,7 +379,7 @@
 
         $('#userForm').on('submit', function(e) {
             e.preventDefault();
-            const url = $('#userId').val() ? `/users/${$('#userId').val()}` : '/users';
+            const url = $('#userId').val() ? "{{ route('users.update', ['id' => ':id']) }}".replace(':id', $('#userId').val()) : "{{  route('users.store') }}";
             const method = $('#userId').val() ? 'PUT' : 'POST';
             const loadingSpinner = document.getElementById(`loadingSpinner-guardar`);
             loadingSpinner.classList.remove('hidden');
@@ -408,7 +411,7 @@
             loadingSpinner.classList.remove('hidden');
 
             $.ajax({
-                url: `/users/${currentUserId}/roles`,
+                url: "{{ route('users.updateRoles', ['id' => ':id']) }}".replace(':id', currentUserId),
                 method: 'POST',
                 data: $(this).serialize(),
                 success: function(response) {
@@ -439,7 +442,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: `/users/${id}`,
+                        url: "{{ route('users.destroy', ['id' => ':id']) }}".replace(':id', id),
                         method: 'DELETE',
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

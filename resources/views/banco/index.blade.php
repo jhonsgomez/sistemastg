@@ -324,7 +324,7 @@
                     loaderGeneral.classList.replace('hidden', 'flex');
 
                     $.ajax({
-                        url: `/banco/${id}`,
+                        url: "{{ route('banco.destroy', ['id' => 'ID_PROPUESTA']) }}".replace('ID_PROPUESTA', id),
                         method: 'DELETE',
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

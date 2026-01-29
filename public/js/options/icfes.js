@@ -53,7 +53,7 @@ $('#icfesEstudianteForm').on('submit', function (e) {
 
     const loadingSpinner = document.getElementById(`loadingSpinner-icfesEstudiante`);
 
-    const url = `/proyectos/icfes`;
+    const url = `${window.APP_URL}/proyectos/icfes`;
     const method = 'POST';
 
     const formData = new FormData(this);
@@ -103,7 +103,7 @@ $('#icfesAdminForm').on('submit', function (e) {
 
     const loadingSpinner = document.getElementById(`loadingSpinner-icfesAdmin`);
 
-    const url = `/proyectos/icfes/responder`;
+    const url = `${window.APP_URL}/proyectos/icfes/responder`;
     const method = 'POST';
 
     const formData = new FormData(this);

@@ -26,7 +26,7 @@ async function openFase3DetailsModal(id) {
 
         if (info.doc_propuesta) {
             info.doc_propuesta.forEach((documento, index) => {
-                doc_propuesta += `<a target="_blank" class="text-blue-600 text-sm underline" href="/storage/documentos_proyectos/proyecto-00${id}/${documento}"><i class="fa-regular fa-file-word text-blue-600 mr-1"></i>Documento ${index + 1}</a><br>`;
+                doc_propuesta += `<a target="_blank" class="text-blue-600 text-sm underline" href="${window.APP_URL}/storage/documentos_proyectos/proyecto-00${id}/${documento}"><i class="fa-regular fa-file-word text-blue-600 mr-1"></i>Documento ${index + 1}</a><br>`;
             });
 
             detailsHtml += `<div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
@@ -37,7 +37,7 @@ async function openFase3DetailsModal(id) {
 
         if (info.doc_turnitin) {
             info.doc_turnitin.forEach((documento, index) => {
-                doc_turnitin += `<a target="_blank" class="text-red-600 text-sm underline" href="/storage/documentos_proyectos/proyecto-00${id}/${documento}"><i class="fa-regular fa-file-pdf text-red-600 mr-1"></i>Documento ${index + 1}</a><br>`;
+                doc_turnitin += `<a target="_blank" class="text-red-600 text-sm underline" href="${window.APP_URL}/storage/documentos_proyectos/proyecto-00${id}/${documento}"><i class="fa-regular fa-file-pdf text-red-600 mr-1"></i>Documento ${index + 1}</a><br>`;
             });
 
             detailsHtml += `<div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
@@ -133,7 +133,7 @@ $('#fase3AprobarForm').on('submit', function (e) {
 
     const loadingSpinner = document.getElementById(`loadingSpinner-fase3AprobarResponse`);
 
-    const url = `/proyectos/fase3/responder`;
+    const url = `${window.APP_URL}/proyectos/fase3/responder`;
     const method = 'POST';
 
     const formData = new FormData(this);

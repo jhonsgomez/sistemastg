@@ -265,7 +265,9 @@
         }
 
         function editPermission(id) {
-            $.get(`/permissions/${id}`, function(data) {
+            const route = "{{ route('permissions.edit', ['id' => 'ID_PERMISSION']) }}".replace('ID_PERMISSION', id);
+            
+            $.get(route, function(data) {
                 $('#formTitle').html(`Editar permiso <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">` + data.name + `</span>`);
                 $('#permissionId').val(data.id);
                 $('#name').val(data.name);
@@ -278,7 +280,8 @@
 
         $('#permissionForm').on('submit', function(e) {
             e.preventDefault();
-            const url = $('#permissionId').val() ? `/permissions/${$('#permissionId').val()}` : '/permissions';
+
+            const url = $('#permissionId').val() ? "{{ route('permissions.update' , ['id' => 'ID_PERMISSION']) }}".replace('ID_PERMISSION', $('#permissionId').val()) : '{{ route("permissions.store") }}';
             const method = $('#permissionId').val() ? 'PUT' : 'POST';
             const loadingSpinner = document.getElementById(`loadingSpinner-guardar`);
             loadingSpinner.classList.remove('hidden');
@@ -321,7 +324,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: `/permissions/${id}`,
+                        url: "{{ route('permissions.destroy', ['id' => 'ID_PERMISSION']) }}".replace('ID_PERMISSION', id),
                         method: 'DELETE',
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
