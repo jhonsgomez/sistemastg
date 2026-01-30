@@ -13,6 +13,8 @@ return [
     |
     */
 
+    'correo_sistemas' => env('CORREO_SISTEMAS'),
+
     'default' => env('MAIL_MAILER', 'smtp'),
 
     /*
