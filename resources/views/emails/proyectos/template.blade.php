@@ -70,7 +70,7 @@
         {!! $cuerpo_correo['solicitud'] !!}
 
         <br>
-        <p><strong>NOTA: </strong>El comité de trabajos de grado revisará la solicitud y dará respuesta a los estudiantes. Si presenta algún inconveniente, favor comunicarse al correo electrónico del comité de trabajos de grado: <span class="email">{{ env('CORREO_SISTEMAS') }}</span></p>
+        <p><strong>NOTA: </strong>El comité de trabajos de grado revisará la solicitud y dará respuesta a los estudiantes. Si presenta algún inconveniente, favor comunicarse al correo electrónico del comité de trabajos de grado: <span class="email">{{ config('custom.correo_sistemas') }}</span></p>
     @endif
 
     @if ($tipo_correo === 'config_admin')
@@ -296,7 +296,7 @@
             {!! $cuerpo_correo['solicitud'] !!}
 
             <br>
-            <p>Si presenta algún inconveniente, favor comunicarse al correo electrónico del comité de trabajos de grado: <span class="email">{{ env('CORREO_SISTEMAS') }}</span></p>
+            <p>Si presenta algún inconveniente, favor comunicarse al correo electrónico del comité de trabajos de grado: <span class="email">{{ config('custom.correo_sistemas') }}</span></p>
         @else
             <p>Estimado usuario, en este correo se le informa que el comité de trabajos de grado ha revisado la solicitud para el proyecto titulado "<strong>{{ mb_strtoupper($cuerpo_correo['titulo']) }}</strong>", con la siguiente información:</p>
             
@@ -606,7 +606,7 @@
                 <p><strong>Acta de registro:</strong> #{{ $cuerpo_correo['nro_acta'] }} - {{ $cuerpo_correo['fecha_acta'] }}</p>
             @endif
             @if ($cuerpo_correo['estado'] === 'Aprobado')
-                <p>Se le recuerda que a partir de hoy los estudiantes cuentan con <strong class="uppercase">{{ env('DIAS_MAXIMOS_INFORME') }} días</strong> calendario para cargar su <strong class="uppercase">F-DC-125</strong>. Tenga en cuenta que el sistema <strong class="uppercase">SOLO</strong> le permitirá cargar este documento una vez hayan pasado como mínimo <strong class="uppercase">{{ env('DIAS_MINIMOS_INFORME') }} días</strong> calendario a partir de hoy. Podrá cargar el <strong>F-DC-125</strong> en el sistema a partir del <strong class="uppercase">{{ $cuerpo_correo['fecha_minima_informe'] }}</strong>, y tendrá como fecha máxima de carga el <strong class="uppercase">{{ $cuerpo_correo['fecha_maxima_informe'] }}</strong>.</p>
+                <p>Se le recuerda que a partir de hoy los estudiantes cuentan con <strong class="uppercase">{{ config('custom.dias_maximos_informe') }} días</strong> calendario para cargar su <strong class="uppercase">F-DC-125</strong>. Tenga en cuenta que el sistema <strong class="uppercase">SOLO</strong> le permitirá cargar este documento una vez hayan pasado como mínimo <strong class="uppercase">{{ config('custom.dias_minimos_informe') }} días</strong> calendario a partir de hoy. Podrá cargar el <strong>F-DC-125</strong> en el sistema a partir del <strong class="uppercase">{{ $cuerpo_correo['fecha_minima_informe'] }}</strong>, y tendrá como fecha máxima de carga el <strong class="uppercase">{{ $cuerpo_correo['fecha_maxima_informe'] }}</strong>.</p>
             @endif
         @endif
         @if ($cuerpo_correo['estado'] === 'Rechazado')
@@ -646,7 +646,7 @@
             @if ($cuerpo_correo['estado'] === 'Aprobado')
                 <p>Se le indica que su proyecto en el sistema ha <strong class="uppercase">FINALIZADO</strong>. A partir de ahora es responsabilidad de los estudiantes, el director y el evaluador programar una fecha para la debida <strong class="uppercase">SUSTENTACIÓN</strong> del proyecto.</p>
                 <br>
-                <p><strong>NOTA: </strong>Una vez realizada la <strong>SUSTENTACIÓN</strong> del proyecto, los estudiantes deberán acercarse a la coordinación del programa para la respectiva entrega de sus documentos de grado. Si presenta dudas sobre estos documentos podrá realizar consultas a través del correo de la coordinación: <span class="email">{{ env('CORREO_COORDINACION') }}</span>.<br><br>
+                <p><strong>NOTA: </strong>Una vez realizada la <strong>SUSTENTACIÓN</strong> del proyecto, los estudiantes deberán acercarse a la coordinación del programa para la respectiva entrega de sus documentos de grado. Si presenta dudas sobre estos documentos podrá realizar consultas a través del correo de la coordinación: <span class="email">{{ config('custom.correo_coordinacion') }}</span>.<br><br>
                 Asimismo, se le recuerda al <strong class="uppercase">DIRECTOR DEL PROYECTO</strong> que deberá publicar el proyecto en el repostiorio institucional, para ello podrá seguir el siguiente tutorial: <a href="https://www.youtube.com/watch?v=IBM-tEMNVAw&t=1s" target="_blank" class="text-blue-500 underline">TUTORIAL</a> o tambien podrá consultar la documentación oficial del proceso en <a href="http://repositorio.uts.edu.co:8080/xmlui/handle/123456789/9967" target="_blank" class="text-blue-500 underline">ESTE LINK</a>.</p>
             @endif
         @endif

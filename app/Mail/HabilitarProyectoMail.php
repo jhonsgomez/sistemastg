@@ -68,7 +68,7 @@ class HabilitarProyectoMail extends Mailable
         if (isset($integrante_3)) $this->estudiantes[] = $integrante_3;
 
         $this->comite = User::role('admin')->pluck('email')->toArray();
-        $this->comite[] = env('CORREO_SISTEMAS');
+        $this->comite[] = config('mail.correo_sistemas');
 
         $director_id = $this->findCampoByName($this->campos, 'director_id');
         $evaluador_id = $this->findCampoByName($this->campos, 'evaluador_id');

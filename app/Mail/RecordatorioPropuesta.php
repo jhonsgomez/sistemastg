@@ -115,7 +115,7 @@ class RecordatorioPropuesta extends Mailable
         $this->fecha_aprobacion = self::getFechasByPeriodo($this->periodo)['fecha_aprobacion_propuesta'];
 
         $this->admins = User::role('admin')->pluck('email')->toArray();
-        $this->admins[] = env('CORREO_SISTEMAS');
+        $this->admins[] = config('mail.correo_sistemas');
     }
 
     public function findCampoByName($campos, $name)

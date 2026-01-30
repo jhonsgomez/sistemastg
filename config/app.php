@@ -60,6 +60,8 @@ return [
 
     'url_prefix' => env('APP_URL_PREFIX', ''),
 
+    'correo_sistemas' => env('CORREO_SISTEMAS'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

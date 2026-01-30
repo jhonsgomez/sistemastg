@@ -43,7 +43,7 @@ class PropuestaBancoMail extends Mailable
         $correos_admins = User::role('admin')->pluck('email')->toArray();
 
         $correos_cc = array_merge($correos_lideres, $correos_admins);
-        $correos_cc[] = env('CORREO_SISTEMAS');
+        $correos_cc[] = config('mail.correo_sistemas');
 
         if ($this->esRespuesta) {
             $subject = 'IDEA PARA BANCO ' . $this->cuerpo_correo['periodo_academico'] . ' ' . strtoupper($this->cuerpo_correo['estado_solicitud']);

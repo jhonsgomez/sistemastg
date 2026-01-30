@@ -111,7 +111,7 @@ class RecordatorioInforme extends Mailable
         $this->fecha_maxima_informe = self::findCampoByName($this->campos, 'fecha_maxima_informe');
 
         $this->admins = User::role('admin')->pluck('email')->toArray();
-        $this->admins[] = env('CORREO_SISTEMAS');
+        $this->admins[] = config('mail.correo_sistemas');
     }
 
     public function findCampoByName($campos, $name)

@@ -94,7 +94,7 @@ class RevisionProyectoMail extends Mailable
         }
 
         $this->comite = User::role('admin')->pluck('email')->toArray();
-        $this->comite[] = env('CORREO_SISTEMAS');
+        $this->comite[] = config('mail.correo_sistemas');
 
         $check_idea_banco = $this->findCampoByName($this->campos, 'check_idea_banco');
 

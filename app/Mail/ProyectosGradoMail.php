@@ -41,7 +41,7 @@ class ProyectosGradoMail extends Mailable
     public function envelope(): Envelope
     {
         $correos_cc = User::role('admin')->pluck('email')->toArray();
-        $correos_cc[] = env('CORREO_SISTEMAS');
+        $correos_cc[] = config('mail.correo_sistemas');
 
         return new Envelope(
             subject: $this->asunto_correo,

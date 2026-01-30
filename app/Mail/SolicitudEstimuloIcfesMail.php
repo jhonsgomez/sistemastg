@@ -75,7 +75,7 @@ class SolicitudEstimuloIcfesMail extends Mailable
         $integrante_3 = User::query()->where('id', $this->findCampoByName($this->campos, 'id_integrante_3'))->first();
         
         $this->comite = User::role('admin')->pluck('email')->toArray();
-        $this->comite[] = env('CORREO_SISTEMAS');
+        $this->comite[] = config('mail.correo_sistemas');
 
         if (isset($this->estado_solicitud) && $this->estado_solicitud === 'Aprobado') {
             $this->director = User::findOrFail($this->findCampoByName($this->campos, 'director_id'));
