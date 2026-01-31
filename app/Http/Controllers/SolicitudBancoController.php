@@ -773,4 +773,82 @@ class SolicitudBancoController extends Controller
             return response()->json(['message' => 'Ha ocurrido un error. Por favor, inténtelo de nuevo.'], 500);
         }
     }
+
+    public function getIdeasRepublicarData()
+    {
+        $type = null;
+        $ideas = null;
+
+        try {
+            $type = self::getType();
+            $ideas = Solicitud::query()
+                ->where('estado', '=', 'Aprobada')
+                ->where('tipo_solicitud_id', '=', $type->id)
+                ->get();
+
+            $periodo_actual = self::getPeriodoActual();
+            $ideas_republicar = [];
+
+            foreach ($ideas as $idea) {
+                $campos = $idea->camposConValores();
+                $periodo = self::findCampoByName($campos, 'periodo');
+                $disponible = self::findCampoByName($campos, 'disponible');
+                $docente = User::findOrFail($idea->user_id);
+                if ($periodo != $periodo_actual && $disponible == "true") {
+                    $ideas_republicar[] = [
+                        'id' => $idea->id,
+                        'titulo' => self::findCampoByName($campos, 'titulo'),
+                        'nivel' => Nivel::findOrFail(self::findCampoByName($campos, 'nivel'))->nombre,
+                        'modalidad' => Modalidad::findOrFail(self::findCampoByName($campos, 'modalidad'))->nombre,
+                        'linea_investigacion' => LineaInvestigacion::findOrFail(self::findCampoByName($campos, 'linea_investigacion'))->nombre,
+                        'docente' => $docente->name,
+                        'periodo' => $periodo
+                    ];
+                }
+            }
+
+            return response()->json($ideas_republicar);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'Ha ocurrido un error. Por favor, inténtelo de nuevo.'], 500);
+        }
+    }
+
+    public function republicarMasivo(Request $request)
+    {
+        $ideas_ids = null;
+
+        try {
+            $ideas_ids = $request->input('ideas_ids');
+
+            if (!empty($ideas_ids) && !is_array($ideas_ids)) {
+                $ideas_ids = explode(',', $ideas_ids);
+            }
+
+            if (empty($ideas_ids) || !is_array($ideas_ids)) {
+                return response()->json(['message' => 'No se han seleccionado ideas para republicar.'], 422);
+            }
+
+            foreach ($ideas_ids as $idea_id) {
+                $idea = Solicitud::query()
+                    ->where('id', '=', $idea_id)
+                    ->firstOrFail();
+
+                $campos_idea = ValorCampo::query()->where('solicitud_id', '=', $idea->id)->where('deleted_at', '=', NULL)->get();
+
+                foreach ($campos_idea as $valor_campo) {
+                    $campo = Campo::query()
+                        ->where('id', '=', $valor_campo->campo_id)
+                        ->firstOrFail();
+
+                    if ($campo->name === 'periodo') {
+                        $valor_campo->update(['valor' => self::getPeriodoActual()]);
+                    }
+                }
+            }
+
+            return response()->json(['success' => 'Ideas republicadas exitosamente']);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'Ha ocurrido un error. Por favor, inténtelo de nuevo.'], 500);
+        }
+    }
 }

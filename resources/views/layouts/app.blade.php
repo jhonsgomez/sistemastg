@@ -73,6 +73,10 @@
             border-radius: 8px !important;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
         }
+
+        input[type="checkbox"] {
+            accent-color: #C1D631 !important;
+        }
     </style>
 
     @stack('styles')

@@ -144,6 +144,9 @@ Route::middleware([
         Route::get('/data', [SolicitudBancoController::class, 'bancoData'])->name('banco.data');
         Route::delete('/{id}', [SolicitudBancoController::class, 'destroySolicitud'])->name('banco.destroy');
 
+        Route::get('/ideas-republicar', [SolicitudBancoController::class, 'getIdeasRepublicarData'])->name('banco.ideas_republicar');
+        Route::post('/ideas-republicar', [SolicitudBancoController::class, 'republicarMasivo'])->name('banco.republicar_masivo');
+
         Route::prefix('reporte')->group(function () {
             Route::post('/', [SolicitudBancoController::class, 'generarReporte'])->name('banco.reporte');
         });
