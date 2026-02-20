@@ -13,7 +13,7 @@ async function openFase5DetailsModal(id) {
     let info = {};
 
     async function obtenerCamposProyecto(id) {
-        let response = await fetch(`/proyectos/${id}/campos`);
+        let response = await fetch(`${window.APP_URL}/proyectos/${id}/campos`);
         let data = await response.json();
 
         return data.campos;
