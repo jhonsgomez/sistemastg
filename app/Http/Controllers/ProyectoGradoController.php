@@ -790,7 +790,8 @@ class ProyectoGradoController extends Controller
             }
 
             $proyecto->update([
-                'deshabilitado' => false
+                'deshabilitado' => false,
+                'vencido' => false
             ]);
 
             $acta = Acta::create([
