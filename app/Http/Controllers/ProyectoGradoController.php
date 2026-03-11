@@ -2572,6 +2572,21 @@ class ProyectoGradoController extends Controller
                     ]);
                 }
 
+                // Verificar si todos los id's de los integrantes estan dentro del array beneficiarios_icfes
+                $beneficiarios_icfes = ValorCampo::where('solicitud_id', '=', $proyecto->id)
+                    ->where('campo_id', '=', $campo_beneficiarios_icfes->id)
+                    ->firstOrFail();
+
+                $beneficiarios_icfes = json_decode($beneficiarios_icfes->valor) ?? [];
+
+                $todos_beneficiarios = true;
+                foreach ($integrantes as $integrante) {
+                    if (!in_array($integrante->id, $beneficiarios_icfes)) {
+                        $todos_beneficiarios = false;
+                        break;
+                    }
+                }
+
                 $acta = Acta::create([
                     'numero' => $request->nro_acta_icfes,
                     'fecha' => $request->fecha_acta_icfes,
@@ -2585,8 +2600,8 @@ class ProyectoGradoController extends Controller
                 Mail::queue(new SolicitudEstimuloIcfesMail($proyecto->id, $integrante_beneficiado->id, null, 'respuesta_estudiante', $request->estado_icfes, $request->respuesta_icfes, $acta));
                 Mail::queue(new SolicitudEstimuloIcfesMail($proyecto->id, $integrante_beneficiado->id, null, 'respuesta_docentes', $request->estado_icfes, $request->respuesta_icfes, $acta));
 
-                // 9. En caso de que todos los integrantes hayan cargado el soporte del ICFES, se debe finalizar todo el proyecto
-                if ($todos_submited) {
+                // 9. En caso de que todos los integrantes hayan cargado el soporte del ICFES, y adicional todos los integrantes se encuentren dentro de $beneficiarios_icfes, se debe finalizar todo el proyecto
+                if ($todos_submited && $todos_beneficiarios) {
                     // Cambiar el estado del proyecto a Finalizado
                     $proyecto->update([
                         'estado' => 'Finalizado'
