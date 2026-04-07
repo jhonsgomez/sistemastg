@@ -9,6 +9,7 @@ use App\Http\Controllers\ModalidadController;
 use App\Http\Controllers\NivelController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ProyectoGradoController;
+use App\Http\Controllers\PracticaController;
 use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\RoadMapController;
 use App\Http\Controllers\RoleController;
@@ -206,6 +207,22 @@ Route::middleware([
         Route::prefix('reporte')->group(function () {
             Route::post('/', [ProyectoGradoController::class, 'generarReporte'])->name('proyectos.reporte');
         });
+    });
+
+    // Rutas para practicas empresariales
+
+    Route::middleware('permission:view_practicas')
+    ->prefix('practicas')
+    ->group(function () {
+
+        Route::get('/', [PracticaController::class, 'index'])->name('practicas.index');
+        Route::post('/', [PracticaController::class, 'store'])->name('practicas.store');
+
+        Route::get('/data', [PracticaController::class, 'getData'])->name('practicas.data');
+
+        Route::post('/habilitar', [PracticaController::class, 'habilitar'])->name('practicas.habilitar');
+        Route::post('/deshabilitar', [PracticaController::class, 'deshabilitar'])->name('practicas.deshabilitar');
+
     });
 
     // Rutas para base documental

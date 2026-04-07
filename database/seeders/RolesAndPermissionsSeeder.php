@@ -29,7 +29,7 @@ class RolesAndPermissionsSeeder extends Seeder
         ];
 
         foreach ($roles as $roleName) {
-            Role::create([
+            Role::firstOrCreate([
                 'name' => $roleName,
                 'description' => 'Rol de ' . ucfirst(str_replace('_', ' ', $roleName))
             ]);
@@ -95,6 +95,13 @@ class RolesAndPermissionsSeeder extends Seeder
             'details_proyecto_grado'
         ];
 
+        $practicasPermissions = [
+            'view_practicas',
+            'list_practicas',
+            'create_practicas',
+            'details_practicas'
+        ];
+
         // Permisos para modulo historico
         $historicoPermissions = [
             'view_historico',
@@ -109,20 +116,20 @@ class RolesAndPermissionsSeeder extends Seeder
             'reply_proyecto_grado'
         ];
 
-        $allPermissions = array_merge($rolePermissions, $permissionPermissions, $userPermissions, $bancoPermissions, $bancoDocentePermissions, $bancoAdminPermissions, $proyectosPermissions, $proyectosAdminPermissions, $proyectosEstudiantePermissions, $historicoPermissions);
+        $allPermissions = array_merge($rolePermissions, $permissionPermissions, $userPermissions, $practicasPermissions, $bancoPermissions, $bancoDocentePermissions, $bancoAdminPermissions, $proyectosPermissions, $proyectosAdminPermissions, $proyectosEstudiantePermissions, $historicoPermissions);
         foreach ($allPermissions as $permissionName) {
-            Permission::create([
-                'name' => $permissionName,
+            Permission::firstOrCreate([
+                'name' => $permissionName
+            ], [
                 'description' => 'Permiso para ' . str_replace('_', ' ', $permissionName)
             ]);
         }
-
-        $adminPermissions = array_merge($assignRoles, $userPermissions, $bancoPermissions, $bancoDocentePermissions, $bancoAdminPermissions, $proyectosPermissions, $proyectosAdminPermissions, $historicoPermissions);
+        $adminPermissions = array_merge($assignRoles, $userPermissions, $bancoPermissions, $bancoDocentePermissions, $bancoAdminPermissions, $proyectosPermissions, $practicasPermissions, $proyectosAdminPermissions, $historicoPermissions);
         $liderPermissions = array_merge($bancoPermissions, $bancoDocentePermissions, $bancoAdminPermissions, $proyectosPermissions, $proyectosAdminPermissions);
-        $docentePermissions = array_merge($bancoPermissions, $bancoDocentePermissions);
-        $directorPermissions = array_merge($proyectosPermissions);
-        $evaluadorPermissions = array_merge($proyectosPermissions);
-        $estudiantePermissions = array_merge($bancoPermissions, $proyectosPermissions, $proyectosEstudiantePermissions);
+        $docentePermissions = array_merge($bancoPermissions, $bancoDocentePermissions, $practicasPermissions);
+        $directorPermissions = array_merge($proyectosPermissions, $practicasPermissions);
+        $evaluadorPermissions = array_merge($proyectosPermissions, $practicasPermissions);
+        $estudiantePermissions = array_merge($bancoPermissions, $proyectosPermissions, $proyectosEstudiantePermissions, $practicasPermissions);
 
         // Asignar los permisos al rol
         $superAdminRole = Role::findByName('super_admin');
