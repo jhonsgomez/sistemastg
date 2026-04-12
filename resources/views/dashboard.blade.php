@@ -113,6 +113,23 @@
             @endcan
             @endif
 
+            @if (!auth()->user()->hasRole(['docente']))
+            @can('view_practicas')
+            <a href="{{ route('practicas.index') }}" class="border bg-white p-6 text-gray-600 rounded-lg shadow-lg hover:bg-uts-500 hover:text-white transition ease-in-out duration-200 flex flex-col items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="currentColor" data-name="Layer 1" viewBox="0 0 24 24" id="graduation-cap">
+                    <path fill="currentColor" d="M20 6h-4V4a2 2 0 0 0-2-2H10a2 2 0 0 0-2 2v2H4a2 2 0 0 0-2 2v3h20V8a2 2 0 0 0-2-2zM10 4h4v2h-4V4zM2 13v5a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5H2z"></path>
+                </svg>
+                @if (auth()->user()->hasRole('estudiante'))
+                <span class="text-center font-bold text-lg">Mis prácticas</span>
+                <p class="text-center mt-2 text-sm">Accede al módulo de tus prácticas y seguimiento de las mismas.</p>
+                @else
+                <span class="text-center font-bold text-lg">Prácticas empresariales</span>
+                <p class="text-center mt-2 text-sm">Accede al módulo de tus prácticas y seguimiento de las mismas.</p>
+                @endif
+            </a>
+            @endcan
+            @endif
+
             <a href="{{ route('documental.index') }}" class="border bg-white p-6 text-gray-600 rounded-lg shadow-lg hover:bg-uts-500 hover:text-white transition ease-in-out duration-200 flex flex-col items-center justify-center">
                 <i class="fas fa-book-open text-4xl mb-4"></i>
                 <span class="text-center font-bold text-lg">Base Documental</span>
