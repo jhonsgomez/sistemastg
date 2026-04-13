@@ -181,7 +181,6 @@ Route::middleware([
 
             Route::get('/', [PracticaController::class, 'index'])->name('practicas.index');
             Route::post('/', [PracticaController::class, 'store'])->name('practicas.store');
-
             Route::get('/data', [PracticaController::class, 'getData'])->name('practicas.data');
             
             Route::post('/habilitar', [PracticaController::class, 'habilitar'])->name('practicas.habilitar');
