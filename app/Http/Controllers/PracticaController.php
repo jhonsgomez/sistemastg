@@ -5,7 +5,9 @@ use App\Models\TipoSolicitud;
 use Illuminate\Http\Request;
 use App\Models\Campo;
 use App\Models\Practica;
+use Yajra\DataTables\Facades\DataTables;
 class PracticaController extends Controller
+
 {
     public function index()
     {
@@ -17,9 +19,83 @@ class PracticaController extends Controller
 
         return view('practicas.index', compact('campos'));
     }
+    
+    
+    public function getData(Request $request)
+    {
+        // Base query: solo prácticas de tipo fase 0
+        $practicas = Practica::with('user')
+            ->where('tipo_solicitud_id', 9);
 
+        // Filtro por rol
+        if (auth()->user()->hasRole('estudiante')) {
+            $practicas->where('user_id', auth()->id());
+        }
+        // Para admin, coordinador, super_admin no se filtra (muestra todas)
 
+        return DataTables::of($practicas)
+            ->addColumn('descripcion', function ($practica) {
+                // Construir una descripción resumida: nombre completo y documento
+                // Normalizar: si es string JSON, decodificarlo; si ya es array, usarlo directamente
+                $data = $practica->data;
+                if (is_string($data)) {
+                    $data = json_decode($data, true);
+                }
+                if (!is_array($data)) {
+                    $data = [];
+                }
+                $nombre = $data['nombre_completo'] ?? 'N/A';
+                $documento = $data['documento'] ?? '';
+                return "{$nombre} (Doc: {$documento})";
+            })
+            ->addColumn('estado', function ($practica) {
+                $badge = match ($practica->estado) {
+                    'Pendiente' => 'bg-yellow-100 text-yellow-800',
+                    'Aprobada'  => 'bg-green-100 text-green-800',
+                    'Rechazada' => 'bg-red-100 text-red-800',
+                    default     => 'bg-gray-100 text-gray-800',
+                };
+                $html = "<span class='px-2 py-1 rounded-full text-xs font-semibold {$badge}'>{$practica->estado}</span>";
+                if ($practica->estado === 'Pendiente') {
+                    $html .= ' <span class="px-2 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">Comité</span>';
+                }
+                return $html;
+            })
+            ->addColumn('acciones', function ($practica) {
+            $user = auth()->user();
+            $buttons = '<div class="flex items-center gap-1">';
 
+            // 1. Botón Ver (todos los roles con permiso)
+            if ($user->can('view_practicas')) {
+                $buttons .= '<button onclick="openDetailsModal('.$practica->id.')" class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white px-3 py-1 rounded-lg"><i class="fa-regular fa-eye"></i></button>';
+            }
+
+            // 2. Si es estudiante y la práctica está deshabilitada, mostrar texto en lugar del ojo
+            if ($user->hasRole('estudiante')) {
+                if ($practica->deshabilitado) {
+                    // Reemplazar el botón Ver por un texto
+                    $buttons = '<div class="flex items-center gap-1"><span class="text-red-600 font-semibold">Deshabilitado</span></div>';
+                }
+                // Estudiante no tiene más botones
+                return $buttons;
+            }
+
+            // 3. Para comité (admin, coordinador, super_admin)
+            if ($user->hasRole(['super_admin', 'admin', 'coordinador'])) {
+                // Botón Responder (solo si estado Pendiente)
+                if ($practica->estado === 'Pendiente') {
+                    $buttons .= '<button onclick="responderPractica('.$practica->id.')" class="btn-action shadow bg-green-500 hover:bg-green-700 text-white px-3 py-1 rounded-lg"><i class="fa-regular fa-paper-plane"></i></button>';
+                }
+            }
+
+            $buttons .= '</div>';
+            return $buttons;
+        })
+            ->rawColumns(['estado', 'acciones'])
+            ->make(true);
+    }
+    
+    
     public function store(Request $request)
     {
         $tipo = TipoSolicitud::where('nombre', 'practicas_fase_0')->first();
@@ -72,7 +148,7 @@ class PracticaController extends Controller
 
             elseif ($campo->type == 'file') {
 
-                // 🔥 SI TIENE EMPRESA, NO GUARDAR HOJA DE VIDA
+                // SI TIENE EMPRESA, NO GUARDAR HOJA DE VIDA
                 if ($campo->name == 'hoja_vida' && $tieneEmpresa) {
                     continue;
                 }
@@ -90,14 +166,61 @@ class PracticaController extends Controller
         }
        
 
-        Practica::create([
+            Practica::create([
             'user_id' => auth()->id(),
             'tipo_solicitud_id' => $tipo->id,
-            'data' => json_encode($data)
+            'data' => json_encode($data),
+            'estado' => 'Pendiente',
+            'vencido' => false,
+            'deshabilitado' => false,
         ]);
 
         return response()->json([
             'message' => 'Práctica enviada correctamente'
         ]);
     }
+
+    public function getDetalle($id)
+    {
+        $practica = Practica::with('user')->findOrFail($id);
+        $data = $practica->data;
+        if (is_string($data)) {
+            $data = json_decode($data, true);
+        }
+        if (!is_array($data)) {
+            $data = [];
+        }
+        return response()->json([
+            'id' => $practica->id,
+            'estado' => $practica->estado,
+            'vencido' => $practica->vencido,
+            'deshabilitado' => $practica->deshabilitado,
+            'fecha_solicitud' => $practica->created_at->format('d/m/Y H:i'),
+            'user' => $practica->user ? $practica->user->name : 'N/A',
+            'data' => $data
+        ]);
+    }
+
+    public function show($id)
+    {
+        $practica = Practica::with('user')->findOrFail($id);
+        return view('practicas.show', compact('practica'));
+    }
+
+    // Habilitar una práctica (cambiar deshabilitado a false)
+    public function habilitar(Request $request)
+    {
+        $practica = Practica::findOrFail($request->id);
+        $practica->update(['deshabilitado' => false]);
+        return response()->json(['success' => true]);
+    }
+
+    // Deshabilitar una práctica
+    public function deshabilitar(Request $request)
+    {
+        $practica = Practica::findOrFail($request->id);
+        $practica->update(['deshabilitado' => true]);
+        return response()->json(['success' => true]);
+    }
+
 }

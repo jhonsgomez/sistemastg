@@ -7,6 +7,128 @@
         </h2>
     </x-slot>
 
+    @push('styles')
+    <style>
+        .btn-action {
+            padding: 6px 12px;
+            margin: 0 4px;
+            transition: all 0.3s ease;
+            border-radius: 0.375rem;
+        }
+
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-close-btn-custom {
+            position: absolute !important;
+            top: 10px !important;
+            right: 28px !important;
+            background: none !important;
+            border: none !important;
+            font-size: 30px !important;
+            cursor: pointer !important;
+            color: #6b7280 !important;
+            transition: color 0.3s ease !important;
+        }
+
+        .modal-close-btn-custom:hover {
+            color: #dc2626 !important;
+        }
+
+        @media screen and (max-width: 640px) {
+            .buttons-container {
+                padding-top: 1rem !important;
+            }
+
+            .modal-content {
+                padding: 1.5rem !important;
+            }
+
+            .container-actions {
+                justify-content: flex-start !important;
+                align-items: center !important;
+            }
+
+            .container_check {
+                margin-top: 0 !important;
+            }
+        }
+
+        #detailsModal,
+        #replySolicitudModal,
+        #desactivarProyectoModal,
+        #activarProyectoModal,
+        #calendarModal,
+        #warningModal,
+        #reporteModal {
+            visibility: hidden;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+        }
+
+        .transition{
+            transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+        }
+
+        #detailsModal.show,
+        #replySolicitudModal.show,
+        #desactivarProyectoModal.show,
+        #activarProyectoModal.show,
+        #calendarModal.show,
+        #warningModal.show,
+        #reporteModal.show {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.5) !important;
+            transition: background-color 0.3s ease;
+        }
+
+        .modal-content {
+            max-width: 850px !important;
+            width: 100% !important;
+            padding: 2rem 3rem;
+            background-color: white !important;
+            border-radius: 8px !important;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        #reporteModal .modal-content {
+            max-width: 500px !important;
+        }
+
+        .modal-close-btn {
+            position: absolute !important;
+            top: 10px !important;
+            right: 10px !important;
+            background-color: transparent !important;
+            border: none !important;
+            font-size: 1.5rem !important;
+            color: #333 !important;
+            cursor: pointer !important;
+        }
+
+        .modal-close-btn:hover {
+            color: #e53e3e !important;
+        }
+
+        #check_integrante_2:checked,
+        #check_integrante_3:checked {
+            background-color: #C1D631 !important;
+        }
+
+        .container_check {
+            margin-top: 1.5rem;
+        }
+    </style>
+    @endpush
+
     <!--Dasboard-->
     <div class="flex flex-col sm:flex-row justify-between items-center p-4 border-b">
         <h2 class="text-2xl text-center font-bold text-gray-800">
@@ -51,7 +173,7 @@
                     <button
                         onclick="openCreateModal()"
                         id="openCreateModalButton"
-                        class="bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg flex items-center shadow">
+                        class="bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg flex items-center shadow transition">
                         <i class="fas fa-plus mr-2"></i>
                         <svg id="loadingSpinner-crear" style="margin: 4px 10px 4px 0" class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64" fill="none"
                             xmlns="http://www.w3.org/2000/svg" width="24" height="24">
@@ -74,6 +196,43 @@
                 @endif
             </div>
         </div>
+
+    <!--Datatables-->
+
+    <div class="p-4">
+        @can('list_proyectos_grado')  {{-- Puedes usar el mismo permiso o crear uno nuevo --}}
+        <table id="practicasTable" class="w-full">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Descripción</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+        </table>
+        @endcan
+    </div>
+
+    <!--Details Fase 0-->
+
+    <div id="detailsModal" class="fixed z-50 inset-0 overflow-y-auto hidden">
+    <div class="modal-overlay absolute inset-0" onclick="closeDetailsModal()">
+        <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
+            <div class="inline-block align-bottom bg-white rounded-lg text-left shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative" onclick="event.stopPropagation()">
+                <button class="modal-close-btn-custom" onclick="closeDetailsModal()">&times;</button>
+                <div class="p-6 mt-2">
+                    <p class="text-2xl font-bold" id="detailsTitle"></p>
+                    <div id="content-details"></div>
+                    <div class="flex justify-end space-x-2 mt-4">
+                        <button type="button" onclick="closeDetailsModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
     </div>
 
         <div id="createModal" class="hidden fixed z-50 inset-0 overflow-y-auto">
@@ -312,6 +471,7 @@
                 </div>
             </div>
         </div>
+    </div>
 
     @push('scripts')
     <script>
@@ -430,7 +590,87 @@
         });
         </script>
 
-      
+        <!--Datatables-->
+
+        <script>
+            $(function() {
+                $('#practicasTable').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: '{{ route("practicas.data") }}',
+                    columns: [
+                        { data: 'id', name: 'id' },
+                        { data: 'descripcion', name: 'descripcion' },
+                        { data: 'estado', name: 'estado' },
+                        { data: 'acciones', name: 'acciones', orderable: false, searchable: false }
+                    ],
+                    language: {
+                        "sProcessing":     "Procesando...",
+                        "sLengthMenu":     "Mostrar _MENU_ registros",
+                        "sZeroRecords":    "No se encontraron resultados",
+                        "sEmptyTable":     "Ningún dato disponible",
+                        "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_",
+                        "sInfoEmpty":      "Mostrando 0 registros",
+                        "sInfoFiltered":   "(filtrado de _MAX_ registros totales)",
+                        "sSearch":         "Buscar:",
+                        "sLoadingRecords": "Cargando...",
+                        "oPaginate": {
+                            "sFirst":    "Primero",
+                            "sLast":     "Último",
+                            "sNext":     "Siguiente",
+                            "sPrevious": "Anterior"
+                        }
+                    }
+                });
+            });
+
+            // Funciones para habilitar/deshabilitar (ya existentes)
+            function habilitarPractica(id) {
+                $.post('{{ route("practicas.habilitar") }}', { id: id, _token: '{{ csrf_token() }}' })
+                    .done(() => $('#practicasTable').DataTable().ajax.reload());
+            }
+
+            function deshabilitarPractica(id) {
+                $.post('{{ route("practicas.deshabilitar") }}', { id: id, _token: '{{ csrf_token() }}' })
+                    .done(() => $('#practicasTable').DataTable().ajax.reload());
+            }
+    </script>
+
+    <script>
+        function openDetailsModal(id) {
+        // Mostrar loading si quieres
+        $('#detailsTitle').html('Detalles de la solicitud de práctica');
+        $('#content-details').html('<div class="text-center">Cargando...</div>');
+        $('#detailsModal').removeClass('hidden').addClass('show');
+
+        $.get('{{ url("practicas") }}/' + id + '/detalle', function(response) {
+            let data = response.data;
+            let html = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div><strong>Nombre completo:</strong> ${data.nombre_completo || 'N/A'}</div>
+                    <div><strong>Correo:</strong> ${data.correo || 'N/A'}</div>
+                    <div><strong>Nivel académico:</strong> ${data.nivel || 'N/A'}</div>
+                    <div><strong>Documento:</strong> ${data.documento || 'N/A'}</div>
+                    <div><strong>Celular:</strong> ${data.celular || 'N/A'}</div>
+                    <div><strong>¿Tiene empresa?</strong> ${data.tiene_empresa ? 'Sí' : 'No'}</div>
+                    ${data.hoja_vida ? `<div><strong>Hoja de vida:</strong> <a href="/storage/${data.hoja_vida}" target="_blank" class="text-uts-500 underline">Ver archivo</a></div>` : ''}
+                    <div><strong>Estado:</strong> ${response.estado}</div>
+                    <div><strong>Vencido:</strong> ${response.vencido ? 'Sí' : 'No'}</div>
+                    <div><strong>Deshabilitado:</strong> ${response.deshabilitado ? 'Sí' : 'No'}</div>
+                    <div><strong>Fecha solicitud:</strong> ${response.fecha_solicitud}</div>
+                </div>
+            `;
+            $('#content-details').html(html);
+        }).fail(function() {
+            $('#content-details').html('<div class="text-red-500">Error al cargar los detalles.</div>');
+        });
+    }
+
+    function closeDetailsModal() {
+        $('#detailsModal').removeClass('show').addClass('hidden');
+    }
+    </script>
+
     @endpush
 
 

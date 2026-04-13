@@ -176,18 +176,6 @@ Route::middleware([
             return redirect()->route('dashboard');
         })->name('roadmap.get');
 
-        //Rutas para practicas empresariales
-        Route::middleware('permission:view_practicas')->prefix('practicas')->group(function () {
-
-            Route::get('/', [PracticaController::class, 'index'])->name('practicas.index');
-            Route::post('/', [PracticaController::class, 'store'])->name('practicas.store');
-            Route::get('/data', [PracticaController::class, 'getData'])->name('practicas.data');
-            
-            Route::post('/habilitar', [PracticaController::class, 'habilitar'])->name('practicas.habilitar');
-            Route::post('/deshabilitar', [PracticaController::class, 'deshabilitar'])->name('practicas.deshabilitar');
-
-        });
-
         // Rutas para configurar el proyecto
         Route::post('/configurar/admin', [ProyectoGradoController::class, 'configAdmin'])->name('proyectos.configurar_admin');
         Route::post('/configurar', [ProyectoGradoController::class, 'configEstudiante'])->name('proyectos.configurar_estudiante');
@@ -231,6 +219,10 @@ Route::middleware([
         Route::post('/', [PracticaController::class, 'store'])->name('practicas.store');
 
         Route::get('/data', [PracticaController::class, 'getData'])->name('practicas.data');
+
+        Route::get('/{id}', [PracticaController::class, 'show'])->name('practicas.show');
+
+        Route::get('/{id}/detalle', [PracticaController::class, 'getDetalle'])->name('practicas.detalle');
 
         Route::post('/habilitar', [PracticaController::class, 'habilitar'])->name('practicas.habilitar');
         Route::post('/deshabilitar', [PracticaController::class, 'deshabilitar'])->name('practicas.deshabilitar');
