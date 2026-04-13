@@ -84,10 +84,201 @@
                             &times;
                         </button>
                         @if (auth()->user()->hasRole(['estudiante']))
-                        <form id="proyectosForm" class="p-6 mt-2">
+                        <form id="practicasForm" class="p-6 mt-2" method="POST" enctype="multipart/form-data">
                             @csrf
                             <p class="text-2xl font-bold" style="margin: 0.8rem 0 1.5rem 0;" id="formTitle"></p>
                             <p class="text-sm mb-2">En este formulario el estudiante registrará la información necesaria para la solicitud de prácticas empresariales.</p>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6 mb-6">
+                                @foreach($campos as $campo)
+                                <div>
+
+                                @if ($campo->label != null && $campo->type != 'hidden')
+                                    <div class="flex items-center gap-2">
+                                        <label for="{{ $campo->name }}" class="block font-medium text-sm text-gray-700">
+
+                                            <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+
+                                            @if($campo->required)
+                                                <span class="text-red-600 mr-1 text-lg">*</span>
+                                            @endif
+
+                                            {{ $campo->label }}
+                                        </label>
+
+                                        @if(!empty($campo->instructions))
+                                        <div class="relative inline-block">
+                                            <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                                data-tooltip="tooltip-{{ $campo->name }}"></i>
+
+                                            <div id="tooltip-{{ $campo->name }}"
+                                                class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg">
+                                                {!! $campo->instructions !!}
+                                            </div>
+                                        </div>
+                                        @endif
+                                    </div>
+                                @endif
+                                
+                                @switch($campo->type)
+
+                                {{-- ================= TEXT ================= --}}
+                                @case('text')
+                                    @switch($campo->name)
+
+                                        @case('nombre_completo')
+                                            <input type="text"
+                                                name="{{ $campo->name }}"
+                                                value="{{ auth()->user()->name }}"
+                                                class="bg-gray-200 border-gray-300 rounded-md mt-1 block w-full cursor-default"
+                                                readonly>
+                                        @break
+
+                                        @case('correo')
+                                            <input type="text"
+                                                name="{{ $campo->name }}"
+                                                value="{{ auth()->user()->email }}"
+                                                class="bg-gray-200 border-gray-300 rounded-md mt-1 block w-full cursor-default"
+                                                readonly>
+                                        @break
+
+                                        @case('nivel')
+                                            <input type="text"
+                                                name="{{ $campo->name }}"
+                                                value="{{ auth()->user()->nivel->nombre ?? '' }}"
+                                                class="bg-gray-200 border-gray-300 rounded-md mt-1 block w-full cursor-default"
+                                                readonly>
+                                        @break
+
+                                        
+
+                                        @default
+                                            <input type="text"
+                                                name="{{ $campo->name }}"
+                                                id="{{ $campo->name }}"
+                                                placeholder="{{ $campo->placeholder ?? '' }}"
+                                                class="border-gray-300 rounded-md mt-1 block w-full">
+                                        @break
+
+                                    @endswitch
+                                @break
+
+
+                                {{-- ================= TEXTAREA ================= --}}
+                                @case('textarea')
+                                    <textarea
+                                        name="{{ $campo->name }}"
+                                        id="{{ $campo->name }}"
+                                        class="border-gray-300 rounded-md mt-1 block w-full">{{ old($campo->name) }}</textarea>
+                                @break
+
+
+                                {{-- ================= NUMBER ================= --}}
+                                @case('number')
+                                    @switch($campo->name)
+                                        @case('documento')
+                                            <input type="number"
+                                                name="{{ $campo->name }}"
+                                                value="{{ auth()->user()->nro_documento ?? '' }}"
+                                                class="bg-gray-200 border-gray-300 rounded-md mt-1 block w-full cursor-default"
+                                                readonly>
+                                        @break
+
+                                        @case('celular')
+                                            <input type="number"
+                                                name="{{ $campo->name }}"
+                                                value="{{ auth()->user()->nro_celular ?? '' }}"
+                                                class="bg-gray-200 border-gray-300 rounded-md mt-1 block w-full cursor-default"
+                                                readonly>
+                                        @break
+
+                                    @endswitch
+                                @break
+
+                                {{-- ================= DATE ================= --}}
+                                @case('date')
+                                    <input type="date"
+                                        name="{{ $campo->name }}"
+                                        id="{{ $campo->name }}"
+                                        class="border-gray-300 rounded-md mt-1 block w-full">
+                                @break
+
+
+
+                                {{-- ================= FILE ================= --}}
+                                @case('file')
+
+                                    @if($campo->name == 'hoja_vida')
+                                        <div id="hojaVidaContainer" style="display:none;">
+                                            <label>Hoja de vida (PDF)</label>
+
+                                            <input type="file"
+                                                name="{{ $campo->name }}"
+                                                id="{{ $campo->name }}"
+                                                class="border-gray-300 rounded-md mt-1 block w-full">
+                                        </div>
+                                    @else
+                                        <input type="file"
+                                            name="{{ $campo->name }}"
+                                            id="{{ $campo->name }}"
+                                            class="border-gray-300 rounded-md mt-1 block w-full">
+                                    @endif
+
+                                @break
+
+                        
+
+
+                                {{-- ================= CHECKBOX ================= --}}
+                                @case('checkbox')
+                                <div class="mt-2">
+
+                                    <div class="flex items-center gap-4">
+                                        <label class="flex items-center gap-1">
+                                            <input type="radio"
+                                                name="{{ $campo->name }}"
+                                                value="1"
+                                                id="tiene_empresa"
+                                                onchange="toggleHojaVida()">
+                                            Sí
+                                        </label>
+
+                                        <label class="flex items-center gap-1">
+                                            <input type="radio"
+                                                name="{{ $campo->name }}"
+                                                value="0"
+                                                id="tiene_empresa"
+                                                onchange="toggleHojaVida()">
+                                            No
+                                        </label>
+                                      
+                                    </div>
+                                </div>
+                                @break
+                                {{-- ================= HIDDEN ================= --}}
+                                @case('hidden')
+                                    <input type="hidden"
+                                        name="{{ $campo->name }}"
+                                        id="{{ $campo->name }}"
+                                        value="{{ $campo->placeholder ?? '' }}">
+                                @break
+
+
+                                {{-- ================= DEFAULT ================= --}}
+                                @default
+                                    <input type="text"
+                                        name="{{ $campo->name }}"
+                                        id="{{ $campo->name }}"
+                                        placeholder="{{ $campo->placeholder ?? '' }}"
+                                        class="border-gray-300 rounded-md mt-1 block w-full">
+                                @endswitch
+                               
+
+                                <span id="{{ $campo->name }}Error" class="text-red-500 text-sm"></span>
+                                </div>
+                                @endforeach
+                            </div>
+
+
                             <p class="text-sm mb-6"><strong>NOTA: </strong>El estudiante debe tener aprobado el 90% de los créditos (Tecnología: 97 / Profesional: 65).</p>
                             <p class="text-sm mb-6"><strong>Convenios: </strong>Verifique si la empresa tiene convenio vigente en la pagina de la Ori :<a href="https://oriapp.uts.edu.co/activities_guest" target="_blank"  class="text-uts-500 underline hover:text-uts-800"> Consultar convenios aquí </a></p>
                             
@@ -146,7 +337,66 @@
 
             $('#createModal').removeClass('hidden');
         }
+        
     </script>
+    <script>
+            $('#practicasForm').on('submit', function(e) {
+            e.preventDefault();
+
+            const button = document.getElementById('guardarModalButton');
+            const loadingSpinner = document.getElementById('loadingSpinner-guardar');
+
+            const url = "{{ route('practicas.store') }}";
+
+            let formData = new FormData(this); //  para archivos
+
+            Swal.fire({
+                title: '¿Está seguro?',
+                text: "No podrá editar la información una vez se envíe",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, enviar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+
+                    loadingSpinner.classList.remove('hidden');
+
+                    $.ajax({
+                        url: url,
+                        method: 'POST',
+                        data: formData,
+                        processData: false, // IMPORTANTE
+                        contentType: false, // IMPORTANTE
+
+                        success: function(response) {
+                         
+                            closeCreateModal();
+                            showToast('Solicitud de Práctica enviada correctamente');
+                        },
+
+                        error: function(xhr) {
+
+                            const errors = xhr.responseJSON?.errors;
+
+                            // limpiar TODOS los errores primero
+                            $('[id$="Error"]').text('');
+
+                            // recorrer dinámicamente
+                            for (let campo in errors) {
+                                $('#' + campo + 'Error').text(errors[campo][0]);
+                            }
+                        },
+
+                        complete: function() {
+                            loadingSpinner.classList.add('hidden');
+                        }
+                    });
+                }
+            });
+        });
+        </script>
+
     <script>
             function closeDetailsModal() {
             $('#detailsModal').removeClass('show');
@@ -158,6 +408,29 @@
             $('#createModal').addClass('hidden');
         }
     </script>
+
+    <script>
+        function toggleHojaVida() {
+            const tieneEmpresaSi = document.querySelector('input[name="tiene_empresa"][value="1"]');
+            const tieneEmpresaNo = document.querySelector('input[name="tiene_empresa"][value="0"]');
+            const container = document.getElementById('hojaVidaContainer');
+
+            if (tieneEmpresaNo && tieneEmpresaNo.checked) {
+                // NO tiene empresa → mostrar hoja de vida
+                container.style.display = 'block';
+            } else {
+                // SÍ tiene empresa → ocultar
+                container.style.display = 'none';
+            }
+        }
+
+        // cuando carga el modal
+        document.addEventListener('DOMContentLoaded', function () {
+            toggleHojaVida();
+        });
+        </script>
+
+      
     @endpush
 
 

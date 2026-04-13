@@ -398,40 +398,7 @@ class CamposSeeder extends Seeder
             'required' => false,
         ]);
 
-        // Campos para fase 5
-        $fase_5 = TipoSolicitud::where('nombre', 'fase_5')->first();
 
-        Campo::create([
-            'tipo_solicitud_id' => $fase_5->id,
-            'name' => 'recordatorio_fase5',
-            'label' => 'Recordatorio de fase 5',
-            'type' => 'hidden',
-            'required' => true,
-        ]);
 
-        Campo::create([
-            'tipo_solicitud_id' => $fase_5->id,
-            'name' => 'submited_fase5_director',
-            'label' => 'Bandera para validar el envío',
-            'type' => 'hidden',
-            'required' => true,
-        ]);
-
-        Campo::create([
-            'tipo_solicitud_id' => $fase_5->id,
-            'name' => 'submited_fase5_evaluador',
-            'label' => 'Bandera para validar el envío',
-            'type' => 'hidden',
-            'required' => true,
-        ]);
-
-        Campo::create([
-            'tipo_solicitud_id' => $fase_5->id,
-            'name' => 'doc_turnitin_informe',
-            'label' => 'Informe de plagio',
-            'type' => 'file',
-            'required' => true,
-            'instructions' => 'Solo se debe subir un archivo en formato pdf.',
-        ]);
     }
 }
