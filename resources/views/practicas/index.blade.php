@@ -593,35 +593,34 @@
         <!--Datatables-->
 
         <script>
-            $(function() {
-                $('#practicasTable').DataTable({
-                    processing: true,
-                    serverSide: true,
-                    ajax: '{{ route("practicas.data") }}',
-                    columns: [
-                        { data: 'id', name: 'id' },
-                        { data: 'descripcion', name: 'descripcion' },
-                        { data: 'estado', name: 'estado' },
-                        { data: 'acciones', name: 'acciones', orderable: false, searchable: false }
-                    ],
-                    language: {
-                        "sProcessing":     "Procesando...",
-                        "sLengthMenu":     "Mostrar _MENU_ registros",
-                        "sZeroRecords":    "No se encontraron resultados",
-                        "sEmptyTable":     "Ningún dato disponible",
-                        "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_",
-                        "sInfoEmpty":      "Mostrando 0 registros",
-                        "sInfoFiltered":   "(filtrado de _MAX_ registros totales)",
-                        "sSearch":         "Buscar:",
-                        "sLoadingRecords": "Cargando...",
-                        "oPaginate": {
-                            "sFirst":    "Primero",
-                            "sLast":     "Último",
-                            "sNext":     "Siguiente",
-                            "sPrevious": "Anterior"
-                        }
+            $('#practicasTable').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: '{{ route("practicas.data") }}',
+                columns: [
+                    { data: 'id', name: 'id' },
+                    { data: 'descripcion', name: 'descripcion' },
+                    { data: 'estado', name: 'estado' },
+                    { data: 'acciones', name: 'acciones', orderable: false, searchable: false }
+                ],
+                language: {
+                    "sProcessing":     "Procesando...",
+                    "sLengthMenu":     "Mostrar _MENU_ registros",
+                    "sZeroRecords":    "No se encontraron resultados",
+                    "sEmptyTable":     "Ningún dato disponible",
+                    "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_",
+                    "sInfoEmpty":      "Mostrando 0 registros",
+                    "sInfoFiltered":   "(filtrado de _MAX_ registros totales)",
+                    "sSearch":         "Buscar:",
+                    "sLoadingRecords": "Cargando...",
+                    "oPaginate": {
+                        "sFirst":    "<<",
+                        "sLast":     ">>",
+                        "sNext":     ">",
+                        "sPrevious": "<"
                     }
-                });
+                },
+                pagingType: "full_numbers"
             });
 
             // Funciones para habilitar/deshabilitar (ya existentes)
