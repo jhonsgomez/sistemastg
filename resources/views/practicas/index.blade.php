@@ -11,16 +11,20 @@
         <style>
             .btn-action {
                 padding: 6px 12px;
-                margin: 0 4px;
+                margin: 0 2px;
                 transition: all 0.3s ease;
                 border-radius: 0.375rem;
             }
 
             .modal-overlay {
+                position: fixed !important;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
                 background-color: rgba(0, 0, 0, 0.5);
                 transition: opacity 0.3s ease;
-                position: fixed !important;
-                
+                z-index: 999;
             }
 
             .modal-close-btn-custom {
@@ -414,7 +418,7 @@
                             <p class="text-sm mb-6"><strong>NOTA: </strong>El estudiante debe tener aprobado el 90% de
                                 los créditos (Tecnología: 97 / Profesional: 65).</p>
                             <p class="text-sm mb-6"><strong>Convenios: </strong>Verifique si la empresa tiene convenio
-                                vigente en la pagina de la O :<a href="https://oriapp.uts.edu.co/activities_guest"
+                                vigente en la pagina de la ORI :<a href="https://oriapp.uts.edu.co/activities_guest"
                                     target="_blank" class="text-uts-500 underline hover:text-uts-800"> Consultar
                                     convenios aquí </a></p>
 
@@ -460,7 +464,7 @@
 
                 $('#formTitle').html(
                     `Solicitud de <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Prácticas Empresariales</span>`
-                    );
+                );
 
                 $('#modalidad').val('');
                 $('#id_integrante_2').val('').trigger('change');
@@ -636,7 +640,7 @@
             function openDetailsModal(id) {
 
                 // 1. Mostrar modal con loading
-                $('#detailsTitle').html('Detalles de la solicitud de práctica');
+                $('#detailsTitle').html('Detalles de la Solicitud');
                 $('#content-details').html('<div class="text-center">Cargando...</div>');
                 $('#detailsModal').removeClass('hidden').addClass('show');
 
@@ -648,58 +652,58 @@
 
                     // 3. Construir HTML
                     let html = `
-                    <div class="space-y-3">
+                    <div class="space-y-1.5">
 
-                        <div class="p-3 bg-gray-50 rounded-lg shadow-sm">
-                            <p class="font-semibold text-gray-700">Nombre completo</p>
+                        <div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
+                            <p class="font-semibold text-gray-700 w-56">Nombre completo:</p>
                             <span class="text-gray-800">${user.name || 'N/A'}</span>
                         </div>
 
-                        <div class="p-3 bg-gray-50 rounded-lg shadow-sm">
-                            <p class="font-semibold text-gray-700">Correo</p>
+                        <div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
+                            <p class="font-semibold text-gray-700 w-56">Correo institucional:</p>
                             <span class="text-gray-800">${user.email || 'N/A'}</span>
                         </div>
 
-                        <div class="p-3 bg-gray-50 rounded-lg shadow-sm">
-                            <p class="font-semibold text-gray-700">Nivel académico</p>
+                        <div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
+                            <p class="font-semibold text-gray-700 w-56">Nivel académico</p>
                             <span class="text-gray-800">${user.nivel.nombre || 'N/A'}</span>
                         </div>
 
-                        <div class="p-3 bg-gray-50 rounded-lg shadow-sm">
-                            <p class="font-semibold text-gray-700">Documento</p>
+                        <div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
+                            <p class="font-semibold text-gray-700 w-56">Documento:</p>
                             <span class="text-gray-800">${user.nro_documento || 'N/A'}</span>
                         </div>
 
-                        <div class="p-3 bg-gray-50 rounded-lg shadow-sm">
-                            <p class="font-semibold text-gray-700">Celular</p>
+                        <div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
+                            <p class="font-semibold text-gray-700 w-56">Celular:</p>
                             <span class="text-gray-800">${user.nro_celular || 'N/A'}</span>
                         </div>
 
-                        <div class="p-3 bg-gray-50 rounded-lg shadow-sm">
-                            <p class="font-semibold text-gray-700">¿Tiene empresa?</p>
+                        <div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
+                            <p class="font-semibold text-gray-700 w-56">¿Tiene empresa?:</p>
                             <span class="text-gray-800">${data.tiene_empresa ? 'Sí' : 'No'}</span>
                         </div>
 
                         ${
                             data.hoja_vida 
                             ? `
-                                    <div class="p-3 bg-gray-50 rounded-lg shadow-sm">
-                                        <p class="font-semibold text-gray-700">Hoja de vida</p>
-                                        <a href="/storage/${data.hoja_vida}" target="_blank" class="text-blue-600 underline">
-                                            Ver archivo
-                                        </a>
-                                    </div>
-                                    ` 
+                                            <div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
+                                                <p class="font-semibold text-gray-700 w-56">Hoja de vida:</p>
+                                                <a href="/storage/${data.hoja_vida}" target="_blank" class="text-blue-600 underline ml-10">
+                                                    Ver archivo
+                                                </a>
+                                            </div>
+                                            ` 
                             : ''
                         }
 
-                        <div class="p-3 bg-gray-50 rounded-lg shadow-sm">
-                            <p class="font-semibold text-gray-700">Estado</p>
+                        <div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
+                            <p class="font-semibold text-gray-700 w-56">Estado:</p>
                             <span class="text-gray-800">${response.estado}</span>
                         </div>
 
-                        <div class="p-3 bg-gray-50 rounded-lg shadow-sm">
-                            <p class="font-semibold text-gray-700">Fecha solicitud</p>
+                        <div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
+                            <p class="font-semibold text-gray-700 w-56">Fecha solicitud:</p>
                             <span class="text-gray-800">${response.fecha_solicitud}</span>
                         </div>
 
