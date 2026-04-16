@@ -174,7 +174,8 @@ class PracticaController extends Controller
 
     public function getDetalle($id)
     {
-        $practica = Practica::with('user')->findOrFail($id);
+      
+        $practica = Practica::with('user.nivel')->findOrFail($id);
         $data     = $practica->data;
         if (is_string($data)) {
             $data = json_decode($data, true);
@@ -189,11 +190,11 @@ class PracticaController extends Controller
             'deshabilitado'   => $practica->deshabilitado,
             'fecha_solicitud' => $practica->created_at->format('d/m/Y H:i'),
             'user'            => [
-                'nombre'    => $practica->user->name,
-                'correo'    => $practica->user->email,
+                'name'    => $practica->user->name,
+                'email'    => $practica->user->email,
                 'nivel'     => $practica->user->nivel->nombre ?? 'N/A',
-                'documento' => $practica->user->nro_documento ?? 'N/A',
-                'celular'   => $practica->user->nro_celular ?? 'N/A',
+                'nro_documento' => $practica->user->nro_documento ?? 'N/A',
+                'nro_celular'   => $practica->user->nro_celular ?? 'N/A',
             ],
             'data'            => $data,
         ]);
