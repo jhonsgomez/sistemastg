@@ -1,26 +1,24 @@
 <?php
-
 namespace App\Http\Controllers;
-use App\Models\TipoSolicitud;
-use Illuminate\Http\Request;
+
 use App\Models\Campo;
 use App\Models\Practica;
+use App\Models\TipoSolicitud;
+use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
-class PracticaController extends Controller
 
+class PracticaController extends Controller
 {
     public function index()
     {
-    
 
         $tipo = TipoSolicitud::where('nombre', 'practicas_fase_0')->first();
-        
+
         $campos = Campo::where('tipo_solicitud_id', $tipo->id)->get();
 
         return view('practicas.index', compact('campos'));
     }
-    
-    
+
     public function getData(Request $request)
     {
         // Base query: solo prácticas de tipo fase 0
@@ -41,11 +39,12 @@ class PracticaController extends Controller
                 if (is_string($data)) {
                     $data = json_decode($data, true);
                 }
-                if (!is_array($data)) {
+                if (! is_array($data)) {
                     $data = [];
                 }
-                $nombre = $data['nombre_completo'] ?? 'N/A';
-                $documento = $data['documento'] ?? '';
+                $nombre    = $practica->user->name ?? 'N/A';
+                $documento = $practica->user->nro_documento ?? 'N/A';
+
                 return "{$nombre} (Doc: {$documento})";
             })
             ->addColumn('estado', function ($practica) {
@@ -62,47 +61,45 @@ class PracticaController extends Controller
                 return $html;
             })
             ->addColumn('acciones', function ($practica) {
-            $user = auth()->user();
-            $buttons = '<div class="flex items-center gap-1">';
+                $user    = auth()->user();
+                $buttons = '<div class="flex items-center gap-1">';
 
-            // 1. Botón Ver (todos los roles con permiso)
-            if ($user->can('view_practicas')) {
-                $buttons .= '<button onclick="openDetailsModal('.$practica->id.')" class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white px-3 py-1 rounded-lg"><i class="fa-regular fa-eye"></i></button>';
-            }
-
-            // 2. Si es estudiante y la práctica está deshabilitada, mostrar texto en lugar del ojo
-            if ($user->hasRole('estudiante')) {
-                if ($practica->deshabilitado) {
-                    // Reemplazar el botón Ver por un texto
-                    $buttons = '<div class="flex items-center gap-1"><span class="text-red-600 font-semibold">Deshabilitado</span></div>';
+                // 1. Botón Ver (todos los roles con permiso)
+                if ($user->can('view_practicas')) {
+                    $buttons .= '<button onclick="openDetailsModal(' . $practica->id . ')" class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white px-3 py-1 rounded-lg"><i class="fa-regular fa-eye"></i></button>';
                 }
-                // Estudiante no tiene más botones
+
+                // 2. Si es estudiante y la práctica está deshabilitada, mostrar texto en lugar del ojo
+                if ($user->hasRole('estudiante')) {
+                    if ($practica->deshabilitado) {
+                        // Reemplazar el botón Ver por un texto
+                        $buttons = '<div class="flex items-center gap-1"><span class="text-red-600 font-semibold">Deshabilitado</span></div>';
+                    }
+                    // Estudiante no tiene más botones
+                    return $buttons;
+                }
+
+                // 3. Para comité (admin, coordinador, super_admin)
+                if ($user->hasRole(['super_admin', 'admin', 'coordinador'])) {
+                    // Botón Responder (solo si estado Pendiente)
+                    if ($practica->estado === 'Pendiente') {
+                        $buttons .= '<button onclick="responderPractica(' . $practica->id . ')" class="btn-action shadow bg-green-500 hover:bg-green-700 text-white px-3 py-1 rounded-lg"><i class="fa-regular fa-paper-plane"></i></button>';
+                    }
+                }
+
+                $buttons .= '</div>';
                 return $buttons;
-            }
-
-            // 3. Para comité (admin, coordinador, super_admin)
-            if ($user->hasRole(['super_admin', 'admin', 'coordinador'])) {
-                // Botón Responder (solo si estado Pendiente)
-                if ($practica->estado === 'Pendiente') {
-                    $buttons .= '<button onclick="responderPractica('.$practica->id.')" class="btn-action shadow bg-green-500 hover:bg-green-700 text-white px-3 py-1 rounded-lg"><i class="fa-regular fa-paper-plane"></i></button>';
-                }
-            }
-
-            $buttons .= '</div>';
-            return $buttons;
-        })
+            })
             ->rawColumns(['estado', 'acciones'])
             ->make(true);
     }
-    
-    
+
     public function store(Request $request)
     {
-        $tipo = TipoSolicitud::where('nombre', 'practicas_fase_0')->first();
+        $tipo   = TipoSolicitud::where('nombre', 'practicas_fase_0')->first();
         $campos = Campo::where('tipo_solicitud_id', $tipo->id)->get();
-        
+
         $tieneEmpresa = $request->input('tiene_empresa');
-       
 
         if ($tieneEmpresa === null) {
             $errors['tiene_empresa'][] = 'Debe seleccionar si tiene empresa o no.';
@@ -111,8 +108,8 @@ class PracticaController extends Controller
         $tieneEmpresa = $request->input('tiene_empresa') === '1';
 
         //  VALIDACIÓN DINÁMICA
-    
-       $errors = [];
+
+        $errors = [];
 
         $tieneEmpresaInput = $request->input('tiene_empresa');
 
@@ -125,79 +122,80 @@ class PracticaController extends Controller
         // SOLO si NO tiene empresa
         if ($tieneEmpresa === false) {
 
-            if (!$request->hasFile('hoja_vida')) {
+            if (! $request->hasFile('hoja_vida')) {
                 $errors['hoja_vida'][] = 'Debe subir la hoja de vida si NO cuenta con empresa.';
             }
         }
-        
-        if (!empty($errors)) {
+
+        if (! empty($errors)) {
             return response()->json([
-                'errors' => $errors
+                'errors' => $errors,
             ], 422);
         }
-      
 
         //GUARDAR DATA
         $data = [];
 
         foreach ($campos as $campo) {
 
-            if ($campo->type == 'checkbox') {
-                $data[$campo->name] = $request->input($campo->name) === '1';
+            // NO guardar estos campos
+            if (in_array($campo->name, ['nombre_completo', 'correo', 'nivel', 'documento', 'celular'])) {
+                continue;
             }
 
-            elseif ($campo->type == 'file') {
-
-                // SI TIENE EMPRESA, NO GUARDAR HOJA DE VIDA
+            if ($campo->type == 'checkbox') {
+                $data[$campo->name] = $request->input($campo->name) === '1';
+            } elseif ($campo->type == 'file') {
                 if ($campo->name == 'hoja_vida' && $tieneEmpresa) {
                     continue;
                 }
 
                 if ($request->hasFile($campo->name)) {
-                    $file = $request->file($campo->name);
-                    $path = $file->store('practicas', 'public');
+                    $path               = $request->file($campo->name)->store('practicas', 'public');
                     $data[$campo->name] = $path;
                 }
-            }
-
-            else {
+            } else {
                 $data[$campo->name] = $request->input($campo->name);
             }
         }
-       
-
-            Practica::create([
-            'user_id' => auth()->id(),
+        Practica::create([
+            'user_id'           => auth()->id(),
             'tipo_solicitud_id' => $tipo->id,
-            'data' => json_encode($data),
-            'estado' => 'Pendiente',
-            'vencido' => false,
-            'deshabilitado' => false,
+            'data'              => $data,
+            'estado'            => 'Pendiente',
+            'vencido'           => false,
+            'deshabilitado'     => false,
         ]);
 
         return response()->json([
-            'message' => 'Práctica enviada correctamente'
+            'message' => 'Práctica enviada correctamente',
         ]);
     }
 
     public function getDetalle($id)
     {
         $practica = Practica::with('user')->findOrFail($id);
-        $data = $practica->data;
+        $data     = $practica->data;
         if (is_string($data)) {
             $data = json_decode($data, true);
         }
-        if (!is_array($data)) {
+        if (! is_array($data)) {
             $data = [];
         }
         return response()->json([
-            'id' => $practica->id,
-            'estado' => $practica->estado,
-            'vencido' => $practica->vencido,
-            'deshabilitado' => $practica->deshabilitado,
+            'id'              => $practica->id,
+            'estado'          => $practica->estado,
+            'vencido'         => $practica->vencido,
+            'deshabilitado'   => $practica->deshabilitado,
             'fecha_solicitud' => $practica->created_at->format('d/m/Y H:i'),
-            'user' => $practica->user ? $practica->user->name : 'N/A',
-            'data' => $data
+            'user'            => [
+                'nombre'    => $practica->user->name,
+                'correo'    => $practica->user->email,
+                'nivel'     => $practica->user->nivel->nombre ?? 'N/A',
+                'documento' => $practica->user->nro_documento ?? 'N/A',
+                'celular'   => $practica->user->nro_celular ?? 'N/A',
+            ],
+            'data'            => $data,
         ]);
     }
 

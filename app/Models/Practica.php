@@ -18,6 +18,12 @@ class Practica extends Model
         'deshabilitado'
     ];
 
+    protected $casts = [
+    'data' => 'array',
+    'created_at' => 'datetime',
+    'updated_at' => 'datetime', 
+    ];
+
      // Relación con el usuario
     public function user()
     {

@@ -21,16 +21,16 @@ return new class extends Migration
             $table->foreignId('tipo_solicitud_id')
                 ->constrained('tipos_solicitudes')
                 ->onDelete('cascade');
-
+            $table->string('estado')->default('pendiente');
             $table->json('data');
-
+            $table->timestamp('enviada_at')->nullable();
             $table->timestamps();
+            $table->index('user_id');
+            $table->index('tipo_solicitud_id');
+            $table->softDeletes();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('practicas');

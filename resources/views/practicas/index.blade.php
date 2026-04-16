@@ -234,7 +234,6 @@
 </div>
 
     </div>
-
         <div id="createModal" class="hidden fixed z-50 inset-0 overflow-y-auto">
             <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeCreateModal()">
                 <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
@@ -396,7 +395,7 @@
                                             <input type="radio"
                                                 name="{{ $campo->name }}"
                                                 value="1"
-                                                id="tiene_empresa"
+                                                @checked(($data['tiene_empresa'] ?? null) == 1)
                                                 onchange="toggleHojaVida()">
                                             Sí
                                         </label>
@@ -405,7 +404,7 @@
                                             <input type="radio"
                                                 name="{{ $campo->name }}"
                                                 value="0"
-                                                id="tiene_empresa"
+                                                @checked(($data['tiene_empresa'] ?? null) == 0)
                                                 onchange="toggleHojaVida()">
                                             No
                                         </label>
@@ -643,14 +642,15 @@
         $('#detailsModal').removeClass('hidden').addClass('show');
 
         $.get('{{ url("practicas") }}/' + id + '/detalle', function(response) {
+            let user = response.user;
             let data = response.data;
             let html = `
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div><strong>Nombre completo:</strong> ${data.nombre_completo || 'N/A'}</div>
-                    <div><strong>Correo:</strong> ${data.correo || 'N/A'}</div>
-                    <div><strong>Nivel académico:</strong> ${data.nivel || 'N/A'}</div>
+                    <div><strong>Nombre completo:</strong> ${user.nombre || 'N/A'}</div>
+                    <div><strong>Correo:</strong> ${user.correo || 'N/A'}</div>
+                    <div><strong>Nivel académico:</strong> ${user.nivel || 'N/A'}</div>
                     <div><strong>Documento:</strong> ${data.documento || 'N/A'}</div>
-                    <div><strong>Celular:</strong> ${data.celular || 'N/A'}</div>
+                    <div><strong>Celular:</strong> ${user.celular || 'N/A'}</div>
                     <div><strong>¿Tiene empresa?</strong> ${data.tiene_empresa ? 'Sí' : 'No'}</div>
                     ${data.hoja_vida ? `<div><strong>Hoja de vida:</strong> <a href="/storage/${data.hoja_vida}" target="_blank" class="text-uts-500 underline">Ver archivo</a></div>` : ''}
                     <div><strong>Estado:</strong> ${response.estado}</div>
