@@ -1,4 +1,4 @@
-
+// Listado de los archivos
 document.addEventListener('DOMContentLoaded', function () {
 
     const input = document.getElementById('hoja_vida');
