@@ -17,7 +17,7 @@
             }
 
             .modal-overlay {
-                position: fixed !important;
+                position: static !important;
                 top: 0;
                 left: 0;
                 width: 100%;
@@ -113,6 +113,16 @@
                 font-size: 1.5rem !important;
                 color: #333 !important;
                 cursor: pointer !important;
+            }
+
+            .radio-verde:checked {
+                color: #C1D631 !important;
+
+            }
+
+            input[type="radio"]:focus {
+                outline: 1px solid #C1D631;
+                box-shadow: 0 0 0 1px #C1D631;
             }
 
             .modal-close-btn:hover {
@@ -225,7 +235,9 @@
     <!--Details Fase 0-->
 
     <div id="detailsModal" class="fixed z-50 inset-0 overflow-y-auto hidden">
-        <div class="modal-overlay fixed inset-0" onclick="closeDetailsModal()">
+        <div class="modal-overlay absolute inset-0"
+            style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;"
+            onclick="closeDetailsModal()">
             <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
                 <div class="inline-block align-bottom bg-white rounded-lg text-left shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
                     onclick="event.stopPropagation()">
@@ -260,9 +272,9 @@
                             <p class="text-2xl font-bold" style="margin: 0.8rem 0 1.5rem 0;" id="formTitle"></p>
                             <p class="text-sm mb-2">En este formulario el estudiante registrará la información
                                 necesaria para la solicitud de prácticas empresariales.</p>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6 mb-6">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6 mb-6 ">
                                 @foreach ($campos as $campo)
-                                    <div>
+                                    <div class="{{ $campo->name == 'hoja_vida' ? 'col-span-1 sm:col-span-2' : '' }}">
 
                                         @if ($campo->label != null && $campo->type != 'hidden')
                                             <div class="flex items-center gap-2">
@@ -359,17 +371,49 @@
                                             {{-- ================= FILE ================= --}}
                                             @case('file')
                                                 @if ($campo->name == 'hoja_vida')
-                                                    <div id="hojaVidaContainer" style="display:none;">
-                                                        <label>Hoja de vida (PDF)</label>
+                                                    <div class="col-span-1 sm:col-span-2">
 
-                                                        <input type="file" name="{{ $campo->name }}"
-                                                            id="{{ $campo->name }}"
-                                                            class="border-gray-300 rounded-md mt-1 block w-full">
+                                                        <div id="hojaVidaContainer" style="display:none;"
+                                                            class="w-full mt-2 relative py-9 bg-gray-50 rounded-2xl border-2 border-gray-300 gap-3 grid border-dashed">
+                                                            <div class="grid gap-1">
+                                                                <i
+                                                                    class="mx-auto text-4xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                                                <h2 class="text-center text-gray-400 text-xs leading-4">
+                                                                    Solo archivos de PDF de máximo
+                                                                    {{ config('custom.peso_maximo_propuesta') }}MB
+                                                                </h2>
+                                                            </div>
+
+                                                            <div class="grid gap-2">
+                                                                <h4 class="text-center text-gray-900 text-sm font-medium">
+                                                                    Arrastra o carga tus archivos aquí
+                                                                </h4>
+
+                                                                <div class="flex items-center justify-center">
+                                                                    <input type="file" name="{{ $campo->name }}"
+                                                                        id="{{ $campo->name }}"
+                                                                        class="absolute inset-0 opacity-0 cursor-pointer"
+                                                                        accept=".pdf" />
+
+                                                                    <div
+                                                                        class="flex w-28 h-9 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer">
+                                                                        Cargar
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                        <span id="{{ $campo->name }}Error"
+                                                            class="text-red-500 text-sm"></span>
+                                                        <ul id="file-list-fase0"
+                                                            class="mt-4 text-gray-600 text-sm list-disc pl-5"></ul>
+                                                        <span id="files-size-fase0" class="text-gray-800 text-sm"></span>
+
                                                     </div>
                                                 @else
                                                     <input type="file" name="{{ $campo->name }}"
                                                         id="{{ $campo->name }}"
-                                                        class="border-gray-300 rounded-md mt-1 block w-full">
+                                                        class="absolute inset-0 opacity-0 cursor-pointer" accept=".pdf" />
                                                 @endif
                                             @break
 
@@ -380,13 +424,15 @@
                                                     <div class="flex items-center gap-4">
                                                         <label class="flex items-center gap-1">
                                                             <input type="radio" name="{{ $campo->name }}" value="1"
-                                                                @checked(($data['tiene_empresa'] ?? null) == 1) onchange="toggleHojaVida()">
+                                                                class="radio-verde" @checked(($data['tiene_empresa'] ?? null) == 1)
+                                                                onchange="toggleHojaVida()">
                                                             Sí
                                                         </label>
 
                                                         <label class="flex items-center gap-1">
                                                             <input type="radio" name="{{ $campo->name }}" value="0"
-                                                                @checked(($data['tiene_empresa'] ?? null) == 0) onchange="toggleHojaVida()">
+                                                                class="radio-verde" @checked(($data['tiene_empresa'] ?? null) == 0)
+                                                                onchange="toggleHojaVida()">
                                                             No
                                                         </label>
 
@@ -455,6 +501,7 @@
     </div>
 
     @push('scripts')
+        <script src="{{ asset('js/fases/practicas/fase_0.js') }}"></script>
         <script>
             function openCreateModal() {
                 var añoActual = new Date().getFullYear();
@@ -463,7 +510,7 @@
                 var periodo_academico = añoActual + '-' + numero;
 
                 $('#formTitle').html(
-                    `Solicitud de <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Prácticas Empresariales</span>`
+                    `Solicitud de <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Prácticas</span>`
                 );
 
                 $('#modalidad').val('');
@@ -640,7 +687,9 @@
             function openDetailsModal(id) {
 
                 // 1. Mostrar modal con loading
-                $('#detailsTitle').html('Detalles de la Solicitud');
+                $('#detailsTitle').html(
+                    'Detalles de la <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded shadow">Solicitud</span>'
+                    );
                 $('#content-details').html('<div class="text-center">Cargando...</div>');
                 $('#detailsModal').removeClass('hidden').addClass('show');
 
@@ -651,8 +700,8 @@
                     let data = response.data;
 
                     // 3. Construir HTML
-                    let html = `
-                    <div class="space-y-1.5">
+                    let html = `<br>
+                    <div class="space-y-2">
 
                         <div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
                             <p class="font-semibold text-gray-700 w-56">Nombre completo:</p>
@@ -687,13 +736,13 @@
                         ${
                             data.hoja_vida 
                             ? `
-                                            <div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
-                                                <p class="font-semibold text-gray-700 w-56">Hoja de vida:</p>
-                                                <a href="/storage/${data.hoja_vida}" target="_blank" class="text-blue-600 underline ml-10">
-                                                    Ver archivo
-                                                </a>
-                                            </div>
-                                            ` 
+                                                                                            <div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
+                                                                                                <p class="font-semibold text-gray-700 w-56">Hoja de vida:</p>
+                                                                                                <a href="/storage/${data.hoja_vida}" target="_blank" class="text-uts-500 underline hover:text-uts-600">
+                                                                                                    Ver archivo
+                                                                                                </a>
+                                                                                            </div>
+                                                                                            ` 
                             : ''
                         }
 
