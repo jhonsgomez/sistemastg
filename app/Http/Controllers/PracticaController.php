@@ -19,80 +19,87 @@ class PracticaController extends Controller
         return view('practicas.index', compact('campos'));
     }
 
-    public function getData(Request $request)
-    {
-        // Base query: solo prácticas de tipo fase 0
-        $practicas = Practica::with('user')
-            ->where('tipo_solicitud_id', 9);
+public function getData(Request $request)
+{
+    $practicas = Practica::with('user')
+        ->where('tipo_solicitud_id', 9);
 
-        // Filtro por rol
-        if (auth()->user()->hasRole('estudiante')) {
-            $practicas->where('user_id', auth()->id());
-        }
-        // Para admin, coordinador, super_admin no se filtra (muestra todas)
-
-        return DataTables::of($practicas)
-            ->addColumn('descripcion', function ($practica) {
-                // Construir una descripción resumida: nombre completo y documento
-                // Normalizar: si es string JSON, decodificarlo; si ya es array, usarlo directamente
-                $data = $practica->data;
-                if (is_string($data)) {
-                    $data = json_decode($data, true);
-                }
-                if (! is_array($data)) {
-                    $data = [];
-                }
-                $nombre    = $practica->user->name ?? 'N/A';
-                $documento = $practica->user->nro_documento ?? 'N/A';
-
-                return "{$nombre} (Doc: {$documento})";
-            })
-            ->addColumn('estado', function ($practica) {
-                $badge = match ($practica->estado) {
-                    'Pendiente' => 'bg-yellow-100 text-yellow-800',
-                    'Aprobada'  => 'bg-green-100 text-green-800',
-                    'Rechazada' => 'bg-red-100 text-red-800',
-                    default     => 'bg-gray-100 text-gray-800',
-                };
-                $html = "<span class='px-2 py-1 rounded-full text-xs font-semibold {$badge}'>{$practica->estado}</span>";
-                if ($practica->estado === 'Pendiente') {
-                    $html .= ' <span class="px-2 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">Comité</span>';
-                }
-                return $html;
-            })
-            ->addColumn('acciones', function ($practica) {
-                $user    = auth()->user();
-                $buttons = '<div class="flex items-center gap-1">';
-
-                // 1. Botón Ver (todos los roles con permiso)
-                if ($user->can('view_practicas')) {
-                    $buttons .= '<button onclick="openDetailsModal(' . $practica->id . ')" class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white px-3 py-1 rounded-lg"><i class="fa-regular fa-eye"></i></button>';
-                }
-
-                // 2. Si es estudiante y la práctica está deshabilitada, mostrar texto en lugar del ojo
-                if ($user->hasRole('estudiante')) {
-                    if ($practica->deshabilitado) {
-                        // Reemplazar el botón Ver por un texto
-                        $buttons = '<div class="flex items-center gap-1"><span class="text-red-600 font-semibold">Deshabilitado</span></div>';
-                    }
-                    // Estudiante no tiene más botones
-                    return $buttons;
-                }
-
-                // 3. Para comité (admin, coordinador, super_admin)
-                if ($user->hasRole(['super_admin', 'admin', 'coordinador'])) {
-                    // Botón Responder (solo si estado Pendiente)
-                    if ($practica->estado === 'Pendiente') {
-                        $buttons .= '<button onclick="responderPractica(' . $practica->id . ')" class="btn-action shadow bg-green-500 hover:bg-green-700 text-white px-3 py-1 rounded-lg"><i class="fa-regular fa-paper-plane"></i></button>';
-                    }
-                }
-
-                $buttons .= '</div>';
-                return $buttons;
-            })
-            ->rawColumns(['estado', 'acciones'])
-            ->make(true);
+    if (auth()->user()->hasRole('estudiante')) {
+        $practicas->where('user_id', auth()->id());
+        $practicas->orderBy('id', 'desc');
     }
+
+    // Búsqueda
+    if ($request->has('search') && $search = $request->input('search.value')) {
+        $practicas->where(function ($q) use ($search) {
+            $q->orWhere('id', 'LIKE', "%{$search}%")
+              ->orWhere('estado', 'LIKE', "%{$search}%")
+              ->orWhereRaw("JSON_UNQUOTE(JSON_EXTRACT(data, '$.nombre_completo')) LIKE ?", ["%{$search}%"])
+              ->orWhereRaw("JSON_UNQUOTE(JSON_EXTRACT(data, '$.documento')) LIKE ?", ["%{$search}%"])
+              ->orWhereHas('user', function ($uq) use ($search) {
+                  $uq->where('name', 'LIKE', "%{$search}%")
+                     ->orWhere('email', 'LIKE', "%{$search}%")
+                     ->orWhere('nro_documento', 'LIKE', "%{$search}%");
+              });
+        });
+    }
+
+    return DataTables::of($practicas)
+        ->addColumn('descripcion', function ($p) {
+            // Obtener el tipo de solicitud (podría ser 9 = prácticas fase 0)
+            $tipo = $p->tipo_solicitud_id; // o puedes cargar la relación
+            // Por ahora, como todas son 9, mostramos un texto fijo
+            $descripcionBase = 'Solicitud de prácticas empresariales';
+            return "{$descripcionBase}";
+        })
+        ->addColumn('estado', function ($p) {
+            $badgeClass = match ($p->estado) {
+                'Pendiente' => 'bg-yellow-100 text-yellow-800 border border-yellow-300',
+                'Aprobada'  => 'bg-green-100 text-green-800 border border-green-300',
+                'Rechazada' => 'bg-red-100 text-red-800 border border-red-300',
+                default     => 'bg-gray-100 text-gray-800 border border-gray-300',
+            };
+            $estadoBadge = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold {$badgeClass}'>{$p->estado}</span>";
+            
+            if ($p->estado === 'Pendiente') {
+                $comiteBadge = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-yellow-100 text-yellow-800 border border-yellow-300'>Comité</span>";
+                return "<div class='flex items-center justify-center gap-2'>{$estadoBadge} {$comiteBadge}</div>";
+            }
+            return "<div class='flex items-center justify-center'>{$estadoBadge}</div>";
+        })
+        ->addColumn('acciones', function ($p) {
+            $user = auth()->user();
+            $buttons = '<div class="flex items-center gap-1">';
+
+            // Botón Ver con spinner
+            $buttons .= '<button onclick="openDetailsModal(this, '.$p->id.')" class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white px-3 py-1 rounded-lg relative">
+                <i class="fa-regular fa-eye"></i>
+                <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute inset-0 m-auto" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                    <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
+                </svg>
+            </button>';
+
+            // Botón responder (solo para admin, coordinador, super_admin y estado Pendiente)
+            if ($user->hasRole(['super_admin', 'admin', 'coordinador']) && $p->estado === 'Pendiente') {
+                $buttons .= '<button onclick="responderPractica('.$p->id.')" class="btn-action shadow bg-uts-500 hover:bg-uts-800 text-white px-3 py-1 rounded-lg"><i class="fa-solid fa-arrow-left"></i></button>';
+            }
+
+            // Botones habilitar/deshabilitar
+            if ($user->hasRole(['super_admin', 'admin', 'coordinador'])) {
+                if (!$p->deshabilitado) {
+                    $buttons .= '<button onclick="deshabilitarPractica('.$p->id.')" class="btn-action shadow bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded-lg"><i class="fa-regular fa-circle-xmark"></i></button>';
+                } else {
+                    $buttons .= '<button onclick="habilitarPractica('.$p->id.')" class="btn-action shadow bg-teal-500 hover:bg-teal-700 text-white px-3 py-1 rounded-lg"><i class="fa-solid fa-clock-rotate-left"></i></button>';
+                }
+            }
+
+            $buttons .= '</div>';
+            return $buttons;
+        })
+        ->rawColumns(['estado', 'acciones', 'descripcion'])
+        ->make(true);
+}
 
     public function store(Request $request)
     {

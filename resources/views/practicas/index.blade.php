@@ -10,14 +10,28 @@
     @push('styles')
         <style>
             .btn-action {
-                padding: 6px 12px;
-                margin: 0 2px;
-                transition: all 0.3s ease;
-                border-radius: 0.375rem;
+                min-width: 42px;
+                height: 38px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+            }
+            .btn-action .loading-spinner {
+                position: absolute;
+                top: 0px;
+                left: 0px;
+                transform: translate(-50%, -50%);
+                width: 1.25rem;
+                height: 1.25rem;
+            }
+            .btn-action i {
+                font-size: 1.125rem;
             }
 
+
             .modal-overlay {
-                position: static !important;
+                position: fixed !important;
                 top: 0;
                 left: 0;
                 width: 100%;
@@ -61,31 +75,18 @@
                     margin-top: 0 !important;
                 }
             }
-
-            #detailsModal,
-            #replySolicitudModal,
-            #desactivarProyectoModal,
-            #activarProyectoModal,
-            #calendarModal,
-            #warningModal,
-            #reporteModal {
-                visibility: hidden;
-                opacity: 0;
-                transform: translateY(-10px);
-                transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
-            }
-
+            
             .transition {
                 transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
             }
-
-            #detailsModal.show,
-            #replySolicitudModal.show,
-            #desactivarProyectoModal.show,
-            #activarProyectoModal.show,
-            #calendarModal.show,
-            #warningModal.show,
-            #reporteModal.show {
+            
+            #detailsModal, #replySolicitudModal, #desactivarProyectoModal, #activarProyectoModal, #calendarModal, #warningModal, #reporteModal {
+                visibility: hidden;
+                opacity: 0;
+                transform: translateY(-10px);
+                transition: visibility 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
+            }
+            #detailsModal.show, #replySolicitudModal.show, #desactivarProyectoModal.show, #activarProyectoModal.show, #calendarModal.show, #warningModal.show, #reporteModal.show {
                 visibility: visible;
                 opacity: 1;
                 transform: translateY(0);
@@ -137,6 +138,41 @@
             .container_check {
                 margin-top: 1.5rem;
             }
+
+    /* Estilos para el select de "Mostrar" */
+.dataTables_length select {
+    border-radius: 0.375rem;
+    border: 1px solid #d1d5db;
+    padding: 0.25rem 2rem 0.25rem 0.75rem;
+    background-color: white;
+    cursor: pointer;
+    appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="gray"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>');
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1rem;
+}
+.dataTables_length select:hover {
+    border-color: #C1D631;
+}
+.dataTables_length select:focus {
+    border-color: #C1D631;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(193, 214, 49, 0.5);
+}
+
+/* Estilos para el input de búsqueda */
+.dataTables_filter input {
+    border-radius: 0.375rem;
+    border: 1px solid #d1d5db;
+    padding: 0.25rem 0.5rem;
+    margin-left: 0.5rem;
+}
+.dataTables_filter input:focus {
+    border-color: #C1D631;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(193, 214, 49, 0.5);
+}
         </style>
     @endpush
 
@@ -234,7 +270,7 @@
 
     <!--Details Fase 0-->
 
-    <div id="detailsModal" class="fixed z-50 inset-0 overflow-y-auto hidden">
+    <div id="detailsModal" class="fixed z-50 inset-0 overflow-y-auto">
         <div class="modal-overlay absolute inset-0"
             style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;"
             onclick="closeDetailsModal()">
@@ -626,24 +662,11 @@
                 processing: true,
                 serverSide: true,
                 ajax: '{{ route('practicas.data') }}',
-                columns: [{
-                        data: 'id',
-                        name: 'id'
-                    },
-                    {
-                        data: 'descripcion',
-                        name: 'descripcion'
-                    },
-                    {
-                        data: 'estado',
-                        name: 'estado'
-                    },
-                    {
-                        data: 'acciones',
-                        name: 'acciones',
-                        orderable: false,
-                        searchable: false
-                    }
+                columns: [
+                    { data: 'id', name: 'id', className: 'text-center' },
+                    { data: 'descripcion', name: 'descripcion', className: 'text-center' },
+                    { data: 'estado', name: 'estado', className: 'text-center' },
+                    { data: 'acciones', name: 'acciones', orderable: false, searchable: false, className: 'text-center' }
                 ],
                 language: {
                     "sProcessing": "Procesando...",
@@ -662,7 +685,9 @@
                         "sPrevious": "<"
                     }
                 },
-                pagingType: "full_numbers"
+                pagingType: "full_numbers",
+                lengthMenu: [[5, 10, 20], [5, 10, 20]],
+                pageLength: 5
             });
 
             // Funciones para habilitar/deshabilitar (ya existentes)
@@ -684,97 +709,80 @@
         </script>
 
         <script>
-            function openDetailsModal(id) {
+            function openDetailsModal(btn, id) {
+    const icon = btn.querySelector('i');
+    const spinner = btn.querySelector('.loading-spinner');
+    icon.classList.add('hidden');
+    spinner.classList.remove('hidden');
+    btn.disabled = true;
 
-                // 1. Mostrar modal con loading
-                $('#detailsTitle').html(
-                    'Detalles de la <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded shadow">Solicitud</span>'
-                    );
-                $('#content-details').html('<div class="text-center">Cargando...</div>');
-                $('#detailsModal').removeClass('hidden').addClass('show');
+    // Hacer la petición AJAX
+    $.get('/practicas/' + id + '/detalle', function(response) {
+        let user = response.user;
+        let data = response.data;
+        let html = `<br><div class="space-y-2">
+            <div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
+                <p class="font-semibold text-gray-700 w-56">Nombre completo:</p>
+                <span class="text-gray-800">${user.name || 'N/A'}</span>
+            </div>
+            <div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
+                <p class="font-semibold text-gray-700 w-56">Correo institucional:</p>
+                <span class="text-gray-800">${user.email || 'N/A'}</span>
+            </div>
+            <div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
+                <p class="font-semibold text-gray-700 w-56">Nivel académico:</p>
+                <span class="text-gray-800">${user.nivel?.nombre || 'N/A'}</span>
+            </div>
+            <div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
+                <p class="font-semibold text-gray-700 w-56">Documento:</p>
+                <span class="text-gray-800">${user.nro_documento || 'N/A'}</span>
+            </div>
+            <div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
+                <p class="font-semibold text-gray-700 w-56">Celular:</p>
+                <span class="text-gray-800">${user.nro_celular || 'N/A'}</span>
+            </div>
+            <div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
+                <p class="font-semibold text-gray-700 w-56">¿Tiene empresa?:</p>
+                <span class="text-gray-800">${data.tiene_empresa ? 'Sí' : 'No'}</span>
+            </div>
+            ${data.hoja_vida ? `<div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
+                <p class="font-semibold text-gray-700 w-56">Hoja de vida:</p>
+                <a href="/storage/${data.hoja_vida}" target="_blank" class="text-uts-500 underline">Ver archivo</a>
+            </div>` : ''}
+            <div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
+                <p class="font-semibold text-gray-700 w-56">Estado:</p>
+                <span class="text-gray-800">${response.estado}</span>
+            </div>
+            <div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
+                <p class="font-semibold text-gray-700 w-56">Fecha solicitud:</p>
+                <span class="text-gray-800">${response.fecha_solicitud}</span>
+            </div>
+        </div>`;
+        $('#detailsTitle').html('Detalles de la solicitud de práctica');
+        $('#content-details').html(html);
+        // Ahora sí, abrimos el modal con la transición
+        $('#detailsModal').addClass('show');
+    }).fail(function() {
+        Swal.fire('Error', 'No se pudieron cargar los detalles.', 'error');
+    }).always(function() {
+        icon.classList.remove('hidden');
+        spinner.classList.add('hidden');
+        btn.disabled = false;
+    });
+}
 
-                // 2. Petición al backend
-                $.get('{{ url('practicas') }}/' + id + '/detalle', function(response) {
+function closeDetailsModal() {
+    $('#detailsModal').removeClass('show');
+}
 
-                    let user = response.user;
-                    let data = response.data;
-
-                    // 3. Construir HTML
-                    let html = `<br>
-                    <div class="space-y-2">
-
-                        <div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
-                            <p class="font-semibold text-gray-700 w-56">Nombre completo:</p>
-                            <span class="text-gray-800">${user.name || 'N/A'}</span>
-                        </div>
-
-                        <div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
-                            <p class="font-semibold text-gray-700 w-56">Correo institucional:</p>
-                            <span class="text-gray-800">${user.email || 'N/A'}</span>
-                        </div>
-
-                        <div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
-                            <p class="font-semibold text-gray-700 w-56">Nivel académico</p>
-                            <span class="text-gray-800">${user.nivel.nombre || 'N/A'}</span>
-                        </div>
-
-                        <div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
-                            <p class="font-semibold text-gray-700 w-56">Documento:</p>
-                            <span class="text-gray-800">${user.nro_documento || 'N/A'}</span>
-                        </div>
-
-                        <div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
-                            <p class="font-semibold text-gray-700 w-56">Celular:</p>
-                            <span class="text-gray-800">${user.nro_celular || 'N/A'}</span>
-                        </div>
-
-                        <div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
-                            <p class="font-semibold text-gray-700 w-56">¿Tiene empresa?:</p>
-                            <span class="text-gray-800">${data.tiene_empresa ? 'Sí' : 'No'}</span>
-                        </div>
-
-                        ${
-                            data.hoja_vida 
-                            ? `
-                                                                                            <div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
-                                                                                                <p class="font-semibold text-gray-700 w-56">Hoja de vida:</p>
-                                                                                                <a href="/storage/${data.hoja_vida}" target="_blank" class="text-uts-500 underline hover:text-uts-600">
-                                                                                                    Ver archivo
-                                                                                                </a>
-                                                                                            </div>
-                                                                                            ` 
-                            : ''
-                        }
-
-                        <div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
-                            <p class="font-semibold text-gray-700 w-56">Estado:</p>
-                            <span class="text-gray-800">${response.estado}</span>
-                        </div>
-
-                        <div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
-                            <p class="font-semibold text-gray-700 w-56">Fecha solicitud:</p>
-                            <span class="text-gray-800">${response.fecha_solicitud}</span>
-                        </div>
-
-                    </div>
-
-                        `;
-
-                    // 4. Mostrar en modal
-                    $('#content-details').html(html);
-
-                }).fail(function() {
-
-                    $('#content-details').html(
-                        '<div class="text-red-500 text-center">Error al cargar los detalles.</div>'
-                    );
-
-                });
-            }
-
-            function closeDetailsModal() {
-                $('#detailsModal').removeClass('show').addClass('hidden');
-            }
+function responderPractica(id) {
+    Swal.fire({
+        title: 'Responder solicitud',
+        text: 'Funcionalidad en desarrollo. Próximamente podrás aprobar o rechazar la práctica.',
+        icon: 'info',
+        confirmButtonColor: '#C1D631'
+    });
+}
         </script>
     @endpush
 
