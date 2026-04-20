@@ -3,8 +3,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Campo;
 use App\Models\Practica;
+use App\Models\Solicitud;
 use App\Models\TipoSolicitud;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 
 class PracticaController extends Controller
@@ -19,60 +22,90 @@ class PracticaController extends Controller
         return view('practicas.index', compact('campos'));
     }
 
-public function getData(Request $request)
-{
-    $practicas = Practica::with('user')
-        ->where('tipo_solicitud_id', 9);
+    public function getData(Request $request)
+    {
+        $practicas = Practica::with('user')
+            ->where('tipo_solicitud_id', 9);
 
-    if (auth()->user()->hasRole('estudiante')) {
-        $practicas->where('user_id', auth()->id());
-        $practicas->orderBy('id', 'desc');
-    }
+        if (auth()->user()->hasRole('estudiante')) {
+            $practicas->where('user_id', auth()->id());
+            $practicas->orderBy('id', 'desc');
+        }
 
-    // Búsqueda
-    if ($request->has('search') && $search = $request->input('search.value')) {
-        $practicas->where(function ($q) use ($search) {
-            $q->orWhere('id', 'LIKE', "%{$search}%")
-              ->orWhere('estado', 'LIKE', "%{$search}%")
-              ->orWhereRaw("JSON_UNQUOTE(JSON_EXTRACT(data, '$.nombre_completo')) LIKE ?", ["%{$search}%"])
-              ->orWhereRaw("JSON_UNQUOTE(JSON_EXTRACT(data, '$.documento')) LIKE ?", ["%{$search}%"])
-              ->orWhereHas('user', function ($uq) use ($search) {
-                  $uq->where('name', 'LIKE', "%{$search}%")
-                     ->orWhere('email', 'LIKE', "%{$search}%")
-                     ->orWhere('nro_documento', 'LIKE', "%{$search}%");
-              });
-        });
-    }
+        // Búsqueda
+        if ($request->has('search') && $search = $request->input('search.value')) {
+            $practicas->where(function ($q) use ($search) {
+                $q->orWhere('id', 'LIKE', "%{$search}%")
+                    ->orWhere('estado', 'LIKE', "%{$search}%")
+                    ->orWhereRaw("JSON_UNQUOTE(JSON_EXTRACT(data, '$.nombre_completo')) LIKE ?", ["%{$search}%"])
+                    ->orWhereRaw("JSON_UNQUOTE(JSON_EXTRACT(data, '$.documento')) LIKE ?", ["%{$search}%"])
+                    ->orWhereHas('user', function ($uq) use ($search) {
+                        $uq->where('name', 'LIKE', "%{$search}%")
+                            ->orWhere('email', 'LIKE', "%{$search}%")
+                            ->orWhere('nro_documento', 'LIKE', "%{$search}%");
+                    });
+            });
+        }
 
-    return DataTables::of($practicas)
-        ->addColumn('descripcion', function ($p) {
-            // Obtener el tipo de solicitud (podría ser 9 = prácticas fase 0)
-            $tipo = $p->tipo_solicitud_id; // o puedes cargar la relación
-            // Por ahora, como todas son 9, mostramos un texto fijo
-            $descripcionBase = 'Solicitud de prácticas empresariales';
-            return "{$descripcionBase}";
-        })
-        ->addColumn('estado', function ($p) {
-            $badgeClass = match ($p->estado) {
-                'Pendiente' => 'bg-yellow-100 text-yellow-800 border border-yellow-300',
-                'Aprobada'  => 'bg-green-100 text-green-800 border border-green-300',
-                'Rechazada' => 'bg-red-100 text-red-800 border border-red-300',
-                default     => 'bg-gray-100 text-gray-800 border border-gray-300',
-            };
-            $estadoBadge = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold {$badgeClass}'>{$p->estado}</span>";
-            
-            if ($p->estado === 'Pendiente') {
-                $comiteBadge = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-yellow-100 text-yellow-800 border border-yellow-300'>Comité</span>";
-                return "<div class='flex items-center justify-center gap-2'>{$estadoBadge} {$comiteBadge}</div>";
-            }
-            return "<div class='flex items-center justify-center'>{$estadoBadge}</div>";
-        })
-        ->addColumn('acciones', function ($p) {
-            $user = auth()->user();
-            $buttons = '<div class="flex items-center gap-1">';
+        return DataTables::of($practicas)
 
-            // Botón Ver con spinner
-            $buttons .= '<button onclick="openDetailsModal(this, '.$p->id.')" class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white px-3 py-1 rounded-lg relative">
+            ->addColumn('descripcion', function ($p) {
+                                               // Obtener el tipo de solicitud (podría ser 9 = prácticas fase 0)
+                $tipo = $p->tipo_solicitud_id; // o puedes cargar la relación
+                                               // Por ahora, como todas son 9, mostramos un texto fijo
+                $descripcionBase = 'Solicitud de prácticas empresariales';
+                return "{$descripcionBase}";
+            })
+
+            ->addColumn('estado', function ($p) {
+                $badgeClass = match ($p->estado) {
+                    'Pendiente' => 'bg-yellow-100 text-yellow-800 border border-yellow-300',
+                    'Aprobada'  => 'bg-green-100 text-green-800 border border-green-300',
+                    'Rechazada' => 'bg-red-100 text-red-800 border border-red-300',
+                    default     => 'bg-gray-100 text-gray-800 border border-gray-300',
+                };
+
+                $return_html = '<div class="flex gap-2 flex-wrap items-center justify-center">';
+                
+                if ($p->estado == 'Pendiente') {
+                    $estadoBadge = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-uts-300 border border-uts-500'>{$p->estado}</span>";
+                    $comiteBadge = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-yellow-100 text-yellow-800 border border-yellow-300'>Comité</span>";
+
+                    return "{$return_html}{$estadoBadge} {$comiteBadge}</div>";
+                }
+
+                if ($p->estado == 'Rechazada') {
+                    $badge = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-red-100 text-red-800 border border-red-300'>Rechazada</span>";
+                    return $return_html . $badge . "</div>";
+                }
+
+                if (str_contains($p->estado, 'Fase')) {
+                    $estadoBadge = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-uts-300 border border-uts-500'>{$p->estado}</span>";
+
+                    $estado_array = explode(' ', $p->estado);
+                    $fase         = $estado_array[1];
+
+                    $estudianteBadge = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-green-100 text-green-800 border border-green-300'>Estudiante</span>";
+                    $comiteBadge     = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-yellow-100 text-yellow-800 border border-yellow-300'>Comité</span>";
+
+                    switch ($fase) {
+                        case 1:
+                            return $return_html . $estadoBadge . $estudianteBadge . "</div>";
+
+                        default:
+                            return $return_html . $estadoBadge . "</div>";
+                    }
+
+                }
+
+                return $return_html . "<span>{$p->estado}</span></div>";
+            })
+            ->addColumn('acciones', function ($p) {
+                $user    = auth()->user();
+                $buttons = '<div class="flex items-center gap-1">';
+
+                // Botón Ver con spinner
+                $buttons .= '<button onclick="openDetailsModal(this, ' . $p->id . ')" class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white px-3 py-1 rounded-lg relative">
                 <i class="fa-regular fa-eye"></i>
                 <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute inset-0 m-auto" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
@@ -80,26 +113,28 @@ public function getData(Request $request)
                 </svg>
             </button>';
 
-            // Botón responder (solo para admin, coordinador, super_admin y estado Pendiente)
-            if ($user->hasRole(['super_admin', 'admin', 'coordinador']) && $p->estado === 'Pendiente') {
-                $buttons .= '<button onclick="responderPractica('.$p->id.')" class="btn-action shadow bg-uts-500 hover:bg-uts-800 text-white px-3 py-1 rounded-lg"><i class="fa-solid fa-arrow-left"></i></button>';
-            }
-
-            // Botones habilitar/deshabilitar
-            if ($user->hasRole(['super_admin', 'admin', 'coordinador'])) {
-                if (!$p->deshabilitado) {
-                    $buttons .= '<button onclick="deshabilitarPractica('.$p->id.')" class="btn-action shadow bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded-lg"><i class="fa-regular fa-circle-xmark"></i></button>';
-                } else {
-                    $buttons .= '<button onclick="habilitarPractica('.$p->id.')" class="btn-action shadow bg-teal-500 hover:bg-teal-700 text-white px-3 py-1 rounded-lg"><i class="fa-solid fa-clock-rotate-left"></i></button>';
+                // Botón responder (solo para admin, coordinador, super_admin y estado Pendiente)
+                if ($user->hasRole(['super_admin', 'admin', 'coordinador']) && $p->estado === 'Pendiente') {
+                    $buttons .= '<button onclick="responderSolicitudPractica(' . $p->id . ')" class="btn-action shadow bg-uts-500 hover:bg-uts-800 text-white px-3 py-1 rounded-lg">
+                                    <i class="fa-solid fa-share"></i></button>';
                 }
-            }
 
-            $buttons .= '</div>';
-            return $buttons;
-        })
-        ->rawColumns(['estado', 'acciones', 'descripcion'])
-        ->make(true);
-}
+                // Botones habilitar/deshabilitar
+                if ($user->hasRole(['super_admin', 'admin', 'coordinador'])) {
+                    if (! $p->deshabilitado) {
+                        $buttons .= '<button onclick="deshabilitarPractica(' . $p->id . ')" class="btn-action shadow bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded-lg"><i class="fa-regular fa-circle-xmark"></i></button>';
+                    } else {
+                        $buttons .= '<button onclick="habilitarPractica(' . $p->id . ')" class="btn-action shadow bg-teal-500 hover:bg-teal-700 text-white px-3 py-1 rounded-lg"><i class="fa-solid fa-clock-rotate-left"></i></button>';
+                    }
+                }
+
+                $buttons .= '</div>';
+                return $buttons;
+            })
+
+            ->rawColumns(['estado', 'acciones', 'descripcion'])
+            ->make(true);
+    }
 
     public function store(Request $request)
     {
@@ -181,7 +216,7 @@ public function getData(Request $request)
 
     public function getDetalle($id)
     {
-      
+
         $practica = Practica::with('user.nivel')->findOrFail($id);
         $data     = $practica->data;
         if (is_string($data)) {
@@ -197,14 +232,50 @@ public function getData(Request $request)
             'deshabilitado'   => $practica->deshabilitado,
             'fecha_solicitud' => $practica->created_at->format('d/m/Y H:i'),
             'user'            => [
-                'name'    => $practica->user->name,
-                'email'    => $practica->user->email,
-                'nivel'     => $practica->user->nivel->nombre ?? 'N/A',
+                'name'          => $practica->user->name,
+                'email'         => $practica->user->email,
+                'nivel'         => $practica->user->nivel->nombre ?? 'N/A',
                 'nro_documento' => $practica->user->nro_documento ?? 'N/A',
                 'nro_celular'   => $practica->user->nro_celular ?? 'N/A',
             ],
             'data'            => $data,
         ]);
+    }
+
+    public function responderSolicitud(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                //Datos del index.blade
+                'solicitudPractica_id' => 'required',
+                'estado'               => 'required',
+                'mensaje'              => 'required',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
+            $p = Solicitud::findOrFail($request->post('solicitudPractica_id'));
+            //$campos_proyecto = $solicitud->camposConValores();
+            
+
+            if ($request->post('estado') === 'Aprobada') {
+                $p->estado = 'Fase 1';
+            } else {
+                $p->estado = $request->post('estado');
+            }
+
+            $p->save();
+            
+
+            // Enviar correo de la respuesta al estudiante
+            //self::sendEmailProyectoRespuesta($campos_proyecto, $request->estado, $request->mensaje);
+
+            return response()->json(['success' => 'Respuesta enviada exitosamente', 'estado' => $p->estado]);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'Ha ocurrido un error. Por favor, inténtelo de nuevo.'], 500);
+        }
     }
 
     public function show($id)

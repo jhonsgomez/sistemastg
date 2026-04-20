@@ -219,11 +219,11 @@ Route::middleware([
         Route::post('/', [PracticaController::class, 'store'])->name('practicas.store');
 
         Route::get('/data', [PracticaController::class, 'getData'])->name('practicas.data');
-
         Route::get('/{id}', [PracticaController::class, 'show'])->name('practicas.show');
 
         Route::get('/{id}/detalle', [PracticaController::class, 'getDetalle'])->name('practicas.detalle');
-
+        Route::post('/responder', [PracticaController::class, 'responderSolicitud'])->name('practicas.responder');
+        
         Route::post('/habilitar', [PracticaController::class, 'habilitar'])->name('practicas.habilitar');
         Route::post('/deshabilitar', [PracticaController::class, 'deshabilitar'])->name('practicas.deshabilitar');
 

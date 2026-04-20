@@ -17,6 +17,7 @@
                 justify-content: center;
                 position: relative;
             }
+
             .btn-action .loading-spinner {
                 position: absolute;
                 top: 0px;
@@ -25,6 +26,7 @@
                 width: 1.25rem;
                 height: 1.25rem;
             }
+
             .btn-action i {
                 font-size: 1.125rem;
             }
@@ -75,18 +77,31 @@
                     margin-top: 0 !important;
                 }
             }
-            
+
             .transition {
                 transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
             }
-            
-            #detailsModal, #replySolicitudModal, #desactivarProyectoModal, #activarProyectoModal, #calendarModal, #warningModal, #reporteModal {
+
+            #detailsModal,
+            #replySolicitudModal,
+            #desactivarProyectoModal,
+            #activarProyectoModal,
+            #calendarModal,
+            #warningModal,
+            #reporteModal {
                 visibility: hidden;
                 opacity: 0;
                 transform: translateY(-10px);
                 transition: visibility 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
             }
-            #detailsModal.show, #replySolicitudModal.show, #desactivarProyectoModal.show, #activarProyectoModal.show, #calendarModal.show, #warningModal.show, #reporteModal.show {
+
+            #detailsModal.show,
+            #replySolicitudModal.show,
+            #desactivarProyectoModal.show,
+            #activarProyectoModal.show,
+            #calendarModal.show,
+            #warningModal.show,
+            #reporteModal.show {
                 visibility: visible;
                 opacity: 1;
                 transform: translateY(0);
@@ -139,40 +154,43 @@
                 margin-top: 1.5rem;
             }
 
-    /* Estilos para el select de "Mostrar" */
-.dataTables_length select {
-    border-radius: 0.375rem;
-    border: 1px solid #d1d5db;
-    padding: 0.25rem 2rem 0.25rem 0.75rem;
-    background-color: white;
-    cursor: pointer;
-    appearance: none;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="gray"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>');
-    background-repeat: no-repeat;
-    background-position: right 0.75rem center;
-    background-size: 1rem;
-}
-.dataTables_length select:hover {
-    border-color: #C1D631;
-}
-.dataTables_length select:focus {
-    border-color: #C1D631;
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(193, 214, 49, 0.5);
-}
+            /* Estilos para el select de "Mostrar" */
+            .dataTables_length select {
+                border-radius: 0.375rem;
+                border: 1px solid #d1d5db;
+                padding: 0.25rem 2rem 0.25rem 0.75rem;
+                background-color: white;
+                cursor: pointer;
+                appearance: none;
+                background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="gray"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>');
+                background-repeat: no-repeat;
+                background-position: right 0.75rem center;
+                background-size: 1rem;
+            }
 
-/* Estilos para el input de búsqueda */
-.dataTables_filter input {
-    border-radius: 0.375rem;
-    border: 1px solid #d1d5db;
-    padding: 0.25rem 0.5rem;
-    margin-left: 0.5rem;
-}
-.dataTables_filter input:focus {
-    border-color: #C1D631;
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(193, 214, 49, 0.5);
-}
+            .dataTables_length select:hover {
+                border-color: #C1D631;
+            }
+
+            .dataTables_length select:focus {
+                border-color: #C1D631;
+                outline: none;
+                box-shadow: 0 0 0 2px rgba(193, 214, 49, 0.5);
+            }
+
+            /* Estilos para el input de búsqueda */
+            .dataTables_filter input {
+                border-radius: 0.375rem;
+                border: 1px solid #d1d5db;
+                padding: 0.25rem 0.5rem;
+                margin-left: 0.5rem;
+            }
+
+            .dataTables_filter input:focus {
+                border-color: #C1D631;
+                outline: none;
+                box-shadow: 0 0 0 2px rgba(193, 214, 49, 0.5);
+            }
         </style>
     @endpush
 
@@ -292,7 +310,7 @@
     </div>
 
     </div>
-    <div id="createModal" class="hidden fixed z-50 inset-0 overflow-y-auto">
+    <div id="createModal" class="hidden  fixed z-50 inset-0 overflow-y-auto">
         <div class="modal-overlay absolute inset-0"
             style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;"
             onclick="closeCreateModal()">
@@ -534,6 +552,70 @@
             </div>
         </div>
     </div>
+
+    <!--Responder Solicitud Practicas Modal-->
+    <div id="responderSolicitudPractica" class="hidden fixed z-50 inset-0 overflow-y-auto">
+        <div class="modal-overlay absolute inset-0"
+            style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;"
+            onclick="closeResponderSolicitudModal()">
+            <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
+                <div class="inline-block align-bottom bg-white rounded-lg text-left shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
+                    onclick="event.stopPropagation()">
+                    <button class="modal-close-btn-custom" onclick="closeResponderSolicitudModal()">&times;</button>
+                    <form id="responderSolicitudForm" class="p-6 mt-2">
+                        @csrf
+                        <p class="text-2xl font-bold" style="margin: 0.8rem 0 1.5rem 0;" id="respuestaTitulo"></p>
+                        <input type="hidden" name="solicitudPractica_id" id="solicitudPractica_id">
+                        <div class="mb-4">
+                            <label for="estado" class="block  font-medium text-sm text-gray-700"><i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>Estado de la
+                                Solicitud</label>
+                            <select name="estado" id="estado"
+                                class="border-gray-300 rounded-md mt-1 block w-full">
+                                <option value="" selected disabled>Seleccione un estado</option>
+                                <option value="Aprobada">Aprobada</option>
+                                <option value="Rechazada">Rechazada</option>
+                            </select>
+                            <span id="estadoError" class="text-red-500 text-sm"></span>
+                        </div>
+                        <div class="mb-4">
+                            <label for="mensaje" class="block  font-medium text-sm text-gray-700"><i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                                Respuesta de la solicitud:
+                            </label>
+                            <div id="txt-editor" class="shadow txt-editor-quill"></div>
+                            <textarea name="mensaje" id="mensaje" class="hidden"></textarea>
+                            <span id="mensajeError" class="text-red-500 text-sm"></span>
+                        </div>
+                        <div class="flex justify-end space-x-2">
+                            <button type="button" onclick="closeResponderSolicitudModal()"
+                                class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">
+                                Cerrar
+                            </button>
+                            <button type="submit" id="responderSolicitudButton"
+                                class="flex bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg">
+                                <svg id="loadingSpinner-replyProyectos" style="margin: 4px 10px 4px 0"
+                                    class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64"
+                                    fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                                    <path
+                                        d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
+                                        stroke="currentColor" stroke-width="5" stroke-linecap="round"
+                                        stroke-linejoin="round"></path>
+                                    <path
+                                        d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
+                                        stroke="currentColor" stroke-width="5" stroke-linecap="round"
+                                        stroke-linejoin="round" class="text-white">
+                                    </path>
+                                </svg>
+                                Responder
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
     </div>
 
     @push('scripts')
@@ -550,15 +632,10 @@
                 );
 
                 $('#modalidad').val('');
-                $('#id_integrante_2').val('').trigger('change');
-                $('#id_integrante_3').val('').trigger('change');
                 $('#periodo').val(periodo_academico);
 
                 $('#nivelError').text('');
                 $('#modalidadError').text('');
-                $('#id_integrante_1Error').text('');
-                $('#id_integrante_2Error').text('');
-                $('#id_integrante_3Error').text('');
                 $('#periodoError').text('');
 
                 $('#createModal').removeClass('hidden');
@@ -640,6 +717,7 @@
                 const tieneEmpresaNo = document.querySelector('input[name="tiene_empresa"][value="0"]');
                 const container = document.getElementById('hojaVidaContainer');
 
+                if (!container) return;
                 if (tieneEmpresaNo && tieneEmpresaNo.checked) {
                     // NO tiene empresa → mostrar hoja de vida
                     container.style.display = 'block';
@@ -662,11 +740,28 @@
                 processing: true,
                 serverSide: true,
                 ajax: '{{ route('practicas.data') }}',
-                columns: [
-                    { data: 'id', name: 'id', className: 'text-center' },
-                    { data: 'descripcion', name: 'descripcion', className: 'text-center' },
-                    { data: 'estado', name: 'estado', className: 'text-center' },
-                    { data: 'acciones', name: 'acciones', orderable: false, searchable: false, className: 'text-center' }
+                columns: [{
+                        data: 'id',
+                        name: 'id',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'descripcion',
+                        name: 'descripcion',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'estado',
+                        name: 'estado',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'acciones',
+                        name: 'acciones',
+                        orderable: false,
+                        searchable: false,
+                        className: 'text-center'
+                    }
                 ],
                 language: {
                     "sProcessing": "Procesando...",
@@ -686,7 +781,10 @@
                     }
                 },
                 pagingType: "full_numbers",
-                lengthMenu: [[5, 10, 20], [5, 10, 20]],
+                lengthMenu: [
+                    [5, 10, 20],
+                    [5, 10, 20]
+                ],
                 pageLength: 5
             });
 
@@ -710,17 +808,17 @@
 
         <script>
             function openDetailsModal(btn, id) {
-    const icon = btn.querySelector('i');
-    const spinner = btn.querySelector('.loading-spinner');
-    icon.classList.add('hidden');
-    spinner.classList.remove('hidden');
-    btn.disabled = true;
+                const icon = btn.querySelector('i');
+                const spinner = btn.querySelector('.loading-spinner');
+                icon.classList.add('hidden');
+                spinner.classList.remove('hidden');
+                btn.disabled = true;
 
-    // Hacer la petición AJAX
-    $.get('/practicas/' + id + '/detalle', function(response) {
-        let user = response.user;
-        let data = response.data;
-        let html = `<br><div class="space-y-2">
+                // Hacer la petición AJAX
+                $.get('/practicas/' + id + '/detalle', function(response) {
+                    let user = response.user;
+                    let data = response.data;
+                    let html = `<br><div class="space-y-2">
             <div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
                 <p class="font-semibold text-gray-700 w-56">Nombre completo:</p>
                 <span class="text-gray-800">${user.name || 'N/A'}</span>
@@ -746,9 +844,9 @@
                 <span class="text-gray-800">${data.tiene_empresa ? 'Sí' : 'No'}</span>
             </div>
             ${data.hoja_vida ? `<div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
-                <p class="font-semibold text-gray-700 w-56">Hoja de vida:</p>
-                <a href="/storage/${data.hoja_vida}" target="_blank" class="text-uts-500 underline">Ver archivo</a>
-            </div>` : ''}
+                                                                <p class="font-semibold text-gray-700 w-56">Hoja de vida:</p>
+                                                                <a href="/storage/${data.hoja_vida}" target="_blank" class="text-uts-500 underline">Ver archivo</a>
+                                                            </div>` : ''}
             <div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
                 <p class="font-semibold text-gray-700 w-56">Estado:</p>
                 <span class="text-gray-800">${response.estado}</span>
@@ -758,31 +856,107 @@
                 <span class="text-gray-800">${response.fecha_solicitud}</span>
             </div>
         </div>`;
-        $('#detailsTitle').html('Detalles de la solicitud de práctica');
-        $('#content-details').html(html);
-        // Ahora sí, abrimos el modal con la transición
-        $('#detailsModal').addClass('show');
-    }).fail(function() {
-        Swal.fire('Error', 'No se pudieron cargar los detalles.', 'error');
-    }).always(function() {
-        icon.classList.remove('hidden');
-        spinner.classList.add('hidden');
-        btn.disabled = false;
-    });
-}
+                    $('#detailsTitle').html('Detalles de la solicitud de práctica');
+                    $('#content-details').html(html);
+                    // Ahora sí, abrimos el modal con la transición
+                    $('#detailsModal').addClass('show');
+                }).fail(function() {
+                    Swal.fire('Error', 'No se pudieron cargar los detalles.', 'error');
+                }).always(function() {
+                    icon.classList.remove('hidden');
+                    spinner.classList.add('hidden');
+                    btn.disabled = false;
+                });
+            }
 
-function closeDetailsModal() {
-    $('#detailsModal').removeClass('show');
-}
+            function closeDetailsModal() {
+                $('#detailsModal').removeClass('show');
+            }
 
-function responderPractica(id) {
-    Swal.fire({
-        title: 'Responder solicitud',
-        text: 'Funcionalidad en desarrollo. Próximamente podrás aprobar o rechazar la práctica.',
-        icon: 'info',
-        confirmButtonColor: '#C1D631'
-    });
-}
+
+            function responderSolicitudPractica(id) {
+                if (!window.quill) {
+                initQuillEditor(undefined, "Ingrese el mensaje de respuesta indicado detalles al destinatario.", 'txt-editor',
+                    'mensaje');
+                }
+
+                $('#respuestaTitulo').html(
+                    `Responder <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Solicitud</span>`
+                    );
+                $('#solicitudPractica_id').val(id);
+                $('#estado').val('');
+                $('#mensaje').val('');
+
+                $('#estadoError').text('');
+                $('#mensajeError').text('');
+                $('#responderSolicitudPractica').removeClass('hidden');
+                
+            }
+
+            $('#responderSolicitudForm').on('submit', function(e)  {
+                e.preventDefault();
+
+                const loadingSpinner = document.getElementById(`loadingSpinner-replyProyectos`);
+                document.querySelector('#mensaje').value = quill.root.innerHTML;
+                const url = "{{ route('practicas.responder') }}";
+
+                const method = 'POST';
+
+                Swal.fire({
+                    title: '¿Está seguro?',
+                    text: "Esta acción no se puede deshacer",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#C1D631',
+                cancelButtonColor: '#d33',
+                    confirmButtonText: 'Sí, responder',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        loaderGeneral.classList.replace('hidden', 'flex');
+                        loadingSpinner.classList.remove('hidden');
+                        
+                        $.ajax({
+                            url: url,
+                            method: 'POST',
+                            data: $(this).serialize(), // para datos sin archivos
+                    
+                            success: function(response) {
+                                console.log('RESPUESTA DEL BACKEND:', response); 
+                                $('#practicasTable').DataTable().ajax.reload(null, false).draw(false);
+                                closeResponderSolicitudModal();
+                                showToast('Respuesta enviada correctamente');
+                                
+                            },
+
+                            error: function(xhr) {
+                                const errors = xhr.responseJSON?.errors;
+                                // limpiar TODOS los errores primero
+                                $('#estadoError').text('');
+                                $('#mensajeError').text('');
+
+                                if (errors.estado) {
+                                    $('#estadoError').text(errors.estado[0]);
+                                }
+                                if (errors.mensaje) {
+                                    $('#mensajeError').text(errors.mensaje[0]);
+                                }
+                            },
+
+                            complete: function() {
+                                quill.root.innerHTML = '';
+                                loaderGeneral.classList.replace('flex', 'hidden');
+                                loadingSpinner.classList.add('hidden');
+                            }
+                        });
+                    }
+                });
+            });
+
+            function closeResponderSolicitudModal() {
+              $('#responderSolicitudPractica').addClass('hidden');
+            }
+
         </script>
     @endpush
 
