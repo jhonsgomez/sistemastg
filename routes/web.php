@@ -16,6 +16,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SolicitudBancoController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\RoadMapPracticaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -226,6 +227,19 @@ Route::middleware([
         
         Route::post('/habilitar', [PracticaController::class, 'habilitar'])->name('practicas.habilitar');
         Route::post('/deshabilitar', [PracticaController::class, 'deshabilitar'])->name('practicas.deshabilitar');
+        
+        Route::post('/seguimiento', function () {
+            return redirect()->route('practicas.index')->with('info', 'Próximamente: Roadmap de prácticas');
+        })->name('practicas.roadmap');     
+        
+        Route::post('/seguimiento', [RoadMapPracticaController::class, 'index'])->name('practicas.roadmap');
+        Route::get('/seguimiento', function () {
+            return redirect()->route('practicas.index');
+        })->name('practicas.roadmap.get');
+
+        Route::post('/deshabilitar-con-acta', [PracticaController::class, 'deshabilitarConActa'])->name('practicas.deshabilitar_con_acta');
+        Route::post('/habilitar-con-acta', [PracticaController::class, 'habilitarConActa'])->name('practicas.habilitar_con_acta');
+        Route::post('/reportar-problema', [PracticaController::class, 'reportarProblema'])->name('practicas.reportar_problema');
 
     });
 

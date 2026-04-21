@@ -31,7 +31,6 @@
                 font-size: 1.125rem;
             }
 
-
             .modal-overlay {
                 position: fixed !important;
                 top: 0;
@@ -63,54 +62,56 @@
                 .buttons-container {
                     padding-top: 1rem !important;
                 }
-
                 .modal-content {
                     padding: 1.5rem !important;
                 }
-
                 .container-actions {
                     justify-content: flex-start !important;
                     align-items: center !important;
                 }
-
                 .container_check {
                     margin-top: 0 !important;
                 }
             }
 
-            .transition {
-                transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
-            }
-
+            /* ESTILOS PARA OCULTAR MODALES */
             #detailsModal,
+            #createModal,
+            #responderSolicitudPractica,
             #replySolicitudModal,
             #desactivarProyectoModal,
             #activarProyectoModal,
-            #calendarModal,
+            #desactivarPracticaModal,
+            #activarPracticaModal,
             #warningModal,
+            #calendarModal,
             #reporteModal {
-                visibility: hidden;
-                opacity: 0;
-                transform: translateY(-10px);
+                visibility: hidden !important;
+                opacity: 0 !important;
+                transform: translateY(-10px) !important;
                 transition: visibility 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
             }
 
             #detailsModal.show,
+            #createModal.show,
+            #responderSolicitudPractica.show,
             #replySolicitudModal.show,
             #desactivarProyectoModal.show,
             #activarProyectoModal.show,
-            #calendarModal.show,
+            #desactivarPracticaModal.show,
+            #activarPracticaModal.show,
             #warningModal.show,
+            #calendarModal.show,
             #reporteModal.show {
-                visibility: visible;
-                opacity: 1;
-                transform: translateY(0);
+                visibility: visible !important;
+                opacity: 1 !important;
+                transform: translateY(0) !important;
             }
 
             .modal-content {
                 max-width: 850px !important;
                 width: 100% !important;
-                padding: 2rem 3rem;
+                padding: 2rem 3rem !important;
                 background-color: white !important;
                 border-radius: 8px !important;
                 box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
@@ -133,7 +134,6 @@
 
             .radio-verde:checked {
                 color: #C1D631 !important;
-
             }
 
             input[type="radio"]:focus {
@@ -154,7 +154,8 @@
                 margin-top: 1.5rem;
             }
 
-            /* Estilos para el select de "Mostrar" */
+            /* ESTILOS PARA SELECT DE DATATABLES */
+            #practicasTable_wrapper .dataTables_length select,
             .dataTables_length select {
                 border-radius: 0.375rem;
                 border: 1px solid #d1d5db;
@@ -162,42 +163,65 @@
                 background-color: white;
                 cursor: pointer;
                 appearance: none;
-                background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="gray"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>');
+                background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="%236b7280"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>');
                 background-repeat: no-repeat;
                 background-position: right 0.75rem center;
                 background-size: 1rem;
+                line-height: 1.5;
+                font-size: 0.875rem;
             }
 
-            .dataTables_length select:hover {
-                border-color: #C1D631;
-            }
-
+            #practicasTable_wrapper .dataTables_length select:focus,
             .dataTables_length select:focus {
                 border-color: #C1D631;
                 outline: none;
                 box-shadow: 0 0 0 2px rgba(193, 214, 49, 0.5);
             }
 
-            /* Estilos para el input de búsqueda */
-            .dataTables_filter input {
-                border-radius: 0.375rem;
-                border: 1px solid #d1d5db;
-                padding: 0.25rem 0.5rem;
-                margin-left: 0.5rem;
+            /* ESTILOS DE PAGINACIÓN */
+            .dataTables_paginate .paginate_button {
+                padding: 0.25rem 0.75rem !important;
+                margin: 0 2px !important;
+                border-radius: 0.375rem !important;
+                border: 1px solid #d1d5db !important;
+                background: white !important;
+                color: #374151 !important;
+                font-size: 0.875rem !important;
             }
 
-            .dataTables_filter input:focus {
-                border-color: #C1D631;
-                outline: none;
-                box-shadow: 0 0 0 2px rgba(193, 214, 49, 0.5);
+            .dataTables_paginate .paginate_button.current {
+                background-color: #C1D631 !important;
+                border-color: #C1D631 !important;
+                color: white !important;
+            }
+
+            .dataTables_paginate .paginate_button:hover {
+                background-color: #e5e7eb !important;
+                border-color: #9ca3af !important;
+            }
+            #practicasTable_wrapper select.dt-input,
+            #practicasTable_length select.dt-input {
+                border-radius: 0.375rem !important;
+                border: 1px solid #d1d5db !important;
+                padding: 0.5rem 2rem 0.5rem 0.75rem !important;
+                background-color: white !important;
+                cursor: pointer !important;
+                appearance: none !important;
+                background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="%236b7280"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>') !important;
+                background-repeat: no-repeat !important;
+                background-position: right 0.75rem center !important;
+                background-size: 1rem !important;
+                line-height: 1.5 !important;
+                font-size: 1rem !important;
             }
         </style>
+
     @endpush
 
     <!--Dasboard-->
     <div class="flex flex-col sm:flex-row justify-between items-center p-4 border-b">
         <h2 class="text-2xl text-center font-bold text-gray-800">
-            Mis Prácticas <span
+            Prácticas <span
                 class="bg-uts-500 text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Empresariales</span>
         </h2>
 
@@ -255,7 +279,7 @@
                                 stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"
                                 class="text-white">
                             </path>
-                        </svg> Solicitar Practicas
+                        </svg> Solicitar
                     </button>
                 @endcan
             @endif
@@ -309,8 +333,9 @@
         </div>
     </div>
 
-    </div>
-    <div id="createModal" class="hidden  fixed z-50 inset-0 overflow-y-auto">
+    <!--Modal de prácticas-->
+
+    <div id="createModal" class="fixed z-50 inset-0 overflow-y-auto">
         <div class="modal-overlay absolute inset-0"
             style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;"
             onclick="closeCreateModal()">
@@ -554,7 +579,7 @@
     </div>
 
     <!--Responder Solicitud Practicas Modal-->
-    <div id="responderSolicitudPractica" class="hidden fixed z-50 inset-0 overflow-y-auto">
+    <div id="responderSolicitudPractica" class="fixed z-50 inset-0 overflow-y-auto">
         <div class="modal-overlay absolute inset-0"
             style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;"
             onclick="closeResponderSolicitudModal()">
@@ -614,12 +639,203 @@
         </div>
     </div>
 
+    <!--Deshabilitar modal practicas-->
 
+    <div id="desactivarPracticaModal" class="fixed z-50 inset-0 overflow-y-auto">
+        <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeDesactivarPracticaModal()">
+            <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative" onclick="event.stopPropagation()">
+                    <button class="modal-close-btn-custom" onclick="closeDesactivarPracticaModal()">
+                        &times;
+                    </button>
+                    <form id="desactivarPracticaForm" class="p-6 mt-2">
+                        @csrf
+                        <p class="text-2xl font-bold" style="margin: 0.8rem 0 1.5rem 0;" id="desactivarPracticaTitle"></p>
+                        <p class="font-medium text-sm text-gray-700 mb-6">En este formulario el comité deshabilitará la práctica empresarial.</p>
+                        <input type="hidden" name="practica_id" id="practica_id">
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-4 mt-4">
+                            <div>
+                                <label for="nro_acta_desactivar" class="block font-medium text-sm text-gray-700">
+                                    <i class="fa-regular fa-file-lines mr-1 text-gray-500"></i>
+                                    Número de acta:
+                                </label>
+                                <input type="text" name="nro_acta_desactivar" id="nro_acta_desactivar"
+                                    class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full focus:ring-uts-500 focus:border-uts-500"
+                                    placeholder="Ingrese el número de acta">
+                                <span id="nro_acta_desactivarError" class="text-red-500 text-sm"></span>
+                            </div>
+                            <div>
+                                <label for="fecha_acta_desactivar" class="block font-medium text-sm text-gray-700">
+                                    <i class="fa-regular fa-calendar-days mr-1 text-gray-500"></i>
+                                    Fecha del acta:
+                                </label>
+                                <input type="date" name="fecha_acta_desactivar" id="fecha_acta_desactivar"
+                                    class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full focus:ring-uts-500 focus:border-uts-500">
+                                <span id="fecha_acta_desactivarError" class="text-red-500 text-sm"></span>
+                            </div>
+                        </div>
 
+                        <div class="mb-4">
+                            <label for="descripcion_desactivar" class="block font-medium text-sm text-gray-700" style="margin-bottom: 5px;">
+                                <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                                Descripción / motivo:
+                            </label>
+                            <div id="txt-editor-desactivar" class="shadow txt-editor-quill"></div>
+                            <textarea name="descripcion_desactivar" id="descripcion_desactivar" class="hidden"></textarea>
+                            <span id="descripcion_desactivarError" class="text-red-500 text-sm"></span>
+                        </div>
+
+                        <div class="flex justify-end space-x-2">
+                            <button type="button" onclick="closeDesactivarPracticaModal()"
+                                class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">
+                                Cerrar
+                            </button>
+                            <button type="submit"
+                                class="flex bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg">
+                                <svg id="loadingSpinner-desactivarPractica" style="margin: 4px 10px 4px 0" class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                                    <path
+                                        d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
+                                        stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    <path
+                                        d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
+                                        stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white">
+                                    </path>
+                                </svg>
+                                Deshabilitar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Hbilitar modal prácticas-->
+
+    <div id="activarPracticaModal" class="fixed z-50 inset-0 overflow-y-auto">
+        <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeActivarPracticaModal()">
+            <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative" onclick="event.stopPropagation()">
+                    <button class="modal-close-btn-custom" onclick="closeActivarPracticaModal()">
+                        &times;
+                    </button>
+                    <form id="activarPracticaForm" class="p-6 mt-2">
+                        @csrf
+                        <p class="text-2xl font-bold" style="margin: 0.8rem 0 1.5rem 0;" id="activarPracticaTitle"></p>
+                        <p class="font-medium text-sm text-gray-700 mb-6">En este formulario el comité habilitará la práctica empresarial previamente deshabilitada.</p>
+                        <input type="hidden" name="practica_id_activar" id="practica_id_activar">
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-4 mt-4">
+                            <div>
+                                <label for="nro_acta_activar" class="block font-medium text-sm text-gray-700">
+                                    <i class="fa-regular fa-file-lines mr-1 text-gray-500"></i>
+                                    Número de acta:
+                                </label>
+                                <input type="text" name="nro_acta_activar" id="nro_acta_activar"
+                                    class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full focus:ring-uts-500 focus:border-uts-500"
+                                    placeholder="Ingrese el número de acta">
+                                <span id="nro_acta_activarError" class="text-red-500 text-sm"></span>
+                            </div>
+                            <div>
+                                <label for="fecha_acta_activar" class="block font-medium text-sm text-gray-700">
+                                    <i class="fa-regular fa-calendar-days mr-1 text-gray-500"></i>
+                                    Fecha del acta:
+                                </label>
+                                <input type="date" name="fecha_acta_activar" id="fecha_acta_activar"
+                                    class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full focus:ring-uts-500 focus:border-uts-500">
+                                <span id="fecha_acta_activarError" class="text-red-500 text-sm"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="descripcion_activar" class="block font-medium text-sm text-gray-700" style="margin-bottom: 5px;">
+                                <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                                Descripción / motivo:
+                            </label>
+                            <div id="txt-editor-activar" class="shadow txt-editor-quill"></div>
+                            <textarea name="descripcion_activar" id="descripcion_activar" class="hidden"></textarea>
+                            <span id="descripcion_activarError" class="text-red-500 text-sm"></span>
+                        </div>
+
+                        <div class="flex justify-end space-x-2">
+                            <button type="button" onclick="closeActivarPracticaModal()"
+                                class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">
+                                Cerrar
+                            </button>
+                            <button type="submit"
+                                class="flex bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg">
+                                <svg id="loadingSpinner-activarPractica" style="margin: 4px 10px 4px 0" class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                                    <path
+                                        d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
+                                        stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    <path
+                                        d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
+                                        stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white">
+                                    </path>
+                                </svg>
+                                Habilitar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!--Reporte modal prácticas-->
+
+    <div id="warningModal" class="fixed z-50 inset-0 overflow-y-auto">
+        <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeWarningModal()">
+            <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative" onclick="event.stopPropagation()">
+                    <button class="modal-close-btn-custom" onclick="closeWarningModal()">
+                        &times;
+                    </button>
+                    <form id="warningForm" class="p-6 mt-2">
+                        @csrf
+                        <p class="text-2xl font-bold" style="margin: 0.8rem 0 1.5rem 0;" id="warningTitle">Reportar problema</p>
+                        <div class="mb-4">
+                            <label for="mensaje_warning" class="block font-medium text-md text-gray-700 mb-4">
+                                En caso de presentar problemas con el sistema, por favor describa su reporte y envíelo:
+                            </label>
+                            <div id="txt-editor-warning" class="shadow txt-editor-quill"></div>
+                            <textarea name="mensaje_warning" id="mensaje_warning" class="hidden"></textarea>
+                            <span id="mensaje_warningError" class="text-red-500 text-sm"></span>
+                        </div>
+                        <div class="flex justify-end space-x-2">
+                            <button type="button" onclick="closeWarningModal()"
+                                class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">
+                                Cancelar
+                            </button>
+                            <button type="submit"
+                                class="flex bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg">
+                                <svg id="loadingSpinner-warning" style="margin: 4px 10px 4px 0" class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                                    <path
+                                        d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
+                                        stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    <path
+                                        d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
+                                        stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white">
+                                    </path>
+                                </svg>
+                                Enviar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
     @push('scripts')
         <script src="{{ asset('js/fases/practicas/fase_0.js') }}"></script>
+
+        <!--Crear solicitud modal-->
+
         <script>
             function openCreateModal() {
                 var añoActual = new Date().getFullYear();
@@ -627,20 +843,70 @@
                 var numero = mesActual <= 6 ? 1 : 2;
                 var periodo_academico = añoActual + '-' + numero;
 
-                $('#formTitle').html(
-                    `Solicitud de <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Prácticas</span>`
-                );
+                $('#formTitle').html(`Solicitud de <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Prácticas</span>`);
 
+                // Limpiar campos (igual que antes)
                 $('#modalidad').val('');
+                $('#id_integrante_2').val('').trigger('change');
+                $('#id_integrante_3').val('').trigger('change');
                 $('#periodo').val(periodo_academico);
 
                 $('#nivelError').text('');
                 $('#modalidadError').text('');
+                $('#id_integrante_1Error').text('');
+                $('#id_integrante_2Error').text('');
+                $('#id_integrante_3Error').text('');
                 $('#periodoError').text('');
 
-                $('#createModal').removeClass('hidden');
+                // ÚNICA FORMA DE ABRIR: añadir clase show (sin tocar display)
+                $('#createModal').addClass('show');
+            }
+
+            function closeCreateModal() {
+                // ÚNICA FORMA DE CERRAR: quitar clase show
+                $('#createModal').removeClass('show');
+            }
+
+        </script>
+
+        <!--Responder solicitud modal-->
+
+        <script>
+            function openResponderSolicitudModal(id) {
+                // Inicializar Quill si es necesario
+                if (typeof quill !== 'undefined' && quill) {
+                    quill.root.innerHTML = '';
+                } else if (typeof Quill !== 'undefined') {
+                    quill = new Quill('#txt-editor', {
+                        theme: 'snow',
+                        placeholder: 'Escriba aquí la respuesta...',
+                        modules: { toolbar: true }
+                    });
+                }
+
+                $('#respuestaTitulo').html('Responder solicitud de práctica');
+                $('#solicitudPractica_id').val(id);
+                $('#estado').val('');
+                $('#mensaje').val('');
+                $('#estadoError').text('');
+                $('#mensajeError').text('');
+
+                if (typeof quill !== 'undefined' && quill) {
+                    quill.root.innerHTML = '';
+                }
+
+                // ÚNICA FORMA DE ABRIR: añadir clase show
+                $('#responderSolicitudPractica').addClass('show');
+            }
+
+            function closeResponderSolicitudModal() {
+                // ÚNICA FORMA DE CERRAR: quitar clase show
+                $('#responderSolicitudPractica').removeClass('show');
             }
         </script>
+
+        <!--Practicas-->
+
         <script>
             $('#practicasForm').on('submit', function(e) {
                 e.preventDefault();
@@ -661,8 +927,6 @@
                     cancelButtonText: 'Cancelar'
                 }).then((result) => {
                     if (result.isConfirmed) {
-
-                        loadingSpinner.classList.remove('hidden');
 
                         $.ajax({
                             url: url,
@@ -689,27 +953,13 @@
                                     $('#' + campo + 'Error').text(errors[campo][0]);
                                 }
                             },
-
-                            complete: function() {
-                                loadingSpinner.classList.add('hidden');
-                            }
                         });
                     }
                 });
             });
         </script>
 
-        <script>
-            function closeDetailsModal() {
-                $('#detailsModal').removeClass('show');
-            }
-        </script>
-        <script>
-            function closeCreateModal() {
-                // TooltipManager.closeTooltips();
-                $('#createModal').addClass('hidden');
-            }
-        </script>
+        <!--Hoja de vida-->
 
         <script>
             function toggleHojaVida() {
@@ -806,6 +1056,8 @@
             }
         </script>
 
+        <!--Details modal functions-->
+
         <script>
             function openDetailsModal(btn, id) {
                 const icon = btn.querySelector('i');
@@ -873,6 +1125,11 @@
                 $('#detailsModal').removeClass('show');
             }
 
+        </script>
+
+        <script>
+
+            // Reponder solicitud comité
 
             function responderSolicitudPractica(id) {
                 if (!window.quill) {
@@ -953,11 +1210,146 @@
                 });
             });
 
-            function closeResponderSolicitudModal() {
-              $('#responderSolicitudPractica').addClass('hidden');
+        </script>
+
+        <!--modales alertas prácticas-->
+
+        <script>
+
+        // ========== DESACTIVAR PRÁCTICA ==========
+        function deshabilitarPracticaConActa(id) {
+            $('#practica_id').val(id);
+            $('#nro_acta_desactivar').val('');
+            $('#fecha_acta_desactivar').val('');
+            if (window.quillDesactivar) {
+                window.quillDesactivar.root.innerHTML = '';
+            } else {
+                window.quillDesactivar = new Quill('#txt-editor-desactivar', { theme: 'snow' });
             }
+            $('#desactivarPracticaModal').addClass('show');
+        }
+
+        function closeDesactivarPracticaModal() {
+            $('#desactivarPracticaModal').removeClass('show');
+            // Limpiar el formulario al cerrar
+            $('#desactivarPracticaForm')[0].reset();
+            if (window.quillDesactivar) window.quillDesactivar.root.innerHTML = '';
+        }
+
+        
+        // ========== ACTIVAR PRÁCTICA ==========
+        function habilitarPracticaConActa(id) {
+            $('#practica_id_activar').val(id);
+            $('#nro_acta_activar').val('');
+            $('#fecha_acta_activar').val('');
+            if (window.quillActivar) {
+                window.quillActivar.root.innerHTML = '';
+            } else {
+                window.quillActivar = new Quill('#txt-editor-activar', { theme: 'snow' });
+            }
+            $('#activarPracticaModal').addClass('show');
+        }
+        
+        function closeActivarPracticaModal() {
+            $('#activarPracticaModal').removeClass('show');
+            $('#activarPracticaForm')[0].reset();
+            if (window.quillActivar) window.quillActivar.root.innerHTML = '';
+        }
+
+        
+        // ========== REPORTE DE PROBLEMA ==========
+        function openWarningModal() {
+            if (window.quillWarning) {
+                window.quillWarning.root.innerHTML = '';
+            } else {
+                window.quillWarning = new Quill('#txt-editor-warning', { theme: 'snow' });
+            }
+            $('#warningModal').addClass('show');
+        }
+        
+        function closeWarningModal() {
+            $('#warningModal').removeClass('show');
+            $('#warningForm')[0].reset();
+            if (window.quillWarning) window.quillWarning.root.innerHTML = '';
+        }
+
+        // ========== ENVÍO DE FORMULARIOS ==========
+        $(document).ready(function() {
+            // Deshabilitar práctica
+            $('#desactivarPracticaForm').on('submit', function(e) {
+                e.preventDefault();
+                $('#descripcion_desactivar').val(window.quillDesactivar.root.innerHTML);
+                $.ajax({
+                    url: '{{ route("practicas.deshabilitar_con_acta") }}',
+                    method: 'POST',
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        $('#practicasTable').DataTable().ajax.reload();
+                        closeDesactivarPracticaModal();
+                        showToast(response.success);
+                    },
+                    error: function(xhr) {
+                        let errors = xhr.responseJSON?.errors;
+                        if (errors) {
+                            for (let key in errors) {
+                                $('#' + key + 'Error').text(errors[key][0]);
+                            }
+                        }
+                    }
+                });
+            });
+
+            // Habilitar práctica
+            $('#activarPracticaForm').on('submit', function(e) {
+                e.preventDefault();
+                $('#descripcion_activar').val(window.quillActivar.root.innerHTML);
+                $.ajax({
+                    url: '{{ route("practicas.habilitar_con_acta") }}',
+                    method: 'POST',
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        $('#practicasTable').DataTable().ajax.reload();
+                        closeActivarPracticaModal();
+                        showToast(response.success);
+                    },
+                    error: function(xhr) {
+                        let errors = xhr.responseJSON?.errors;
+                        if (errors) {
+                            for (let key in errors) {
+                                $('#' + key + 'Error').text(errors[key][0]);
+                            }
+                        }
+                    }
+                });
+            });
+
+            // Reportar problema
+            $('#warningForm').on('submit', function(e) {
+                e.preventDefault();
+                $('#mensaje_warning').val(window.quillWarning.root.innerHTML);
+                $.ajax({
+                    url: '{{ route("practicas.reportar_problema") }}',
+                    method: 'POST',
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        closeWarningModal();
+                        showToast(response.success);
+                    },
+                    error: function(xhr) {
+                        let errors = xhr.responseJSON?.errors;
+                        if (errors && errors.mensaje_warning) {
+                            $('#mensaje_warningError').text(errors.mensaje_warning[0]);
+                        }
+                    }
+                });
+            });
+        });
 
         </script>
+
+        <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
+
     @endpush
 
 
