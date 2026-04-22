@@ -129,6 +129,7 @@ class PracticaController extends Controller
                         $buttons .= '<button onclick="habilitarPracticaConActa(' . $p->id . ')" class="btn-action shadow bg-teal-500 hover:bg-teal-700 text-white px-3 py-1 rounded-lg"><i class="fa-solid fa-clock-rotate-left"></i></button>';
                     }
                 }
+               
 
                 // Botón roadmap (se mantiene igual)
                 if (!in_array($p->estado, ['Pendiente', 'Rechazada'])) {
@@ -220,7 +221,9 @@ class PracticaController extends Controller
         
         $data = [];
         foreach ($practica->valoresCampos as $vc) {
-            $data[$vc->campo->name] = $vc->valor;
+            if ($vc->campo && $vc->campo->name) {
+                $data[$vc->campo->name] = $vc->valor;
+            }
         }
         
         return response()->json([
@@ -255,10 +258,12 @@ class PracticaController extends Controller
         $practica = Practica::findOrFail($request->solicitudPractica_id);
         
         // Buscar el campo 'respuesta_comite'
-        $campoRespuesta = Campo::where('name', 'respuesta_comite')->first();
+        $campoRespuesta = Campo::where('name', 'respuesta_comite')->firstOrFail();
         if (!$campoRespuesta) {
             return response()->json(['message' => 'Campo de respuesta no configurado'], 500);
         }
+        
+   
         
         // Guardar la respuesta en practica_valores_campos
         PracticaValorCampo::updateOrCreate(

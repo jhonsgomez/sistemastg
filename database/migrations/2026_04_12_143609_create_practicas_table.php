@@ -21,7 +21,14 @@ return new class extends Migration
             $table->foreignId('tipo_solicitud_id')
                 ->constrained('tipos_solicitudes')
                 ->onDelete('cascade');
-            $table->string('estado')->default('pendiente');
+            $table->enum('estado', [
+                    'Pendiente',
+                    'Aprobada',
+                    'Rechazada',
+                    'Fase 1',
+                    'Fase 2',
+                    'Finalizado'
+                ])->default('Pendiente');
             $table->json('data');
             $table->timestamp('enviada_at')->nullable();
             $table->timestamps();

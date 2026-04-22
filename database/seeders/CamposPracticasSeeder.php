@@ -81,5 +81,7 @@ class CamposPracticasSeeder extends Seeder
             'required'          => false,
             'instructions'      => 'Suba la hoja de vida si NO cuenta con empresa.',
         ]);
+
+       
     }
 }
