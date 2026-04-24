@@ -17,6 +17,8 @@ use App\Http\Controllers\SolicitudBancoController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RoadMapPracticaController;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\PracticasMail;
 
 /*
 |--------------------------------------------------------------------------
@@ -241,6 +243,7 @@ Route::middleware([
         Route::post('/habilitar-con-acta', [PracticaController::class, 'habilitarConActa'])->name('practicas.habilitar_con_acta');
         Route::post('/reportar-problema', [PracticaController::class, 'reportarProblema'])->name('practicas.reportar_problema');
 
+        
     });
 
     // Rutas para base documental

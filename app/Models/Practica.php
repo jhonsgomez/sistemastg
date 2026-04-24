@@ -42,4 +42,19 @@ class Practica extends Model{
     {
         return $this->hasMany(PracticaValorCampo::class);
     }
+
+    // Método para obtener todos los campos con sus respectivos valores
+    public function camposConValores()
+{
+    if (!$this->relationLoaded('valoresCampos')) {
+        $this->load('valoresCampos.campo');
+    }
+
+    return $this->valoresCampos->map(function ($valorCampo) {
+        return [
+            'campo' => $valorCampo->campo->name ?? null,
+            'valor' => $valorCampo->valor
+        ];
+    });
+}
 }

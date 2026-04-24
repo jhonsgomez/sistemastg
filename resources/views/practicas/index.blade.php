@@ -353,6 +353,10 @@
                                 necesaria para la solicitud de prácticas empresariales.</p>
                             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6 mb-6 ">
                                 @foreach ($campos as $campo)
+                                        @if($campo->name == 'respuesta_comite')
+                                            @continue
+                                        @endif
+
                                     <div class="{{ $campo->name == 'hoja_vida' ? 'col-span-1 sm:col-span-2' : '' }}">
 
                                         @if ($campo->label != null && $campo->type != 'hidden')
@@ -446,6 +450,8 @@
                                                 <input type="date" name="{{ $campo->name }}" id="{{ $campo->name }}"
                                                     class="border-gray-300 rounded-md mt-1 block w-full">
                                             @break
+
+                                         
 
                                             {{-- ================= FILE ================= --}}
                                             @case('file')

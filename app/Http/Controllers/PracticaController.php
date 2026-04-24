@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\Campo;
 use App\Models\Practica;
 use App\Models\Solicitud;
+use App\Mail\PracticasMail;
 use App\Models\TipoSolicitud;
 use Exception;
 use Illuminate\Http\Request;
@@ -11,6 +12,9 @@ use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 use App\Models\PracticaValorCampo;
 use App\Models\ActaPractica;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+
 
 class PracticaController extends Controller
 {
@@ -211,9 +215,73 @@ class PracticaController extends Controller
                 ]);
             }
         }
+            
+
+        $campos_nueva_practica =$practica->camposConValores();
+        $this->sendEmailSolicitudPractica($campos_nueva_practica);
+      
+    
 
         return response()->json(['message' => 'Práctica enviada correctamente']);
     }
+
+
+        public function sendEmailSolicitudPractica($campos)
+        {
+            try {
+                $cuerpo_correo = [];
+                $correos_destinatarios = [];
+                $asunto_correo = 'PRÁCTICAS EMPRESARIALES - FASE 0';
+                $tipo_correo = 'practicas_fase_0';
+                $comentarios = null;
+                $esRespuesta = false;
+
+                // Datos del usuario autenticado
+                $user = auth()->user();
+
+                $cuerpo_correo['estudiante'] = $user->name;
+                $cuerpo_correo['correo'] = $user->email;
+                $cuerpo_correo['estado'] = 'Pendiente';
+
+                $correos_destinatarios[] = $user->email;
+
+                foreach ($campos as $campo) {
+                    switch ($campo['campo']) {
+
+                        case 'nivel':
+                            $cuerpo_correo['nivel'] = \App\Models\Nivel::find($campo['valor'])->nombre ?? $campo['valor'];
+                            break;
+
+                        case 'empresa':
+                            $cuerpo_correo['empresa'] = $campo['valor'];
+                            break;
+
+                        case 'hoja_vida':
+                            $cuerpo_correo['hoja_vida'] = $campo['valor'];
+                            break;
+
+                        default:
+                            $cuerpo_correo[$campo['campo']] = $campo['valor'];
+                            break;
+                    }
+                }
+
+                Mail::send(new PracticasMail(
+                    $asunto_correo,
+                    $cuerpo_correo,
+                    $comentarios,
+                    $tipo_correo,
+                    $correos_destinatarios,
+                    $esRespuesta
+                ));
+
+            } catch (\Exception $e) {
+                dd($e->getMessage());
+            }
+        }
+
+
+
 
     public function getDetalle($id)
     {
