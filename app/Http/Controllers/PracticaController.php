@@ -284,32 +284,55 @@ class PracticaController extends Controller
 
 
     public function getDetalle($id)
-    {
-        $practica = Practica::with('user.nivel', 'valoresCampos.campo')->findOrFail($id);
-        
-        $data = [];
-        foreach ($practica->valoresCampos as $vc) {
-            if ($vc->campo && $vc->campo->name) {
-                $data[$vc->campo->name] = $vc->valor;
-            }
+{
+    $practica = Practica::with('user.nivel', 'valoresCampos.campo')->findOrFail($id);
+    
+    $data = [];
+    foreach ($practica->valoresCampos as $vc) {
+        if ($vc->campo && $vc->campo->name) {
+            $data[$vc->campo->name] = $vc->valor;
         }
-        
-        return response()->json([
-            'id'              => $practica->id,
-            'estado'          => $practica->estado,
-            'vencido'         => $practica->vencido,
-            'deshabilitado'   => $practica->deshabilitado,
-            'fecha_solicitud' => $practica->created_at->format('d/m/Y H:i'),
-            'user'            => [
-                'name'          => $practica->user->name,
-                'email'         => $practica->user->email,
-                'nivel'         => $practica->user->nivel->nombre ?? 'N/A',
-                'nro_documento' => $practica->user->nro_documento ?? 'N/A',
-                'nro_celular'   => $practica->user->nro_celular ?? 'N/A',
-            ],
-            'data'            => $data
-        ]);
     }
+    
+    // Determinar si el usuario es estudiante
+    $esEstudiante = auth()->user()->hasRole('estudiante');
+    
+    // Valores por defecto
+    $director = $data['director_id'] ?? 'No asignado';
+    $evaluador = $data['evaluador_id'] ?? 'No asignado';
+    $codirector = $data['codirector_id'] ?? 'No asignado';
+    
+    // Si es estudiante, ocultar evaluador y codirector
+    if ($esEstudiante) {
+        $directorHtml = "<span><b>Director:</b> {$director}</span><br>";
+        $evaluadorHtml = "";
+        $codirectorHtml = "<span><b>Codirector:</b> {$codirector}</span>";
+    } else {
+        // Para otros roles, mostrar todo normalmente
+        $directorHtml = "<span><b>Director:</b> {$director}</span><br>";
+        $evaluadorHtml = "<span><b>Evaluador:</b> {$evaluador}</span><br>";
+        $codirectorHtml = "<span><b>Codirector:</b> {$codirector}</span>";
+    }
+    
+    return response()->json([
+        'id'              => $practica->id,
+        'estado'          => $practica->estado,
+        'vencido'         => $practica->vencido,
+        'deshabilitado'   => $practica->deshabilitado,
+        'fecha_solicitud' => $practica->created_at->format('d/m/Y H:i'),
+        'user'            => [
+            'name'          => $practica->user->name,
+            'email'         => $practica->user->email,
+            'nivel'         => $practica->user->nivel->nombre ?? 'N/A',
+            'nro_documento' => $practica->user->nro_documento ?? 'N/A',
+            'nro_celular'   => $practica->user->nro_celular ?? 'N/A',
+        ],
+        'data'            => $data,
+        // Añadir los HTMLs formateados para usar en la vista
+        'docentes_html'   => $directorHtml . $evaluadorHtml . $codirectorHtml,
+        'es_estudiante'   => $esEstudiante
+    ]);
+}
 
     public function responderSolicitud(Request $request)
     {
@@ -344,13 +367,28 @@ class PracticaController extends Controller
             ]
         );
         
-        // Cambiar estado de la práctica
-        $nuevoEstado = ($request->estado === 'Aprobada') ? 'Fase 1' : 'Rechazada';
+        $estadoActual = $practica->estado;
+
+        if ($request->estado === 'Aprobada') {
+            $siguienteEstado = match ($estadoActual) {
+                'Pendiente' => 'Fase 1',
+                'Fase 1'    => 'Fase 2',
+                'Fase 2'    => 'Fase 3',
+                'Fase 3'    => 'Fase 4',
+                'Fase 4'    => 'Fase 5',
+                'Fase 5'    => 'Finalizado',
+                default     => $estadoActual
+            };
+            $nuevoEstado = $siguienteEstado;
+        } else {
+            $nuevoEstado = $estadoActual;
+        }
+
         $practica->estado = $nuevoEstado;
         $practica->save();
         
-        // Aquí enviar correo al estudiante (similar a proyectos)
-        // ...
+        // Enviar correo al estudiante (implementar después)
+        // $this->sendEmailRespuesta($practica, $request->mensaje, $nuevoEstado);
         
         return response()->json(['success' => 'Respuesta enviada exitosamente', 'estado' => $practica->estado]);
     }

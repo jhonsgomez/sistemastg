@@ -919,10 +919,11 @@
 
                 const button = document.getElementById('guardarModalButton');
                 const loadingSpinner = document.getElementById('loadingSpinner-guardar');
+                button.disabled = true;
+                loadingSpinner.classList.remove('hidden');
 
                 const url = "{{ route('practicas.store') }}";
-
-                let formData = new FormData(this); //  para archivos
+                let formData = new FormData(this);
 
                 Swal.fire({
                     title: '¿Está seguro?',
@@ -933,33 +934,39 @@
                     cancelButtonText: 'Cancelar'
                 }).then((result) => {
                     if (result.isConfirmed) {
-
                         $.ajax({
                             url: url,
                             method: 'POST',
                             data: formData,
-                            processData: false, // IMPORTANTE
-                            contentType: false, // IMPORTANTE
-
+                            processData: false,
+                            contentType: false,
                             success: function(response) {
-
                                 closeCreateModal();
                                 showToast('Solicitud de Práctica enviada correctamente');
+                                // ✅ Recargar el DataTable
+                                $('#practicasTable').DataTable().ajax.reload();
                             },
-
                             error: function(xhr) {
-
                                 const errors = xhr.responseJSON?.errors;
-
-                                // limpiar TODOS los errores primero
-                                $('[id$="Error"]').text('');
-
-                                // recorrer dinámicamente
-                                for (let campo in errors) {
-                                    $('#' + campo + 'Error').text(errors[campo][0]);
+                                if (errors) {
+                                    for (let campo in errors) {
+                                        $('#' + campo + 'Error').text(errors[campo][0]);
+                                    }
+                                } else {
+                                    // Si no hay errores de validación, recargar la tabla igualmente
+                                    $('#practicasTable').DataTable().ajax.reload();
+                                    closeCreateModal();
+                                    showToast('Solicitud enviada (recarga para ver los cambios)');
                                 }
                             },
+                            complete: function() {
+                                button.disabled = false;
+                                loadingSpinner.classList.add('hidden');
+                            }
                         });
+                    } else {
+                        button.disabled = false;
+                        loadingSpinner.classList.add('hidden');
                     }
                 });
             });
@@ -1066,64 +1073,132 @@
 
         <script>
             function openDetailsModal(btn, id) {
-                const icon = btn.querySelector('i');
-                const spinner = btn.querySelector('.loading-spinner');
-                icon.classList.add('hidden');
-                spinner.classList.remove('hidden');
-                btn.disabled = true;
+                // Mostrar spinner si existe el botón
+                if (btn) {
+                    const icon = btn.querySelector('i');
+                    const spinner = btn.querySelector('.loading-spinner');
+                    if (icon) icon.classList.add('hidden');
+                    if (spinner) spinner.classList.remove('hidden');
+                    btn.disabled = true;
+                }
 
-                // Hacer la petición AJAX
+                $('#detailsTitle').html(`Detalles de la <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Práctica</span>`);
+
                 $.get('/practicas/' + id + '/detalle', function(response) {
-                    let user = response.user;
-                    let data = response.data;
-                    let html = `<br><div class="space-y-2">
-            <div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
-                <p class="font-semibold text-gray-700 w-56">Nombre completo:</p>
-                <span class="text-gray-800">${user.name || 'N/A'}</span>
+        let user = response.user;
+        let data = response.data;
+        
+        // Usar el HTML de docentes ya formateado desde el backend
+        let docentesHtml = response.docentes_html;
+        
+        // Valores por defecto
+        let titulo = data.titulo || 'No disponible';
+        let nivel = user.nivel || 'N/A';
+        let periodo = data.periodo || (new Date().getFullYear() + '-' + (new Date().getMonth() < 6 ? '1' : '2'));
+        let tieneEmpresa = data.tiene_empresa;
+        let hojaVida = data.hoja_vida;
+        let modalidad = 'Prácticas empresariales';
+        
+        // Construir HTML
+        let html = `
+            <div class="space-y-2">
+                <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
+                    <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Título de la práctica:</p>
+                    <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">${titulo}</span>
+                </div>
+                <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
+                    <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Docentes:</p>
+                    <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">
+                        ${docentesHtml}
+                    </span>
+                </div>
+                <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
+                    <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Nivel académico:</p>
+                    <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">${nivel}</span>
+                </div>
+                <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
+                    <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Modalidad:</p>
+                    <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">${modalidad}</span>
+                </div>
+                <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
+                    <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Periodo académico:</p>
+                    <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">${periodo}</span>
+                </div>
+        `;
+        
+        // Datos del estudiante
+        if (user) {
+            html += `
+                <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
+                    <p class="font-semibold text-gray-700 w-1/3 min-w-[100px]">Estudiante:</p>
+                    <span class="text-gray-800 flex-1 xl:ml-2 lg:ml-2 sm:ml-0">
+                        <span>${(user.name || 'N/A').toUpperCase()}</span><br>
+                        <span>${user.nro_documento ? 'C.C ' + user.nro_documento : 'N/A'}</span><br>
+                        <span class="underline text-blue-600">${user.email || 'N/A'}</span><br>
+                        <span>${user.nro_celular || 'N/A'}</span><br>
+                    </span>
+                </div>
+            `;
+        }
+        
+        // Sección de empresa
+        html += `<div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">`;
+        if (tieneEmpresa === 'true' || tieneEmpresa === true) {
+            html += `
+                <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">¿Cuenta con empresa?</p>
+                <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">Sí</span>
+            `;
+        } else {
+            html += `
+                <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Hoja de vida:</p>
+                <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">
+                    ${hojaVida ? `<a href="/storage/${hojaVida}" target="_blank" class="text-uts-500 underline">Ver archivo</a>` : 'No disponible'}
+                </span>
+            `;
+        }
+        html += `</div>`;
+        
+        // Fechas
+        html += `
+            <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
+                <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Fechas propuesta:</p>
+                <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">
+                    <span><b>Envío de propuesta:</b> No disponible</span><br>
+                    <span><b>Revisión director:</b> No disponible</span><br>
+                    <span><b>Revisión evaluador:</b> No disponible</span>
+                </span>
             </div>
-            <div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
-                <p class="font-semibold text-gray-700 w-56">Correo institucional:</p>
-                <span class="text-gray-800">${user.email || 'N/A'}</span>
+            <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
+                <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Fechas informe:</p>
+                <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">
+                    <span><b>Envío de informe:</b> No disponible</span><br>
+                    <span><b>Revisión director:</b> No disponible</span><br>
+                    <span><b>Revisión evaluador:</b> No disponible</span>
+                </span>
             </div>
-            <div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
-                <p class="font-semibold text-gray-700 w-56">Nivel académico:</p>
-                <span class="text-gray-800">${user.nivel?.nombre || 'N/A'}</span>
-            </div>
-            <div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
-                <p class="font-semibold text-gray-700 w-56">Documento:</p>
-                <span class="text-gray-800">${user.nro_documento || 'N/A'}</span>
-            </div>
-            <div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
-                <p class="font-semibold text-gray-700 w-56">Celular:</p>
-                <span class="text-gray-800">${user.nro_celular || 'N/A'}</span>
-            </div>
-            <div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
-                <p class="font-semibold text-gray-700 w-56">¿Tiene empresa?:</p>
-                <span class="text-gray-800">${data.tiene_empresa ? 'Sí' : 'No'}</span>
-            </div>
-            ${data.hoja_vida ? `<div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
-                                                                <p class="font-semibold text-gray-700 w-56">Hoja de vida:</p>
-                                                                <a href="/storage/${data.hoja_vida}" target="_blank" class="text-uts-500 underline">Ver archivo</a>
-                                                            </div>` : ''}
-            <div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
-                <p class="font-semibold text-gray-700 w-56">Estado:</p>
-                <span class="text-gray-800">${response.estado}</span>
-            </div>
-            <div class="p-2 bg-gray-50 rounded-lg shadow-sm flex items-center gap-2">
-                <p class="font-semibold text-gray-700 w-56">Fecha solicitud:</p>
-                <span class="text-gray-800">${response.fecha_solicitud}</span>
-            </div>
-        </div>`;
-                    $('#detailsTitle').html('Detalles de la solicitud de práctica');
-                    $('#content-details').html(html);
-                    // Ahora sí, abrimos el modal con la transición
-                    $('#detailsModal').addClass('show');
+        </div>
+        `;
+        
+        $('#content-details').html(html);
+        $('#detailsModal').addClass('show');
+
+                    // Ocultar spinner y restaurar botón
+                    if (btn) {
+                        const icon = btn.querySelector('i');
+                        const spinner = btn.querySelector('.loading-spinner');
+                        if (icon) icon.classList.remove('hidden');
+                        if (spinner) spinner.classList.add('hidden');
+                        btn.disabled = false;
+                    }
                 }).fail(function() {
                     Swal.fire('Error', 'No se pudieron cargar los detalles.', 'error');
-                }).always(function() {
-                    icon.classList.remove('hidden');
-                    spinner.classList.add('hidden');
-                    btn.disabled = false;
+                    if (btn) {
+                        const icon = btn.querySelector('i');
+                        const spinner = btn.querySelector('.loading-spinner');
+                        if (icon) icon.classList.remove('hidden');
+                        if (spinner) spinner.classList.add('hidden');
+                        btn.disabled = false;
+                    }
                 });
             }
 
@@ -1224,6 +1299,7 @@
 
         // ========== DESACTIVAR PRÁCTICA ==========
         function deshabilitarPracticaConActa(id) {
+                $('#desactivarPracticaTitle').html(`Desactivar <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Práctica</span>`);
             $('#practica_id').val(id);
             $('#nro_acta_desactivar').val('');
             $('#fecha_acta_desactivar').val('');
@@ -1245,6 +1321,7 @@
         
         // ========== ACTIVAR PRÁCTICA ==========
         function habilitarPracticaConActa(id) {
+            $('#activarPracticaTitle').html(`Activar <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Práctica</span>`);
             $('#practica_id_activar').val(id);
             $('#nro_acta_activar').val('');
             $('#fecha_acta_activar').val('');

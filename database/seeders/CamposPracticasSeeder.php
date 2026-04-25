@@ -82,6 +82,16 @@ class CamposPracticasSeeder extends Seeder
             'instructions'      => 'Suba la hoja de vida si NO cuenta con empresa.',
         ]);
 
+        Campo::create([
+            'tipo_solicitud_id' => $practicas_fase_0->id,
+            'label' => 'Título de la práctica',
+            'name' => 'titulo',
+            'type' => 'text',
+            'required' => 1,
+            'instructions' => 'Ingrese un título descriptivo para su práctica empresarial.'
+        ]);
+
+
        
     }
 }
