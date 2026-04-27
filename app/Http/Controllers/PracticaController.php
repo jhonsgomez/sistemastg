@@ -34,13 +34,25 @@ class PracticaController extends Controller
             ->where('tipo_solicitud_id', 9);
 
         if (auth()->user()->hasRole('estudiante')) {
-            $practicas->where('user_id', auth()->id());
-            $practicas->orderBy('id', 'desc');
-        }
+        // Mostrar prácticas donde:
+        // 1. El usuario es el creador (user_id)
+        // 2. O el usuario es el segundo integrante (id_integrante_2)
+        $practicas->where(function ($q) {
+            $q->where('user_id', auth()->id())
+              ->orWhereHas('valoresCampos', function ($vc) {
+                  $vc->whereHas('campo', function ($c) {
+                      $c->where('name', 'id_integrante_2');
+                  })->where('valor', auth()->id());
+              });
+        });
+        $practicas->orderBy('id', 'desc');
+    }
 
         if (auth()->user()->hasRole(['super_admin', 'admin', 'coordinador'])) {
         $filter = $request->input('filter');
-        
+
+        $practicas->orderBy('id', 'desc');
+
         switch ($filter) {
             case 'pendientes_comite':
                 // Prácticas donde el responsable es COMITÉ y están pendientes de acción
@@ -69,7 +81,7 @@ class PracticaController extends Controller
         }
     }
 
-        // 🔍 BÚSQUEDA AVANZADA
+        // BÚSQUEDA AVANZADA
     if ($request->has('search') && $search = $request->input('search.value')) {
         $practicas->where(function ($q) use ($search) {
             // 1. Búsqueda por ID formateado (PRA-00001, PRA-00123, etc.)
@@ -242,75 +254,155 @@ class PracticaController extends Controller
             ->make(true);
     }
 
+public function buscarEstudiantes(Request $request)
+{
+    try {
+        $search = $request->get('search');
+        
+        if (strlen($search) < 5) {
+            return response()->json([]);
+        }
+        
+        $userId = auth()->id();
+        $userNivelId = auth()->user()->nivel_id;
+        
+        // Subconsulta para encontrar estudiantes que NO tienen prácticas activas
+        // Estados que se consideran "activos" (no se puede agregar a estos estudiantes)
+        $estadosActivos = ['Pendiente', 'Fase 1', 'Fase 2', 'Fase 3', 'Fase 4', 'Fase 5'];
+        
+        $estudiantes = \App\Models\User::where('id', '!=', $userId)
+            ->where('nivel_id', $userNivelId) // Mismo nivel académico
+            ->where(function ($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                  ->orWhere('nro_documento', 'LIKE', "%{$search}%")
+                  ->orWhere('email', 'LIKE', "%{$search}%");
+            })
+            // Excluir estudiantes que tienen prácticas activas
+            ->whereNotIn('id', function ($subquery) use ($estadosActivos) {
+                $subquery->select('user_id')
+                    ->from('practicas')
+                    ->whereIn('estado', $estadosActivos)
+                    ->where('tipo_solicitud_id', 9); // Solo prácticas, no proyectos
+            })
+            // También excluir estudiantes que son segundo integrante en prácticas activas
+            ->whereNotIn('id', function ($subquery) use ($estadosActivos) {
+                $subquery->select('valor')
+                    ->from('practica_valores_campos')
+                    ->whereIn('practica_id', function ($q) use ($estadosActivos) {
+                        $q->select('id')
+                            ->from('practicas')
+                            ->whereIn('estado', $estadosActivos)
+                            ->where('tipo_solicitud_id', 9);
+                    })
+                    ->where('campo_id', function ($cq) {
+                        $cq->select('id')
+                            ->from('campos')
+                            ->where('name', 'id_integrante_2')
+                            ->where('tipo_solicitud_id', 9);
+                    });
+            })
+            ->with('nivel')
+            ->limit(10)
+            ->get();
+        
+        $resultado = $estudiantes->map(function ($user) {
+            return [
+                'id' => $user->id,
+                'nombre_completo' => $user->name,
+                'documento' => $user->nro_documento,
+                'email' => $user->email,
+                'nivel' => $user->nivel ? $user->nivel->nombre : 'N/A'
+            ];
+        });
+        
+        return response()->json($resultado);
+        
+    } catch (\Exception $e) {
+        \Log::error('Error en buscarEstudiantes: ' . $e->getMessage());
+        return response()->json(['error' => 'Error interno del servidor'], 500);
+    }
+}
+
     public function store(Request $request)
-    {
-        $tipo = TipoSolicitud::where('nombre', 'practicas_fase_0')->first();
-        $campos = Campo::where('tipo_solicitud_id', $tipo->id)->get();
+{
+    $tipo = TipoSolicitud::where('nombre', 'practicas_fase_0')->first();
+    $campos = Campo::where('tipo_solicitud_id', $tipo->id)->get();
 
-        $tieneEmpresa = $request->input('tiene_empresa');
-        if ($tieneEmpresa === null) {
-            return response()->json(['errors' => ['tiene_empresa' => ['Debe seleccionar si tiene empresa o no.']]], 422);
+    // Verificar si se envió tiene_empresa
+    $tieneEmpresa = $request->input('tiene_empresa');
+    if ($tieneEmpresa === null) {
+        return response()->json(['errors' => ['tiene_empresa' => ['Debe seleccionar si tiene empresa o no.']]], 422);
+    }
+    $tieneEmpresa = $tieneEmpresa === '1';
+
+    // Validación de hoja de vida
+    $errors = [];
+    if (!$tieneEmpresa && !$request->hasFile('hoja_vida')) {
+        $errors['hoja_vida'][] = 'Debe subir la hoja de vida si NO cuenta con empresa.';
+    }
+    
+    // Validar que el segundo integrante no sea el mismo usuario
+    if ($request->filled('id_integrante_2') && $request->id_integrante_2 == auth()->id()) {
+        $errors['id_integrante_2'][] = 'No puede seleccionarse a sí mismo como compañero.';
+    }
+    
+    if (!empty($errors)) {
+        return response()->json(['errors' => $errors], 422);
+    }
+
+    // Crear la práctica
+    $practica = Practica::create([
+        'user_id'           => auth()->id(),
+        'tipo_solicitud_id' => $tipo->id,
+        'estado'            => 'Pendiente',
+        'vencido'           => false,
+        'deshabilitado'     => false,
+    ]);
+
+    // Guardar cada campo dinámico
+    foreach ($campos as $campo) {
+        // Saltar campos que se llenan automáticamente desde la sesión
+        if (in_array($campo->name, ['nombre_completo', 'correo', 'nivel', 'documento', 'celular'])) {
+            continue;
         }
-        $tieneEmpresa = $tieneEmpresa === '1';
 
-        // Validación
-        $errors = [];
-        if (!$tieneEmpresa && !$request->hasFile('hoja_vida')) {
-            $errors['hoja_vida'][] = 'Debe subir la hoja de vida si NO cuenta con empresa.';
-        }
-        if (!empty($errors)) {
-            return response()->json(['errors' => $errors], 422);
-        }
+        $valor = null;
 
-        // Crear la práctica
-        $practica = Practica::create([
-            'user_id'           => auth()->id(),
-            'tipo_solicitud_id' => $tipo->id,
-            'estado'            => 'Pendiente',
-            'vencido'           => false,
-            'deshabilitado'     => false,
-        ]);
-
-        // Guardar cada campo dinámico
-        foreach ($campos as $campo) {
-            // Estos campos ya están en la tabla users, no se guardan aquí
-            if (in_array($campo->name, ['nombre_completo', 'correo', 'nivel', 'documento', 'celular'])) {
+        if ($campo->type == 'checkbox') {
+            $valor = $request->input($campo->name) === '1' ? 'true' : 'false';
+        } elseif ($campo->type == 'file') {
+            if ($campo->name == 'hoja_vida' && $tieneEmpresa) {
                 continue;
             }
-
-            $valor = null;
-
-            if ($campo->type == 'checkbox') {
-                $valor = $request->input($campo->name) === '1' ? 'true' : 'false';
-            } elseif ($campo->type == 'file') {
-                if ($campo->name == 'hoja_vida' && $tieneEmpresa) {
-                    continue;
-                }
-                if ($request->hasFile($campo->name)) {
-                    $path = $request->file($campo->name)->store('practicas', 'public');
-                    $valor = $path;
-                }
-            } else {
-                $valor = $request->input($campo->name);
+            if ($request->hasFile($campo->name)) {
+                $path = $request->file($campo->name)->store('practicas', 'public');
+                $valor = $path;
             }
-
-            if ($valor !== null) {
-                PracticaValorCampo::create([
-                    'practica_id' => $practica->id,
-                    'campo_id'    => $campo->id,
-                    'valor'       => $valor,
-                ]);
+        }  elseif ($campo->name == 'id_integrante_2') {
+            // Solo guardar si se seleccionó un integrante
+            $valor = $request->input($campo->name);
+            if (empty($valor)) {
+                continue; // No guardar si está vacío
             }
+        } else {
+            $valor = $request->input($campo->name);
         }
-            
 
-        //$campos_nueva_practica =$practica->camposConValores();
-        //$this->sendEmailSolicitudPractica($campos_nueva_practica);
-      
-    
-
-        return response()->json(['message' => 'Práctica enviada correctamente']);
+        if ($valor !== null) {
+            PracticaValorCampo::create([
+                'practica_id' => $practica->id,
+                'campo_id'    => $campo->id,
+                'valor'       => $valor,
+            ]);
+        }
     }
+
+    // Enviar correos (comentados por ahora)
+    // $campos_nueva_practica = $practica->camposConValores();
+    // $this->sendEmailSolicitudPractica($campos_nueva_practica);
+
+    return response()->json(['message' => 'Práctica enviada correctamente']);
+}
 
 
         public function sendEmailSolicitudPractica($campos)
@@ -372,53 +464,111 @@ class PracticaController extends Controller
 
     public function getDetalle($id)
 {
-    $practica = Practica::with('user.nivel', 'valoresCampos.campo')->findOrFail($id);
-    
-    $data = [];
-    foreach ($practica->valoresCampos as $vc) {
-        if ($vc->campo && $vc->campo->name) {
-            $data[$vc->campo->name] = $vc->valor;
+    try {
+        $practica = Practica::with('user.nivel', 'valoresCampos.campo')->findOrFail($id);
+        
+        $data = [];
+        foreach ($practica->valoresCampos as $vc) {
+            if ($vc->campo && $vc->campo->name) {
+                $data[$vc->campo->name] = $vc->valor;
+            }
         }
+        
+        // Determinar si el usuario es estudiante
+        $esEstudiante = auth()->user()->hasRole('estudiante');
+
+        // Obtener el segundo integrante
+        $integrante2 = null;
+        if (isset($data['id_integrante_2']) && !empty($data['id_integrante_2'])) {
+            $integrante2 = \App\Models\User::find($data['id_integrante_2']);
+        }
+
+        // Construir HTML de integrantes
+        $integrantesHtml = '';
+        
+        // Integrante 1
+        $integrantesHtml .= '<div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">';
+        $integrantesHtml .= '<p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Integrante:</p>';
+        $integrantesHtml .= '<div class="text-gray-800 w-full sm:flex-1 sm:ml-2">';
+        $integrantesHtml .= e($practica->user->name) . '<br>';
+        $integrantesHtml .= 'C.C ' . e($practica->user->nro_documento ?? 'N/A') . '<br>';
+        $integrantesHtml .= e($practica->user->email) . '<br>';
+        $integrantesHtml .= e($practica->user->nro_celular ?? 'N/A');
+        $integrantesHtml .= '</div></div>';
+        
+        // Integrante 2 (si existe)
+        if ($integrante2) {
+            $integrantesHtml .= '<div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">';
+            $integrantesHtml .= '<p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Integrante:</p>';
+            $integrantesHtml .= '<div class="text-gray-800 w-full sm:flex-1 sm:ml-2">';
+            $integrantesHtml .= e($integrante2->name) . '<br>';
+            $integrantesHtml .= 'C.C ' . e($integrante2->nro_documento ?? 'N/A') . '<br>';
+            $integrantesHtml .= e($integrante2->email) . '<br>';
+            $integrantesHtml .= e($integrante2->nro_celular ?? 'N/A');
+            $integrantesHtml .= '</div></div>';
+        }
+        
+        // Valores por defecto
+        $director = $data['director_id'] ?? 'No asignado';
+        $evaluador = $data['evaluador_id'] ?? 'No asignado';
+        $codirector = $data['codirector_id'] ?? 'No asignado';
+        
+        // Si es estudiante, ocultar evaluador y codirector
+        if ($esEstudiante) {
+            $docentesHtml = '<div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">';
+            $docentesHtml .= '<p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Docentes:</p>';
+            $docentesHtml .= '<div class="text-gray-800 w-full sm:flex-1 sm:ml-2">';
+            $docentesHtml .= '<span><b>Director:</b> ' . e($director) . '</span><br>';
+            $docentesHtml .= '<span><b>Evaluador:</b> <span class="text-gray-400 italic">No disponible</span></span><br>';
+            $docentesHtml .= '<span><b>Codirector:</b> ' . e($codirector) . '</span>';
+            $docentesHtml .= '</div></div>';
+        } else {
+            $docentesHtml = '<div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">';
+            $docentesHtml .= '<p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Docentes:</p>';
+            $docentesHtml .= '<div class="text-gray-800 w-full sm:flex-1 sm:ml-2">';
+            $docentesHtml .= '<span><b>Director:</b> ' . e($director) . '</span><br>';
+            $docentesHtml .= '<span><b>Evaluador:</b> ' . e($evaluador) . '</span><br>';
+            $docentesHtml .= '<span><b>Codirector:</b> ' . e($codirector) . '</span>';
+            $docentesHtml .= '</div></div>';
+        }
+        
+        // Título
+        $titulo = $data['titulo'] ?? 'No disponible';
+        
+        // Nivel académico
+        $nivel = $practica->user->nivel->nombre ?? 'N/A';
+        
+        // Periodo académico
+        $periodo = $data['periodo'] ?? (date('Y') . '-' . (date('n') <= 6 ? '1' : '2'));
+        
+        // Modalidad
+        $modalidad = 'Prácticas empresariales';
+        
+        // Empresa
+        $tieneEmpresa = $data['tiene_empresa'] ?? 'false';
+        $hojaVida = $data['hoja_vida'] ?? null;
+        
+        return response()->json([
+            'id' => $practica->id,
+            'estado' => $practica->estado,
+            'vencido' => $practica->vencido,
+            'deshabilitado' => $practica->deshabilitado,
+            'fecha_solicitud' => $practica->created_at->format('d/m/Y H:i'),
+            'integrantes_html' => $integrantesHtml,
+            'docentes_html' => $docentesHtml,
+            'titulo' => $titulo,
+            'nivel' => $nivel,
+            'periodo' => $periodo,
+            'modalidad' => $modalidad,
+            'tiene_empresa' => $tieneEmpresa === 'true',
+            'hoja_vida' => $hojaVida,
+            'es_estudiante' => $esEstudiante
+        ]);
+        
+    } catch (\Exception $e) {
+        \Log::error('Error en getDetalle: ' . $e->getMessage());
+        return response()->json(['error' => 'Error al cargar los detalles'], 500);
     }
-    
-    // Determinar si el usuario es estudiante
-    $esEstudiante = auth()->user()->hasRole('estudiante');
-    
-    // Valores por defecto
-    $director = $data['director_id'] ?? 'No asignado';
-    $evaluador = $data['evaluador_id'] ?? 'No asignado';
-    $codirector = $data['codirector_id'] ?? 'No asignado';
-    
-    // Si es estudiante, ocultar evaluador y codirector
-    if ($esEstudiante) {
-        $directorHtml = "<span><b>Director:</b> {$director}</span><br>";
-        $evaluadorHtml = "";
-        $codirectorHtml = "<span><b>Codirector:</b> {$codirector}</span>";
-    } else {
-        // Para otros roles, mostrar todo normalmente
-        $directorHtml = "<span><b>Director:</b> {$director}</span><br>";
-        $evaluadorHtml = "<span><b>Evaluador:</b> {$evaluador}</span><br>";
-        $codirectorHtml = "<span><b>Codirector:</b> {$codirector}</span>";
-    }
-    
-    return response()->json([
-        'id'              => $practica->id,
-        'estado'          => $practica->estado,
-        'vencido'         => $practica->vencido,
-        'deshabilitado'   => $practica->deshabilitado,
-        'fecha_solicitud' => $practica->created_at->format('d/m/Y H:i'),
-        'user'            => [
-            'name'          => $practica->user->name,
-            'email'         => $practica->user->email,
-            'nivel'         => $practica->user->nivel->nombre ?? 'N/A',
-            'nro_documento' => $practica->user->nro_documento ?? 'N/A',
-            'nro_celular'   => $practica->user->nro_celular ?? 'N/A',
-        ],
-        'data'            => $data,
-        // Añadir los HTMLs formateados para usar en la vista
-        'docentes_html'   => $directorHtml . $evaluadorHtml . $codirectorHtml,
-        'es_estudiante'   => $esEstudiante
-    ]);
 }
 
     public function responderSolicitud(Request $request)

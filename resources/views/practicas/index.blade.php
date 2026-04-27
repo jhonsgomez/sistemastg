@@ -131,6 +131,26 @@
                 transform: translateY(0) !important;
             }
 
+            #integrantes_list {
+    position: absolute;
+    z-index: 50;
+    width: 100%;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    max-height: 240px;
+    overflow-y: auto;
+}
+
+#integrantes_list div:hover {
+    background-color: #f3f4f6;
+}
+
+#selected_integrante_2 {
+    display: none;
+}
+            
             .modal-content {
                 max-width: 850px !important;
                 width: 100% !important;
@@ -363,255 +383,255 @@ select.dt-input:focus {
     </div>
 
     <!--Modal de prácticas-->
-
-    <div id="createModal" class="fixed z-50 inset-0 overflow-y-auto">
-        <div class="modal-overlay absolute inset-0"
-            style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;"
-            onclick="closeCreateModal()">
-            <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
-                <div class="inline-block align-bottom bg-white rounded-lg text-left shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
-                    onclick="event.stopPropagation()">
-                    <button class="modal-close-btn-custom" onclick="closeCreateModal()">
-                        &times;
-                    </button>
-                    @if (auth()->user()->hasRole(['estudiante']))
-                        <form id="practicasForm" class="p-6 mt-2" method="POST" enctype="multipart/form-data">
-                            @csrf
-                            <p class="text-2xl font-bold" style="margin: 0.8rem 0 1.5rem 0;" id="formTitle"></p>
-                            <p class="text-sm mb-2">En este formulario el estudiante registrará la información
-                                necesaria para la solicitud de prácticas empresariales.</p>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6 mb-6 ">
-                                @foreach ($campos as $campo)
-                                        @if($campo->name == 'respuesta_comite')
-                                            @continue
-                                        @endif
-
-                                    <div class="{{ $campo->name == 'hoja_vida' ? 'col-span-1 sm:col-span-2' : '' }}">
-
-                                        @if ($campo->label != null && $campo->type != 'hidden')
-                                            <div class="flex items-center gap-2">
-                                                <label for="{{ $campo->name }}"
-                                                    class="block font-medium text-sm text-gray-700">
-
-                                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
-
-                                                    @if ($campo->required)
-                                                        <span class="text-red-600 mr-1 text-lg">*</span>
-                                                    @endif
-
-                                                    {{ $campo->label }}
-                                                </label>
-
-                                                @if (!empty($campo->instructions))
-                                                    <div class="relative inline-block">
-                                                        <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
-                                                            data-tooltip="tooltip-{{ $campo->name }}"></i>
-
-                                                        <div id="tooltip-{{ $campo->name }}"
-                                                            class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg">
-                                                            {!! $campo->instructions !!}
-                                                        </div>
-                                                    </div>
-                                                @endif
-                                            </div>
-                                        @endif
-
-                                        @switch($campo->type)
-
-                                            {{-- ================= TEXT ================= --}}
-                                            @case('text')
-                                                @switch($campo->name)
-                                                    @case('nombre_completo')
-                                                        <input type="text" name="{{ $campo->name }}"
-                                                            value="{{ auth()->user()->name }}"
-                                                            class="bg-gray-200 border-gray-300 rounded-md mt-1 block w-full cursor-default"
-                                                            readonly>
-                                                    @break
-
-                                                    @case('correo')
-                                                        <input type="text" name="{{ $campo->name }}"
-                                                            value="{{ auth()->user()->email }}"
-                                                            class="bg-gray-200 border-gray-300 rounded-md mt-1 block w-full cursor-default"
-                                                            readonly>
-                                                    @break
-
-                                                    @case('nivel')
-                                                        <input type="text" name="{{ $campo->name }}"
-                                                            value="{{ auth()->user()->nivel->nombre ?? '' }}"
-                                                            class="bg-gray-200 border-gray-300 rounded-md mt-1 block w-full cursor-default"
-                                                            readonly>
-                                                    @break
-
-                                                    @default
-                                                        <input type="text" name="{{ $campo->name }}" id="{{ $campo->name }}"
-                                                            placeholder="{{ $campo->placeholder ?? '' }}"
-                                                            class="border-gray-300 rounded-md mt-1 block w-full">
-                                                    @break
-                                                @endswitch
-                                            @break
-
-                                            {{-- ================= TEXTAREA ================= --}}
-                                            @case('textarea')
-                                                <textarea name="{{ $campo->name }}" id="{{ $campo->name }}" class="border-gray-300 rounded-md mt-1 block w-full">{{ old($campo->name) }}</textarea>
-                                            @break
-
-                                            {{-- ================= NUMBER ================= --}}
-                                            @case('number')
-                                                @switch($campo->name)
-                                                    @case('documento')
-                                                        <input type="number" name="{{ $campo->name }}"
-                                                            value="{{ auth()->user()->nro_documento ?? '' }}"
-                                                            class="bg-gray-200 border-gray-300 rounded-md mt-1 block w-full cursor-default"
-                                                            readonly>
-                                                    @break
-
-                                                    @case('celular')
-                                                        <input type="number" name="{{ $campo->name }}"
-                                                            value="{{ auth()->user()->nro_celular ?? '' }}"
-                                                            class="bg-gray-200 border-gray-300 rounded-md mt-1 block w-full cursor-default"
-                                                            readonly>
-                                                    @break
-                                                @endswitch
-                                            @break
-
-                                            {{-- ================= DATE ================= --}}
-                                            @case('date')
-                                                <input type="date" name="{{ $campo->name }}" id="{{ $campo->name }}"
-                                                    class="border-gray-300 rounded-md mt-1 block w-full">
-                                            @break
-
-                                         
-
-                                            {{-- ================= FILE ================= --}}
-                                            @case('file')
-                                                @if ($campo->name == 'hoja_vida')
-                                                    <div class="col-span-1 sm:col-span-2">
-
-                                                        <div id="hojaVidaContainer" style="display:none;"
-                                                            class="w-full mt-2 relative py-9 bg-gray-50 rounded-2xl border-2 border-gray-300 gap-3 grid border-dashed">
-                                                            <div class="grid gap-1">
-                                                                <i
-                                                                    class="mx-auto text-4xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                                                <h2 class="text-center text-gray-400 text-xs leading-4">
-                                                                    Solo archivos de PDF de máximo
-                                                                    {{ config('custom.peso_maximo_propuesta') }}MB
-                                                                </h2>
-                                                            </div>
-
-                                                            <div class="grid gap-2">
-                                                                <h4 class="text-center text-gray-900 text-sm font-medium">
-                                                                    Arrastra o carga tus archivos aquí
-                                                                </h4>
-
-                                                                <div class="flex items-center justify-center">
-                                                                    <input type="file" name="{{ $campo->name }}"
-                                                                        id="{{ $campo->name }}"
-                                                                        class="absolute inset-0 opacity-0 cursor-pointer"
-                                                                        accept=".pdf" />
-
-                                                                    <div
-                                                                        class="flex w-28 h-9 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer">
-                                                                        Cargar
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
-                                                        </div>
-                                                        <span id="{{ $campo->name }}Error"
-                                                            class="text-red-500 text-sm"></span>
-                                                        <ul id="file-list-fase0"
-                                                            class="mt-4 text-gray-600 text-sm list-disc pl-5"></ul>
-                                                        <span id="files-size-fase0" class="text-gray-800 text-sm"></span>
-
-                                                    </div>
-                                                @else
-                                                    <input type="file" name="{{ $campo->name }}"
-                                                        id="{{ $campo->name }}"
-                                                        class="absolute inset-0 opacity-0 cursor-pointer" accept=".pdf" />
-                                                @endif
-                                            @break
-
-                                            {{-- ================= CHECKBOX ================= --}}
-                                            @case('checkbox')
-                                                <div class="mt-2">
-
-                                                    <div class="flex items-center gap-4">
-                                                        <label class="flex items-center gap-1">
-                                                            <input type="radio" name="{{ $campo->name }}" value="1"
-                                                                class="radio-verde" @checked(($data['tiene_empresa'] ?? null) == 1)
-                                                                onchange="toggleHojaVida()">
-                                                            Sí
-                                                        </label>
-
-                                                        <label class="flex items-center gap-1">
-                                                            <input type="radio" name="{{ $campo->name }}" value="0"
-                                                                class="radio-verde" @checked(($data['tiene_empresa'] ?? null) == 0)
-                                                                onchange="toggleHojaVida()">
-                                                            No
-                                                        </label>
-
-                                                    </div>
-                                                </div>
-                                            @break
-
-                                            {{-- ================= HIDDEN ================= --}}
-                                            @case('hidden')
-                                                <input type="hidden" name="{{ $campo->name }}" id="{{ $campo->name }}"
-                                                    value="{{ $campo->placeholder ?? '' }}">
-                                            @break
-
-                                            {{-- ================= DEFAULT ================= --}}
-
-                                            @default
-                                                <input type="text" name="{{ $campo->name }}" id="{{ $campo->name }}"
-                                                    placeholder="{{ $campo->placeholder ?? '' }}"
-                                                    class="border-gray-300 rounded-md mt-1 block w-full">
-                                        @endswitch
-
-
-                                        <span id="{{ $campo->name }}Error" class="text-red-500 text-sm"></span>
+<div id="createModal" class="fixed z-50 inset-0 overflow-y-auto">
+    <div class="modal-overlay absolute inset-0"
+        style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;"
+        onclick="closeCreateModal()">
+        <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
+            <div class="inline-block align-bottom bg-white rounded-lg text-left shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
+                onclick="event.stopPropagation()">
+                <button class="modal-close-btn-custom" onclick="closeCreateModal()">&times;</button>
+                @if (auth()->user()->hasRole(['estudiante']))
+                    <form id="practicasForm" class="p-6 mt-2" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <p class="text-2xl font-bold" style="margin: 0.8rem 0 1.5rem 0;" id="formTitle"></p>
+                        <p class="text-sm mb-2">En este formulario el estudiante registrará la información necesaria para la solicitud de prácticas empresariales.</p>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6 mb-6">
+                            
+                            {{-- FILA 1: NOMBRE COMPLETO --}}
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <label class="block font-medium text-sm text-gray-700">
+                                        <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                        <span class="text-red-600 mr-1 text-lg">*</span> Nombre completo
+                                    </label>
+                                    <div class="relative inline-block">
+                                        <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                            data-tooltip="tooltip-nombre_completo"></i>
+                                        <div id="tooltip-nombre_completo"
+                                            class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg">
+                                            Nombre completo del estudiante.
+                                        </div>
                                     </div>
-                                @endforeach
+                                </div>
+                                <input type="text" name="nombre_completo" value="{{ auth()->user()->name }}"
+                                    class="bg-gray-200 border-gray-300 rounded-md mt-1 block w-full cursor-default" readonly>
                             </div>
 
-
-                            <p class="text-sm mb-6"><strong>NOTA: </strong>El estudiante debe tener aprobado el 90% de
-                                los créditos (Tecnología: 97 / Profesional: 65).</p>
-                            <p class="text-sm mb-6"><strong>Convenios: </strong>Verifique si la empresa tiene convenio
-                                vigente en la pagina de la ORI :<a href="https://oriapp.uts.edu.co/activities_guest"
-                                    target="_blank" class="text-uts-500 underline hover:text-uts-800"> Consultar
-                                    convenios aquí </a></p>
-
-                            <div class="flex justify-end space-x-2">
-                                <button type="button" onclick="closeCreateModal()"
-                                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">
-                                    Cancelar
-                                </button>
-                                <button type="submit" id="guardarModalButton"
-                                    class="flex bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg">
-                                    <svg id="loadingSpinner-guardar" style="margin: 4px 10px 4px 0"
-                                        class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64"
-                                        fill="none" xmlns="http://www.w3.org/2000/svg" width="24"
-                                        height="24">
-                                        <path
-                                            d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
-                                            stroke="currentColor" stroke-width="5" stroke-linecap="round"
-                                            stroke-linejoin="round"></path>
-                                        <path
-                                            d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
-                                            stroke="currentColor" stroke-width="5" stroke-linecap="round"
-                                            stroke-linejoin="round" class="text-white">
-                                        </path>
-                                    </svg>
-                                    Enviar
-                                </button>
+                            {{-- CORREO INSTITUCIONAL --}}
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <label class="block font-medium text-sm text-gray-700">
+                                        <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                        <span class="text-red-600 mr-1 text-lg">*</span> Correo institucional
+                                    </label>
+                                    <div class="relative inline-block">
+                                        <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                            data-tooltip="tooltip-correo"></i>
+                                        <div id="tooltip-correo"
+                                            class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg">
+                                            Correo institucional del estudiante.
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="text" name="correo" value="{{ auth()->user()->email }}"
+                                    class="bg-gray-200 border-gray-300 rounded-md mt-1 block w-full cursor-default" readonly>
                             </div>
-                        </form>
-                    @endif
-                </div>
+
+                            {{-- FILA 2: NIVEL ACADÉMICO --}}
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <label class="block font-medium text-sm text-gray-700">
+                                        <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                        <span class="text-red-600 mr-1 text-lg">*</span> Nivel académico
+                                    </label>
+                                    <div class="relative inline-block">
+                                        <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                            data-tooltip="tooltip-nivel"></i>
+                                        <div id="tooltip-nivel"
+                                            class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg">
+                                            Nivel académico del estudiante.
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="text" name="nivel" value="{{ auth()->user()->nivel->nombre ?? '' }}"
+                                    class="bg-gray-200 border-gray-300 rounded-md mt-1 block w-full cursor-default" readonly>
+                            </div>
+
+                            {{-- NÚMERO DE DOCUMENTO --}}
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <label class="block font-medium text-sm text-gray-700">
+                                        <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                        <span class="text-red-600 mr-1 text-lg">*</span> Número de documento
+                                    </label>
+                                    <div class="relative inline-block">
+                                        <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                            data-tooltip="tooltip-documento"></i>
+                                        <div id="tooltip-documento"
+                                            class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg">
+                                            Número de documento de identidad.
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="number" name="documento" value="{{ auth()->user()->nro_documento ?? '' }}"
+                                    class="bg-gray-200 border-gray-300 rounded-md mt-1 block w-full cursor-default" readonly>
+                            </div>
+
+                            {{-- FILA 3: NÚMERO DE CELULAR --}}
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <label class="block font-medium text-sm text-gray-700">
+                                        <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                        <span class="text-red-600 mr-1 text-lg">*</span> Número de celular
+                                    </label>
+                                    <div class="relative inline-block">
+                                        <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                            data-tooltip="tooltip-celular"></i>
+                                        <div id="tooltip-celular"
+                                            class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg">
+                                            Número de celular de contacto.
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="number" name="celular" value="{{ auth()->user()->nro_celular ?? '' }}"
+                                    class="bg-gray-200 border-gray-300 rounded-md mt-1 block w-full cursor-default" readonly>
+                            </div>
+
+                            {{-- SEGUNDO INTEGRANTE (al lado del celular) --}}
+                            <div>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <label class="block font-medium text-sm text-gray-700">
+                                        <i class="fa-regular fa-user-plus mr-1 text-gray-500"></i>
+                                        Segundo integrante (opcional)
+                                    </label>
+                                    <div class="relative inline-block">
+                                        <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                            data-tooltip="tooltip-integrante"></i>
+                                        <div id="tooltip-integrante"
+                                            class="hidden absolute z-10 max-w-[90vw] px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg left-1/2 -translate-x-1/2 bottom-full mb-2 sm:left-0 sm:translate-x-0">
+                                            Seleccione el compañero con quien realizará la práctica empresarial. El comité verificará la información y se pondrá en contacto si es pertinente.
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <input type="text" id="search_integrante_2" 
+                                    placeholder="Escriba al menos 5 caracteres (nombre, documento o correo) para buscar..."
+                                    class="border-gray-300 focus:ring-uts-500 focus:border-uts-500 rounded-md shadow-sm mt-1 block w-full"
+                                    autocomplete="off">
+                                
+                                <input type="hidden" name="id_integrante_2" id="id_integrante_2" value="">
+                                <div id="integrantes_list" class="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg hidden max-h-60 overflow-y-auto mt-1"></div>
+                                <div id="selected_integrante_2" class="mt-2"></div>
+                                <span id="id_integrante_2Error" class="text-red-500 text-sm"></span>
+                            </div>
+
+                            {{-- ¿CUENTA CON EMPRESA? (ocupa ambas columnas) --}}
+                            @php $campoTieneEmpresa = $campos->where('name', 'tiene_empresa')->first(); @endphp
+                            @if($campoTieneEmpresa)
+                            <div class="col-span-1 sm:col-span-2">
+                                <div class="flex items-center gap-2">
+                                    <label class="block font-medium text-sm text-gray-700">
+                                        <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                        <span class="text-red-600 mr-1 text-lg">*</span> {{ $campoTieneEmpresa->label }}
+                                    </label>
+                                    <div class="relative inline-block">
+                                        <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                            data-tooltip="tooltip-tiene_empresa"></i>
+                                        <div id="tooltip-tiene_empresa"
+                                            class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg">
+                                            Marque si ya cuenta con empresa donde realizar la práctica.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <div class="flex items-center gap-4">
+                                        <label class="flex items-center gap-1">
+                                            <input type="radio" name="tiene_empresa" value="1" class="radio-verde" onchange="toggleHojaVida()"> Sí
+                                        </label>
+                                        <label class="flex items-center gap-1">
+                                            <input type="radio" name="tiene_empresa" value="0" class="radio-verde" onchange="toggleHojaVida()"> No
+                                        </label>
+                                    </div>
+                                </div>
+                                <span id="tiene_empresaError" class="text-red-500 text-sm"></span>
+                            </div>
+                            @endif
+
+                            {{-- HOJA DE VIDA (condicional, ocupa ambas columnas) --}}
+                            @php $campoHojaVida = $campos->where('name', 'hoja_vida')->first(); @endphp
+                            @if($campoHojaVida)
+                            <div class="col-span-1 sm:col-span-2">
+                                <div class="flex items-center gap-2" id="hojaVidaLabel" style="display:none;">
+                                    <label class="block font-medium text-sm text-gray-700">
+                                        <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                        {{ $campoHojaVida->label }}
+                                    </label>
+                                    <div class="relative inline-block">
+                                        <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                            data-tooltip="tooltip-hoja_vida"></i>
+                                        <div id="tooltip-hoja_vida"
+                                            class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg">
+                                            Suba su hoja de vida en formato PDF si no cuenta con empresa.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="hojaVidaContainer" style="display:none;"
+                                    class="w-full mt-2 relative py-9 bg-gray-50 rounded-2xl border-2 border-gray-300 gap-3 grid border-dashed">
+                                    <div class="grid gap-1">
+                                        <i class="mx-auto text-4xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                        <h2 class="text-center text-gray-400 text-xs leading-4">
+                                            Solo archivos de PDF de máximo {{ config('custom.peso_maximo_propuesta') }}MB
+                                        </h2>
+                                    </div>
+                                    <div class="grid gap-2">
+                                        <h4 class="text-center text-gray-900 text-sm font-medium">Arrastra o carga tus archivos aquí</h4>
+                                        <div class="flex items-center justify-center">
+                                            <input type="file" name="hoja_vida" id="hoja_vida"
+                                                class="absolute inset-0 opacity-0 cursor-pointer" accept=".pdf" />
+                                            <div class="flex w-28 h-9 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer">Cargar</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span id="hoja_vidaError" class="text-red-500 text-sm"></span>
+                                <ul id="file-list-fase0" class="mt-4 text-gray-600 text-sm list-disc pl-5"></ul>
+                                <span id="files-size-fase0" class="text-gray-800 text-sm"></span>
+                            </div>
+                            @endif
+
+                            {{-- CAMPO OCULTO PERIODO --}}
+                            @php $campoPeriodo = $campos->where('name', 'periodo')->first(); @endphp
+                            @if($campoPeriodo)
+                                @php
+                                    $anio_actual = date('Y');
+                                    $mes_actual = date('n');
+                                    $periodo_actual = ($mes_actual <= 6) ? "$anio_actual-1" : "$anio_actual-2";
+                                @endphp
+                                <input type="hidden" name="periodo" value="{{ $periodo_actual }}">
+                            @endif
+
+                        </div>
+
+                        <p class="text-sm mb-6"><strong>NOTA: </strong>El estudiante debe tener aprobado el 90% de los créditos (Tecnología: 97 / Profesional: 65).</p>
+                        <p class="text-sm mb-6"><strong>Convenios: </strong>Verifique si la empresa tiene convenio vigente en la pagina de la ORI :<a href="https://oriapp.uts.edu.co/activities_guest" target="_blank" class="text-uts-500 underline hover:text-uts-800"> Consultar convenios aquí </a></p>
+
+                        <div class="flex justify-end space-x-2">
+                            <button type="button" onclick="closeCreateModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cancelar</button>
+                            <button type="submit" id="guardarModalButton" class="flex bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg">
+                                <svg id="loadingSpinner-guardar" style="margin: 4px 10px 4px 0" class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                                    <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
+                                </svg>
+                                Enviar
+                            </button>
+                        </div>
+                    </form>
+                @endif
             </div>
         </div>
     </div>
+</div>
 
     <!--Responder Solicitud Practicas Modal-->
     <div id="responderSolicitudPractica" class="fixed z-50 inset-0 overflow-y-auto">
@@ -904,6 +924,86 @@ select.dt-input:focus {
 
         </script>
 
+        <script>
+    $(document).ready(function() {
+        let searchTimeout;
+        
+        // Búsqueda de estudiantes para segundo integrante
+        $(document).on('input', '#search_integrante_2', function() {
+            clearTimeout(searchTimeout);
+            let searchTerm = $(this).val().trim();
+            
+            if (searchTerm.length >= 5) {
+                searchTimeout = setTimeout(function() {
+                    $.ajax({
+                        url: '{{ route("practicas.buscar_estudiantes") }}',
+                        method: 'GET',
+                        data: { search: searchTerm },
+                        success: function(estudiantes) {
+                            let list = $('#integrantes_list');
+                            list.empty();
+                            
+                            if (estudiantes.length > 0) {
+                                estudiantes.forEach(function(estudiante) {
+                                    list.append(`
+                                        <div class="p-2 hover:bg-gray-100 cursor-pointer border-b border-gray-200"
+                                             onclick="seleccionarIntegrante2(${estudiante.id}, '${estudiante.nombre_completo.replace(/'/g, "\\'")} (${estudiante.documento})')">
+                                            <div class="font-medium">${estudiante.nombre_completo}</div>
+                                            <div class="text-sm text-gray-500">${estudiante.documento} | ${estudiante.email} | ${estudiante.nivel}</div>
+                                        </div>
+                                    `);
+                                });
+                                list.removeClass('hidden');
+                            } else {
+                                list.html('<div class="p-2 text-gray-500 text-center">No se encontraron estudiantes</div>');
+                                list.removeClass('hidden');
+                            }
+                        },
+                        error: function(xhr) {
+                            console.error('Error en búsqueda:', xhr);
+                            if (xhr.status === 404) {
+                                $('#integrantes_list').html('<div class="p-2 text-red-500 text-center">Error: Ruta no encontrada. Contacte al administrador.</div>');
+                                $('#integrantes_list').removeClass('hidden');
+                            }
+                        }
+                    });
+                }, 500);
+            } else {
+                $('#integrantes_list').addClass('hidden');
+            }
+        });
+    });
+    
+    function seleccionarIntegrante2(id, nombre) {
+        $('#id_integrante_2').val(id);
+        $('#selected_integrante_2').html(`
+            <div class="flex items-center justify-between bg-uts-50 p-2 rounded-md border border-uts-200">
+                <span><i class="fa-solid fa-user-check text-uts-500 mr-2"></i>${nombre}</span>
+                <button type="button" onclick="limpiarIntegrante2()" class="text-red-500 hover:text-red-700">
+                    <i class="fa-solid fa-times"></i>
+                </button>
+            </div>
+        `);
+        $('#search_integrante_2').val('');
+        $('#integrantes_list').addClass('hidden');
+        $('#selected_integrante_2').show();
+    }
+    
+    function limpiarIntegrante2() {
+        $('#id_integrante_2').val('');
+        $('#selected_integrante_2').empty().hide();
+        $('#search_integrante_2').val('');
+        $('#integrantes_list').addClass('hidden');
+    }
+    
+    // Cerrar lista al hacer clic fuera
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('#search_integrante_2, #integrantes_list').length) {
+            $('#integrantes_list').addClass('hidden');
+        }
+    });
+</script>
+
         <!--Responder solicitud modal-->
 <script>
     // ========== ABRIR MODAL RESPONDER ==========
@@ -1043,7 +1143,7 @@ select.dt-input:focus {
                             success: function(response) {
                                 closeCreateModal();
                                 showToast('Solicitud de Práctica enviada correctamente');
-                                // ✅ Recargar el DataTable
+                                //  Recargar el DataTable
                                 $('#practicasTable').DataTable().ajax.reload();
                             },
                             error: function(xhr) {
@@ -1075,26 +1175,38 @@ select.dt-input:focus {
         <!--Hoja de vida-->
 
         <script>
-            function toggleHojaVida() {
-                const tieneEmpresaSi = document.querySelector('input[name="tiene_empresa"][value="1"]');
-                const tieneEmpresaNo = document.querySelector('input[name="tiene_empresa"][value="0"]');
-                const container = document.getElementById('hojaVidaContainer');
+    // Inicializar tooltips (igual que antes)
+    $(document).ready(function() {
+        $('.tooltip-icon').on('mouseenter', function() {
+            var tooltipId = $(this).data('tooltip');
+            $('#' + tooltipId).removeClass('hidden');
+        }).on('mouseleave', function() {
+            var tooltipId = $(this).data('tooltip');
+            $('#' + tooltipId).addClass('hidden');
+        });
+    });
 
-                if (!container) return;
-                if (tieneEmpresaNo && tieneEmpresaNo.checked) {
-                    // NO tiene empresa → mostrar hoja de vida
-                    container.style.display = 'block';
-                } else {
-                    // SÍ tiene empresa → ocultar
-                    container.style.display = 'none';
-                }
-            }
+    // Función para mostrar/ocultar hoja de vida
+    function toggleHojaVida() {
+        const tieneEmpresaNo = document.querySelector('input[name="tiene_empresa"][value="0"]');
+        const container = document.getElementById('hojaVidaContainer');
+        const label = document.getElementById('hojaVidaLabel');
 
-            // cuando carga el modal
-            document.addEventListener('DOMContentLoaded', function() {
-                toggleHojaVida();
-            });
-        </script>
+        if (!container) return;
+        
+        if (tieneEmpresaNo && tieneEmpresaNo.checked) {
+            container.style.display = 'block';
+            if (label) label.style.display = 'flex';
+        } else {
+            container.style.display = 'none';
+            if (label) label.style.display = 'none';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        toggleHojaVida();
+    });
+</script>
 
         <!--Datatables-->
 
@@ -1183,134 +1295,118 @@ $('#filtroRolesPracticas').on('change', function() {
 
         <script>
             function openDetailsModal(btn, id) {
-                // Mostrar spinner si existe el botón
-                if (btn) {
-                    const icon = btn.querySelector('i');
-                    const spinner = btn.querySelector('.loading-spinner');
-                    if (icon) icon.classList.add('hidden');
-                    if (spinner) spinner.classList.remove('hidden');
-                    btn.disabled = true;
-                }
+    if (btn) {
+        const icon = btn.querySelector('i');
+        const spinner = btn.querySelector('.loading-spinner');
+        if (icon) icon.classList.add('hidden');
+        if (spinner) spinner.classList.remove('hidden');
+        btn.disabled = true;
+    }
 
-                $('#detailsTitle').html(`Detalles de la <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Práctica</span>`);
+    $('#detailsTitle').html(`Detalles de la <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Práctica</span>`);
 
-                $.get('/practicas/' + id + '/detalle', function(response) {
-        let user = response.user;
-        let data = response.data;
-        
-        // Usar el HTML de docentes ya formateado desde el backend
-        let docentesHtml = response.docentes_html;
-        
-        // Valores por defecto
-        let titulo = data.titulo || 'No disponible';
-        let nivel = user.nivel || 'N/A';
-        let periodo = data.periodo || (new Date().getFullYear() + '-' + (new Date().getMonth() < 6 ? '1' : '2'));
-        let tieneEmpresa = data.tiene_empresa;
-        let hojaVida = data.hoja_vida;
-        let modalidad = 'Prácticas empresariales';
-        
-        // Construir HTML
+    $.get('/practicas/' + id + '/detalle', function(response) {
         let html = `
             <div class="space-y-2">
+                <!-- Título -->
                 <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
                     <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Título de la práctica:</p>
-                    <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">${titulo}</span>
+                    <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">${escapeHtml(response.titulo)}</span>
                 </div>
+                
+                
+                ${response.docentes_html}
+                
+                <!-- Nivel académico -->
                 <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
-                    <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Docentes:</p>
-                    <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">
-                        ${docentesHtml}
-                    </span>
+                <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Nivel académico:</p>
+                <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">${escapeHtml(response.nivel)}</span>
                 </div>
+                
+                <!-- Modalidad -->
                 <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
-                    <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Nivel académico:</p>
-                    <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">${nivel}</span>
+                <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Modalidad:</p>
+                <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">${escapeHtml(response.modalidad)}</span>
                 </div>
+                
+                <!-- Periodo académico -->
                 <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
-                    <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Modalidad:</p>
-                    <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">${modalidad}</span>
+                <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Periodo académico:</p>
+                <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">${escapeHtml(response.periodo)}</span>
                 </div>
-                <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
-                    <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Periodo académico:</p>
-                    <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">${periodo}</span>
-                </div>
+
+                ${response.integrantes_html}
+                
         `;
         
-        // Datos del estudiante
-        if (user) {
+        // Empresa / Hoja de vida
+        if (response.tiene_empresa) {
             html += `
                 <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
-                    <p class="font-semibold text-gray-700 w-1/3 min-w-[100px]">Estudiante:</p>
-                    <span class="text-gray-800 flex-1 xl:ml-2 lg:ml-2 sm:ml-0">
-                        <span>${(user.name || 'N/A').toUpperCase()}</span><br>
-                        <span>${user.nro_documento ? 'C.C ' + user.nro_documento : 'N/A'}</span><br>
-                        <span class="underline text-blue-600">${user.email || 'N/A'}</span><br>
-                        <span>${user.nro_celular || 'N/A'}</span><br>
+                    <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">¿Cuenta con empresa?</p>
+                    <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">Sí</span>
+                </div>
+            `;
+        } else if (response.hoja_vida) {
+            html += `
+                <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
+                    <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Hoja de vida:</p>
+                    <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">
+                        <a href="/storage/${response.hoja_vida}" target="_blank" class="text-uts-500 underline hover:text-uts-800">Ver archivo</a>
                     </span>
                 </div>
             `;
         }
-        
-        // Sección de empresa
-        html += `<div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">`;
-        if (tieneEmpresa === 'true' || tieneEmpresa === true) {
-            html += `
-                <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">¿Cuenta con empresa?</p>
-                <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">Sí</span>
-            `;
-        } else {
-            html += `
-                <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Hoja de vida:</p>
-                <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">
-                    ${hojaVida ? `<a href="/storage/${hojaVida}" target="_blank" class="text-uts-500 underline">Ver archivo</a>` : 'No disponible'}
-                </span>
-            `;
-        }
-        html += `</div>`;
         
         // Fechas
         html += `
-            <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
-                <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Fechas propuesta:</p>
-                <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">
-                    <span><b>Envío de propuesta:</b> No disponible</span><br>
-                    <span><b>Revisión director:</b> No disponible</span><br>
-                    <span><b>Revisión evaluador:</b> No disponible</span>
-                </span>
+                <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
+                    <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Fechas propuesta:</p>
+                    <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">
+                        <span><b>Envío de propuesta:</b> No disponible</span><br>
+                        <span><b>Revisión director:</b> No disponible</span><br>
+                        <span><b>Revisión evaluador:</b> No disponible</span>
+                    </span>
+                </div>
+                <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
+                    <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Fechas informe:</p>
+                    <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">
+                        <span><b>Envío de informe:</b> No disponible</span><br>
+                        <span><b>Revisión director:</b> No disponible</span><br>
+                        <span><b>Revisión evaluador:</b> No disponible</span>
+                    </span>
+                </div>
             </div>
-            <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
-                <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Fechas informe:</p>
-                <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">
-                    <span><b>Envío de informe:</b> No disponible</span><br>
-                    <span><b>Revisión director:</b> No disponible</span><br>
-                    <span><b>Revisión evaluador:</b> No disponible</span>
-                </span>
-            </div>
-        </div>
         `;
         
         $('#content-details').html(html);
         $('#detailsModal').addClass('show');
+        
+        if (btn) {
+            const icon = btn.querySelector('i');
+            const spinner = btn.querySelector('.loading-spinner');
+            if (icon) icon.classList.remove('hidden');
+            if (spinner) spinner.classList.add('hidden');
+            btn.disabled = false;
+        }
+    }).fail(function(xhr) {
+        Swal.fire('Error', 'No se pudieron cargar los detalles.', 'error');
+        if (btn) {
+            const icon = btn.querySelector('i');
+            const spinner = btn.querySelector('.loading-spinner');
+            if (icon) icon.classList.remove('hidden');
+            if (spinner) spinner.classList.add('hidden');
+            btn.disabled = false;
+        }
+    });
+}
 
-                    // Ocultar spinner y restaurar botón
-                    if (btn) {
-                        const icon = btn.querySelector('i');
-                        const spinner = btn.querySelector('.loading-spinner');
-                        if (icon) icon.classList.remove('hidden');
-                        if (spinner) spinner.classList.add('hidden');
-                        btn.disabled = false;
-                    }
-                }).fail(function() {
-                    Swal.fire('Error', 'No se pudieron cargar los detalles.', 'error');
-                    if (btn) {
-                        const icon = btn.querySelector('i');
-                        const spinner = btn.querySelector('.loading-spinner');
-                        if (icon) icon.classList.remove('hidden');
-                        if (spinner) spinner.classList.add('hidden');
-                        btn.disabled = false;
-                    }
-                });
-            }
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
 
             function closeDetailsModal() {
                 $('#detailsModal').removeClass('show');

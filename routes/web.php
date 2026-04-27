@@ -213,37 +213,30 @@ Route::middleware([
     });
 
     // Rutas para practicas empresariales
-
-    Route::middleware('permission:view_practicas')
+Route::middleware('permission:view_practicas')
     ->prefix('practicas')
     ->group(function () {
-
+        // Rutas específicas SIN parámetros (van primero)
         Route::get('/', [PracticaController::class, 'index'])->name('practicas.index');
         Route::post('/', [PracticaController::class, 'store'])->name('practicas.store');
-
         Route::get('/data', [PracticaController::class, 'getData'])->name('practicas.data');
-        Route::get('/{id}', [PracticaController::class, 'show'])->name('practicas.show');
-
-        Route::get('/{id}/detalle', [PracticaController::class, 'getDetalle'])->name('practicas.detalle');
+        Route::get('/buscar-estudiantes', [PracticaController::class, 'buscarEstudiantes'])->name('practicas.buscar_estudiantes');
         Route::post('/responder', [PracticaController::class, 'responderSolicitud'])->name('practicas.responder');
-        
         Route::post('/habilitar', [PracticaController::class, 'habilitar'])->name('practicas.habilitar');
         Route::post('/deshabilitar', [PracticaController::class, 'deshabilitar'])->name('practicas.deshabilitar');
+        Route::post('/deshabilitar-con-acta', [PracticaController::class, 'deshabilitarConActa'])->name('practicas.deshabilitar_con_acta');
+        Route::post('/habilitar-con-acta', [PracticaController::class, 'habilitarConActa'])->name('practicas.habilitar_con_acta');
+        Route::post('/reportar-problema', [PracticaController::class, 'reportarProblema'])->name('practicas.reportar_problema');
         
-        Route::post('/seguimiento', function () {
-            return redirect()->route('practicas.index')->with('info', 'Próximamente: Roadmap de prácticas');
-        })->name('practicas.roadmap');     
-        
+        // Rutas POST para seguimiento (sin duplicar)
         Route::post('/seguimiento', [RoadMapPracticaController::class, 'index'])->name('practicas.roadmap');
         Route::get('/seguimiento', function () {
             return redirect()->route('practicas.index');
         })->name('practicas.roadmap.get');
-
-        Route::post('/deshabilitar-con-acta', [PracticaController::class, 'deshabilitarConActa'])->name('practicas.deshabilitar_con_acta');
-        Route::post('/habilitar-con-acta', [PracticaController::class, 'habilitarConActa'])->name('practicas.habilitar_con_acta');
-        Route::post('/reportar-problema', [PracticaController::class, 'reportarProblema'])->name('practicas.reportar_problema');
-
         
+        // Rutas con parámetros (van al final)
+        Route::get('/{id}/detalle', [PracticaController::class, 'getDetalle'])->name('practicas.detalle');
+        Route::get('/{id}', [PracticaController::class, 'show'])->name('practicas.show');
     });
 
     // Rutas para base documental
