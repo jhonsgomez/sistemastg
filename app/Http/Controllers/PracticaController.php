@@ -38,22 +38,87 @@ class PracticaController extends Controller
             $practicas->orderBy('id', 'desc');
         }
 
-        // Búsqueda
-        if ($request->has('search') && $search = $request->input('search.value')) {
-            $practicas->where(function ($q) use ($search) {
-                $q->orWhere('id', 'LIKE', "%{$search}%")
-                    ->orWhere('estado', 'LIKE', "%{$search}%")
-                    //->orWhereRaw("JSON_UNQUOTE(JSON_EXTRACT(data, '$.nombre_completo')) LIKE ?", ["%{$search}%"])
-                    //->orWhereRaw("JSON_UNQUOTE(JSON_EXTRACT(data, '$.documento')) LIKE ?", ["%{$search}%"])
-                    ->orWhereHas('user', function ($uq) use ($search) {
-                        $uq->where('name', 'LIKE', "%{$search}%")
-                            ->orWhere('email', 'LIKE', "%{$search}%")
-                            ->orWhere('nro_documento', 'LIKE', "%{$search}%");
-                    });
-            });
+        if (auth()->user()->hasRole(['super_admin', 'admin', 'coordinador'])) {
+        $filter = $request->input('filter');
+        
+        switch ($filter) {
+            case 'pendientes_comite':
+                // Prácticas donde el responsable es COMITÉ y están pendientes de acción
+                $practicas->whereIn('estado', ['Pendiente', 'Fase 1', 'Fase 2', 'Fase 5']);
+                break;
+                
+            case 'pendientes_director':
+                // Prácticas donde el responsable es DIRECTOR (Fase 3)
+                $practicas->where('estado', 'Fase 3');
+                break;
+                
+            case 'pendientes_evaluador':
+                // Prácticas donde el responsable es EVALUADOR (Fase 4)
+                $practicas->where('estado', 'Fase 4');
+                break;
+                
+            case 'propuestas_pendientes':
+                // Prácticas que están en Fase 1 (propuesta sin aprobar por comité)
+                $practicas->where('estado', 'Fase 1');
+                break;
+                
+            case 'informes_pendientes':
+                // Prácticas que están en Fase 4 (informe final sin aprobar por evaluador)
+                $practicas->where('estado', 'Fase 4');
+                break;
         }
+    }
+
+        // 🔍 BÚSQUEDA AVANZADA
+    if ($request->has('search') && $search = $request->input('search.value')) {
+        $practicas->where(function ($q) use ($search) {
+            // 1. Búsqueda por ID formateado (PRA-00001, PRA-00123, etc.)
+            // Extraer el número del formato PRA-XXXXX
+            if (preg_match('/PRA-(\d+)/i', $search, $matches)) {
+                $idNumero = intval($matches[1]);
+                $q->orWhere('id', $idNumero);
+            }
+            
+            // 2. Búsqueda por ID numérico directo
+            if (is_numeric($search)) {
+                $q->orWhere('id', $search);
+            }
+            
+            // 3. Búsqueda por estado (Pendiente, Fase 1, Fase 2, etc.)
+            $q->orWhere('estado', 'LIKE', "%{$search}%");
+            
+            // 4. Búsqueda por datos del usuario (estudiante)
+            $q->orWhereHas('user', function ($uq) use ($search) {
+                // Nombre completo
+                $uq->where('name', 'LIKE', "%{$search}%")
+                   // Correo electrónico
+                   ->orWhere('email', 'LIKE', "%{$search}%")
+                   // Número de documento (cédula)
+                   ->orWhere('nro_documento', 'LIKE', "%{$search}%")
+                   // Número de celular
+                   ->orWhere('nro_celular', 'LIKE', "%{$search}%");
+            });
+            
+            // 5. Búsqueda por nivel académico
+            $q->orWhereHas('user.nivel', function ($nq) use ($search) {
+                $nq->where('nombre', 'LIKE', "%{$search}%");
+            });
+            
+            // 6. Búsqueda en campos dinámicos (título, empresa, etc.)
+            $q->orWhereHas('valoresCampos', function ($vcq) use ($search) {
+                $vcq->whereHas('campo', function ($cq) use ($search) {
+                    $cq->whereIn('name', ['titulo', 'nombre_empresa']);
+                })->where('valor', 'LIKE', "%{$search}%");
+            });
+        });
+    }
 
         return DataTables::of($practicas)
+
+            ->addColumn('formatted_id', function ($p) {
+                // Formatear el ID: PRA + 5 dígitos con ceros a la izquierda
+                return 'PRA-' . str_pad($p->id, 5, '0', STR_PAD_LEFT);
+            })
 
             ->addColumn('descripcion', function ($p) {
 
@@ -64,92 +129,114 @@ class PracticaController extends Controller
             })
 
             ->addColumn('estado', function ($p) {
-                $badgeClass = match ($p->estado) {
-                    'Pendiente' => 'bg-yellow-100 text-yellow-800 border border-yellow-300',
-                    'Aprobada'  => 'bg-green-100 text-green-800 border border-green-300',
-                    'Rechazada' => 'bg-red-100 text-red-800 border border-red-300',
-                    default     => 'bg-gray-100 text-gray-800 border border-gray-300',
-                };
-
-                $return_html = '<div class="flex gap-2 flex-wrap items-center justify-center">';
-                
-                if ($p->estado == 'Pendiente') {
-                    $estadoBadge = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-yellow-100 text-yellow-800 border border-yellow-300'>{$p->estado}</span>";
-                    $comiteBadge = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-yellow-100 text-yellow-800 border border-yellow-300'>Comité</span>";
-
-                    return "{$return_html}{$estadoBadge} {$comiteBadge}</div>";
-                }
-
-                if ($p->estado == 'Rechazada') {
-                    $badge = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-red-100 text-red-800 border border-red-300'>Rechazada</span>";
-                    return $return_html . $badge . "</div>";
-                }
-
-                if (str_contains($p->estado, 'Fase')) {
-                    $estadoBadge = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-uts-300 border border-uts-500'>{$p->estado}</span>";
-
-                    $estado_array = explode(' ', $p->estado);
-                    $fase         = $estado_array[1];
-
-                    $estudianteBadge = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-yellow-100 text-yellow-800 border border-yellow-300'>Estudiante</span>";
-                    $comiteBadge     = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-yellow-100 text-yellow-800 border border-yellow-300'>Comité</span>";
-
-                    switch ($fase) {
-                        case 1:
-                            return $return_html . $estadoBadge . $estudianteBadge . "</div>";
-
-                        default:
-                            return $return_html . $estadoBadge . "</div>";
-                    }
-
-                }
-
-                
-                return $return_html . "<span>{$p->estado}</span></div>";
-            })
+    $return_html = '<div class="flex gap-2 flex-wrap items-center justify-center">';
+    
+    // Caso especial: Rechazada
+    if ($p->estado === 'Rechazada') {
+        $badge = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-red-100 text-red-800 border border-red-300'>Rechazada</span>";
+        return $return_html . $badge . "</div>";
+    }
+    
+    // Construir el HTML del estado normal (fase + actor)
+    $htmlEstado = '';
+    
+    if ($p->estado === 'Pendiente') {
+        // Fase 0: Pendiente - Comité debe responder
+        $htmlEstado = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-yellow-100 text-yellow-800 border border-yellow-300'>Pendiente</span>
+                       <span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-yellow-100 text-yellow-800 border border-yellow-300'>Comité</span>";
+    } 
+    elseif ($p->estado === 'Fase 1') {
+        // Fase 1: Estudiante debe subir el formato F-DC-126
+        $htmlEstado = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-uts-300 border border-uts-500'>Fase 1</span>
+                       <span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-yellow-100 text-yellow-800 border border-yellow-300'>Estudiante</span>";
+    }
+    elseif ($p->estado === 'Fase 2') {
+        // Fase 2: Estudiante debe subir el pago
+        $htmlEstado = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-uts-300 border border-uts-500'>Fase 2</span>
+                       <span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-yellow-100 text-yellow-800 border border-yellow-300'>Estudiante</span>";
+    }
+    elseif ($p->estado === 'Fase 3') {
+        // Fase 3: Estudiante debe subir la propuesta
+        $htmlEstado = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-uts-300 border border-uts-500'>Fase 3</span>
+                       <span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-yellow-100 text-yellow-800 border border-yellow-300'>Estudiante</span>";
+    }
+    elseif ($p->estado === 'Fase 4') {
+        // Fase 4: Estudiante debe subir el informe final
+        $htmlEstado = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-uts-300 border border-uts-500'>Fase 4</span>
+                       <span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-yellow-100 text-yellow-800 border border-yellow-300'>Estudiante</span>";
+    }
+    elseif ($p->estado === 'Fase 5') {
+        // Fase 5: Comité debe aprobar el final
+        $htmlEstado = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-uts-300 border border-uts-500'>Fase 5</span>
+                       <span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-yellow-100 text-yellow-800 border border-yellow-300'>Comité</span>";
+    }
+    elseif ($p->estado === 'Finalizado') {
+        $htmlEstado = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-green-100 text-green-800 border border-green-300'>Finalizado</span>";
+    }
+    
+    // Si está deshabilitado y no es rechazada, añadir badge rojo
+    if ($p->deshabilitado && $p->estado !== 'Rechazada') {
+        $deshabilitadoBadge = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-red-100 text-red-800 border border-red-300'>Deshabilitado</span>";
+        return $return_html . $htmlEstado . ' ' . $deshabilitadoBadge . "</div>";
+    }
+    
+    return $return_html . $htmlEstado . "</div>";
+})
             ->addColumn('acciones', function ($p) {
-                $user    = auth()->user();
-                $buttons = '<div class="flex items-center gap-1">';
-
-                // Botón Ver con spinner
-                $buttons .= '<button onclick="openDetailsModal(this, ' . $p->id . ')" class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white px-3 py-1 rounded-lg relative">
-                <i class="fa-regular fa-eye"></i>
-                <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute inset-0 m-auto" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
-                    <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
-                    </svg>
-                    </button>';
-                    
-                    // Botón responder (solo para admin, coordinador, super_admin y estado Pendiente)
-                    if ($user->hasRole(['super_admin', 'admin', 'coordinador']) && $p->estado === 'Pendiente') {
-                    $buttons .= '<button onclick="openResponderSolicitudModal('.$p->id.')" class="btn-action shadow bg-uts-500 hover:bg-uts-800 text-white px-3 py-1 rounded-lg"><i class="fa-solid fa-reply"></i></button>';
-                }
-
-                // Botones habilitar/deshabilitar (ahora con modal de acta)
-                if ($user->hasRole(['super_admin', 'admin', 'coordinador'])) {
-                    if (! $p->deshabilitado) {
-                        $buttons .= '<button onclick="deshabilitarPracticaConActa(' . $p->id . ')" class="btn-action shadow bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded-lg"><i class="fa-regular fa-circle-xmark"></i></button>';
-                    } else {
-                        $buttons .= '<button onclick="habilitarPracticaConActa(' . $p->id . ')" class="btn-action shadow bg-teal-500 hover:bg-teal-700 text-white px-3 py-1 rounded-lg"><i class="fa-solid fa-clock-rotate-left"></i></button>';
-                    }
-                }
-               
-
-                // Botón roadmap (se mantiene igual)
-                if (!in_array($p->estado, ['Pendiente', 'Rechazada'])) {
-                    $buttons .= '
-                    <form action="' . route('practicas.roadmap') . '" method="POST" class="inline-block">
-                        ' . csrf_field() . '
-                        <input type="hidden" name="practica_id" value="' . $p->id . '">
-                        <button type="submit" class="btn-action shadow bg-blue-500 hover:bg-blue-700 text-white px-3 py-1 rounded-lg">
-                            <i class="fa-solid fa-map-location-dot"></i>
-                        </button>
-                    </form>';
-                }
-
-                $buttons .= '</div>';
-                return $buttons;
-            })
+    $user = auth()->user();
+    $buttons = '<div class="flex items-center justify-center gap-1">';  // ← Añadir justify-center
+    
+    // Botón Ver
+    $buttons .= '<button onclick="openDetailsModal(this, ' . $p->id . ')" class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white w-10 h-10 rounded-lg relative inline-flex items-center justify-center">
+        <i class="fa-regular fa-eye"></i>
+        <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
+        </svg>
+    </button>';
+    
+    // Botón Responder (solo para admin/comité en estado Pendiente)
+    if ($user->hasRole(['super_admin', 'admin', 'coordinador']) && $p->estado === 'Pendiente' && !$p->deshabilitado) {
+        $buttons .= '<button onclick="openResponderSolicitudModal(' . $p->id . ')" 
+            class="btn-action shadow bg-uts-500 hover:bg-uts-800 text-white w-10 h-10 rounded-lg inline-flex items-center justify-center">
+            <i class="fa-solid fa-reply"></i>
+        </button>';
+    }
+    
+    // Botones Habilitar/Deshabilitar
+    $esFase1oMas = (str_contains($p->estado, 'Fase') || $p->estado === 'Finalizado') && $p->estado !== 'Rechazada';
+    
+    if ($user->hasRole(['super_admin', 'admin', 'coordinador']) && $esFase1oMas && !$p->deshabilitado) {
+        $buttons .= '<button onclick="deshabilitarPracticaConActa(' . $p->id . ')" 
+            class="btn-action shadow bg-red-500 hover:bg-red-700 text-white w-10 h-10 rounded-lg inline-flex items-center justify-center">
+            <i class="fa-regular fa-circle-xmark"></i>
+        </button>';
+    }
+    
+    if ($user->hasRole(['super_admin', 'admin', 'coordinador']) && $esFase1oMas && $p->deshabilitado) {
+        $buttons .= '<button onclick="habilitarPracticaConActa(' . $p->id . ')" 
+            class="btn-action shadow bg-teal-500 hover:bg-teal-700 text-white w-10 h-10 rounded-lg inline-flex items-center justify-center">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+        </button>';
+    }
+    
+    // Botón Roadmap
+    $puedeVerRoadmap = !$p->deshabilitado && !in_array($p->estado, ['Pendiente', 'Rechazada']);
+    
+    if ($puedeVerRoadmap) {
+        $buttons .= '
+        <form action="' . route('practicas.roadmap') . '" method="POST" class="inline-block m-0">
+            ' . csrf_field() . '
+            <input type="hidden" name="practica_id" value="' . $p->id . '">
+            <button type="submit" class="btn-action shadow bg-blue-500 hover:bg-blue-700 text-white w-10 h-10 rounded-lg inline-flex items-center justify-center">
+                <i class="fa-solid fa-map-location-dot"></i>
+            </button>
+        </form>';
+    }
+    
+    $buttons .= '</div>';
+    return $buttons;
+})
 
             ->rawColumns(['estado', 'acciones', 'descripcion'])
             ->make(true);
@@ -217,8 +304,8 @@ class PracticaController extends Controller
         }
             
 
-        $campos_nueva_practica =$practica->camposConValores();
-        $this->sendEmailSolicitudPractica($campos_nueva_practica);
+        //$campos_nueva_practica =$practica->camposConValores();
+        //$this->sendEmailSolicitudPractica($campos_nueva_practica);
       
     
 
@@ -369,23 +456,25 @@ class PracticaController extends Controller
         
         $estadoActual = $practica->estado;
 
-        if ($request->estado === 'Aprobada') {
-            $siguienteEstado = match ($estadoActual) {
-                'Pendiente' => 'Fase 1',
-                'Fase 1'    => 'Fase 2',
-                'Fase 2'    => 'Fase 3',
-                'Fase 3'    => 'Fase 4',
-                'Fase 4'    => 'Fase 5',
-                'Fase 5'    => 'Finalizado',
-                default     => $estadoActual
-            };
-            $nuevoEstado = $siguienteEstado;
-        } else {
-            $nuevoEstado = $estadoActual;
-        }
+if ($request->estado === 'Aprobada') {
+    // Mapeo de estados actuales → siguiente fase
+    $nuevoEstado = match ($estadoActual) {
+        'Pendiente' => 'Fase 1',
+        'Fase 1'    => 'Fase 2',
+        'Fase 2'    => 'Fase 3',
+        'Fase 3'    => 'Fase 4',
+        'Fase 4'    => 'Fase 5',
+        'Fase 5'    => 'Finalizado',
+        default     => $estadoActual
+    };
+} else {
+    // Si es rechazada, el nuevo estado es 'Rechazada'
+    $nuevoEstado = 'Rechazada';
+}
 
-        $practica->estado = $nuevoEstado;
-        $practica->save();
+// Asignar el nuevo estado al objeto
+$practica->estado = $nuevoEstado;
+$practica->save();
         
         // Enviar correo al estudiante (implementar después)
         // $this->sendEmailRespuesta($practica, $request->mensaje, $nuevoEstado);

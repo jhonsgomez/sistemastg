@@ -18,10 +18,33 @@
                 position: relative;
             }
 
+            /* Contenedor de botones de acciones */
+            #practicasTable .btn-action-container {
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+                gap: 0.5rem !important;
+                width: 100% !important;
+            }
+
+            /* Cada botón individual */
+            #practicasTable .btn-action {
+                display: inline-flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+                min-width: 42px;
+                height: 38px;
+                text-align: center !important;
+            }
+
+            /* Celda completa de acciones */
+            #practicasTable td:last-child {
+                text-align: center !important;
+                vertical-align: middle !important;
+            }
+            
             .btn-action .loading-spinner {
-                position: absolute;
-                top: 0px;
-                left: 0px;
+                align-items: center;
                 transform: translate(-50%, -50%);
                 width: 1.25rem;
                 height: 1.25rem;
@@ -154,30 +177,23 @@
                 margin-top: 1.5rem;
             }
 
-            /* ESTILOS PARA SELECT DE DATATABLES */
-            #practicasTable_wrapper .dataTables_length select,
-            .dataTables_length select {
-                border-radius: 0.375rem;
-                border: 1px solid #d1d5db;
-                padding: 0.25rem 2rem 0.25rem 0.75rem;
-                background-color: white;
-                cursor: pointer;
-                appearance: none;
-                background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="%236b7280"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>');
-                background-repeat: no-repeat;
-                background-position: right 0.75rem center;
-                background-size: 1rem;
-                line-height: 1.5;
-                font-size: 0.875rem;
-            }
+            /* Estilos para el foco del selector de cantidad de registros (length menu) */
+#practicasTable_wrapper .dataTables_length select:focus,
+.dataTables_length select:focus,
+#practicasTable_length select:focus,
+select.dt-input:focus {
+    border-color: #C1D631 !important;
+    outline: none !important;
+    box-shadow: 0 0 0 2px rgba(193, 214, 49, 1) !important;
+}
 
-            #practicasTable_wrapper .dataTables_length select:focus,
-            .dataTables_length select:focus {
-                border-color: #C1D631;
-                outline: none;
-                box-shadow: 0 0 0 2px rgba(193, 214, 49, 0.5);
-            }
-
+/* Estilos para cualquier input o select dentro del wrapper de DataTables */
+.dataTables_wrapper input:focus,
+.dataTables_wrapper select:focus {
+    border-color: #C1D631 !important;
+    outline: none !important;
+    box-shadow: 0 0 0 2px rgba(193, 214, 49, 0.5) !important;
+}
             /* ESTILOS DE PAGINACIÓN */
             .dataTables_paginate .paginate_button {
                 padding: 0.25rem 0.75rem !important;
@@ -295,20 +311,33 @@
     <!--Datatables-->
 
     <div class="p-4">
-        @can('list_proyectos_grado')
-            {{-- Puedes usar el mismo permiso o crear uno nuevo --}}
-            <table id="practicasTable" class="w-full">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Descripción</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-            </table>
-        @endcan
+    @if (auth()->user()->hasRole(['super_admin', 'admin', 'coordinador']))
+    <div class="mb-3">
+        <select id="filtroRolesPracticas"
+            class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block focus:ring-uts-500 focus:border-uts-500">
+            <option value="" selected>Seleccione un filtro</option>
+            <option value="pendientes_comite">Pendientes Comité</option>
+            <option value="pendientes_director">Pendientes Director</option>
+            <option value="pendientes_evaluador">Pendientes Evaluador</option>
+            <option value="propuestas_pendientes">Propuestas sin aprobar</option>
+            <option value="informes_pendientes">Informes finales sin aprobar</option>
+        </select>
     </div>
+    @endif
+    
+    @can('view_practicas')
+    <table id="practicasTable" class="w-full">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Descripción</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+    </table>
+    @endcan
+</div>
 
     <!--Details Fase 0-->
 
@@ -601,11 +630,11 @@
                             <label for="estado" class="block  font-medium text-sm text-gray-700"><i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>Estado de la
                                 Solicitud</label>
                             <select name="estado" id="estado"
-                                class="border-gray-300 rounded-md mt-1 block w-full">
-                                <option value="" selected disabled>Seleccione un estado</option>
-                                <option value="Aprobada">Aprobada</option>
-                                <option value="Rechazada">Rechazada</option>
-                            </select>
+    class="border-gray-300 rounded-md mt-1 block w-full focus:ring-uts-500 focus:border-uts-500">
+    <option value="" selected disabled>Seleccione un estado</option>
+    <option value="Aprobada">Aprobada</option>
+    <option value="Rechazada">Rechazada</option>
+</select>
                             <span id="estadoError" class="text-red-500 text-sm"></span>
                         </div>
                         <div class="mb-4">
@@ -657,7 +686,7 @@
                     <form id="desactivarPracticaForm" class="p-6 mt-2">
                         @csrf
                         <p class="text-2xl font-bold" style="margin: 0.8rem 0 1.5rem 0;" id="desactivarPracticaTitle"></p>
-                        <p class="font-medium text-sm text-gray-700 mb-6">En este formulario el comité deshabilitará la práctica empresarial.</p>
+                        <p class="font-medium text-sm text-gray-700 mb-6">En este formulario el comité de trabajos de grado del programa desactivará la práctica en curso.</p>
                         <input type="hidden" name="practica_id" id="practica_id">
                         
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-4 mt-4">
@@ -685,7 +714,7 @@
                         <div class="mb-4">
                             <label for="descripcion_desactivar" class="block font-medium text-sm text-gray-700" style="margin-bottom: 5px;">
                                 <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
-                                Descripción / motivo:
+                                Descripción de la respuesta:
                             </label>
                             <div id="txt-editor-desactivar" class="shadow txt-editor-quill"></div>
                             <textarea name="descripcion_desactivar" id="descripcion_desactivar" class="hidden"></textarea>
@@ -756,14 +785,14 @@
                         </div>
 
                         <div class="mb-4">
-                            <label for="descripcion_activar" class="block font-medium text-sm text-gray-700" style="margin-bottom: 5px;">
-                                <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
-                                Descripción / motivo:
-                            </label>
-                            <div id="txt-editor-activar" class="shadow txt-editor-quill"></div>
-                            <textarea name="descripcion_activar" id="descripcion_activar" class="hidden"></textarea>
-                            <span id="descripcion_activarError" class="text-red-500 text-sm"></span>
-                        </div>
+    <label for="descripcion_activar" class="block font-medium text-sm text-gray-700" style="margin-bottom: 5px;">
+        <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+        Descripción / motivo:
+    </label>
+    <div id="txt-editor-activar" class="shadow" style="height: 200px;"></div>
+    <textarea name="descripcion_activar" id="descripcion_activar" class="hidden"></textarea>
+    <span id="descripcion_activarError" class="text-red-500 text-sm"></span>
+</div>
 
                         <div class="flex justify-end space-x-2">
                             <button type="button" onclick="closeActivarPracticaModal()"
@@ -802,7 +831,7 @@
                     </button>
                     <form id="warningForm" class="p-6 mt-2">
                         @csrf
-                        <p class="text-2xl font-bold" style="margin: 0.8rem 0 1.5rem 0;" id="warningTitle">Reportar problema</p>
+                        <p class="text-2xl font-bold" style="margin: 0.8rem 0 1.5rem 0;" id="warningTitle">Enviar Reporte <span class="bg-uts-500 text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">PQRSD</span></p>
                         <div class="mb-4">
                             <label for="mensaje_warning" class="block font-medium text-md text-gray-700 mb-4">
                                 En caso de presentar problemas con el sistema, por favor describa su reporte y envíelo:
@@ -876,40 +905,111 @@
         </script>
 
         <!--Responder solicitud modal-->
-
-        <script>
-            function openResponderSolicitudModal(id) {
-                // Inicializar Quill si es necesario
-                if (typeof quill !== 'undefined' && quill) {
-                    quill.root.innerHTML = '';
-                } else if (typeof Quill !== 'undefined') {
-                    quill = new Quill('#txt-editor', {
-                        theme: 'snow',
-                        placeholder: 'Escriba aquí la respuesta...',
-                        modules: { toolbar: true }
-                    });
+<script>
+    // ========== ABRIR MODAL RESPONDER ==========
+    function openResponderSolicitudModal(id) {
+        // Inicializar Quill si es necesario
+        if (!window.quill) {
+            window.quill = new Quill('#txt-editor', {
+                theme: 'snow',
+                placeholder: 'Ingrese el mensaje de respuesta indicando detalles al destinatario.',
+                modules: {
+                    toolbar: [
+                        [{ 'header': 1}],
+                        [{ 'header': 2}],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        ['bold', 'italic', 'underline'],
+                        [{ 'color': [] }],
+                        ['clean']
+                    ]
                 }
+            });
+        } else {
+            window.quill.root.innerHTML = '';
+        }
+        
+        $('#respuestaTitulo').html(`Responder <span class="bg-uts-500 text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Solicitud</span>`);
+        $('#solicitudPractica_id').val(id);
+        $('#estado').val('');
+        $('#mensaje').val('');
+        $('#estadoError').text('');
+        $('#mensajeError').text('');
+        
+        $('#responderSolicitudPractica').addClass('show');
+    }
 
-                $('#respuestaTitulo').html('Responder solicitud de práctica');
-                $('#solicitudPractica_id').val(id);
-                $('#estado').val('');
-                $('#mensaje').val('');
-                $('#estadoError').text('');
-                $('#mensajeError').text('');
+    // ========== CERRAR MODAL RESPONDER ==========
+    function closeResponderSolicitudModal() {
+        $('#responderSolicitudPractica').removeClass('show');
+        if (window.quill) {
+            window.quill.root.innerHTML = '';
+        }
+    }
 
-                if (typeof quill !== 'undefined' && quill) {
-                    quill.root.innerHTML = '';
-                }
+    // ========== ENVÍO DEL FORMULARIO DE RESPUESTA ==========
+    $(document).ready(function() {
+        $('#responderSolicitudForm').on('submit', function(e) {
+            e.preventDefault();
 
-                // ÚNICA FORMA DE ABRIR: añadir clase show
-                $('#responderSolicitudPractica').addClass('show');
+            // Obtener el contenido del editor Quill
+            if (window.quill) {
+                $('#mensaje').val(window.quill.root.innerHTML);
             }
 
-            function closeResponderSolicitudModal() {
-                // ÚNICA FORMA DE CERRAR: quitar clase show
-                $('#responderSolicitudPractica').removeClass('show');
-            }
-        </script>
+            const button = $('#responderSolicitudButton');
+            const loadingSpinner = $('#loadingSpinner-replyProyectos');
+            button.prop('disabled', true);
+            loadingSpinner.removeClass('hidden');
+
+            $.ajax({
+                url: '{{ route("practicas.responder") }}',
+                method: 'POST',
+                data: $(this).serialize(),
+                success: function(response) {
+                    $('#practicasTable').DataTable().ajax.reload();
+                    closeResponderSolicitudModal();
+                    showToast('Respuesta enviada exitosamente');
+                },
+                error: function(xhr) {
+                    $('#estadoError').text('');
+                    $('#mensajeError').text('');
+
+                    if (xhr.status === 404) {
+                        Swal.fire('Error', 'Ruta no encontrada. Limpia la caché de rutas.', 'error');
+                        return;
+                    }
+
+                    const errors = xhr.responseJSON?.errors;
+                    if (errors) {
+                        if (errors.estado) $('#estadoError').text(errors.estado[0]);
+                        if (errors.mensaje) $('#mensajeError').text(errors.mensaje[0]);
+                    } else {
+                        Swal.fire('Error', xhr.responseJSON?.message || 'Ocurrió un error inesperado', 'error');
+                    }
+                },
+                complete: function() {
+                    button.prop('disabled', false);
+                    loadingSpinner.addClass('hidden');
+                }
+            });
+        });
+    });
+
+    // Toast
+    
+    function showToast(message, type = 'success') {
+        Swal.fire({
+            title: type === 'success' ? '¡Éxito!' : 'Error',
+            text: message,
+            icon: type,
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000
+        });
+    }
+
+</script>
 
         <!--Practicas-->
 
@@ -999,57 +1099,67 @@
         <!--Datatables-->
 
         <script>
-            $('#practicasTable').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: '{{ route('practicas.data') }}',
-                columns: [{
-                        data: 'id',
-                        name: 'id',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'descripcion',
-                        name: 'descripcion',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'estado',
-                        name: 'estado',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'acciones',
-                        name: 'acciones',
-                        orderable: false,
-                        searchable: false,
-                        className: 'text-center'
-                    }
-                ],
-                language: {
-                    "sProcessing": "Procesando...",
-                    "sLengthMenu": "Mostrar _MENU_ registros",
-                    "sZeroRecords": "No se encontraron resultados",
-                    "sEmptyTable": "Ningún dato disponible",
-                    "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_",
-                    "sInfoEmpty": "Mostrando 0 registros",
-                    "sInfoFiltered": "(filtrado de _MAX_ registros totales)",
-                    "sSearch": "Buscar:",
-                    "sLoadingRecords": "Cargando...",
-                    "oPaginate": {
-                        "sFirst": "<<",
-                        "sLast": ">>",
-                        "sNext": ">",
-                        "sPrevious": "<"
-                    }
-                },
-                pagingType: "full_numbers",
-                lengthMenu: [
-                    [5, 10, 20],
-                    [5, 10, 20]
-                ],
-                pageLength: 5
-            });
+            // Inicializar DataTable (como ya lo tienes)
+var table = $('#practicasTable').DataTable({
+    processing: true,
+    serverSide: true,
+    ajax: {
+        url: '{{ route("practicas.data") }}',
+        data: function(d) {
+            d.filter = $('#filtroRolesPracticas').val();
+        }
+    },
+    columns: [
+            { 
+                data: 'formatted_id', 
+                name: 'formatted_id', 
+                className: 'text-center'
+            },
+            { 
+                data: 'descripcion', 
+                name: 'descripcion', 
+                className: 'text-center',
+                orderable: false 
+            },
+            { 
+                data: 'estado', 
+                name: 'estado', 
+                className: 'text-center' 
+            },
+            { 
+                data: 'acciones', 
+                name: 'acciones', 
+                orderable: false, 
+                searchable: false, 
+                className: 'text-center' 
+            }
+        ],
+        language: {
+            "sProcessing": "Procesando...",
+            "sLengthMenu": "Mostrar _MENU_ registros",
+            "sZeroRecords": "No se encontraron resultados",
+            "sEmptyTable": "Ningún dato disponible",
+            "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_",
+            "sInfoEmpty": "Mostrando 0 registros",
+            "sInfoFiltered": "(filtrado de _MAX_ registros totales)",
+            "sSearch": "Buscar:",
+            "sLoadingRecords": "Cargando...",
+            "oPaginate": {
+                "sFirst": "<<",
+                "sLast": ">>",
+                "sNext": ">",
+                "sPrevious": "<"
+            }
+        },
+        pagingType: "full_numbers",
+        lengthMenu: [[5, 10, 20], [5, 10, 20]],
+        pageLength: 5
+});
+
+// Evento cambio del filtro
+$('#filtroRolesPracticas').on('change', function() {
+    table.ajax.reload();
+});
 
             // Funciones para habilitar/deshabilitar (ya existentes)
             function habilitarPractica(id) {
@@ -1208,225 +1318,197 @@
 
         </script>
 
-        <script>
-
-            // Reponder solicitud comité
-
-            function responderSolicitudPractica(id) {
-                if (!window.quill) {
-                initQuillEditor(undefined, "Ingrese el mensaje de respuesta indicado detalles al destinatario.", 'txt-editor',
-                    'mensaje');
-                }
-
-                $('#respuestaTitulo').html(
-                    `Responder <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Solicitud</span>`
-                    );
-                $('#solicitudPractica_id').val(id);
-                $('#estado').val('');
-                $('#mensaje').val('');
-
-                $('#estadoError').text('');
-                $('#mensajeError').text('');
-                $('#responderSolicitudPractica').removeClass('hidden');
-                
-            }
-
-            $('#responderSolicitudForm').on('submit', function(e)  {
-                e.preventDefault();
-
-                const loadingSpinner = document.getElementById(`loadingSpinner-replyProyectos`);
-                document.querySelector('#mensaje').value = quill.root.innerHTML;
-                const url = "{{ route('practicas.responder') }}";
-
-                const method = 'POST';
-
-                Swal.fire({
-                    title: '¿Está seguro?',
-                    text: "Esta acción no se puede deshacer",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#C1D631',
-                cancelButtonColor: '#d33',
-                    confirmButtonText: 'Sí, responder',
-                    cancelButtonText: 'Cancelar'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        loaderGeneral.classList.replace('hidden', 'flex');
-                        loadingSpinner.classList.remove('hidden');
-                        
-                        $.ajax({
-                            url: url,
-                            method: 'POST',
-                            data: $(this).serialize(), // para datos sin archivos
-                    
-                            success: function(response) {
-                                console.log('RESPUESTA DEL BACKEND:', response); 
-                                $('#practicasTable').DataTable().ajax.reload(null, false).draw(false);
-                                closeResponderSolicitudModal();
-                                showToast('Respuesta enviada correctamente');
-                                
-                            },
-
-                            error: function(xhr) {
-                                const errors = xhr.responseJSON?.errors;
-                                // limpiar TODOS los errores primero
-                                $('#estadoError').text('');
-                                $('#mensajeError').text('');
-
-                                if (errors.estado) {
-                                    $('#estadoError').text(errors.estado[0]);
-                                }
-                                if (errors.mensaje) {
-                                    $('#mensajeError').text(errors.mensaje[0]);
-                                }
-                            },
-
-                            complete: function() {
-                                quill.root.innerHTML = '';
-                                loaderGeneral.classList.replace('flex', 'hidden');
-                                loadingSpinner.classList.add('hidden');
-                            }
-                        });
-                    }
-                });
-            });
-
-        </script>
-
         <!--modales alertas prácticas-->
 
         <script>
 
         // ========== DESACTIVAR PRÁCTICA ==========
-        function deshabilitarPracticaConActa(id) {
-                $('#desactivarPracticaTitle').html(`Desactivar <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Práctica</span>`);
-            $('#practica_id').val(id);
-            $('#nro_acta_desactivar').val('');
-            $('#fecha_acta_desactivar').val('');
-            if (window.quillDesactivar) {
-                window.quillDesactivar.root.innerHTML = '';
-            } else {
-                window.quillDesactivar = new Quill('#txt-editor-desactivar', { theme: 'snow' });
+function deshabilitarPracticaConActa(id) {
+    $('#desactivarPracticaTitle').html(`Desactivar <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Práctica</span>`);
+    $('#practica_id').val(id);
+    $('#nro_acta_desactivar').val('');
+    $('#fecha_acta_desactivar').val('');
+    
+    // Inicializar Quill para desactivar
+    if (!window.quillDesactivar) {
+        window.quillDesactivar = new Quill('#txt-editor-desactivar', {
+            theme: 'snow',
+            placeholder: 'Describa la respuesta para el estudiante.',
+            modules: {
+                toolbar: [
+                    [{ 'header': 1}],  // H1
+                    [{ 'header': 2}],  // H2
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],  // Numeración y viñetas
+                    ['bold', 'italic', 'underline'],  // Negrita, cursiva, subrayado
+                    [{ 'color': [] }],  // Selector de color
+                    ['clean']  // Eliminar formato
+                ]
             }
-            $('#desactivarPracticaModal').addClass('show');
-        }
-
-        function closeDesactivarPracticaModal() {
-            $('#desactivarPracticaModal').removeClass('show');
-            // Limpiar el formulario al cerrar
-            $('#desactivarPracticaForm')[0].reset();
-            if (window.quillDesactivar) window.quillDesactivar.root.innerHTML = '';
-        }
-
-        
-        // ========== ACTIVAR PRÁCTICA ==========
-        function habilitarPracticaConActa(id) {
-            $('#activarPracticaTitle').html(`Activar <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Práctica</span>`);
-            $('#practica_id_activar').val(id);
-            $('#nro_acta_activar').val('');
-            $('#fecha_acta_activar').val('');
-            if (window.quillActivar) {
-                window.quillActivar.root.innerHTML = '';
-            } else {
-                window.quillActivar = new Quill('#txt-editor-activar', { theme: 'snow' });
-            }
-            $('#activarPracticaModal').addClass('show');
-        }
-        
-        function closeActivarPracticaModal() {
-            $('#activarPracticaModal').removeClass('show');
-            $('#activarPracticaForm')[0].reset();
-            if (window.quillActivar) window.quillActivar.root.innerHTML = '';
-        }
-
-        
-        // ========== REPORTE DE PROBLEMA ==========
-        function openWarningModal() {
-            if (window.quillWarning) {
-                window.quillWarning.root.innerHTML = '';
-            } else {
-                window.quillWarning = new Quill('#txt-editor-warning', { theme: 'snow' });
-            }
-            $('#warningModal').addClass('show');
-        }
-        
-        function closeWarningModal() {
-            $('#warningModal').removeClass('show');
-            $('#warningForm')[0].reset();
-            if (window.quillWarning) window.quillWarning.root.innerHTML = '';
-        }
-
-        // ========== ENVÍO DE FORMULARIOS ==========
-        $(document).ready(function() {
-            // Deshabilitar práctica
-            $('#desactivarPracticaForm').on('submit', function(e) {
-                e.preventDefault();
-                $('#descripcion_desactivar').val(window.quillDesactivar.root.innerHTML);
-                $.ajax({
-                    url: '{{ route("practicas.deshabilitar_con_acta") }}',
-                    method: 'POST',
-                    data: $(this).serialize(),
-                    success: function(response) {
-                        $('#practicasTable').DataTable().ajax.reload();
-                        closeDesactivarPracticaModal();
-                        showToast(response.success);
-                    },
-                    error: function(xhr) {
-                        let errors = xhr.responseJSON?.errors;
-                        if (errors) {
-                            for (let key in errors) {
-                                $('#' + key + 'Error').text(errors[key][0]);
-                            }
-                        }
-                    }
-                });
-            });
-
-            // Habilitar práctica
-            $('#activarPracticaForm').on('submit', function(e) {
-                e.preventDefault();
-                $('#descripcion_activar').val(window.quillActivar.root.innerHTML);
-                $.ajax({
-                    url: '{{ route("practicas.habilitar_con_acta") }}',
-                    method: 'POST',
-                    data: $(this).serialize(),
-                    success: function(response) {
-                        $('#practicasTable').DataTable().ajax.reload();
-                        closeActivarPracticaModal();
-                        showToast(response.success);
-                    },
-                    error: function(xhr) {
-                        let errors = xhr.responseJSON?.errors;
-                        if (errors) {
-                            for (let key in errors) {
-                                $('#' + key + 'Error').text(errors[key][0]);
-                            }
-                        }
-                    }
-                });
-            });
-
-            // Reportar problema
-            $('#warningForm').on('submit', function(e) {
-                e.preventDefault();
-                $('#mensaje_warning').val(window.quillWarning.root.innerHTML);
-                $.ajax({
-                    url: '{{ route("practicas.reportar_problema") }}',
-                    method: 'POST',
-                    data: $(this).serialize(),
-                    success: function(response) {
-                        closeWarningModal();
-                        showToast(response.success);
-                    },
-                    error: function(xhr) {
-                        let errors = xhr.responseJSON?.errors;
-                        if (errors && errors.mensaje_warning) {
-                            $('#mensaje_warningError').text(errors.mensaje_warning[0]);
-                        }
-                    }
-                });
-            });
         });
+    } else {
+        window.quillDesactivar.root.innerHTML = '';
+    }
+    
+    $('#desactivarPracticaModal').addClass('show');
+}
+
+function closeDesactivarPracticaModal() {
+    $('#desactivarPracticaModal').removeClass('show');
+    $('#desactivarPracticaForm')[0].reset();
+    if (window.quillDesactivar) window.quillDesactivar.root.innerHTML = '';
+}
+
+// ========== ACTIVAR PRÁCTICA ==========
+function habilitarPracticaConActa(id) {
+    $('#activarPracticaTitle').html(`Activar <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Práctica</span>`);
+    $('#practica_id_activar').val(id);
+    $('#nro_acta_activar').val('');
+    $('#fecha_acta_activar').val('');
+    
+    // Inicializar Quill para activar
+    if (!window.quillActivar) {
+        window.quillActivar = new Quill('#txt-editor-activar', {
+            theme: 'snow',
+            placeholder: 'Describa la respuesta para el estudiante.',
+            modules: {
+                toolbar: [
+                    [{ 'header': 1}],  // H1
+                    [{ 'header': 2}],  // H2
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],  // Numeración y viñetas
+                    ['bold', 'italic', 'underline'],  // Negrita, cursiva, subrayado
+                    [{ 'color': [] }],  // Selector de color
+                    ['clean']  // Eliminar formato
+                ]
+            }
+        });
+    } else {
+        window.quillActivar.root.innerHTML = '';
+    }
+    
+    $('#activarPracticaModal').addClass('show');
+}
+
+function closeActivarPracticaModal() {
+    $('#activarPracticaModal').removeClass('show');
+    $('#activarPracticaForm')[0].reset();
+    if (window.quillActivar) window.quillActivar.root.innerHTML = '';
+}
+
+// ========== REPORTE DE PROBLEMA ==========
+function openWarningModal() {
+    // Inicializar Quill para warning
+    if (!window.quillWarning) {
+        window.quillWarning = new Quill('#txt-editor-warning', {
+            theme: 'snow',
+            placeholder: 'Describa su reporte o inconveniente y déjenos saber sus recomendaciones.',
+            modules: {
+                toolbar: [
+                    [{ 'header': 1}],  // H1
+                    [{ 'header': 2}],  // H2
+                    ['bold', 'italic', 'underline'],  // Negrita, cursiva, subrayado
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],  // Numeración y viñetas
+                    [{ 'color': [] }],  // Selector de color
+                    ['clean']  // Eliminar formato
+                ]
+            }
+        });
+    } else {
+        window.quillWarning.root.innerHTML = '';
+    }
+    
+    $('#warningModal').addClass('show');
+}
+
+function closeWarningModal() {
+    $('#warningModal').removeClass('show');
+    $('#warningForm')[0].reset();
+    if (window.quillWarning) window.quillWarning.root.innerHTML = '';
+}
+
+//ENVIO DE FORMULARIOS
+
+$(document).ready(function() {
+    // Deshabilitar práctica
+    $('#desactivarPracticaForm').on('submit', function(e) {
+        e.preventDefault();
+        if (window.quillDesactivar) {
+            $('#descripcion_desactivar').val(window.quillDesactivar.root.innerHTML);
+        }
+        $.ajax({
+            url: '{{ route("practicas.deshabilitar_con_acta") }}',
+            method: 'POST',
+            data: $(this).serialize(),
+            success: function(response) {
+                $('#practicasTable').DataTable().ajax.reload();
+                closeDesactivarPracticaModal();
+                showToast(response.success);
+            },
+            error: function(xhr) {
+                let errors = xhr.responseJSON?.errors;
+                if (errors) {
+                    for (let key in errors) {
+                        $('#' + key + 'Error').text(errors[key][0]);
+                    }
+                } else {
+                    showToast('Error al deshabilitar la práctica', 'error');
+                }
+            }
+        });
+    });
+
+    // Habilitar práctica
+    $('#activarPracticaForm').on('submit', function(e) {
+        e.preventDefault();
+        if (window.quillActivar) {
+            $('#descripcion_activar').val(window.quillActivar.root.innerHTML);
+        }
+        $.ajax({
+            url: '{{ route("practicas.habilitar_con_acta") }}',
+            method: 'POST',
+            data: $(this).serialize(),
+            success: function(response) {
+                $('#practicasTable').DataTable().ajax.reload();
+                closeActivarPracticaModal();
+                showToast(response.success);
+            },
+            error: function(xhr) {
+                let errors = xhr.responseJSON?.errors;
+                if (errors) {
+                    for (let key in errors) {
+                        $('#' + key + 'Error').text(errors[key][0]);
+                    }
+                } else {
+                    showToast('Error al habilitar la práctica', 'error');
+                }
+            }
+        });
+    });
+
+    // Reportar problema
+    $('#warningForm').on('submit', function(e) {
+        e.preventDefault();
+        if (window.quillWarning) {
+            $('#mensaje_warning').val(window.quillWarning.root.innerHTML);
+        }
+        $.ajax({
+            url: '{{ route("practicas.reportar_problema") }}',
+            method: 'POST',
+            data: $(this).serialize(),
+            success: function(response) {
+                closeWarningModal();
+                showToast(response.success);
+            },
+            error: function(xhr) {
+                let errors = xhr.responseJSON?.errors;
+                if (errors && errors.mensaje_warning) {
+                    $('#mensaje_warningError').text(errors.mensaje_warning[0]);
+                } else {
+                    showToast('Error al enviar el reporte', 'error');
+                }
+            }
+        });
+    });
+});
 
         </script>
 
