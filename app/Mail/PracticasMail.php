@@ -44,10 +44,15 @@ class PracticasMail extends Mailable
 
     public function content(): Content
     {
+         $mensaje_adicional = "<p>Esto es un correo generado automáticamente por el sistema de trabajos de grado del programa, favor no responder al mismo.</p>";
+
         return new Content(
             view: 'emails.practicas.template',
             with: [
-                'data' => $this->cuerpo_correo
+                'tipo_correo' => $this->tipo_correo,
+                'cuerpo_correo' => $this->cuerpo_correo,
+                'comentarios' => $this->comentarios,
+                'mensaje_adicional' => $mensaje_adicional,
             ],
         );
     }

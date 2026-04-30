@@ -397,179 +397,76 @@ public function buscarEstudiantes(Request $request)
         }
     }
 
-    // Enviar correos (comentados por ahora)
-    // $campos_nueva_practica = $practica->camposConValores();
-    // $this->sendEmailSolicitudPractica($campos_nueva_practica);
+    // Enviar correos 
+   //  $campos_nueva_practica = $practica->camposConValores();
+  //   $this->sendEmailSolicitudPractica($campos_nueva_practica);
 
     return response()->json(['message' => 'Práctica enviada correctamente']);
 }
 
 
-        public function sendEmailSolicitudPractica($campos)
-        {
-            try {
-                $cuerpo_correo = [];
-                $correos_destinatarios = [];
-                $asunto_correo = 'PRÁCTICAS EMPRESARIALES - FASE 0';
-                $tipo_correo = 'practicas_fase_0';
-                $comentarios = null;
-                $esRespuesta = false;
-
-                // Datos del usuario autenticado
-                $user = auth()->user();
-
-                $cuerpo_correo['estudiante'] = $user->name;
-                $cuerpo_correo['correo'] = $user->email;
-                $cuerpo_correo['estado'] = 'Pendiente';
-
-                $correos_destinatarios[] = $user->email;
-
-                foreach ($campos as $campo) {
-                    switch ($campo['campo']) {
-
-                        case 'nivel':
-                            $cuerpo_correo['nivel'] = \App\Models\Nivel::find($campo['valor'])->nombre ?? $campo['valor'];
-                            break;
-
-                        case 'empresa':
-                            $cuerpo_correo['empresa'] = $campo['valor'];
-                            break;
-
-                        case 'hoja_vida':
-                            $cuerpo_correo['hoja_vida'] = $campo['valor'];
-                            break;
-
-                        default:
-                            $cuerpo_correo[$campo['campo']] = $campo['valor'];
-                            break;
-                    }
-                }
-
-                Mail::send(new PracticasMail(
-                    $asunto_correo,
-                    $cuerpo_correo,
-                    $comentarios,
-                    $tipo_correo,
-                    $correos_destinatarios,
-                    $esRespuesta
-                ));
-
-            } catch (\Exception $e) {
-                dd($e->getMessage());
-            }
-        }
-
-
-
-
-    public function getDetalle($id)
+public function sendEmailSolicitudPractica($campos)
 {
     try {
-        $practica = Practica::with('user.nivel', 'valoresCampos.campo')->findOrFail($id);
-        
-        $data = [];
-        foreach ($practica->valoresCampos as $vc) {
-            if ($vc->campo && $vc->campo->name) {
-                $data[$vc->campo->name] = $vc->valor;
+        $cuerpo_correo = [];
+        $correos_destinatarios = [];
+        $asunto_correo = 'PRÁCTICAS EMPRESARIALES - FASE 0';
+        $tipo_correo = 'practicas_fase_0';
+        $comentarios = null;
+        $esRespuesta = false;
+
+        $user = auth()->user();
+
+        // Datos básicos
+        $cuerpo_correo['estudiante'] = $user->name;
+        $cuerpo_correo['correo']     = $user->email;
+        $cuerpo_correo['estado']     = 'Pendiente';
+        $cuerpo_correo['periodo']    = '2026-1'; 
+
+        $correos_destinatarios[] = $user->email;
+
+        foreach ($campos as $campo) {
+
+            $nombreCampo = $campo['campo'];
+            $valorCampo  = $campo['valor'];
+
+            switch ($nombreCampo) {
+                case 'nivel':
+                    $cuerpo_correo['nivel'] = \App\Models\Nivel::find($valorCampo)->nombre ?? $valorCampo;
+                    break;
+
+                case 'empresa':
+                    $cuerpo_correo['empresa'] = $valorCampo;
+                    break;
+
+                case 'hoja_vida':
+                    $cuerpo_correo['hoja_vida'] = $valorCampo;
+                    break;
+
+                default:
+                    $cuerpo_correo[$nombreCampo] = $valorCampo;
+                    break;
             }
         }
-        
-        // Determinar si el usuario es estudiante
-        $esEstudiante = auth()->user()->hasRole('estudiante');
 
-        // Obtener el segundo integrante
-        $integrante2 = null;
-        if (isset($data['id_integrante_2']) && !empty($data['id_integrante_2'])) {
-            $integrante2 = \App\Models\User::find($data['id_integrante_2']);
-        }
+        //  enviar campos dinámicos al Blade
+        $cuerpo_correo['campos'] = $campos;
 
-        // Construir HTML de integrantes
-        $integrantesHtml = '';
-        
-        // Integrante 1
-        $integrantesHtml .= '<div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">';
-        $integrantesHtml .= '<p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Integrante:</p>';
-        $integrantesHtml .= '<div class="text-gray-800 w-full sm:flex-1 sm:ml-2">';
-        $integrantesHtml .= e($practica->user->name) . '<br>';
-        $integrantesHtml .= 'C.C ' . e($practica->user->nro_documento ?? 'N/A') . '<br>';
-        $integrantesHtml .= e($practica->user->email) . '<br>';
-        $integrantesHtml .= e($practica->user->nro_celular ?? 'N/A');
-        $integrantesHtml .= '</div></div>';
-        
-        // Integrante 2 (si existe)
-        if ($integrante2) {
-            $integrantesHtml .= '<div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">';
-            $integrantesHtml .= '<p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Integrante:</p>';
-            $integrantesHtml .= '<div class="text-gray-800 w-full sm:flex-1 sm:ml-2">';
-            $integrantesHtml .= e($integrante2->name) . '<br>';
-            $integrantesHtml .= 'C.C ' . e($integrante2->nro_documento ?? 'N/A') . '<br>';
-            $integrantesHtml .= e($integrante2->email) . '<br>';
-            $integrantesHtml .= e($integrante2->nro_celular ?? 'N/A');
-            $integrantesHtml .= '</div></div>';
+                Mail::to($correos_destinatarios)->send(
+                    new PracticasMail(
+                        $asunto_correo,
+                        $cuerpo_correo,
+                        $comentarios,
+                        $tipo_correo,
+                        $correos_destinatarios,
+                        $esRespuesta
+                    )
+                );
+
+            } catch (\Exception $e) {
+        //dd($e->getMessage());
+            }
         }
-        
-        // Valores por defecto
-        $director = $data['director_id'] ?? 'No asignado';
-        $evaluador = $data['evaluador_id'] ?? 'No asignado';
-        $codirector = $data['codirector_id'] ?? 'No asignado';
-        
-        // Si es estudiante, ocultar evaluador y codirector
-        if ($esEstudiante) {
-            $docentesHtml = '<div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">';
-            $docentesHtml .= '<p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Docentes:</p>';
-            $docentesHtml .= '<div class="text-gray-800 w-full sm:flex-1 sm:ml-2">';
-            $docentesHtml .= '<span><b>Director:</b> ' . e($director) . '</span><br>';
-            $docentesHtml .= '<span><b>Evaluador:</b> <span class="text-gray-400 italic">No disponible</span></span><br>';
-            $docentesHtml .= '<span><b>Codirector:</b> ' . e($codirector) . '</span>';
-            $docentesHtml .= '</div></div>';
-        } else {
-            $docentesHtml = '<div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">';
-            $docentesHtml .= '<p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Docentes:</p>';
-            $docentesHtml .= '<div class="text-gray-800 w-full sm:flex-1 sm:ml-2">';
-            $docentesHtml .= '<span><b>Director:</b> ' . e($director) . '</span><br>';
-            $docentesHtml .= '<span><b>Evaluador:</b> ' . e($evaluador) . '</span><br>';
-            $docentesHtml .= '<span><b>Codirector:</b> ' . e($codirector) . '</span>';
-            $docentesHtml .= '</div></div>';
-        }
-        
-        // Título
-        $titulo = $data['titulo'] ?? 'No disponible';
-        
-        // Nivel académico
-        $nivel = $practica->user->nivel->nombre ?? 'N/A';
-        
-        // Periodo académico
-        $periodo = $data['periodo'] ?? (date('Y') . '-' . (date('n') <= 6 ? '1' : '2'));
-        
-        // Modalidad
-        $modalidad = 'Prácticas empresariales';
-        
-        // Empresa
-        $tieneEmpresa = $data['tiene_empresa'] ?? 'false';
-        $hojaVida = $data['hoja_vida'] ?? null;
-        
-        return response()->json([
-            'id' => $practica->id,
-            'estado' => $practica->estado,
-            'vencido' => $practica->vencido,
-            'deshabilitado' => $practica->deshabilitado,
-            'fecha_solicitud' => $practica->created_at->format('d/m/Y H:i'),
-            'integrantes_html' => $integrantesHtml,
-            'docentes_html' => $docentesHtml,
-            'titulo' => $titulo,
-            'nivel' => $nivel,
-            'periodo' => $periodo,
-            'modalidad' => $modalidad,
-            'tiene_empresa' => $tieneEmpresa === 'true',
-            'hoja_vida' => $hojaVida,
-            'es_estudiante' => $esEstudiante
-        ]);
-        
-    } catch (\Exception $e) {
-        \Log::error('Error en getDetalle: ' . $e->getMessage());
-        return response()->json(['error' => 'Error al cargar los detalles'], 500);
-    }
-}
 
     public function responderSolicitud(Request $request)
     {
@@ -606,28 +503,28 @@ public function buscarEstudiantes(Request $request)
         
         $estadoActual = $practica->estado;
 
-if ($request->estado === 'Aprobada') {
-    // Mapeo de estados actuales → siguiente fase
-    $nuevoEstado = match ($estadoActual) {
-        'Pendiente' => 'Fase 1',
-        'Fase 1'    => 'Fase 2',
-        'Fase 2'    => 'Fase 3',
-        'Fase 3'    => 'Fase 4',
-        'Fase 4'    => 'Fase 5',
-        'Fase 5'    => 'Finalizado',
-        default     => $estadoActual
-    };
-} else {
-    // Si es rechazada, el nuevo estado es 'Rechazada'
-    $nuevoEstado = 'Rechazada';
-}
+        if ($request->estado === 'Aprobada') {
+            // Mapeo de estados actuales → siguiente fase
+            $nuevoEstado = match ($estadoActual) {
+                'Pendiente' => 'Fase 1',
+                'Fase 1'    => 'Fase 2',
+                'Fase 2'    => 'Fase 3',
+                'Fase 3'    => 'Fase 4',
+                'Fase 4'    => 'Fase 5',
+                'Fase 5'    => 'Finalizado',
+                default     => $estadoActual
+            };
+        } else {
+            // Si es rechazada, el nuevo estado es 'Rechazada'
+            $nuevoEstado = 'Rechazada';
+        }
 
-// Asignar el nuevo estado al objeto
-$practica->estado = $nuevoEstado;
-$practica->save();
+        // Asignar el nuevo estado al objeto
+        $practica->estado = $nuevoEstado;
+        $practica->save();
         
         // Enviar correo al estudiante (implementar después)
-        // $this->sendEmailRespuesta($practica, $request->mensaje, $nuevoEstado);
+        //$this->sendEmailRespuesta($practica, $request->mensaje, $nuevoEstado);
         
         return response()->json(['success' => 'Respuesta enviada exitosamente', 'estado' => $practica->estado]);
     }
