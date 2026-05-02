@@ -44,6 +44,11 @@ class RoadMapPracticaController extends Controller
         }
         
         $estado = $practica->estado;
+
+        if (str_contains($estado, 'Fase')) {
+            $estado_array = explode(' ', $estado);
+            $estado = (int) $estado_array[1];
+        }
         
         // Si está en Pendiente o Rechazada, redirigir
         if (in_array($estado, ['Pendiente', 'Rechazada'])) {

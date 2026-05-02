@@ -298,6 +298,7 @@
                 <i class="fas fa-check-circle text-4xl mb-4"></i>
                 <span class="text-center font-bold text-lg">Fase 1: Pago</span>
                 <p class="text-center mt-2 text-sm mx-4">El estudiante describe su idea y sube el pago.</p>
+                
                 @if ($estado == 1)
                 @if ($submited_fase1 != "true")
                 @if (auth()->user()->hasRole('estudiante'))
