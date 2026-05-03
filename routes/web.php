@@ -227,7 +227,12 @@ Route::middleware('permission:view_practicas')
         Route::post('/deshabilitar-con-acta', [PracticaController::class, 'deshabilitarConActa'])->name('practicas.deshabilitar_con_acta');
         Route::post('/habilitar-con-acta', [PracticaController::class, 'habilitarConActa'])->name('practicas.habilitar_con_acta');
         Route::post('/reportar-problema', [PracticaController::class, 'reportarProblema'])->name('practicas.reportar_problema');
-        
+
+        // Rutas para Fase 1 del roadmap
+        Route::post('/fase1/store', [RoadMapPracticaController::class, 'storeFase1'])->name('practicas.fase1.store');
+        Route::post('/fase1/details', [RoadMapPracticaController::class, 'getFase1Details'])->name('practicas.fase1.details');
+        Route::post('/fase1/reply', [RoadMapPracticaController::class, 'replyFase1'])->name('practicas.fase1.reply');
+
         // Rutas POST para seguimiento (sin duplicar)
         Route::post('/seguimiento', [RoadMapPracticaController::class, 'index'])->name('practicas.roadmap');
         Route::get('/seguimiento', function () {
