@@ -101,17 +101,16 @@ class RoadMapPracticaController extends Controller
 
     $practica = Practica::findOrFail($request->practica_id);
 
-    // Solo permitir si está en Fase 1 (no importa si ya había enviado antes)
-    if ($practica->estado !== 'Fase 1') {
+    // ✅ CORREGIDO: Permitir si está en Fase 1 O si está en Pendiente (recién aprobada)
+    if (!in_array($practica->estado, ['Fase 1', 'Pendiente'])) {
         return response()->json(['error' => 'La práctica no está en la fase correspondiente'], 422);
     }
 
     $tipo_fase1 = $this->getType('practicas_fase_1');
     $campos_fase1 = Campo::where('tipo_solicitud_id', $tipo_fase1->id)->get();
 
-    // ========== 1. Guardar o SOBRESCRIBIR el archivo F-DC-126 ==========
+    // Guardar archivo (con overwrite)
     if ($request->hasFile('doc_fdc126')) {
-        // Eliminar archivo anterior si existe
         $campoDoc = $campos_fase1->where('name', 'doc_fdc126')->first();
         $valorExistente = PracticaValorCampo::where('practica_id', $practica->id)
             ->where('campo_id', $campoDoc->id)
@@ -121,7 +120,6 @@ class RoadMapPracticaController extends Controller
             Storage::disk('public')->delete($valorExistente->valor);
         }
         
-        // Guardar nuevo archivo
         $path = $request->file('doc_fdc126')->store('practicas/fase1', 'public');
         PracticaValorCampo::updateOrCreate(
             ['practica_id' => $practica->id, 'campo_id' => $campoDoc->id],
@@ -129,7 +127,7 @@ class RoadMapPracticaController extends Controller
         );
     }
 
-    // ========== 2. Guardar o SOBRESCRIBIR es_institucional ==========
+    // Guardar es_institucional
     $campoEsInstitucional = $campos_fase1->where('name', 'es_institucional')->first();
     $esInstitucional = $request->has('es_institucional') ? 'true' : 'false';
     PracticaValorCampo::updateOrCreate(
@@ -137,7 +135,7 @@ class RoadMapPracticaController extends Controller
         ['valor' => $esInstitucional]
     );
 
-    // ========== 3. Guardar o SOBRESCRIBIR nombre de la empresa ==========
+    // Guardar nombre de empresa
     $campoNombreEmpresa = $campos_fase1->where('name', 'nombre_empresa')->first();
     if ($esInstitucional === 'true') {
         $nombreEmpresa = 'Unidades Tecnológicas de Santander';
@@ -152,18 +150,21 @@ class RoadMapPracticaController extends Controller
         );
     }
 
-    // ========== 4. Marcar como enviada la fase 1 ==========
+    // ✅ CRUCIAL: Marcar como enviada
     $campoSubmited = $campos_fase1->where('name', 'submited_fase1')->first();
     PracticaValorCampo::updateOrCreate(
         ['practica_id' => $practica->id, 'campo_id' => $campoSubmited->id],
         ['valor' => 'true']
     );
 
-    // ========== 5. IMPORTANTE: NO cambiar tipo_solicitud_id todavía ==========
-    // El tipo_solicitud_id solo cambia cuando el COMITÉ APRUEBA
-    // Por ahora solo actualizamos el estado a 'Fase 1' si no lo está
-    if ($practica->estado !== 'Fase 1') {
-        $practica->estado = 'Fase 1';
+    // ✅ CRUCIAL: Cambiar el estado a 'Fase 1' (para que DataTable muestre "Fase 1 - Comité")
+    $practica->estado = 'Fase 1';
+    $practica->save();
+
+    // ✅ También actualizar tipo_solicitud_id a Fase 1
+    $tipoFase1 = TipoSolicitud::where('nombre', 'practicas_fase_1')->first();
+    if ($tipoFase1 && $practica->tipo_solicitud_id != $tipoFase1->id) {
+        $practica->tipo_solicitud_id = $tipoFase1->id;
         $practica->save();
     }
 
