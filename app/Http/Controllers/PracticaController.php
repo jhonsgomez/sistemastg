@@ -24,9 +24,15 @@ class PracticaController extends Controller
         return view('practicas.index', compact('campos'));
     }
 
+    
+    
+    
+    
+    
+    
     public function getData(Request $request)
 {
-    // ✅ CORREGIDO: Mostrar TODAS las prácticas, no solo tipo_solicitud_id = 9
+    // CORREGIDO: Mostrar TODAS las prácticas, no solo tipo_solicitud_id = 9
     $practicas = Practica::with('user')
         ->where('tipo_solicitud_id', '>=', 9);  // Todas las fases de prácticas (9, 10, 11, 12, 13, 14)
 
@@ -119,7 +125,7 @@ class PracticaController extends Controller
                                <span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-yellow-100 text-yellow-800 border border-yellow-300'>Comité</span>";
             } 
             elseif ($p->estado === 'Fase 1') {
-                // ✅ CORREGIDO: Verificar quién debe actuar
+                // CORREGIDO: Verificar quién debe actuar
                 $submited = $p->valoresCampos->where('campo.name', 'submited_fase1')->first();
                 $yaEnvio = $submited && $submited->valor === 'true';
                 
@@ -134,9 +140,20 @@ class PracticaController extends Controller
                 }
             } 
             elseif ($p->estado === 'Fase 2') {
-                $htmlEstado = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-uts-300 border border-uts-500'>Fase 2</span>
-                               <span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-yellow-100 text-yellow-800 border border-yellow-300'>Estudiante</span>";
-            } 
+    // Verificar si el estudiante ya envió los documentos
+    $submited = $p->valoresCampos->where('campo.name', 'submited_fase2')->first();
+    $yaEnvio = $submited && $submited->valor === 'true';
+    
+    if ($yaEnvio) {
+        // El estudiante ya envió, ahora le toca al COMITÉ
+        $htmlEstado = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-uts-300 border border-uts-500'>Fase 2</span>
+                       <span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-yellow-100 text-yellow-800 border border-yellow-300'>Comité</span>";
+    } else {
+        // El estudiante aún no ha enviado
+        $htmlEstado = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-uts-300 border border-uts-500'>Fase 2</span>
+                       <span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-yellow-100 text-yellow-800 border border-yellow-300'>Estudiante</span>";
+    }
+}
             elseif ($p->estado === 'Fase 3') {
                 $htmlEstado = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-uts-300 border border-uts-500'>Fase 3</span>
                                <span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-yellow-100 text-yellow-800 border border-yellow-300'>Estudiante</span>";
@@ -161,64 +178,76 @@ class PracticaController extends Controller
             return $return_html . $htmlEstado . "</div>";
         })
         ->addColumn('acciones', function ($p) {
-            // Tu código de acciones existente...
-            $user = auth()->user();
-            $buttons = '<div class="flex items-center justify-center gap-1">';
+    $user = auth()->user();
+    $buttons = '<div class="flex items-center justify-center gap-1">';
 
-            // Botón Ver
-            $buttons .= '<button onclick="openDetailsModal(this, ' . $p->id . ')" class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white w-10 h-10 rounded-lg relative inline-flex items-center justify-center">
-                <i class="fa-regular fa-eye"></i>
+    // ========== 1. Botón Ver (siempre visible para todos) ==========
+    $buttons .= '<button onclick="openDetailsModal(this, ' . $p->id . ')" 
+        class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white w-10 h-10 rounded-lg relative inline-flex items-center justify-center">
+        <i class="fa-regular fa-eye"></i>
+        <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
+            <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
+            <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
+        </svg>
+    </button>';
+
+    // ========== 2. Botón Responder VERDE (SOLO para Comité en Fase 0 Pendiente) ==========
+$esComite = $user->hasRole(['super_admin', 'admin', 'coordinador']);
+if ($esComite && $p->estado === 'Pendiente') {
+    $submited = $p->valoresCampos->where('campo.name', 'submited_fase0')->first();
+    if ($submited && $submited->valor === 'true') {
+        // Usar la función existente openResponderSolicitudModal
+        $buttons .= '<button onclick="openResponderSolicitudModal(' . $p->id . ')"
+            class="btn-action shadow bg-uts-500 hover:bg-uts-800 text-white w-10 h-10 rounded-lg inline-flex items-center justify-center">
+            <i class="fa-solid fa-reply"></i>
+        </button>';
+    }
+}
+
+    // ========== 3. Botón Roadmap AZUL (para todos en Fase 1 en adelante) ==========
+    $esFaseActiva = in_array($p->estado, ['Fase 1', 'Fase 2', 'Fase 3', 'Fase 4', 'Fase 5', 'Finalizado']);
+    $puedeVerRoadmap = !$p->deshabilitado && $esFaseActiva;
+    
+    if ($puedeVerRoadmap) {
+        $buttons .= '
+            <form action="' . route('practicas.roadmap') . '" method="POST" class="inline-block m-0">
+                ' . csrf_field() . '
+                <input type="hidden" name="practica_id" value="' . $p->id . '">
+                <button type="submit" class="btn-action shadow bg-blue-500 hover:bg-blue-700 text-white w-10 h-10 rounded-lg inline-flex items-center justify-center">
+                    <i class="fa-solid fa-map-location-dot"></i>
+                </button>
+            </form>';
+    }
+
+    // ========== 4. Botón Deshabilitar/Habilitar ROJO/TEAL (SOLO para Comité, en Fase 1 en adelante) ==========
+    if ($esComite && $esFaseActiva && $p->estado !== 'Rechazada') {
+        if (!$p->deshabilitado) {
+            $buttons .= '<button onclick="deshabilitarPracticaConActa(' . $p->id . ')"
+                class="btn-action shadow bg-red-500 hover:bg-red-700 text-white w-10 h-10 rounded-lg inline-flex items-center justify-center">
+                <i class="fa-regular fa-circle-xmark"></i>
             </button>';
+        } else {
+            $buttons .= '<button onclick="habilitarPracticaConActa(' . $p->id . ')"
+                class="btn-action shadow bg-teal-500 hover:bg-teal-700 text-white w-10 h-10 rounded-lg inline-flex items-center justify-center">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+            </button>';
+        }
+    }
 
-            // Botón Responder (solo para admin/comité en estado Pendiente o Fase 1 con submited=true)
-            if ($user->hasRole(['super_admin', 'admin', 'coordinador'])) {
-                if ($p->estado === 'Pendiente' && !$p->deshabilitado) {
-                    $buttons .= '<button onclick="openResponderSolicitudModal(' . $p->id . ')"
-                        class="btn-action shadow bg-uts-500 hover:bg-uts-800 text-white w-10 h-10 rounded-lg inline-flex items-center justify-center">
-                        <i class="fa-solid fa-reply"></i>
-                    </button>';
-                }
-                
-                // Para Fase 1, verificar si el estudiante ya envió
-                if ($p->estado === 'Fase 1' && !$p->deshabilitado) {
-                    $submited = $p->valoresCampos->where('campo.name', 'submited_fase1')->first();
-                    $yaEnvio = $submited && $submited->valor === 'true';
-                    
-                    if ($yaEnvio) {
-                        $buttons .= '<button onclick="abrirRespuestaFase1(' . $p->id . ')"
-                            class="btn-action shadow bg-uts-500 hover:bg-uts-800 text-white w-10 h-10 rounded-lg inline-flex items-center justify-center">
-                            <i class="fa-solid fa-reply"></i>
-                        </button>';
-                    }
-                }
-            }
-
-            // Botones Habilitar/Deshabilitar (tu código existente)
-            // ... 
-
-            // Botón Roadmap
-            $puedeVerRoadmap = !$p->deshabilitado && !in_array($p->estado, ['Pendiente', 'Rechazada']);
-            if ($puedeVerRoadmap) {
-                $buttons .= '
-                    <form action="' . route('practicas.roadmap') . '" method="POST" class="inline-block m-0">
-                        ' . csrf_field() . '
-                        <input type="hidden" name="practica_id" value="' . $p->id . '">
-                        <button type="submit" class="btn-action shadow bg-blue-500 hover:bg-blue-700 text-white w-10 h-10 rounded-lg inline-flex items-center justify-center">
-                            <i class="fa-solid fa-map-location-dot"></i>
-                        </button>
-                    </form>';
-            }
-
-            $buttons .= '</div>';
-            return $buttons;
-        })
+    $buttons .= '</div>';
+    return $buttons;
+})
         ->rawColumns(['estado', 'acciones', 'descripcion'])
         ->make(true);
 }
 
     
 
-    public function buscarEstudiantes(Request $request)
+    
+
+
+
+public function buscarEstudiantes(Request $request)
     {
         try {
             $search = $request->get('search');
@@ -287,88 +316,122 @@ class PracticaController extends Controller
         }
     }
 
+    
+    
+    
+    
+    
     public function store(Request $request)
-    {
-        $tipo   = TipoSolicitud::where('nombre', 'practicas_fase_0')->first();
-        $campos = Campo::where('tipo_solicitud_id', $tipo->id)->get();
+{
+    $tipo   = TipoSolicitud::where('nombre', 'practicas_fase_0')->first();
+    $campos = Campo::where('tipo_solicitud_id', $tipo->id)->get();
 
-        // Verificar si se envió tiene_empresa
-        $tieneEmpresa = $request->input('tiene_empresa');
-        if ($tieneEmpresa === null) {
-            return response()->json(['errors' => ['tiene_empresa' => ['Debe seleccionar si tiene empresa o no.']]], 422);
-        }
-        $tieneEmpresa = $tieneEmpresa === '1';
+    // Verificar si se envió tiene_empresa
+    $tieneEmpresa = $request->input('tiene_empresa');
+    if ($tieneEmpresa === null) {
+        return response()->json(['errors' => ['tiene_empresa' => ['Debe seleccionar si tiene empresa o no.']]], 422);
+    }
+    $tieneEmpresa = $tieneEmpresa === '1';
 
-        // Validación de hoja de vida
-        $errors = [];
-        if (! $tieneEmpresa && ! $request->hasFile('hoja_vida')) {
-            $errors['hoja_vida'][] = 'Debe subir la hoja de vida si NO cuenta con empresa.';
-        }
-
-        // Validar que el segundo integrante no sea el mismo usuario
-        if ($request->filled('id_integrante_2') && $request->id_integrante_2 == auth()->id()) {
-            $errors['id_integrante_2'][] = 'No puede seleccionarse a sí mismo como compañero.';
-        }
-
-        if (! empty($errors)) {
-            return response()->json(['errors' => $errors], 422);
-        }
-
-        // Crear la práctica
-        $practica = Practica::create([
-            'user_id'           => auth()->id(),
-            'tipo_solicitud_id' => $tipo->id,
-            'estado'            => 'Pendiente',
-            'vencido'           => false,
-            'deshabilitado'     => false,
-        ]);
-
-        // Guardar cada campo dinámico
-        foreach ($campos as $campo) {
-            // Saltar campos que se llenan automáticamente desde la sesión
-            if (in_array($campo->name, ['nombre_completo', 'correo', 'nivel', 'documento', 'celular'])) {
-                continue;
-            }
-
-            $valor = null;
-
-            if ($campo->type == 'checkbox') {
-                $valor = $request->input($campo->name) === '1' ? 'true' : 'false';
-            } elseif ($campo->type == 'file') {
-                if ($campo->name == 'hoja_vida' && $tieneEmpresa) {
-                    continue;
-                }
-                if ($request->hasFile($campo->name)) {
-                    $path  = $request->file($campo->name)->store('practicas', 'public');
-                    $valor = $path;
-                }
-            } elseif ($campo->name == 'id_integrante_2') {
-                // Solo guardar si se seleccionó un integrante
-                $valor = $request->input($campo->name);
-                if (empty($valor)) {
-                    continue; // No guardar si está vacío
-                }
-            } else {
-                $valor = $request->input($campo->name);
-            }
-
-            if ($valor !== null) {
-                PracticaValorCampo::create([
-                    'practica_id' => $practica->id,
-                    'campo_id'    => $campo->id,
-                    'valor'       => $valor,
-                ]);
-            }
-        }
-
-        // Enviar correos
-       // $campos_nueva_practica = $practica->camposConValores();
-       // $this->sendEmailSolicitudPractica($campos_nueva_practica);
-
-        return response()->json(['message' => 'Práctica enviada correctamente']);
+    // Validación de hoja de vida
+    $errors = [];
+    if (! $tieneEmpresa && ! $request->hasFile('hoja_vida')) {
+        $errors['hoja_vida'][] = 'Debe subir la hoja de vida si NO cuenta con empresa.';
     }
 
-    public function sendEmailSolicitudPractica($campos)
+    // Validar que el segundo integrante no sea el mismo usuario
+    if ($request->filled('id_integrante_2') && $request->id_integrante_2 == auth()->id()) {
+        $errors['id_integrante_2'][] = 'No puede seleccionarse a sí mismo como compañero.';
+    }
+
+    if (! empty($errors)) {
+        return response()->json(['errors' => $errors], 422);
+    }
+
+    // Crear la práctica
+    $practica = Practica::create([
+        'user_id'           => auth()->id(),
+        'tipo_solicitud_id' => $tipo->id,
+        'estado'            => 'Pendiente',
+        'vencido'           => false,
+        'deshabilitado'     => false,
+    ]);
+
+    // Guardar cada campo dinámico
+    foreach ($campos as $campo) {
+        // Saltar campos que se llenan automáticamente desde la sesión
+        if (in_array($campo->name, ['nombre_completo', 'correo', 'nivel', 'documento', 'celular'])) {
+            continue;
+        }
+
+        $valor = null;
+
+        if ($campo->type == 'checkbox') {
+            $valor = $request->input($campo->name) === '1' ? 'true' : 'false';
+        } elseif ($campo->type == 'file') {
+            if ($campo->name == 'hoja_vida' && $tieneEmpresa) {
+                continue;
+            }
+            if ($request->hasFile($campo->name)) {
+                $path  = $request->file($campo->name)->store('practicas', 'public');
+                $valor = $path;
+            }
+        } elseif ($campo->name == 'id_integrante_2') {
+            // Solo guardar si se seleccionó un integrante
+            $valor = $request->input($campo->name);
+            if (empty($valor)) {
+                continue;
+            }
+        } else {
+            $valor = $request->input($campo->name);
+        }
+
+        if ($valor !== null) {
+            PracticaValorCampo::create([
+                'practica_id' => $practica->id,
+                'campo_id'    => $campo->id,
+                'valor'       => $valor,
+            ]);
+        }
+    }
+
+    // ========== NUEVO: Guardar submited_fase0 ==========
+    // Buscar el campo submited_fase0
+    $campoSubmited = $campos->where('name', 'submited_fase0')->first();
+    if ($campoSubmited) {
+        PracticaValorCampo::create([
+            'practica_id' => $practica->id,
+            'campo_id'    => $campoSubmited->id,
+            'valor'       => 'true',
+        ]);
+    } else {
+        // Si no existe el campo en la variable $campos, buscarlo directamente
+        $campoSubmited = Campo::where('tipo_solicitud_id', $tipo->id)
+            ->where('name', 'submited_fase0')
+            ->first();
+        if ($campoSubmited) {
+            PracticaValorCampo::create([
+                'practica_id' => $practica->id,
+                'campo_id'    => $campoSubmited->id,
+                'valor'       => 'true',
+            ]);
+        }
+    }
+
+    // Enviar correos
+    // $campos_nueva_practica = $practica->camposConValores();
+    // $this->sendEmailSolicitudPractica($campos_nueva_practica);
+
+    return response()->json(['message' => 'Práctica enviada correctamente']);
+}
+
+    
+
+
+
+
+
+public function sendEmailSolicitudPractica($campos)
     {
         try {
             $cuerpo_correo         = [];
@@ -454,6 +517,11 @@ class PracticaController extends Controller
         }
     }
 
+    
+    
+    
+    
+    
     public function responderSolicitud(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -513,6 +581,12 @@ class PracticaController extends Controller
         return response()->json(['success' => 'Respuesta enviada exitosamente', 'estado' => $practica->estado]);
     }
 
+    
+    
+    
+    
+    
+    
     public function sendEmailRespuesta($practica, $nuevoEstado, $mensaje, $estadoRespuesta)
     {
         try {
@@ -612,6 +686,12 @@ class PracticaController extends Controller
 
 
 
+    
+    
+    
+    
+    
+    
     public function getDetalle($id)
 {
     try {

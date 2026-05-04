@@ -233,6 +233,11 @@ Route::middleware('permission:view_practicas')
         Route::post('/fase1/details', [RoadMapPracticaController::class, 'getFase1Details'])->name('practicas.fase1.details');
         Route::post('/fase1/reply', [RoadMapPracticaController::class, 'replyFase1'])->name('practicas.fase1.reply');
 
+        // Rutas para Fase 2 del roadmap
+        Route::post('/fase2/store', [RoadMapPracticaController::class, 'storeFase2'])->name('practicas.fase2.store');
+        Route::post('/fase2/details', [RoadMapPracticaController::class, 'getFase2Details'])->name('practicas.fase2.details');
+        Route::post('/fase2/reply', [RoadMapPracticaController::class, 'replyFase2'])->name('practicas.fase2.reply');
+        
         // Rutas POST para seguimiento (sin duplicar)
         Route::post('/seguimiento', [RoadMapPracticaController::class, 'index'])->name('practicas.roadmap');
         Route::get('/seguimiento', function () {

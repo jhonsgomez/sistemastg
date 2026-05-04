@@ -82,6 +82,13 @@ class CamposPracticasSeeder extends Seeder
                 ['tipo_solicitud_id' => $practicas_fase_0->id, 'name' => 'respuesta_comite'],
                 ['label' => 'Respuesta del comité', 'type' => 'textarea', 'required' => true, 'instructions' => 'Respuesta del comité a la solicitud de práctica']
             );
+
+            // 12. Bandera para validar el envío de Fase 1
+            Campo::updateOrCreate(
+                ['tipo_solicitud_id' => $practicas_fase_0->id, 'name' => 'submited_fase0'],
+                ['label' => 'Fase 0 enviada', 'type' => 'hidden', 'required' => false, 'instructions' => null]
+            );
+
         }
 
         // ==================== FASE 1 ====================
@@ -121,5 +128,102 @@ class CamposPracticasSeeder extends Seeder
                 ['label' => 'Respuesta del comité', 'type' => 'textarea', 'required' => true, 'instructions' => 'Respuesta del comité a la solicitud de práctica']
             );
         }
+
+        // ==================== FASE 2 ====================
+        $practicas_fase_2 = TipoSolicitud::where('nombre', 'practicas_fase_2')->first();
+        if ($practicas_fase_2) {
+            // Restaurar campos eliminados lógicamente
+            Campo::withTrashed()
+                ->where('tipo_solicitud_id', $practicas_fase_2->id)
+                ->restore();
+
+            // 1. Liquidación de pago (PDF con marca de agua)
+            Campo::updateOrCreate(
+                ['tipo_solicitud_id' => $practicas_fase_2->id, 'name' => 'liquidacion_pago'],
+                [
+                    'label' => 'Liquidación de pago de modalidad',
+                    'type' => 'file',
+                    'required' => true,
+                    'instructions' => '<p>Suba la liquidación generada del pago de modalidad en formato <strong>PDF</strong> (máx. 5 MB). El documento debe incluir la marca de agua correspondiente.</p>
+                                    <ul class="list-disc mt-2 ml-4">
+                                        <li class="ml-4">La liquidación debe estar debidamente diligenciada</li>
+                                        <li class="ml-4">Debe contener la marca de agua del banco o entidad</li>
+                                        <li class="ml-4">Asegúrese de que los datos sean legibles</li>
+                                    </ul>'
+                ]
+            );
+
+            // 2. Soporte de pago
+            Campo::updateOrCreate(
+                ['tipo_solicitud_id' => $practicas_fase_2->id, 'name' => 'soporte_pago'],
+                [
+                    'label' => 'Soporte de pago',
+                    'type' => 'file',
+                    'required' => true,
+                    'instructions' => '<p>Suba el soporte de pago de la liquidación en formato <strong>PDF</strong> (máx. 5 MB).</p>
+                                    <ul class="list-disc mt-2 ml-4">
+                                        <li class="ml-4">El soporte debe corresponder a la liquidación adjunta</li>
+                                        <li class="ml-4">Debe ser un comprobante de pago válido</li>
+                                        <li class="ml-4">Asegúrese de que el monto sea el correcto</li>
+                                    </ul>'
+                ]
+            );
+
+            // 3. Bandera para validar el envío de Fase 2
+            Campo::updateOrCreate(
+                ['tipo_solicitud_id' => $practicas_fase_2->id, 'name' => 'submited_fase2'],
+                [
+                    'label' => 'Fase 2 enviada',
+                    'type' => 'hidden',
+                    'required' => false,
+                    'instructions' => null
+                ]
+            );
+
+            // 4. Respuesta del comité (Fase 2)
+            Campo::updateOrCreate(
+                ['tipo_solicitud_id' => $practicas_fase_2->id, 'name' => 'respuesta_comite_fase2'],
+                [
+                    'label' => 'Respuesta del comité',
+                    'type' => 'textarea',
+                    'required' => true,
+                    'instructions' => 'Respuesta del comité a la solicitud de pago de modalidad'
+                ]
+            );
+
+            // 5. Director de práctica (asignado por el comité)
+            Campo::updateOrCreate(
+                ['tipo_solicitud_id' => $practicas_fase_2->id, 'name' => 'director_id'],
+                [
+                    'label' => 'Director de práctica',
+                    'type' => 'hidden',
+                    'required' => false,
+                    'instructions' => 'Docente asignado como director de la práctica empresarial'
+                ]
+            );
+
+            // 6. Evaluador de práctica (asignado por el comité)
+            Campo::updateOrCreate(
+                ['tipo_solicitud_id' => $practicas_fase_2->id, 'name' => 'evaluador_id'],
+                [
+                    'label' => 'Evaluador de práctica',
+                    'type' => 'hidden',
+                    'required' => false,
+                    'instructions' => 'Docente asignado como evaluador de la práctica empresarial'
+                ]
+            );
+
+            // 7. Codirector de práctica (opcional - asignado por el comité)
+            Campo::updateOrCreate(
+                ['tipo_solicitud_id' => $practicas_fase_2->id, 'name' => 'codirector_id'],
+                [
+                    'label' => 'Codirector de práctica',
+                    'type' => 'hidden',
+                    'required' => false,
+                    'instructions' => 'Docente asignado como codirector de la práctica empresarial (opcional)'
+                ]
+            );
+        }
+
     }
 }

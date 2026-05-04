@@ -30,25 +30,16 @@ function toggleNombreEmpresa() {
     }
 }
 
-// Abrir modal del estudiante
-function openFase1EstudianteModal() {
-    $('#doc_fdc126Error').text('');
-    $('#doc_fdc126').val('');
-    $('#nombre_empresa').val('');
-    $('#es_institucional').prop('checked', false);
-    $('#nombre_empresa_container').hide();
-    $('#file-list-fase1').empty();
-    $('#fase1EstudianteModal').removeClass('hidden').addClass('show');
-}
-
-function closeFase1EstudianteModal() {
-    $('#fase1EstudianteModal').removeClass('show').addClass('hidden');
-}
-
-// Abrir modal de detalles
-function openFase1DetailsModal() {
-    const loadingSpinner = $('#loadingSpinner-fase1-details');
-    if (loadingSpinner.length) loadingSpinner.removeClass('hidden');
+// Abrir modal de detalles con spinner en el botón
+function openFase1DetailsModal(btn) {
+    // Mostrar spinner y ocultar icono en el botón
+    if (btn) {
+        const icon = btn.querySelector('i');
+        const spinner = btn.querySelector('.loading-spinner');
+        if (icon) icon.classList.add('hidden');
+        if (spinner) spinner.classList.remove('hidden');
+        btn.disabled = true;
+    }
     
     $.ajax({
         url: ROUTES.fase1_details,
@@ -91,24 +82,36 @@ function openFase1DetailsModal() {
             
             html += `</div>`;
             $('#fase1DetailsContent').html(html);
-            $('#fase1DetailsModal').removeClass('hidden').addClass('show');
+            $('#fase1DetailsModal').addClass('show');
         },
         error: function(xhr) {
             console.error(xhr);
             Swal.fire('Error', 'No se pudieron cargar los detalles', 'error');
         },
         complete: function() {
-            if (loadingSpinner.length) loadingSpinner.addClass('hidden');
+            // Restaurar el botón: ocultar spinner y mostrar icono
+            if (btn) {
+                const icon = btn.querySelector('i');
+                const spinner = btn.querySelector('.loading-spinner');
+                if (icon) icon.classList.remove('hidden');
+                if (spinner) spinner.classList.add('hidden');
+                btn.disabled = false;
+            }
         }
     });
 }
 
-function closeFase1DetailsModal() {
-    $('#fase1DetailsModal').removeClass('show').addClass('hidden');
-}
-
-// Abrir modal de administrador (responder)
-function openFase1AdminModal() {
+// Función para abrir modal de administrador (responder) con spinner
+function openFase1AdminModal(btn) {
+    // Mostrar spinner y ocultar icono en el botón
+    if (btn) {
+        const icon = btn.querySelector('i');
+        const spinner = btn.querySelector('.loading-spinner');
+        if (icon) icon.classList.add('hidden');
+        if (spinner) spinner.classList.remove('hidden');
+        btn.disabled = true;
+    }
+    
     $('#nro_acta_fase1').val('');
     $('#fecha_acta_fase1').val('');
     $('#estado_fase1').val('');
@@ -117,11 +120,24 @@ function openFase1AdminModal() {
     $('#fecha_acta_fase1Error').text('');
     $('#estado_fase1Error').text('');
     $('#respuesta_fase1Error').text('');
-    $('#fase1AdminModal').removeClass('hidden').addClass('show');
+    $('#fase1AdminModal').addClass('show');
+    
+    // Restaurar el botón después de abrir el modal
+    if (btn) {
+        const icon = btn.querySelector('i');
+        const spinner = btn.querySelector('.loading-spinner');
+        if (icon) icon.classList.remove('hidden');
+        if (spinner) spinner.classList.add('hidden');
+        btn.disabled = false;
+    }
+}
+
+function closeFase1DetailsModal() {
+    $('#fase1DetailsModal').removeClass('show');
 }
 
 function closeFase1AdminModal() {
-    $('#fase1AdminModal').removeClass('show').addClass('hidden');
+    $('#fase1AdminModal').removeClass('show');
 }
 
 // Envío del formulario del estudiante
