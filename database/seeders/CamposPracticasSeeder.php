@@ -113,7 +113,7 @@ class CamposPracticasSeeder extends Seeder
             // 3. Nombre de la empresa (aparece si no es institucional)
             Campo::updateOrCreate(
                 ['tipo_solicitud_id' => $practicas_fase_1->id, 'name' => 'nombre_empresa'],
-                ['label' => 'Nombre de la empresa', 'type' => 'text', 'required' => false, 'instructions' => 'Ingrese el nombre de la empresa donde realizará la práctica.']
+                ['label' => 'Nombre de la empresa', 'type' => 'text', 'required' => false, 'instructions' => 'Ingrese el nombre de la empresa donde realizará la práctica.', 'placeholder' => 'Escribe el nombre de la empresa']
             );
 
             // 4. Bandera para validar el envío de Fase 1

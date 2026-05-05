@@ -323,7 +323,7 @@
 
     <!-- Modal FASE 1 - Estudiante (Enviar documentos) -->
     <div id="fase1EstudianteModal" class="fixed z-50 inset-0 overflow-y-auto">
-    <div class="modal-overlay absolute inset-0" onclick="closeFase1EstudianteModal()">
+    <div class="modal-overlay absolute inset-0"  style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeFase1EstudianteModal()">
         <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
             <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative" onclick="event.stopPropagation()">
                 <button class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500" onclick="closeFase1EstudianteModal()">&times;</button>
@@ -356,12 +356,13 @@
                                     <label class="block font-medium text-sm text-gray-700">Nombre de la empresa</label>
                                     <div class="relative inline-block">
                                         <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon" data-tooltip="tooltip-empresa"></i>
+                                        
                                         <div id="tooltip-empresa" class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg w-64">
-                                            Ingrese el nombre de la empresa donde realizará la práctica.
+                                           Ingrese el nombre de la empresa donde realizará la práctica.
                                         </div>
                                     </div>
                                 </div>
-                                <input type="text" name="nombre_empresa" id="nombre_empresa" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
+                                <input type="text" name="nombre_empresa" id="nombre_empresa" placeholder="Escribe el nombre de la empresa" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
                             </div>
 
                             <!-- Campo para subir F-DC-126 -->
@@ -375,6 +376,7 @@
                                         </div>
                                     </div>
                                 </div>
+                              
                                 <div class="w-full mt-2 relative py-9 bg-gray-50 rounded-2xl border-2 border-gray-300 gap-3 grid border-dashed">
                                     <div class="grid gap-1">
                                         <i class="mx-auto text-4xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
@@ -388,6 +390,9 @@
                                         </div>
                                     </div>
                                 </div>
+                                <br>
+                                <p class="text-sm mb-6"><strong>Nota:</strong> El formato F-DC-126 debe estar debidamente diligenciado y no debe superar los 5MB en formato Word. </p>
+                                
                                 <span id="doc_fdc126Error" class="text-red-500 text-sm"></span>
                                 <ul id="file-list-fase1" class="mt-4 text-gray-600 text-sm list-disc pl-5"></ul>
                             </div>

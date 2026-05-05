@@ -1,14 +1,11 @@
 function openFase1EstudianteModal() {
-    console.log('CLICK FUNCIONA');
 
     const modal = document.getElementById('fase1EstudianteModal');
 
-    if (!modal) {
-        console.log('NO EXISTE EL MODAL');
-        return;
-    }
+
 
     modal.classList.add('show');
+    toggleNombreEmpresa();
 }
 
 function closeFase1EstudianteModal() {
