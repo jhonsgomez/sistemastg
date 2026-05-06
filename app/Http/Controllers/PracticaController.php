@@ -11,18 +11,54 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
+use App\Models\Fecha;
 
 class PracticaController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        // Obtener el periodo actual
+        $periodoActual = session('periodo_academico', '2026-1');
 
+        // Buscar las fechas para el periodo actual
+        $fechasData = Fecha::where('periodo', $periodoActual)->first();
+
+        $fechas = [];
+        
+        if ($fechasData) {
+            // Como el modelo tiene cast, $fechasData->fechas ya es un array
+            $fechasArray = $fechasData->fechas;
+            
+            $fechas = [
+                'fecha_inicio_banco' => $fechasArray['fecha_inicio_banco'] ?? 'No definida',
+                'fecha_fin_banco' => $fechasArray['fecha_fin_banco'] ?? 'No definida',
+                'fecha_inicio_proyectos' => $fechasArray['fecha_inicio_proyectos'] ?? 'No definida',
+                'fecha_fin_proyectos' => $fechasArray['fecha_fin_proyectos'] ?? 'No definida',
+                'fecha_aprobacion_propuesta' => $fechasArray['fecha_aprobacion_propuesta'] ?? 'No definida',
+            ];
+        } else {
+            // Fechas por defecto
+            $fechas = [
+                'fecha_inicio_banco' => '2026-01-30',
+                'fecha_fin_banco' => '2026-09-30',
+                'fecha_inicio_proyectos' => '2026-02-09',
+                'fecha_fin_proyectos' => '2026-09-30',
+                'fecha_aprobacion_propuesta' => '2026-09-30',
+            ];
+        }
+        
+        // Obtener las prácticas del usuario logueado
+        $practicas = Practica::where('user_id', auth()->id())
+            ->orderBy('created_at', 'desc')
+            ->get();
+        
+        // Obtener campos para el formulario de Fase 0
         $tipo = TipoSolicitud::where('nombre', 'practicas_fase_0')->first();
-
         $campos = Campo::where('tipo_solicitud_id', $tipo->id)->get();
 
-        return view('practicas.index', compact('campos'));
+        return view('practicas.index', compact('campos', 'practicas', 'fechas'));
     }
+
 
     
     

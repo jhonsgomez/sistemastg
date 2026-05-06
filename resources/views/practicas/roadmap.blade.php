@@ -1,14 +1,11 @@
+<!-- Vista Roadmap - seguimiento de prácticas -->
 <x-app-layout>
     
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Seguimiento de <span
-                class="bg-uts-500 text-gray-800 font-bold me-2 px-2.5 py-0.5 rounded uppercase">Prácticas
-                Empresariales</span>
-        </h2>
-    </x-slot>
 
-    @push('styles')
+        </x-slot>
+            
+            @push('styles')
 
         <style>
 
@@ -132,37 +129,79 @@
         </style>
     
     @endPush
+
+    <div class="p-6">
     
-    <div class="p-4">
-        <div class="mb-4">
-            <a href="{{ route('practicas.index') }}"
-                class="bg-gray-500 hover:bg-gray-700 text-white px-4 py-2 rounded-lg">
-                ← Volver al listado
+    <div class="flex justify-between items-center">
+        <h2 class="font-semibold text-2xl text-gray-800 leading-tight">
+            Seguimiento de <span
+                class="bg-uts-500 text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase">Prácticas</span>
+        </h2>
+        
+        <!-- Botones de acción en el header -->
+        <div class="flex gap-2">
+            <!-- Botón Alertas (Rojo) -->
+            <button type="button" id="warning" onclick="openWarningModal()"
+                class="btn-action shadow bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded-lg relative">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <svg id="loadingSpinner-warningOpen" style="margin: 4px 1px"
+                    class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64" fill="none"
+                    xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                    <path
+                        d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
+                        stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                    <path
+                        d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
+                        stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"
+                        class="text-white">
+                    </path>
+                </svg>
+            </button>
+            
+            <!-- Botón Calendario (Verde) -->
+            <button onclick="openCalendarModal()" 
+                class="bg-uts-500 hover:bg-uts-800 text-white px-4 py-1 rounded-lg transition flex items-center gap-2">
+                <i class="fa-regular fa-calendar"></i>
+            </button>
+            
+            <!-- Botón Configuración (Gris) -->
+            <button onclick="openConfiguracionModal()" 
+                class="bg-gray-500 hover:bg-gray-700 text-white px-4 py-1 rounded-lg transition flex items-center gap-2">
+                <i class="fa-solid fa-gear"></i>
+            </button>
+            
+            <!-- Botón Volver (Verde) -->
+            <a href="{{ route('practicas.index') }}" 
+                class="bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg transition flex items-center gap-2">
+                <i class="fa-solid fa-arrow-rotate-left"></i>
+                Volver
             </a>
         </div>
-
-        <div class="bg-white rounded-lg shadow p-6">
-            <h3 class="text-lg font-bold mb-2">Práctica #{{ $codigo_practica }}</h3>
-            <p class="text-gray-600 mb-4">Estado actual: <strong>{{ $practica->estado }}</strong></p>
-            <p class="text-gray-600">Aquí podrás llevar el seguimiento del progreso de tu práctica empresarial.</p>
-        </div>
     </div>
+    
+    <hr class="mt-4 mb-6">
 
-    <!-- Container donde aparecen las fases -->
-    <div class="p-4" id="container-fases-main">
+    <p class="text-gray-700">
+        Aquí podrás llevar el seguimiento de tus prácticas empresariales en curso.
+    </p>
+
+        <!-- Nota informativa -->
+        
+        <!-- Container donde aparecen las fases -->
+    <div id="container-fases-main">
         <div class="mt-8 grid w-full grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
             
             <!-- FASE 1 -->
 <div id="fase-1"
     class="relative mx-auto flex flex-col items-center justify-center bg-white text-gray-600 rounded-lg shadow-lg h-60 w-full sm:w-50 border card-fase {{ $fase_actual >= 1 ? 'card-activated' : '' }} {{ $fase_actual == 1 ? 'card-activated-animated' : '' }}">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-12">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-10">
         <path fill-rule="evenodd" d="M5.625 1.5H9a3.75 3.75 0 0 1 3.75 3.75v1.875c0 1.036.84 1.875 1.875 1.875H16.5a3.75 3.75 0 0 1 3.75 3.75v7.875c0 1.035-.84 1.875-1.875 1.875H5.625a1.875 1.875 0 0 1-1.875-1.875V3.375c0-1.036.84-1.875 1.875-1.875Zm6.905 9.97a.75.75 0 0 0-1.06 0l-3 3a.75.75 0 1 0 1.06 1.06l1.72-1.72V18a.75.75 0 0 0 1.5 0v-4.19l1.72 1.72a.75.75 0 1 0 1.06-1.06l-3-3Z" clip-rule="evenodd" />
         <path d="M14.25 5.25a5.23 5.23 0 0 0-1.279-3.434 9.768 9.768 0 0 1 6.963 6.963A5.23 5.23 0 0 0 16.5 7.5h-1.875a.375.375 0 0 1-.375-.375V5.25Z" />
     </svg>
 
-    <span class="text-center font-bold text-lg">Fase 1: Formato F-DC-126</span>
-    <p class="text-center mt-2 text-xs mx-4">El estudiante envía el formato de solicitud de practicantes de la empresa.</p>
+    <span class="text-center font-bold text-lg">Fase 1: Formato <br>F-DC-126</span>
+    <p class="text-center mt-2 text-xs mx-4">El estudiante envía el formato de solicitud de practicantes.</p>
     
     @if ($fase_actual == 1)
         @php
@@ -226,11 +265,9 @@
 <div id="fase-2"
     class="relative mx-auto flex flex-col items-center justify-center bg-white text-gray-600 rounded-lg shadow-lg h-60 w-full sm:w-50 border card-fase {{ $fase_actual >= 2 ? 'card-activated' : '' }} {{ $fase_actual == 2 ? 'card-activated-animated' : '' }}">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-12">
-        <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z" clip-rule="evenodd" />
-    </svg>
+    <i class="fa-solid fa-circle-check" style="font-size: 32px; margin-bottom: 10px;"></i>
 
-    <span class="text-center font-bold text-lg">Fase 2: Pago de modalidad</span>
+    <span class="text-center font-bold text-lg">Fase 2: Pago</span>
     <p class="text-center mt-2 text-xs mx-4">El estudiante sube la liquidación y soporte de pago.</p>
     
     @if ($fase_actual == 2)
@@ -290,35 +327,45 @@
     @endif
 </div>
 
-            <!-- FASE 3 -->
-            <div class="relative mx-auto flex flex-col items-center justify-center bg-white text-gray-600 rounded-lg shadow-lg h-60 w-full sm:w-50 border opacity-50">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-12">
-                    <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z" clip-rule="evenodd" />
-                </svg>
-                <span class="text-center font-bold text-lg">Fase 3: Propuesta</span>
-                <p class="text-center mt-2 text-xs mx-4">Próximamente...</p>
+            <!-- FASE 3 . I -->
+            <div class="relative mx-auto flex flex-col items-center justify-center bg-white text-gray-600 rounded-lg shadow-lg h-60 w-full sm:w-50 border">
+                <i class="fa-solid fa-hourglass-half" style="font-size: 32px; margin-bottom: 10px;"></i>
+                <span class="text-center font-bold text-lg">Fase 3: Propuesta I</span>
+                <p class="text-center mt-2 text-xs mx-4">El estudiante envía la propuesta al director.</p>
             </div>
 
-            <!-- FASE 4 -->
-            <div class="relative mx-auto flex flex-col items-center justify-center bg-white text-gray-600 rounded-lg shadow-lg h-60 w-full sm:w-50 border opacity-50">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-12">
-                    <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z" clip-rule="evenodd" />
-                </svg>
-                <span class="text-center font-bold text-lg">Fase 4: Documentos</span>
-                <p class="text-center mt-2 text-xs mx-4">Próximamente...</p>
+            <!-- FASE 3 . II -->
+            <div class="relative mx-auto flex flex-col items-center justify-center bg-white text-gray-600 rounded-lg shadow-lg h-60 w-full sm:w-50 border">
+                <i class="fa-solid fa-paper-plane" style="font-size: 32px; margin-bottom: 10px;"></i>
+                <span class="text-center font-bold text-lg">Fase 4: Propuesta II</span>
+                <p class="text-center mt-2 text-xs mx-4">El director envía propuesta al evaluador y comité.</p>
+            </div>
+
+            <!-- FASE 4 . I -->
+            <div class="relative mx-auto flex flex-col items-center justify-center bg-white text-gray-600 rounded-lg shadow-lg h-60 w-full sm:w-50 border">
+                <i class="fa-solid fa-hourglass-half" style="font-size: 32px; margin-bottom: 10px;"></i>
+                <span class="text-center font-bold text-lg">Fase 5: Informe I</span>
+                <p class="text-center mt-2 text-xs mx-4">El estudiante envía el informe al director.</p>
+            </div>
+
+            <!-- FASE 4 . II -->
+            <div class="relative mx-auto flex flex-col items-center justify-center bg-white text-gray-600 rounded-lg shadow-lg h-60 w-full sm:w-50 border">
+                <i class="fa-solid fa-paper-plane" style="font-size: 32px; margin-bottom: 10px;"></i>
+                <span class="text-center font-bold text-lg">Fase 6: Informe II</span>
+                <p class="text-center mt-2 text-xs mx-4">El director envia el informa al evaluador y comitpe.</p>
             </div>
 
             <!-- FASE 5 -->
-            <div class="relative mx-auto flex flex-col items-center justify-center bg-white text-gray-600 rounded-lg shadow-lg h-60 w-full sm:w-50 border opacity-50">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-12">
-                    <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z" clip-rule="evenodd" />
-                </svg>
-                <span class="text-center font-bold text-lg">Fase 5: Finalización</span>
-                <p class="text-center mt-2 text-xs mx-4">Próximamente...</p>
+            <div class="relative mx-auto flex flex-col items-center justify-center bg-white text-gray-600 rounded-lg shadow-lg h-60 w-full sm:w-50 border">
+                <i class="fa-solid fa-user-graduate" style="font-size: 32px; margin-bottom: 10px;"></i>
+                <span class="text-center font-bold text-lg">Fase Final</span>
+                <p class="text-center mt-2 text-xs mx-4">Estudiantes, director y evaluador programan sustentación.</p>
             </div>
         </div>
     </div>
 
+</div>
+    
     <!-- ==================== MODALES FASE 1 ==================== -->
 
     <!-- Modal FASE 1 - Estudiante (Enviar documentos) -->
@@ -745,6 +792,52 @@
         </div>
     </div>
 </div>
+
+    <!--Reporte modal prácticas-->
+
+    <div id="warningModal" class="fixed z-50 inset-0 overflow-y-auto">
+        <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeWarningModal()">
+            <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative" onclick="event.stopPropagation()">
+                    <button class="modal-close-btn-custom" onclick="closeWarningModal()">
+                        &times;
+                    </button>
+                    <form id="warningForm" class="p-6 mt-2">
+                        @csrf
+                        <p class="text-2xl font-bold" style="margin: 0.8rem 0 1.5rem 0;" id="warningTitle">Enviar Reporte <span class="bg-uts-500 text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">PQRSD</span></p>
+                        <div class="mb-4">
+                            <label for="mensaje_warning" class="block font-medium text-md text-gray-700 mb-4">
+                                En caso de presentar problemas con el sistema, por favor describa su reporte y envíelo:
+                            </label>
+                            <div id="txt-editor-warning" class="shadow txt-editor-quill"></div>
+                            <textarea name="mensaje_warning" id="mensaje_warning" class="hidden"></textarea>
+                            <span id="mensaje_warningError" class="text-red-500 text-sm"></span>
+                        </div>
+                        <div class="flex justify-end space-x-2">
+                            <button type="button" onclick="closeWarningModal()"
+                                class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">
+                                Cancelar
+                            </button>
+                            <button type="submit"
+                                class="flex bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg">
+                                <svg id="loadingSpinner-warning" style="margin: 4px 10px 4px 0" class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                                    <path
+                                        d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
+                                        stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    <path
+                                        d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
+                                        stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white">
+                                    </path>
+                                </svg>
+                                Enviar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
     
     @push('styles')
     <style>
@@ -774,7 +867,6 @@
             transition: background-color 0.3s ease;
         }
         .modal-content {
-            max-width: 650px !important;
             width: 100% !important;
         }
         .tooltip-icon {
@@ -807,6 +899,88 @@
         fase2_reply: '{{ route("practicas.fase2.reply") }}'
     };
 </script>
+
+    <script>
+
+        // ========== REPORTE DE PROBLEMA ==========
+function openWarningModal() {
+    // Inicializar Quill para warning
+    if (!window.quillWarning) {
+        window.quillWarning = new Quill('#txt-editor-warning', {
+            theme: 'snow',
+            placeholder: 'Describa su reporte o inconveniente y déjenos saber sus recomendaciones.',
+            modules: {
+                toolbar: [
+                    [{ 'header': 1}],  // H1
+                    [{ 'header': 2}],  // H2
+                    ['bold', 'italic', 'underline'],  // Negrita, cursiva, subrayado
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],  // Numeración y viñetas
+                    [{ 'color': [] }],  // Selector de color
+                    ['clean']  // Eliminar formato
+                ]
+            }
+        });
+    } else {
+        window.quillWarning.root.innerHTML = '';
+    }
+    
+    $('#warningModal').addClass('show');
+}
+
+function closeWarningModal() {
+    $('#warningModal').removeClass('show');
+    $('#warningForm')[0].reset();
+    if (window.quillWarning) window.quillWarning.root.innerHTML = '';
+}
+
+    </script>
+
+    <script>
+
+        // En tu archivo de JavaScript principal o en la vista
+
+// Función para abrir el modal de calendario
+function openCalendarModal() {
+    const modal = document.getElementById('calendarModal');
+    if (modal) {
+        modal.classList.add('show');
+        
+        // Opcional: Actualizar el título dinámicamente
+        const title = document.getElementById('calendarTitle');
+        if (title) {
+            const periodoActual = '{{ session('periodo_academico', '2026-1') }}';
+            title.textContent = `Calendario Académico - ${periodoActual}`;
+        }
+    }
+}
+
+// Función para cerrar el modal de calendario
+function closeCalendarModal() {
+    const modal = document.getElementById('calendarModal');
+    if (modal) {
+        modal.classList.remove('show');
+    }
+}
+
+// Cerrar modal al hacer clic fuera del contenido
+document.addEventListener('click', function(event) {
+    const modal = document.getElementById('calendarModal');
+    if (modal && modal.classList.contains('show')) {
+        const modalContent = modal.querySelector('.modal-content');
+        if (modalContent && !modalContent.contains(event.target)) {
+            closeCalendarModal();
+        }
+    }
+});
+
+// Cerrar modal con la tecla ESC
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeCalendarModal();
+    }
+});
+
+    </script>
 
     <script src="{{ asset('js/fases/practicas/fase_2.js') }}"></script>
 

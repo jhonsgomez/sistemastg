@@ -107,7 +107,6 @@
             #desactivarPracticaModal,
             #activarPracticaModal,
             #warningModal,
-            #calendarModal,
             #reporteModal {
                 visibility: hidden !important;
                 opacity: 0 !important;
@@ -124,13 +123,32 @@
             #desactivarPracticaModal.show,
             #activarPracticaModal.show,
             #warningModal.show,
-            #calendarModal.show,
             #reporteModal.show {
                 visibility: visible !important;
                 opacity: 1 !important;
                 transform: translateY(0) !important;
             }
 
+    /* Estilos específicos para calendarModal */
+    #calendarModal {
+        visibility: hidden !important;
+        opacity: 0 !important;
+        transform: translateY(-10px) !important;
+        transition: visibility 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
+        pointer-events: none !important;
+    }
+    
+    #calendarModal.show {
+        visibility: visible !important;
+        opacity: 1 !important;
+        transform: translateY(0) !important;
+        pointer-events: auto !important;
+    }
+    
+    .modal-close-btn-custom:hover {
+        color: #ef4444 !important;
+    }
+            
             #integrantes_list {
     position: absolute;
     z-index: 50;
@@ -886,6 +904,59 @@ select.dt-input:focus {
         </div>
     </div>
 
+    <div id="calendarModal" class="fixed z-50 inset-0 overflow-y-auto" style="visibility: hidden; opacity: 0; transform: translateY(-20px); transition: visibility 0.3s ease, opacity 0.3s ease, transform 0.3s ease; pointer-events: none;">
+    <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5);" onclick="closeCalendarModal()">
+        <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative" style="max-width: 650px !important; width: 100% !important; padding: 2rem 2rem !important;" onclick="event.stopPropagation()">
+                
+                <button class="modal-close-btn-custom" onclick="closeCalendarModal()" style="position: absolute !important; top: 10px !important; right: 28px !important; background: none !important; border: none !important; cursor: pointer !important; color: #6b7280 !important;">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+                
+                <div class="p-4 mt-2">
+                    <p class="text-2xl font-bold text-gray-800 mb-4">Calendario del Proyecto</p>
+                    <p class="font-medium text-md text-gray-700 mb-6">Aquí podrá visualizar algunas fechas importantes del proyecto en curso.</p>
+                    
+                    <div class="overflow-x-auto mb-4">
+                        <table class="min-w-full border-collapse border border-gray-300 bg-gray-50 shadow-md rounded-lg">
+                            <thead>
+                                <tr class="bg-gray-200 text-gray-700">
+                                    <th class="px-4 py-3 text-left font-semibold border border-gray-300 uppercase text-sm">Descripción</th>
+                                    <th class="px-4 py-3 text-left font-semibold border border-gray-300 uppercase text-sm">Fechas</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="bg-white">
+                                    <td class="px-4 py-3 border border-gray-300">Propuestas en banco de ideas</td>
+                                    <td class="px-4 py-3 border border-gray-300">
+                                        Desde {{ $fechas['fecha_inicio_banco'] ?? 'No definida' }} 
+                                        hasta {{ $fechas['fecha_fin_banco'] ?? 'No definida' }}
+                                    </td>
+                                </tr>
+                                <tr class="bg-gray-50">
+                                    <td class="px-4 py-3 border border-gray-300">Propuesta de proyectos de grado</td>
+                                    <td class="px-4 py-3 border border-gray-300">
+                                        Desde {{ $fechas['fecha_inicio_proyectos'] ?? 'No definida' }} 
+                                        hasta {{ $fechas['fecha_fin_proyectos'] ?? 'No definida' }}
+                                    </td>
+                                </tr>
+                                <tr class="bg-white">
+                                    <td class="px-4 py-3 border border-gray-300">Fecha máxima para aprobación de propuestas</td>
+                                    <td class="px-4 py-3 border border-gray-300">
+                                        Hasta {{ $fechas['fecha_aprobacion_propuesta'] ?? 'No definida' }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    
     @push('scripts')
         <script src="{{ asset('js/fases/practicas/fase_0.js') }}"></script>
 
@@ -1607,6 +1678,26 @@ $(document).ready(function() {
 });
 
         </script>
+
+    <script>
+    function openCalendarModal() {
+        const modal = document.getElementById('calendarModal');
+        if (modal) {
+            modal.style.display = 'block';
+            console.log('Modal abierto');
+        } else {
+            console.error('Modal no encontrado');
+        }
+    }
+    
+    function closeCalendarModal() {
+        const modal = document.getElementById('calendarModal');
+        if (modal) {
+            modal.style.display = 'none';
+            console.log('Modal cerrado');
+        }
+    }
+</script>
 
         <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
         <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
