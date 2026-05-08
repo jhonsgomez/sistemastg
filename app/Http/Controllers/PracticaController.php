@@ -371,9 +371,9 @@ public function buscarEstudiantes(Request $request)
     {
         $practica = $this->practicaService
             ->crearPractica($request);
+        
 
-        $this->practicaMailService
-            ->sendSolicitud($practica);
+       //  $this->practicaMailService ->sendSolicitud($practica);
 
         return response()->json([
             'message' => 'Práctica enviada correctamente'
@@ -434,7 +434,7 @@ public function buscarEstudiantes(Request $request)
         $practica->save();
 
         // Enviar correo al estudiante (implementar después)
-        $this->practicaMailService->sendRespuesta($practica,$nuevoEstado,$request->mensaje,$request->estado);
+       // $this->practicaMailService->sendRespuesta($practica,$nuevoEstado,$request->mensaje,$request->estado);
 
         return response()->json(['success' => 'Respuesta enviada exitosamente', 'estado' => $practica->estado]);
     }

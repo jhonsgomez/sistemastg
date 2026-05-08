@@ -16,12 +16,30 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\Fecha;
+use App\Services\PracticaMailService;
+use App\Services\PracticaService;
 
 class RoadMapPracticaController extends Controller
 {
     /**
      * Obtener el tipo de solicitud por nombre
      */
+
+    protected $practicaMailService;
+
+    protected $practicaService;
+
+    public function __construct(
+        PracticaMailService $practicaMailService,
+        PracticaService $practicaService
+    ) {
+        $this->practicaMailService =
+            $practicaMailService;
+
+        $this->practicaService =
+            $practicaService;
+    }
+
     private function getType($nombre)
     {
         return TipoSolicitud::where('nombre', $nombre)->firstOrFail();
@@ -173,6 +191,9 @@ class RoadMapPracticaController extends Controller
         $practica->tipo_solicitud_id = $tipoFase1->id;
         $practica->save();
     }
+
+    // ENVIAR CORREO  FASE 1
+    // $this->practicaMailService->sendFase1($practica);
 
     return response()->json(['success' => 'Documentos enviados correctamente']);
 }

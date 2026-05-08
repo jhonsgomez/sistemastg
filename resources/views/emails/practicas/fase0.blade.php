@@ -106,6 +106,8 @@
 <div class="footer">
 
             <br>
+            <p>Se verificará la información suministrada para dar accesso a las siguientes fases del proyecto.</p>
+            <br>
 
             <p>
                 Este es un correo generado automáticamente por el sistema de prácticas,

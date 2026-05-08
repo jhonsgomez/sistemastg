@@ -18,6 +18,68 @@ class PracticaMailService
         );
     }
 
+    public function sendFase1($practica)
+    {
+        $practica->load([
+            'user.tipo_documento',
+            'valoresCampos.campo'
+        ]);
+
+        // Obtener valores dinámicos
+        $campos = [];
+
+        foreach ($practica->valoresCampos as $valorCampo){
+
+            $campos[] = [
+                'campo' => $valorCampo->campo->name,
+                'valor' => $valorCampo->valor,
+            ];
+        }
+
+        // Buscar datos específicos
+        $empresa = collect($campos)
+            ->firstWhere('campo', 'nombre_empresa');
+
+        $practicaInstitucional = collect($campos)
+            ->firstWhere('campo', 'es_institucional');
+
+        $fdc126 = collect($campos)
+            ->firstWhere('campo', 'doc_fdc126');
+
+        // Data del correo
+        $data = [
+
+            'tipo_correo' => 'practicas_fase_1',
+
+            'cuerpo_correo' => [
+
+                'estado' => $practica->estado,
+
+                'empresa' => $empresa['valor'] ?? null,
+
+                'practica_institucional' =>
+                    ($practicaInstitucional['valor'] ?? false) == '1'
+                        ? 'Sí'
+                        : 'No',
+
+                'correo' => $practica->user->email,
+
+                'estudiante' => $practica->user,
+            ],
+
+            // ADJUNTOS
+            'adjuntos' => [
+                $fdc126['valor'] ?? null
+            ],
+        ];
+
+        // Limpiar adjuntos null
+        $data['adjuntos'] = array_filter($data['adjuntos']);
+
+        Mail::to(config('mail.from.address'))
+            ->queue(new PracticasMail($data));
+    }
+
     public function sendRespuesta(
         $practica,
         string $nuevoEstado,
