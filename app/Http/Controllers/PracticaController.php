@@ -12,9 +12,29 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 use App\Models\Fecha;
+use App\Services\PracticaMailService;
+use App\Services\PracticaService;
+use App\Http\Requests\StorePracticaRequest;
+
 
 class PracticaController extends Controller
 {
+
+    protected $practicaMailService;
+
+    protected $practicaService;
+
+    public function __construct(
+        PracticaMailService $practicaMailService,
+        PracticaService $practicaService
+    ) {
+        $this->practicaMailService =
+            $practicaMailService;
+
+        $this->practicaService =
+            $practicaService;
+    }
+
     public function index(Request $request)
     {
         // Obtener el periodo actual
@@ -60,11 +80,6 @@ class PracticaController extends Controller
     }
 
 
-    
-    
-    
-    
-    
     
     public function getData(Request $request)
 {
@@ -277,11 +292,6 @@ if ($esComite && $p->estado === 'Pendiente') {
         ->make(true);
 }
 
-    
-
-    
-
-
 
 public function buscarEstudiantes(Request $request)
     {
@@ -357,206 +367,18 @@ public function buscarEstudiantes(Request $request)
     
     
     
-    public function store(Request $request)
-{
-    $tipo   = TipoSolicitud::where('nombre', 'practicas_fase_0')->first();
-    $campos = Campo::where('tipo_solicitud_id', $tipo->id)->get();
-
-    // Verificar si se envió tiene_empresa
-    $tieneEmpresa = $request->input('tiene_empresa');
-    if ($tieneEmpresa === null) {
-        return response()->json(['errors' => ['tiene_empresa' => ['Debe seleccionar si tiene empresa o no.']]], 422);
-    }
-    $tieneEmpresa = $tieneEmpresa === '1';
-
-    // Validación de hoja de vida
-    $errors = [];
-    if (! $tieneEmpresa && ! $request->hasFile('hoja_vida')) {
-        $errors['hoja_vida'][] = 'Debe subir la hoja de vida si NO cuenta con empresa.';
-    }
-
-    // Validar que el segundo integrante no sea el mismo usuario
-    if ($request->filled('id_integrante_2') && $request->id_integrante_2 == auth()->id()) {
-        $errors['id_integrante_2'][] = 'No puede seleccionarse a sí mismo como compañero.';
-    }
-
-    if (! empty($errors)) {
-        return response()->json(['errors' => $errors], 422);
-    }
-
-    // Crear la práctica
-    $practica = Practica::create([
-        'user_id'           => auth()->id(),
-        'tipo_solicitud_id' => $tipo->id,
-        'estado'            => 'Pendiente',
-        'vencido'           => false,
-        'deshabilitado'     => false,
-    ]);
-
-    // Guardar cada campo dinámico
-    foreach ($campos as $campo) {
-        // Saltar campos que se llenan automáticamente desde la sesión
-        if (in_array($campo->name, ['nombre_completo', 'correo', 'nivel', 'documento', 'celular'])) {
-            continue;
-        }
-
-        $valor = null;
-
-        if ($campo->type == 'checkbox') {
-            $valor = $request->input($campo->name) === '1' ? 'true' : 'false';
-        } elseif ($campo->type == 'file') {
-            if ($campo->name == 'hoja_vida' && $tieneEmpresa) {
-                continue;
-            }
-            if ($request->hasFile($campo->name)) {
-                $path  = $request->file($campo->name)->store('practicas', 'public');
-                $valor = $path;
-            }
-        } elseif ($campo->name == 'id_integrante_2') {
-            // Solo guardar si se seleccionó un integrante
-            $valor = $request->input($campo->name);
-            if (empty($valor)) {
-                continue;
-            }
-        } else {
-            $valor = $request->input($campo->name);
-        }
-
-        if ($valor !== null) {
-            PracticaValorCampo::create([
-                'practica_id' => $practica->id,
-                'campo_id'    => $campo->id,
-                'valor'       => $valor,
-            ]);
-        }
-    }
-
-    // ========== NUEVO: Guardar submited_fase0 ==========
-    // Buscar el campo submited_fase0
-    $campoSubmited = $campos->where('name', 'submited_fase0')->first();
-    if ($campoSubmited) {
-        PracticaValorCampo::create([
-            'practica_id' => $practica->id,
-            'campo_id'    => $campoSubmited->id,
-            'valor'       => 'true',
-        ]);
-    } else {
-        // Si no existe el campo en la variable $campos, buscarlo directamente
-        $campoSubmited = Campo::where('tipo_solicitud_id', $tipo->id)
-            ->where('name', 'submited_fase0')
-            ->first();
-        if ($campoSubmited) {
-            PracticaValorCampo::create([
-                'practica_id' => $practica->id,
-                'campo_id'    => $campoSubmited->id,
-                'valor'       => 'true',
-            ]);
-        }
-    }
-
-    // Enviar correos
-    // $campos_nueva_practica = $practica->camposConValores();
-    // $this->sendEmailSolicitudPractica($campos_nueva_practica);
-
-    return response()->json(['message' => 'Práctica enviada correctamente']);
-}
-
-    
-
-
-
-
-
-public function sendEmailSolicitudPractica($campos)
+   public function store(StorePracticaRequest $request)
     {
-        try {
-            $cuerpo_correo         = [];
-            $correos_destinatarios = [];
-            $asunto_correo         = 'PRÁCTICAS EMPRESARIALES - FASE 0';
-            $tipo_correo           = 'practicas_fase_0';
-            $comentarios           = null;
-            $esRespuesta           = false;
+        $practica = $this->practicaService
+            ->crearPractica($request);
 
-            $user = auth()->user();
+        $this->practicaMailService
+            ->sendSolicitud($practica);
 
-            // Datos básicos
-            $cuerpo_correo['estudiante']             = $user;
-            $cuerpo_correo['correo']                 = $user->email;
-            $cuerpo_correo['estado']                 = 'Pendiente';
-            $cuerpo_correo['periodo']                = '2026-1';
-            $cuerpo_correo['celular']                = $user->nro_celular ?? '';
-            $cuerpo_correo['nivel'] = $user->nivel->nombre ?? '';
-            $cuerpo_correo['integrante_2']           = null;
-            $cuerpo_correo['integrante_2_documento'] = null;
-           
-
-            $correos_destinatarios[] = $user->email;
-
-            foreach ($campos as $campo) {
-
-                $nombreCampo = $campo['campo'];
-                $valorCampo  = $campo['valor'];
-
-                switch ($nombreCampo) {
-                    case 'nivel':
-                        $cuerpo_correo['nivel'] = \App\Models\Nivel::find($valorCampo)->nombre ?? $valorCampo;
-                        break;
-
-                    case 'empresa':
-                        $cuerpo_correo['empresa'] = $valorCampo;
-                        break;
-
-                    case 'hoja_vida':
-                        $cuerpo_correo['hoja_vida'] = $valorCampo;
-                        break;
-                    case 'id_integrante_2':
-                        if (! empty($valorCampo)) {
-                            $integrante = \App\Models\User::find($valorCampo);
-
-                            if ($integrante) {
-                                $cuerpo_correo['integrante_2'] = $integrante->name;
-
-                                $cuerpo_correo['integrante_2_documento'] =
-                                    ($integrante->tipo_documento->tag ?? '') . ' ' . ($integrante->nro_documento ?? '');
-
-                                $cuerpo_correo['integrante_2_correo'] = $integrante->email ?? '';
-
-                                $cuerpo_correo['integrante_2_celular'] = $integrante->nro_celular ?? '';
-                            }
-                        }
-                        break;
-
-                    default:
-                        if ($nombreCampo !== 'id_integrante_2') {
-                            $cuerpo_correo[$nombreCampo] = $valorCampo;
-                        }
-                        break;
-                }
-            }
-
-            //  enviar campos dinámicos al Blade
-            $cuerpo_correo['campos'] = $campos;
-
-            Mail::to($correos_destinatarios)->send(
-                new PracticasMail(
-                    $asunto_correo,
-                    $cuerpo_correo,
-                    $comentarios,
-                    $tipo_correo,
-                    $correos_destinatarios,
-                    $esRespuesta
-                )
-            );
-
-        } catch (\Exception $e) {
-            //dd($e->getMessage());
-        }
+        return response()->json([
+            'message' => 'Práctica enviada correctamente'
+        ]);
     }
-
-    
-    
-    
-    
     
     public function responderSolicitud(Request $request)
     {
@@ -612,121 +434,12 @@ public function sendEmailSolicitudPractica($campos)
         $practica->save();
 
         // Enviar correo al estudiante (implementar después)
-       // $this->sendEmailRespuesta($practica, $nuevoEstado, $request->mensaje, $request->estado);
+        $this->practicaMailService->sendRespuesta($practica,$nuevoEstado,$request->mensaje,$request->estado);
 
         return response()->json(['success' => 'Respuesta enviada exitosamente', 'estado' => $practica->estado]);
     }
 
-    
-    
-    
-    
-    
-    
-    public function sendEmailRespuesta($practica, $nuevoEstado, $mensaje, $estadoRespuesta)
-    {
-        try {
-            $cuerpo_correo         = [];
-            $correos_destinatarios = [];
-            $asunto_correo         = 'RESPUESTA COMITÉ - PRÁCTICAS';
-            $tipo_correo           = 'respuesta_comite';
-            $comentarios           = $mensaje;
-            $esRespuesta           = true;
 
-            $user = $practica->user;
-
-            //Datos básicos
-            $cuerpo_correo['estudiante'] = $user; 
-            $cuerpo_correo['correo']     = $user->email ?? '';
-            $cuerpo_correo['estado']     = $estadoRespuesta;
-            $cuerpo_correo['mensaje']    = $mensaje;
-
-            $cuerpo_correo['celular'] = $user->nro_celular ?? '';
-            $cuerpo_correo['nivel']   = $user->nivel->nombre ?? '';
-            $cuerpo_correo['periodo'] = $practica->periodo ?? '2026-1';
-
-            // Integrante 2
-            $cuerpo_correo['integrante_2']           = null;
-            $cuerpo_correo['integrante_2_documento'] = null;
-            $cuerpo_correo['integrante_2_correo']    = null;
-            $cuerpo_correo['integrante_2_celular']   = null;
-
-            // Destinatario
-            if (!empty($user->email)) {
-                $correos_destinatarios[] = $user->email;
-            }
-
-            // Campos dinámicos
-            $campos = $practica->camposConValores();
-
-            foreach ($campos as $campo) {
-
-                $nombreCampo = $campo['campo'];
-                $valorCampo  = $campo['valor'];
-
-                switch ($nombreCampo) {
-
-                    case 'nivel':
-                        $cuerpo_correo['nivel'] =
-                            \App\Models\Nivel::find($valorCampo)->nombre ?? $valorCampo;
-                        break;
-
-                    case 'empresa':
-                        $cuerpo_correo['empresa'] = $valorCampo;
-                        break;
-
-                    case 'id_integrante_2':
-                        if (!empty($valorCampo)) {
-                            $integrante = \App\Models\User::find($valorCampo);
-
-                            if ($integrante) {
-                                $cuerpo_correo['integrante_2'] = $integrante;
-
-                                $cuerpo_correo['integrante_2_documento'] =
-                                    ($integrante->tipo_documento->tag ?? '') . ' ' .
-                                    ($integrante->nro_documento ?? '');
-
-                                $cuerpo_correo['integrante_2_correo']  = $integrante->email ?? '';
-                                $cuerpo_correo['integrante_2_celular'] = $integrante->nro_celular ?? '';
-                            }
-                        }
-                        break;
-
-                    default:
-                        if ($nombreCampo !== 'id_integrante_2') {
-                            $cuerpo_correo[$nombreCampo] = $valorCampo;
-                        }
-                        break;
-                }
-            }
-
-            // Campos al blade
-            $cuerpo_correo['campos'] = $campos;
-
-            // Enviar correo
-            Mail::to($correos_destinatarios)->send(
-                new PracticasMail(
-                    $asunto_correo,
-                    $cuerpo_correo,
-                    $comentarios,
-                    $tipo_correo,
-                    $correos_destinatarios,
-                    $esRespuesta
-                )
-            );
-
-        } catch (\Exception $e) {
-            \Log::error('Error correo: '.$e->getMessage());
-        }
-    }
-
-
-
-    
-    
-    
-    
-    
     
     public function getDetalle($id)
 {

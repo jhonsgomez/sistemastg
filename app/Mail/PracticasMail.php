@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Mail;
-use App\Models\User;
+
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -10,66 +10,60 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class PracticasMail extends Mailable
+class PracticasMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    public $asunto_correo;
-    public $cuerpo_correo;
-    public $comentarios;
-    public $tipo_correo;
-    public $correos_destinatarios;
-    public $esRespuesta;
-
-    public function __construct($asunto_correo, $cuerpo_correo, $comentarios, $tipo_correo, $correos_destinatarios, $esRespuesta)
-    {
-       /* $correos_cc = User::role('admin')->pluck('email')->toArray();
-        $correos_cc[] = config('mail.correo_sistemas');*/
-
-        $this->asunto_correo = $asunto_correo;
-        $this->cuerpo_correo = $cuerpo_correo;
-        $this->comentarios = $comentarios;
-        $this->tipo_correo = $tipo_correo;
-        $this->correos_destinatarios = $correos_destinatarios;
-        $this->esRespuesta = $esRespuesta;
-    }
+    public function __construct(
+        public array $data
+    ) {}
 
     public function envelope(): Envelope
     {
+        $configCorreo = config(
+            'practicas.correos.' .
+            $this->data['tipo_correo']
+        );
+
         return new Envelope(
-            subject: $this->asunto_correo,
-            to: $this->correos_destinatarios,
+            subject: $configCorreo['subject'],
         );
     }
 
     public function content(): Content
     {
-         $mensaje_adicional = "<p>Esto es un correo generado automáticamente por el sistema de trabajos de grado del programa, favor no responder al mismo.</p>";
+        $configCorreo = config(
+            'practicas.correos.' .
+            $this->data['tipo_correo']
+        );
 
         return new Content(
-            view: 'emails.practicas.template',
+            view: $configCorreo['view'],
+
             with: [
-                'tipo_correo' => $this->tipo_correo,
-                'cuerpo_correo' => $this->cuerpo_correo,
-                'comentarios' => $this->comentarios,
-                'mensaje_adicional' => $mensaje_adicional,
+                'data' => $this->data,
             ],
         );
     }
 
+
+
     public function attachments(): array
     {
-        $adjuntos = [];
+        $attachments = [];
 
-        if (isset($this->cuerpo_correo['adjunto']) && is_array($this->cuerpo_correo['adjunto'])) {
-            foreach ($this->cuerpo_correo['adjunto'] as $archivo) {
-                if (!empty($archivo)) {
-                    $adjuntos[] = Attachment::fromPath($archivo);
-                }
+        if (!empty($this->data['adjuntos'])) {
+
+            foreach ($this->data['adjuntos'] as $archivo) {
+
+                $attachments[] =
+                    Attachment::fromStorageDisk(
+                        'public',
+                        $archivo
+                    );
             }
         }
 
-        return $adjuntos;
+        return $attachments;
     }
 }
-
