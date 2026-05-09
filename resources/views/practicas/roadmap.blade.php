@@ -837,7 +837,7 @@
 
     <!-- Modal FASE 2 - Administrador (Responder solicitud + Asignar docentes) -->
     <div id="fase2AdminModal" class="fixed z-50 inset-0 overflow-y-auto">
-        <div class="modal-overlay absolute inset-0" onclick="closeFase2AdminModal()">
+        <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeFase2AdminModal()">
             <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
                 <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
                     onclick="event.stopPropagation()">

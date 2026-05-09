@@ -16,7 +16,7 @@ return [
         'respuesta_comite' => [
 
             'subject' =>
-                'RESPUESTA SOLICITUD DE PRÁCTICAS',
+                'RESPUESTA SOLICITUD PRÁCTICAS',
 
             'view' =>
                 'emails.practicas.respuestaF0',
@@ -29,6 +29,33 @@ return [
 
             'view' =>
                 'emails.practicas.fase1',
+        ],
+
+        'respuesta_fase_1' => [
+
+            'subject' =>
+                'RESPUESTA PRÁCTICAS - FASE 1',
+
+            'view' =>
+                'emails.practicas.respuestaF1',
+        ],
+
+        'practicas_fase_2' => [
+
+            'subject' =>
+                'PRÁCTICAS EMPRESARIALES - FASE 2: PAGO',
+
+            'view' =>
+                'emails.practicas.fase2',
+        ],
+
+        'respuesta_fase_2' => [
+
+            'subject' =>
+                'RESPUESTA PRÁCTICAS - FASE 2',
+
+            'view' =>
+                'emails.practicas.respuestaF2',
         ],
 
 

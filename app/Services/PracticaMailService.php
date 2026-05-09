@@ -80,31 +80,176 @@ class PracticaMailService
             ->queue(new PracticasMail($data));
     }
 
-    public function sendRespuesta(
-        $practica,
-        string $nuevoEstado,
-        string $mensaje,
-        string $estadoRespuesta
-    ): void {
+    public function sendFase2($practica)
+    {
+        $practica->load([
+            'user.tipo_documento',
+            'valoresCampos.campo'
+        ]);
 
-    $this->send(
-        'respuesta_comite',
-        $practica,
-        [
+        // Obtener valores dinámicos
+        $campos = [];
 
-            'comentarios' => $mensaje,
+        foreach ($practica->valoresCampos as $valorCampo) {
 
-            'es_respuesta' => true,
+            $campos[] = [
+                'campo' => $valorCampo->campo->name,
+                'valor' => $valorCampo->valor,
+            ];
+        }
 
-            'estado' => $estadoRespuesta,
+        // Buscar documentos
+        $liquidacionPago = collect($campos)
+            ->firstWhere('campo', 'liquidacion_pago');
 
-            'nuevo_estado' => $nuevoEstado,
+        $soportePago = collect($campos)
+            ->firstWhere('campo', 'soporte_pago');
 
-            'mensaje' => $mensaje,
-        ]
-    );
-}
-    
+        // Data del correo
+        $data = [
+
+            'tipo_correo' => 'practicas_fase_2',
+
+            'cuerpo_correo' => [
+
+                'estado' => $practica->estado,
+
+                'correo' => $practica->user->email,
+
+                'estudiante' => $practica->user,
+
+                'campos' => $campos,
+            ],
+
+            // ADJUNTOS
+            'adjuntos' => [
+
+                $liquidacionPago['valor'] ?? null,
+
+                $soportePago['valor'] ?? null,
+            ],
+        ];
+
+        // Limpiar adjuntos null
+        $data['adjuntos'] = array_filter(
+            $data['adjuntos']
+        );
+
+        Mail::to(config('mail.from.address'))
+            ->queue(new PracticasMail($data));
+    }
+
+   
+
+
+    public function sendRespuestaFase1($practica,$request) {
+
+        $practica->load([
+            'user.tipo_documento',
+            'valoresCampos.campo'
+        ]);
+
+        // Obtener campos dinámicos
+        $campos = [];
+
+        foreach ($practica->valoresCampos as $valorCampo) {
+
+            $campos[] = [
+                'campo' => $valorCampo->campo->name,
+                'valor' => $valorCampo->valor,
+            ];
+        }
+
+        // Buscar datos específicos
+        $empresa = collect($campos)
+            ->firstWhere('campo', 'nombre_empresa');
+
+        $practicaInstitucional = collect($campos)
+            ->firstWhere('campo', 'practica_institucional');
+
+        // Construcción del correo
+        $data = [
+
+            'tipo_correo' => 'respuesta_fase_1',
+
+            'cuerpo_correo' => [
+
+                'estado' => $request->estado,
+
+                'respuesta' => $request->respuesta,
+
+                'nro_acta' => $request->nro_acta,
+
+                'fecha_acta' => $request->fecha_acta,
+
+                'empresa' =>
+                    $empresa['valor'] ?? 'No registra',
+
+                'practica_institucional' =>
+
+                    ($practicaInstitucional['valor'] ?? false) == '1'
+                        ? 'Sí'
+                        : 'No',
+
+                'correo' => $practica->user->email,
+
+                'estudiante' => $practica->user,
+            ],
+        ];
+
+        // Enviar correo
+        Mail::to($practica->user->email)
+            ->queue(new PracticasMail($data));
+    }
+
+    public function sendRespuestaFase2($practica, $respuesta)
+    {
+        $practica->load([
+            'user.tipo_documento',
+            'valoresCampos.campo'
+        ]);
+
+        // Obtener valores dinámicos
+        $campos = [];
+
+        foreach ($practica->valoresCampos as $valorCampo) {
+
+            $campos[] = [
+                'campo' => $valorCampo->campo->name,
+                'valor' => $valorCampo->valor,
+            ];
+        }
+
+        $data = [
+
+            'tipo_correo' => 'respuesta_fase_2',
+
+            'cuerpo_correo' => [
+            
+                'estado' => $respuesta['estado'],
+
+                'respuesta' => $respuesta['respuesta'],
+
+                'correo' => $practica->user->email,
+
+                'estudiante' => $practica->user,
+
+                // 👇 CAMBIAR ESTO
+                'director' => $respuesta['director'] ?? null,
+
+                'evaluador' => $respuesta['evaluador'] ?? null,
+
+                'codirector' => $respuesta['codirector'] ?? null,
+
+                'campos' => $campos,
+            ],
+        ];
+
+        Mail::to($practica->user->email)
+            ->queue(new PracticasMail($data));
+    }
+        
+
     private function send(string $tipoCorreo,$practica, array $extraData = []): void {
     try {
 

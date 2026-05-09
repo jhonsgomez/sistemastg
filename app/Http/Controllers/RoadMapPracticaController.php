@@ -192,7 +192,7 @@ class RoadMapPracticaController extends Controller
         $practica->save();
     }
 
-    // ENVIAR CORREO  FASE 1
+    // ENVIAR CORREO  FASE 1 - DESCOMENTAR PARA
     // $this->practicaMailService->sendFase1($practica);
 
     return response()->json(['success' => 'Documentos enviados correctamente']);
@@ -288,8 +288,7 @@ class RoadMapPracticaController extends Controller
         $practica->save();
         
         // Enviar correo de aprobación al estudiante
-        // Mail::to($practica->user->email)->send(new PracticaFase1AprobadaMail($practica, $request->respuesta));
-        
+     //   $this->practicaMailService->sendRespuestaFase1($practica, $request);
     } else {
         // RECHAZADA: Volver a Fase 1 (para que el estudiante pueda reenviar)
         $practica->estado = 'Fase 1';
@@ -310,8 +309,10 @@ class RoadMapPracticaController extends Controller
         }
         
         // Enviar correo de rechazo al estudiante
-        // Mail::to($practica->user->email)->send(new PracticaFase1RechazadaMail($practica, $request->respuesta));
-    }
+    
+    // $this->practicaMailService->sendRespuestaFase1($practica, $request);
+     
+     }
 
     return response()->json([
         'success' => 'Respuesta enviada correctamente', 
@@ -320,9 +321,7 @@ class RoadMapPracticaController extends Controller
     ]);
 }
 
-        /**
-     * FASE 2 - Estudiante: Envío de documentos de pago
-     */
+
     /**
  * FASE 2 - Estudiante: Envío de documentos de pago
  */
@@ -407,6 +406,8 @@ public function storeFase2(Request $request)
         'practica_id' => $practica->id,
         'user_id' => auth()->id()
     ]);
+    //Envio de correo
+    //$this->practicaMailService->sendFase2($practica);
 
     return response()->json(['success' => 'Documentos de pago enviados correctamente']);
 }
@@ -450,9 +451,7 @@ public function storeFase2(Request $request)
         /**
      * FASE 2 - Comité/Admin: Responder solicitud (con asignación de director/evaluador/codirector)
      */
-    /**
- * FASE 2 - Comité/Admin: Responder solicitud
- */
+
 public function replyFase2(Request $request)
 {
     Log::info('=== replyFase2 INICIO ===', $request->all());
@@ -571,6 +570,25 @@ public function replyFase2(Request $request)
         
         Log::info('Fase 2 - Rechazada');
     }
+
+    $this->practicaMailService->sendRespuestaFase2($practica,
+        [
+            'estado' => $request->estado,
+            'respuesta' => $request->respuesta,
+
+            'director' => $request->director_id
+                ? User::find($request->director_id)?->name
+                : null,
+
+            'evaluador' => $request->evaluador_id
+                ? User::find($request->evaluador_id)?->name
+                : null,
+
+            'codirector' => $request->codirector_id
+                ? User::find($request->codirector_id)?->name
+                : null,
+        ]
+    );
 
     return response()->json([
         'success' => 'Respuesta enviada correctamente', 
