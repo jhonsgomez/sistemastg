@@ -23,7 +23,7 @@
     <p>
         Su solicitud
 
-        {!! ($data['cuerpo_correo']['estado'] ?? '') === 'Fase 3'
+        {!! ($data['cuerpo_correo']['estado'] ?? '') === 'Aprobada'
             ? 'ha sido <strong>APROBADA</strong>'
             : 'ha sido <strong>RECHAZADA</strong>' !!}
     </p>
@@ -104,7 +104,7 @@
 
     <br>
 
-    @if (($data['cuerpo_correo']['estado'] ?? '') === 'Fase 3')
+    @if (($data['cuerpo_correo']['estado'] ?? '') === 'Aprobada')
 
         <p>
             Puede continuar con la siguiente fase del proceso
