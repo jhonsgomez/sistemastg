@@ -5,70 +5,432 @@ let currentFase2DetailsButton = null;
 
 // ==================== MODAL ESTUDIANTE ====================
 
-function openFase2EstudianteModal() {
-    const modal = document.getElementById('fase2EstudianteModal');
-    if (modal) {
-        modal.classList.add('show');  // ← Usar clase .show
-        // Limpiar formulario
-        const form = document.getElementById('fase2EstudianteForm');
-        if (form) form.reset();
-        // Limpiar errores
-        clearFase2EstudianteErrors();
-        // Limpiar listas de archivos
-        const listaLiquidacion = document.getElementById('file-list-liquidacion');
-        const listaSoporte = document.getElementById('file-list-soporte');
-        if (listaLiquidacion) listaLiquidacion.innerHTML = '';
-        if (listaSoporte) listaSoporte.innerHTML = '';
+// ==================== FUNCIONES FASE 2 ESTUDIANTE ====================
+
+function openFase2EstudianteModal(btn) {
+    // Mostrar spinner y ocultar icono en el botón
+    if (btn) {
+        const icon = btn.querySelector('i');
+        const spinner = btn.querySelector('.loading-spinner');
+        if (icon) icon.classList.add('hidden');
+        if (spinner) spinner.classList.remove('hidden');
+        btn.disabled = true;
+    }
+    
+    // Limpiar campos del formulario
+    $('#liquidacion_pago').val('');
+    $('#soporte_pago').val('');
+    $('#file-list-liquidacion').empty();
+    $('#file-list-soporte').empty();
+    $('#liquidacion_pagoError').text('');
+    $('#soporte_pagoError').text('');
+    
+    // Cambiar el título si es necesario
+    $('#fase2EstudianteTitle').html(`Prácticas empresariales: <span class="bg-uts-500 text-white px-3 py-1 rounded uppercase shadow-md text-xl">Fase 2</span>`);
+    
+    // Abrir el modal con animación
+    $('#fase2EstudianteModal').addClass('show');
+    
+    // Restaurar el botón después de abrir el modal
+    if (btn) {
+        setTimeout(() => {
+            const icon = btn.querySelector('i');
+            const spinner = btn.querySelector('.loading-spinner');
+            if (icon) icon.classList.remove('hidden');
+            if (spinner) spinner.classList.add('hidden');
+            btn.disabled = false;
+        }, 200);
     }
 }
 
 function closeFase2EstudianteModal() {
-    const modal = document.getElementById('fase2EstudianteModal');
-    if (modal) {
-        modal.classList.remove('show');  // ← Usar clase .show
-    }
+    $('#fase2EstudianteModal').removeClass('show');
 }
 
-// ==================== MODAL DETALLES ====================
+// ==================== TOOLTIPS PARA FASE 2 ====================
+$(document).ready(function() {
+    // Tooltips para Fase 2
+    $('.tooltip-icon').on('mouseenter', function() {
+        const tooltipId = $(this).data('tooltip');
+        $('#' + tooltipId).removeClass('hidden');
+    }).on('mouseleave', function() {
+        const tooltipId = $(this).data('tooltip');
+        $('#' + tooltipId).addClass('hidden');
+    });
+    
+    // Vista previa de archivos para Liquidación
+    $('#liquidacion_pago').on('change', function(e) {
+        const file = e.target.files[0];
+        const fileList = $('#file-list-liquidacion');
+        fileList.empty();
+        
+        if (file) {
+            const fileSizeMB = file.size / (1024 * 1024);
+            if (fileSizeMB > 5) {
+                Swal.fire('Error', 'El archivo no puede superar los 5MB', 'error');
+                $(this).val('');
+                return;
+            }
+            
+            const fileExtension = file.name.split('.').pop().toLowerCase();
+            if (fileExtension !== 'pdf') {
+                Swal.fire('Error', 'Solo se permiten archivos PDF', 'error');
+                $(this).val('');
+                return;
+            }
+            
+            fileList.append(`<li><i class="fa-regular fa-file-pdf text-red-500 mr-2"></i>${file.name}</li>`);
+        }
+    });
+    
+    // Vista previa de archivos para Soporte
+    $('#soporte_pago').on('change', function(e) {
+        const file = e.target.files[0];
+        const fileList = $('#file-list-soporte');
+        fileList.empty();
+        
+        if (file) {
+            const fileSizeMB = file.size / (1024 * 1024);
+            if (fileSizeMB > 5) {
+                Swal.fire('Error', 'El archivo no puede superar los 5MB', 'error');
+                $(this).val('');
+                return;
+            }
+            
+            const fileExtension = file.name.split('.').pop().toLowerCase();
+            if (fileExtension !== 'pdf') {
+                Swal.fire('Error', 'Solo se permiten archivos PDF', 'error');
+                $(this).val('');
+                return;
+            }
+            
+            fileList.append(`<li><i class="fa-regular fa-file-pdf text-red-500 mr-2"></i>${file.name}</li>`);
+        }
+    });
+    
+    // ========== ENVÍO DEL FORMULARIO DEL ESTUDIANTE CON CONFIRMACIÓN ==========
+    $('#fase2EstudianteForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        Swal.fire({
+            heightAuto: false,
+            title: '¿Está seguro?',
+            text: "No podrá editar la información una vez se envíe",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#C1D631',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, enviar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const button = $('#fase2EstudianteForm').find('button[type="submit"]');
+                const spinner = $('#loadingSpinner-fase2');
+                const formData = new FormData(this);
+                
+                button.prop('disabled', true);
+                if (spinner.length) spinner.removeClass('hidden');
+                
+                $.ajax({
+                    url: ROUTES.fase2_store,
+                    method: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        closeFase2EstudianteModal();
+                        Swal.fire({
+                            title: '¡Éxito!',
+                            text: 'Documentos enviados correctamente. Tendrá respuesta en los próximos 5 días hábiles.',
+                            icon: 'success',
+                            confirmButtonText: 'Ok',
+                            confirmButtonColor: '#C1D631'
+                        }).then(() => {
+                            location.reload();
+                        });
+                    },
+                    error: function(xhr) {
+                        if (xhr.status === 422 && xhr.responseJSON.errors) {
+                            const errors = xhr.responseJSON.errors;
+                            if (errors.liquidacion_pago) $('#liquidacion_pagoError').text(errors.liquidacion_pago[0]);
+                            if (errors.soporte_pago) $('#soporte_pagoError').text(errors.soporte_pago[0]);
+                            // Limpiar errores después de 5 segundos
+                            setTimeout(() => {
+                                $('#liquidacion_pagoError').text('');
+                                $('#soporte_pagoError').text('');
+                            }, 5000);
+                        } else {
+                            Swal.fire('Error', xhr.responseJSON?.error || 'Error al enviar', 'error');
+                        }
+                    },
+                    complete: function() {
+                        button.prop('disabled', false);
+                        if (spinner.length) spinner.addClass('hidden');
+                    }
+                });
+            }
+        });
+    });
+});
 
-function openFase2DetailsModal(button = null) {
-    currentFase2DetailsButton = button;
-    const modal = document.getElementById('fase2DetailsModal');
-    if (modal) {
-        modal.classList.add('show');  // ← Usar clase .show
-        loadFase2Details();
+// Abrir modal de detalles con spinner en el botón (exactamente como Fase 1)
+function openFase2DetailsModal(btn) {
+    // Mostrar spinner y ocultar icono en el botón
+    if (btn) {
+        const icon = btn.querySelector('i');
+        const spinner = btn.querySelector('.loading-spinner');
+        if (icon) icon.classList.add('hidden');
+        if (spinner) spinner.classList.remove('hidden');
+        btn.disabled = true;
     }
+    
+    // Hacer la petición AJAX
+    $.ajax({
+        url: ROUTES.fase2_details,
+        method: 'POST',
+        data: {
+            _token: $('meta[name="csrf-token"]').attr('content'),
+            practica_id: $('input[name="practica_id"]').first().val()
+        },
+        success: function(response) {
+            let html = `
+                <div class="flex flex-col space-y-3">
+                    <div class="flex flex-col sm:flex-row items-start justify-between p-3 bg-gray-50 rounded-lg">
+                        <p class="font-semibold text-gray-700 w-1/3">Liquidación de pago:</p>
+                        ${response.liquidacion_url ? 
+                            `<a href="${response.liquidacion_url}" target="_blank" class="text-uts-500 underline hover:text-uts-800">Ver Liquidación</a>` : 
+                            '<span class="text-gray-500">No disponible</span>'}
+                    </div>
+                    <div class="flex flex-col sm:flex-row items-start justify-between p-3 bg-gray-50 rounded-lg">
+                        <p class="font-semibold text-gray-700 w-1/3">Soporte de pago:</p>
+                        ${response.soporte_url ? 
+                            `<a href="${response.soporte_url}" target="_blank" class="text-uts-500 underline hover:text-uts-800">Ver Soporte de pago</a>` : 
+                            '<span class="text-gray-500">No disponible</span>'}
+                    </div>
+                </div>
+            `;
+            
+            $('#fase2DetailsContent').html(html);
+            $('#fase2DetailsModal').addClass('show');
+        },
+        error: function(xhr) {
+            console.error(xhr);
+            Swal.fire('Error', 'No se pudieron cargar los detalles', 'error');
+        },
+        complete: function() {
+            // Restaurar el botón: ocultar spinner y mostrar icono
+            if (btn) {
+                const icon = btn.querySelector('i');
+                const spinner = btn.querySelector('.loading-spinner');
+                if (icon) icon.classList.remove('hidden');
+                if (spinner) spinner.classList.add('hidden');
+                btn.disabled = false;
+            }
+        }
+    });
 }
 
+// Cerrar modal de detalles
 function closeFase2DetailsModal() {
-    const modal = document.getElementById('fase2DetailsModal');
-    if (modal) {
-        modal.classList.remove('show');  // ← Usar clase .show
-    }
+    $('#fase2DetailsModal').removeClass('show');
 }
 
 // ==================== MODAL ADMINISTRADOR ====================
 
-function openFase2AdminModal() {
-    const modal = document.getElementById('fase2AdminModal');
-    if (modal) {
-        modal.classList.add('show');  // ← Usar clase .show
-        // Limpiar formulario
-        const form = document.getElementById('fase2AdminForm');
-        if (form) form.reset();
-        // Ocultar contenedor de docentes
-        const containerDocentes = document.getElementById('container_docentes_fase2');
-        if (containerDocentes) containerDocentes.classList.add('hidden');
-        clearFase2AdminErrors();
+// ==================== MODAL ADMINISTRADOR FASE 2 ====================
+
+let quillFase2 = null;
+
+function openFase2AdminModal(btn) {
+    // Mostrar spinner y ocultar icono en el botón
+    if (btn) {
+        const icon = btn.querySelector('i');
+        const spinner = btn.querySelector('.loading-spinner');
+        if (icon) icon.classList.add('hidden');
+        if (spinner) spinner.classList.remove('hidden');
+        btn.disabled = true;
+    }
+    
+    // Limpiar campos
+    $('#nro_acta_fase2').val('');
+    $('#fecha_acta_fase2').val('');
+    $('#estado_fase2').val('');
+    $('#respuesta_fase2').val('');
+    $('#director_id_fase2').val('');
+    $('#evaluador_id_fase2').val('');
+    $('#codirector_id_fase2').val('');
+    $('#nro_acta_fase2Error').text('');
+    $('#fecha_acta_fase2Error').text('');
+    $('#estado_fase2Error').text('');
+    $('#respuesta_fase2Error').text('');
+    $('#director_id_fase2Error').text('');
+    $('#evaluador_id_fase2Error').text('');
+    $('#codirector_id_fase2Error').text('');
+    
+    // Ocultar contenedor de docentes inicialmente
+    $('#container_docentes_fase2').addClass('hidden');
+    
+    // PRIMERO abrir el modal
+    $('#fase2AdminModal').addClass('show');
+    
+    // ESPERAR a que el modal esté visible y luego inicializar Quill
+    setTimeout(function() {
+        // Verificar si el elemento existe
+        if ($('#txt-editor-fase2').length > 0) {
+            if (quillFase2 === null) {
+                quillFase2 = new Quill('#txt-editor-fase2', {
+                    theme: 'snow',
+                placeholder: 'Ingrese el mensaje de respuesta indicando detalles al destinatario.',
+                modules: {
+                    toolbar: [
+                        [{ 'header': 1}],
+                        [{ 'header': 2}],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        ['bold', 'italic', 'underline'],
+                        [{ 'color': [] }],
+                        ['clean']
+                    ]
+                }
+                });
+            } else {
+                quillFase2.root.innerHTML = '';
+            }
+            quillFase2.update();
+        } else {
+            console.error('No se encontró el elemento #txt-editor-fase2');
+        }
+    }, 200);
+    
+    // Restaurar el botón después de abrir el modal
+    if (btn) {
+        setTimeout(() => {
+            const icon = btn.querySelector('i');
+            const spinner = btn.querySelector('.loading-spinner');
+            if (icon) icon.classList.remove('hidden');
+            if (spinner) spinner.classList.add('hidden');
+            btn.disabled = false;
+        }, 200);
     }
 }
 
 function closeFase2AdminModal() {
-    const modal = document.getElementById('fase2AdminModal');
-    if (modal) {
-        modal.classList.remove('show');  // ← Usar clase .show
+    $('#fase2AdminModal').removeClass('show');
+    if (quillFase2) {
+        quillFase2.root.innerHTML = '';
     }
 }
+
+// Mostrar/ocultar contenedor de docentes según el estado seleccionado
+$(document).ready(function() {
+    $('#estado_fase2').on('change', function() {
+        if ($(this).val() === 'Aprobada') {
+            $('#container_docentes_fase2').removeClass('hidden');
+        } else {
+            $('#container_docentes_fase2').addClass('hidden');
+            // Limpiar selecciones de docentes cuando se oculta
+            $('#director_id_fase2').val('');
+            $('#evaluador_id_fase2').val('');
+            $('#codirector_id_fase2').val('');
+        }
+    });
+});
+
+// Manejo del formulario de administrador Fase 2
+$('#fase2AdminForm').on('submit', function(e) {
+    e.preventDefault();
+    
+    // Obtener el contenido del editor Quill
+    if (quillFase2) {
+        $('#respuesta_fase2').val(quillFase2.root.innerHTML);
+    }
+    
+    // Validar que haya seleccionado un estado
+    const estadoSeleccionado = $('#estado_fase2').val();
+    if (!estadoSeleccionado) {
+        $('#estado_fase2Error').text('Debe seleccionar un estado');
+        return;
+    }
+    
+    // Si está aprobado, validar que haya seleccionado director y evaluador
+    if (estadoSeleccionado === 'Aprobada') {
+        if (!$('#director_id_fase2').val()) {
+            $('#director_id_fase2Error').text('Debe seleccionar un director');
+            return;
+        }
+        if (!$('#evaluador_id_fase2').val()) {
+            $('#evaluador_id_fase2Error').text('Debe seleccionar un evaluador');
+            return;
+        }
+    }
+    
+    let mensajeConfirmacion = "Esta acción no se puede deshacer";
+    if (estadoSeleccionado === 'Aprobada') {
+        mensajeConfirmacion = "Al aprobar, se asignarán los docentes seleccionados. Esta acción no se puede deshacer.";
+    } else if (estadoSeleccionado === 'Rechazada') {
+        mensajeConfirmacion = "Esta acción no se puede deshacer.";
+    }
+    
+    Swal.fire({
+        heightAuto: false,
+        title: '¿Está seguro?',
+        text: mensajeConfirmacion,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#C1D631',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, responder',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const button = $(this).find('button[type="submit"]');
+            const spinner = $('#loadingSpinner-fase2-admin');
+            const formData = $(this).serialize();
+            
+            button.prop('disabled', true);
+            if (spinner.length) spinner.removeClass('hidden');
+            
+            $.ajax({
+                url: ROUTES.fase2_reply,
+                method: 'POST',
+                data: formData,
+                success: function(response) {
+                    closeFase2AdminModal();
+                    Swal.fire({
+                        title: '¡Éxito!',
+                        text: response.success || 'Respuesta enviada exitosamente',
+                        icon: 'success',
+                        confirmButtonText: 'Ok',
+                        confirmButtonColor: '#C1D631'
+                    }).then(() => {
+                        location.reload();
+                    });
+                },
+                error: function(xhr) {
+                    if (xhr.status === 422 && xhr.responseJSON.errors) {
+                        const errors = xhr.responseJSON.errors;
+                        if (errors.nro_acta) $('#nro_acta_fase2Error').text(errors.nro_acta[0]);
+                        if (errors.fecha_acta) $('#fecha_acta_fase2Error').text(errors.fecha_acta[0]);
+                        if (errors.estado) $('#estado_fase2Error').text(errors.estado[0]);
+                        if (errors.respuesta) $('#respuesta_fase2Error').text(errors.respuesta[0]);
+                        if (errors.director_id) $('#director_id_fase2Error').text(errors.director_id[0]);
+                        if (errors.evaluador_id) $('#evaluador_id_fase2Error').text(errors.evaluador_id[0]);
+                        if (errors.codirector_id) $('#codirector_id_fase2Error').text(errors.codirector_id[0]);
+                        
+                        setTimeout(() => {
+                            $('#nro_acta_fase2Error, #fecha_acta_fase2Error, #estado_fase2Error, #respuesta_fase2Error, #director_id_fase2Error, #evaluador_id_fase2Error, #codirector_id_fase2Error').text('');
+                        }, 5000);
+                    } else {
+                        Swal.fire('Error', xhr.responseJSON?.error || 'Error al enviar respuesta', 'error');
+                    }
+                },
+                complete: function() {
+                    button.prop('disabled', false);
+                    if (spinner.length) spinner.addClass('hidden');
+                }
+            });
+        }
+    });
+});
 
 // ==================== FUNCIONES DE LIMPIEZA ====================
 
@@ -88,99 +450,6 @@ function clearFase2AdminErrors() {
     });
 }
 
-// ==================== LOAD DETAILS ====================
-
-async function loadFase2Details() {
-    const contentDiv = document.getElementById('fase2DetailsContent');
-    if (!contentDiv) return;
-    
-    contentDiv.innerHTML = `
-        <div class="text-center py-4">
-            <svg class="inline w-8 h-8 text-gray-400 animate-spin" viewBox="0 0 64 64" fill="none">
-                <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
-            </svg>
-            <p class="mt-2 text-gray-500">Cargando detalles...</p>
-        </div>
-    `;
-    
-    const practicaId = document.querySelector('input[name="practica_id"]')?.value;
-    if (!practicaId) return;
-    
-    try {
-        const response = await fetch(ROUTES.fase2_details, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-            },
-            body: JSON.stringify({ practica_id: practicaId })
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok && data.success) {
-            let html = `
-                <div class="space-y-4">
-                    <div class="border-b pb-2">
-                        <p class="text-sm text-gray-500">Fecha de envío:</p>
-                        <p class="font-medium">${data.fecha_envio || 'No disponible'}</p>
-                    </div>
-                    
-                    <div class="border-b pb-2">
-                        <p class="text-sm text-gray-500">Liquidación de pago:</p>
-                        ${data.liquidacion_url ? 
-                            `<a href="${data.liquidacion_url}" target="_blank" class="text-blue-600 hover:text-blue-800 flex items-center gap-2 mt-1">
-                                <i class="fa-regular fa-file-pdf text-red-500"></i>
-                                Ver liquidación
-                            </a>` : 
-                            '<p class="text-gray-400 italic">No disponible</p>'
-                        }
-                    </div>
-                    
-                    <div class="border-b pb-2">
-                        <p class="text-sm text-gray-500">Soporte de pago:</p>
-                        ${data.soporte_url ? 
-                            `<a href="${data.soporte_url}" target="_blank" class="text-blue-600 hover:text-blue-800 flex items-center gap-2 mt-1">
-                                <i class="fa-regular fa-file-pdf text-red-500"></i>
-                                Ver soporte
-                            </a>` : 
-                            '<p class="text-gray-400 italic">No disponible</p>'
-                        }
-                    </div>
-            `;
-            
-            if (data.respuesta_comite) {
-                html += `
-                    <div>
-                        <p class="text-sm text-gray-500">Respuesta del comité:</p>
-                        <div class="mt-1 p-3 bg-gray-50 rounded-lg">
-                            ${data.respuesta_comite}
-                        </div>
-                    </div>
-                `;
-            }
-            
-            html += `</div>`;
-            contentDiv.innerHTML = html;
-        } else {
-            contentDiv.innerHTML = `
-                <div class="text-center py-4 text-red-500">
-                    <i class="fa-solid fa-circle-exclamation text-2xl mb-2"></i>
-                    <p>Error al cargar los detalles</p>
-                </div>
-            `;
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        contentDiv.innerHTML = `
-            <div class="text-center py-4 text-red-500">
-                <i class="fa-solid fa-circle-exclamation text-2xl mb-2"></i>
-                <p>Error al cargar los detalles</p>
-            </div>
-        `;
-    }
-}
-
 // ==================== EVENT LISTENERS ====================
 
 // Mostrar/ocultar campos de docentes según el estado seleccionado
@@ -193,131 +462,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 container.classList.remove('hidden');
             } else {
                 container.classList.add('hidden');
-            }
-        });
-    }
-    
-    // Manejo del formulario de estudiante
-    const estudianteForm = document.getElementById('fase2EstudianteForm');
-    if (estudianteForm) {
-        estudianteForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const submitButton = this.querySelector('button[type="submit"]');
-            const spinner = document.getElementById('loadingSpinner-fase2');
-            
-            submitButton.disabled = true;
-            if (spinner) spinner.classList.remove('hidden');
-            
-            const formData = new FormData(this);
-            
-            try {
-                const response = await fetch(ROUTES.fase2_store, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    }
-                });
-                
-                const data = await response.json();
-                
-                if (response.ok && data.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: '¡Documentos enviados!',
-                        text: data.success,
-                        timer: 2000,
-                        showConfirmButton: false
-                    }).then(() => {
-                        location.reload();
-                    });
-                } else if (data.errors) {
-                    for (const [field, errors] of Object.entries(data.errors)) {
-                        const errorSpan = document.getElementById(`${field}Error`);
-                        if (errorSpan) errorSpan.innerHTML = errors[0];
-                    }
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error de validación',
-                        text: 'Por favor revise los campos marcados',
-                        timer: 3000
-                    });
-                } else {
-                    throw new Error(data.error || 'Error al enviar los documentos');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: error.message || 'Ha ocurrido un error al enviar los documentos'
-                });
-            } finally {
-                submitButton.disabled = false;
-                if (spinner) spinner.classList.add('hidden');
-            }
-        });
-    }
-    
-    // Manejo del formulario de administrador
-    const adminForm = document.getElementById('fase2AdminForm');
-    if (adminForm) {
-        adminForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const submitButton = this.querySelector('button[type="submit"]');
-            const spinner = document.getElementById('loadingSpinner-fase2-admin');
-            
-            submitButton.disabled = true;
-            if (spinner) spinner.classList.remove('hidden');
-            
-            const formData = new FormData(this);
-            
-            try {
-                const response = await fetch(ROUTES.fase2_reply, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    }
-                });
-                
-                const data = await response.json();
-                
-                if (response.ok && data.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: '¡Respuesta enviada!',
-                        text: data.success,
-                        timer: 2000,
-                        showConfirmButton: false
-                    }).then(() => {
-                        location.reload();
-                    });
-                } else if (data.errors) {
-                    for (const [field, errors] of Object.entries(data.errors)) {
-                        const errorSpan = document.getElementById(`${field}_fase2Error`);
-                        if (errorSpan) errorSpan.innerHTML = errors[0];
-                    }
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error de validación',
-                        text: 'Por favor revise los campos marcados'
-                    });
-                } else {
-                    throw new Error(data.error || 'Error al enviar la respuesta');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: error.message || 'Ha ocurrido un error al enviar la respuesta'
-                });
-            } finally {
-                submitButton.disabled = false;
-                if (spinner) spinner.classList.add('hidden');
             }
         });
     }

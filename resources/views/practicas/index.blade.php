@@ -268,6 +268,155 @@ select.dt-input:focus {
                 line-height: 1.5 !important;
                 font-size: 1rem !important;
             }
+
+    /* Estilos tipo Select2 */
+    .select2-container--default .select2-selection--single {
+        border-color: #d1d5db;
+        border-radius: 0.375rem;
+    }
+    
+    .select2-container--default.select2-container--open .select2-selection--single {
+        border-color: #C1D631;
+    }
+    
+    .select2-container--default .select2-selection--single:focus {
+        border-color: #C1D631;
+        box-shadow: 0 0 0 2px rgba(193, 214, 49, 0.2);
+    }
+    
+    /* Estilos para la lista de resultados */
+    .integrante-resultado {
+        padding: 8px 12px;
+        cursor: pointer;
+        border-bottom: 1px solid #e5e7eb;
+        font-size: 0.875rem;
+    }
+    
+    .integrante-resultado:last-child {
+        border-bottom: none;
+    }
+    
+    .integrante-resultado:hover {
+        background-color: #f0fdf4;
+        background-color: rgba(193, 214, 49, 0.1);
+    }
+    
+    .integrante-resultado.highlight {
+        background-color: #f0fdf4;
+        background-color: rgba(193, 214, 49, 0.2);
+    }
+    
+    /* Tag seleccionado */
+    .selected-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background-color: #f0fdf4;
+        border: 1px solid #C1D631;
+        color: #4a5b1a;
+        padding: 4px 8px 4px 12px;
+        border-radius: 9999px;
+        font-size: 0.875rem;
+    }
+    
+    .selected-tag .remove-btn {
+        cursor: pointer;
+        font-size: 1.125rem;
+        font-weight: bold;
+        color: #9ca3af;
+        transition: color 0.2s;
+    }
+    
+    .selected-tag .remove-btn:hover {
+        color: #dc2626;
+    }
+    
+    /* Mensaje de búsqueda */
+    .search-message {
+        padding: 8px 12px;
+        text-align: center;
+        color: #6b7280;
+        font-size: 0.875rem;
+    }
+    
+    /* Input con borde verde cuando tiene foco */
+    #search_integrante_2:focus {
+        border-color: #C1D631;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(193, 214, 49, 0.2);
+    }
+
+    /* Estilo del input cuando tiene focus - VERDE del programa */
+    #search_integrante_2:focus {
+        border-color: #C1D631 !important;
+        outline: none !important;
+        box-shadow: 0 0 0 2px rgba(193, 214, 49, 0.2) !important;
+        ring-color: #C1D631 !important;
+    }
+    
+    /* Estilos para la lista desplegable */
+    #integrantes_list {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        max-height: 240px;
+        overflow-y: auto;
+        z-index: 50;
+    }
+    
+    /* Cada resultado */
+    #integrantes_list > div {
+        padding: 10px 12px;
+        cursor: pointer;
+        border-bottom: 1px solid #f3f4f6;
+        transition: all 0.2s;
+    }
+    
+    #integrantes_list > div:last-child {
+        border-bottom: none;
+    }
+    
+    /* Hover con color VERDE del programa */
+    #integrantes_list > div:hover {
+        background-color: rgba(193, 214, 49, 0.1);
+    }
+    
+    /* Estilo del elemento seleccionado (tag) */
+    #selected_integrante_2 {
+        margin-top: 8px;
+    }
+    
+    #selected_integrante_2 > div {
+        background-color: #f0f9f0;
+        border: 1px solid #C1D631;
+        border-radius: 8px;
+        padding: 8px 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    #selected_integrante_2 button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 18px;
+        color: #9ca3af;
+        transition: color 0.2s;
+    }
+    
+    #selected_integrante_2 button:hover {
+        color: #dc2626;
+    }
+    
+    /* Mensaje de "No se encontraron estudiantes" */
+    #integrantes_list .text-center {
+        padding: 12px;
+        color: #6b7280;
+        text-align: center;
+    }
+    
         </style>
 
     @endpush
@@ -415,7 +564,7 @@ select.dt-input:focus {
                         <p class="text-2xl font-bold" style="margin: 0.8rem 0 1.5rem 0;" id="formTitle"></p>
                         <p class="text-sm mb-2">En este formulario el estudiante registrará la información necesaria para la solicitud de prácticas empresariales.</p>
                         
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6 mb-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6">
                             
                             {{-- FILA 1: NOMBRE COMPLETO --}}
                             <div>
@@ -428,7 +577,7 @@ select.dt-input:focus {
                                         <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
                                             data-tooltip="tooltip-nombre_completo"></i>
                                         <div id="tooltip-nombre_completo"
-                                            class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg">
+                                            class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg w-40">
                                             Nombre completo del estudiante.
                                         </div>
                                     </div>
@@ -448,7 +597,7 @@ select.dt-input:focus {
                                         <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
                                             data-tooltip="tooltip-correo"></i>
                                         <div id="tooltip-correo"
-                                            class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg">
+                                            class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg w-44">
                                             Correo institucional del estudiante.
                                         </div>
                                     </div>
@@ -468,7 +617,7 @@ select.dt-input:focus {
                                         <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
                                             data-tooltip="tooltip-nivel"></i>
                                         <div id="tooltip-nivel"
-                                            class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg">
+                                            class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg w-44">
                                             Nivel académico del estudiante.
                                         </div>
                                     </div>
@@ -488,7 +637,7 @@ select.dt-input:focus {
                                         <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
                                             data-tooltip="tooltip-documento"></i>
                                         <div id="tooltip-documento"
-                                            class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg">
+                                            class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg w-48">
                                             Número de documento de identidad.
                                         </div>
                                     </div>
@@ -508,7 +657,7 @@ select.dt-input:focus {
                                         <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
                                             data-tooltip="tooltip-celular"></i>
                                         <div id="tooltip-celular"
-                                            class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg">
+                                            class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg w-44">
                                             Número de celular de contacto.
                                         </div>
                                     </div>
@@ -517,33 +666,40 @@ select.dt-input:focus {
                                     class="bg-gray-200 border-gray-300 rounded-md mt-1 block w-full cursor-default" readonly>
                             </div>
 
-                            {{-- SEGUNDO INTEGRANTE (al lado del celular) --}}
-                            <div>
-                                <div class="flex items-center gap-2 mb-1">
-                                    <label class="block font-medium text-sm text-gray-700">
-                                        <i class="fa-regular fa-user-plus mr-1 text-gray-500"></i>
-                                        Segundo integrante (opcional)
-                                    </label>
-                                    <div class="relative inline-block">
-                                        <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
-                                            data-tooltip="tooltip-integrante"></i>
-                                        <div id="tooltip-integrante"
-                                            class="hidden absolute z-10 max-w-[90vw] px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg left-1/2 -translate-x-1/2 bottom-full mb-2 sm:left-0 sm:translate-x-0">
-                                            Seleccione el compañero con quien realizará la práctica empresarial. El comité verificará la información y se pondrá en contacto si es pertinente.
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <input type="text" id="search_integrante_2" 
-                                    placeholder="Escriba al menos 5 caracteres (nombre, documento o correo) para buscar..."
-                                    class="border-gray-300 focus:ring-uts-500 focus:border-uts-500 rounded-md shadow-sm mt-1 block w-full"
-                                    autocomplete="off">
-                                
-                                <input type="hidden" name="id_integrante_2" id="id_integrante_2" value="">
-                                <div id="integrantes_list" class="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg hidden max-h-60 overflow-y-auto mt-1"></div>
-                                <div id="selected_integrante_2" class="mt-2"></div>
-                                <span id="id_integrante_2Error" class="text-red-500 text-sm"></span>
-                            </div>
+                            {{-- SEGUNDO INTEGRANTE (opcional) --}}
+<div>
+    <div class="flex items-center gap-2 mb-1">
+        <label class="block font-medium text-sm text-gray-700">
+            <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+            Segundo integrante (opcional)
+        </label>
+        <div class="relative inline-block">
+            <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                data-tooltip="tooltip-integrante"></i>
+            <div id="tooltip-integrante"
+                class="hidden absolute z-10 max-w-[90vw] px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg left-1/2 -translate-x-1/2 bottom-full mb-2 sm:left-0 sm:translate-x-0 w-44">
+                Seleccione el compañero con quien realizará la práctica empresarial.
+            </div>
+        </div>
+    </div>
+    
+    <div class="relative">
+        <input type="text" id="search_integrante_2"
+            placeholder="Escribe el documento del integrante"
+            class="border-gray-300 focus:border-uts-800 focus:ring-uts-800 rounded-md mt-1 block w-full"
+            autocomplete="off">
+        
+        <input type="hidden" name="id_integrante_2" id="id_integrante_2" value="">
+        
+        <!-- Lista desplegable -->
+        <div id="integrantes_list" class="absolute w-full bg-white border border-gray-200 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto mt-1"></div>
+    </div>
+    
+    <!-- Contenedor para mostrar el seleccionado -->
+    <div id="selected_integrante_2" class="mt-2 hidden"></div>
+    
+    <span id="id_integrante_2Error" class="text-red-500 text-sm"></span>
+</div>
 
                             {{-- ¿CUENTA CON EMPRESA? (ocupa ambas columnas) --}}
                             @php $campoTieneEmpresa = $campos->where('name', 'tiene_empresa')->first(); @endphp
@@ -558,7 +714,7 @@ select.dt-input:focus {
                                         <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
                                             data-tooltip="tooltip-tiene_empresa"></i>
                                         <div id="tooltip-tiene_empresa"
-                                            class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg">
+                                            class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg w-44">
                                             Marque si ya cuenta con empresa donde realizar la práctica.
                                         </div>
                                     </div>
@@ -590,7 +746,7 @@ select.dt-input:focus {
                                         <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
                                             data-tooltip="tooltip-hoja_vida"></i>
                                         <div id="tooltip-hoja_vida"
-                                            class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg">
+                                            class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg w-44">
                                             Suba su hoja de vida en formato PDF si no cuenta con empresa.
                                         </div>
                                     </div>
@@ -631,6 +787,11 @@ select.dt-input:focus {
 
                         </div>
 
+                        <p class="text-red-600 text-sm mb-6">
+                            <i class="fa-solid fa-circle-info mr-1"></i>
+                            Si selecciona un segundo integrante, el comité tendrá que evaluar la complejidad de la propuesta de los estudiantes y posteriormente aprobará o rechazará la solicitud.
+                        </p>
+                        
                         <p class="text-sm mb-6"><strong>NOTA: </strong>El estudiante debe tener aprobado el 90% de los créditos (Tecnología: 97 / Profesional: 65).</p>
                         <p class="text-sm mb-6"><strong>Convenios: </strong>Verifique si la empresa tiene convenio vigente en la pagina de la ORI :<a href="https://oriapp.uts.edu.co/activities_guest" target="_blank" class="text-uts-500 underline hover:text-uts-800"> Consultar convenios aquí </a></p>
 
@@ -668,11 +829,11 @@ select.dt-input:focus {
                             <label for="estado" class="block  font-medium text-sm text-gray-700"><i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>Estado de la
                                 Solicitud</label>
                             <select name="estado" id="estado"
-    class="border-gray-300 rounded-md mt-1 block w-full focus:ring-uts-500 focus:border-uts-500">
-    <option value="" selected disabled>Seleccione un estado</option>
-    <option value="Aprobada">Aprobada</option>
-    <option value="Rechazada">Rechazada</option>
-</select>
+                            class="border-gray-300 rounded-md mt-1 block w-full focus:ring-uts-500 focus:border-uts-500">
+                            <option value="" selected disabled>Seleccione un estado</option>
+                            <option value="Aprobada">Aprobada</option>
+                            <option value="Rechazada">Rechazada</option>
+                        </select>
                             <span id="estadoError" class="text-red-500 text-sm"></span>
                         </div>
                         <div class="mb-4">
@@ -1017,28 +1178,30 @@ select.dt-input:focus {
                             if (estudiantes.length > 0) {
                                 estudiantes.forEach(function(estudiante) {
                                     list.append(`
-                                        <div class="p-2 hover:bg-gray-100 cursor-pointer border-b border-gray-200"
-                                             onclick="seleccionarIntegrante2(${estudiante.id}, '${estudiante.nombre_completo.replace(/'/g, "\\'")} (${estudiante.documento})')">
-                                            <div class="font-medium">${estudiante.nombre_completo}</div>
-                                            <div class="text-sm text-gray-500">${estudiante.documento} | ${estudiante.email} | ${estudiante.nivel}</div>
+                                        <div class="integrante-item"
+                                             onclick="seleccionarIntegrante2(${estudiante.id}, '${estudiante.nombre_completo.replace(/'/g, "\\'")}')"
+                                             data-documento="${estudiante.documento}">
+                                            <div class="font-medium">${estudiante.documento} | ${estudiante.nombre_completo}</div>
+                                            <div class="text-sm text-gray-500">${estudiante.nivel}</div>
                                         </div>
                                     `);
                                 });
                                 list.removeClass('hidden');
                             } else {
-                                list.html('<div class="p-2 text-gray-500 text-center">No se encontraron estudiantes</div>');
+                                list.html('<div class="text-center py-3 text-gray-500">No se encontraron estudiantes</div>');
                                 list.removeClass('hidden');
                             }
                         },
                         error: function(xhr) {
                             console.error('Error en búsqueda:', xhr);
-                            if (xhr.status === 404) {
-                                $('#integrantes_list').html('<div class="p-2 text-red-500 text-center">Error: Ruta no encontrada. Contacte al administrador.</div>');
-                                $('#integrantes_list').removeClass('hidden');
-                            }
+                            $('#integrantes_list').html('<div class="text-center py-3 text-red-500">Error al buscar estudiantes</div>');
+                            $('#integrantes_list').removeClass('hidden');
                         }
                     });
                 }, 500);
+            } else if (searchTerm.length > 0 && searchTerm.length < 5) {
+                $('#integrantes_list').html('<div class="text-center py-3 text-gray-500">Por favor introduzca cinco (5) caracteres</div>');
+                $('#integrantes_list').removeClass('hidden');
             } else {
                 $('#integrantes_list').addClass('hidden');
             }
@@ -1048,21 +1211,21 @@ select.dt-input:focus {
     function seleccionarIntegrante2(id, nombre) {
         $('#id_integrante_2').val(id);
         $('#selected_integrante_2').html(`
-            <div class="flex items-center justify-between bg-uts-50 p-2 rounded-md border border-uts-200">
+            <div>
                 <span><i class="fa-solid fa-user-check text-uts-500 mr-2"></i>${nombre}</span>
-                <button type="button" onclick="limpiarIntegrante2()" class="text-red-500 hover:text-red-700">
+                <button type="button" onclick="limpiarIntegrante2()">
                     <i class="fa-solid fa-times"></i>
                 </button>
             </div>
         `);
-        $('#search_integrante_2').val('');
+        $('#selected_integrante_2').removeClass('hidden');
+        $('#search_integrante_2').val(nombre);
         $('#integrantes_list').addClass('hidden');
-        $('#selected_integrante_2').show();
     }
     
     function limpiarIntegrante2() {
         $('#id_integrante_2').val('');
-        $('#selected_integrante_2').empty().hide();
+        $('#selected_integrante_2').addClass('hidden');
         $('#search_integrante_2').val('');
         $('#integrantes_list').addClass('hidden');
     }
@@ -1246,7 +1409,6 @@ select.dt-input:focus {
         <!--Hoja de vida-->
 
         <script>
-    // Inicializar tooltips (igual que antes)
     $(document).ready(function() {
         $('.tooltip-icon').on('mouseenter', function() {
             var tooltipId = $(this).data('tooltip');
@@ -1257,7 +1419,6 @@ select.dt-input:focus {
         });
     });
 
-    // Función para mostrar/ocultar hoja de vida
     function toggleHojaVida() {
         const tieneEmpresaNo = document.querySelector('input[name="tiene_empresa"][value="0"]');
         const container = document.getElementById('hojaVidaContainer');

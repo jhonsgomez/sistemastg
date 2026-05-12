@@ -7,8 +7,6 @@
 
     @push('styles')
         <style>
-            /* ========== ESTILOS UNIFICADOS PARA MODALES ========== */
-
             /* Overlay para todos los modales */
             .modal-overlay {
                 position: fixed !important;
@@ -123,7 +121,6 @@
                 width: 1.25rem;
                 height: 1.25rem;
             }
-
         </style>
     @endPush
 
@@ -190,156 +187,170 @@
             <div class="mt-8 grid w-full grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
 
                 <!-- FASE 1 -->
-                <div id="fase-1"
-                    class="relative mx-auto flex flex-col items-center justify-center bg-white text-gray-600 rounded-lg shadow-lg h-60 w-full sm:w-50 border card-fase {{ $fase_actual >= 1 ? 'card-activated' : '' }} {{ $fase_actual == 1 ? 'card-activated-animated' : '' }}">
+<div id="fase-1"
+    class="relative mx-auto flex flex-col items-center justify-center bg-white text-gray-600 rounded-lg shadow-lg h-60 w-full sm:w-50 border card-fase {{ $fase_actual >= 1 ? 'card-activated' : '' }} {{ $fase_actual == 1 ? 'card-activated-animated' : '' }}">
 
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-10">
-                        <path fill-rule="evenodd"
-                            d="M5.625 1.5H9a3.75 3.75 0 0 1 3.75 3.75v1.875c0 1.036.84 1.875 1.875 1.875H16.5a3.75 3.75 0 0 1 3.75 3.75v7.875c0 1.035-.84 1.875-1.875 1.875H5.625a1.875 1.875 0 0 1-1.875-1.875V3.375c0-1.036.84-1.875 1.875-1.875Zm6.905 9.97a.75.75 0 0 0-1.06 0l-3 3a.75.75 0 1 0 1.06 1.06l1.72-1.72V18a.75.75 0 0 0 1.5 0v-4.19l1.72 1.72a.75.75 0 1 0 1.06-1.06l-3-3Z"
-                            clip-rule="evenodd" />
-                        <path
-                            d="M14.25 5.25a5.23 5.23 0 0 0-1.279-3.434 9.768 9.768 0 0 1 6.963 6.963A5.23 5.23 0 0 0 16.5 7.5h-1.875a.375.375 0 0 1-.375-.375V5.25Z" />
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-10">
+        <path fill-rule="evenodd"
+            d="M5.625 1.5H9a3.75 3.75 0 0 1 3.75 3.75v1.875c0 1.036.84 1.875 1.875 1.875H16.5a3.75 3.75 0 0 1 3.75 3.75v7.875c0 1.035-.84 1.875-1.875 1.875H5.625a1.875 1.875 0 0 1-1.875-1.875V3.375c0-1.036.84-1.875 1.875-1.875Zm6.905 9.97a.75.75 0 0 0-1.06 0l-3 3a.75.75 0 1 0 1.06 1.06l1.72-1.72V18a.75.75 0 0 0 1.5 0v-4.19l1.72 1.72a.75.75 0 1 0 1.06-1.06l-3-3Z"
+            clip-rule="evenodd" />
+        <path
+            d="M14.25 5.25a5.23 5.23 0 0 0-1.279-3.434 9.768 9.768 0 0 1 6.963 6.963A5.23 5.23 0 0 0 16.5 7.5h-1.875a.375.375 0 0 1-.375-.375V5.25Z" />
+    </svg>
+
+    <span class="text-center font-bold text-lg">Fase 1: Formato <br>F-DC-126</span>
+    <p class="text-center mt-2 text-xs mx-4">El estudiante envía el formato de solicitud de practicantes.</p>
+
+    @if ($fase_actual == 1)
+        @php
+            $user = auth()->user();
+            $esEstudiante = $user->hasRole('estudiante');
+            $esComite = $user->hasRole(['super_admin', 'admin', 'coordinador']);
+            $yaEnvio = $submited_fase1 == 'true';
+        @endphp
+
+        @if ($esEstudiante && !$yaEnvio)
+            <!-- Estudiante: Mostrar botón para enviar SOLO si no ha enviado o fue rechazado -->
+            <div class="flex justify-center items-center mt-3">
+                <button type="button" onclick="openFase1EstudianteModal()"
+                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+                    <i class="fa-solid fa-user-pen"></i>
+                </button>
+            </div>
+        @elseif ($esEstudiante && $yaEnvio)
+            <!-- Estudiante: Después de enviar, SOLO puede ver detalles (no puede reenviar hasta que el comité rechace) -->
+            <div class="flex justify-center items-center mt-3">
+                <button type="button" onclick="openFase1DetailsModal(this)"
+                    class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+                    <i class="fa-regular fa-eye"></i>
+                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
                     </svg>
+                </button>
+            </div>
+        @elseif ($esComite)
+            <!-- Comité: Botones con estilos unificados -->
+            <div class="flex justify-center items-center mt-3 gap-2">
+                <!-- Botón Ver con spinner -->
+                <button type="button" onclick="openFase1DetailsModal(this)"
+                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white w-10 h-10 rounded-lg relative inline-flex items-center justify-center">
+                    <i class="fa-regular fa-eye"></i>
+                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
+                    </svg>
+                </button>
 
-                    <span class="text-center font-bold text-lg">Fase 1: Formato <br>F-DC-126</span>
-                    <p class="text-center mt-2 text-xs mx-4">El estudiante envía el formato de solicitud de
-                        practicantes.</p>
-
-                    @if ($fase_actual == 1)
-                        @php
-                            $user = auth()->user();
-                            $esEstudiante = $user->hasRole('estudiante');
-                            $esComite = $user->hasRole(['super_admin', 'admin', 'coordinador']);
-                            $yaEnvio = $submited_fase1 == 'true';
-                        @endphp
-
-                        @if ($esEstudiante && !$yaEnvio)
-                            <!-- Estudiante: Mostrar botón para enviar SOLO si no ha enviado o fue rechazado -->
-                            <div class="flex justify-center items-center mt-3">
-                                <button type="button" onclick="openFase1EstudianteModal()"
-                                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white px-3 py-1 rounded-lg relative">
-                                    <i class="fa-solid fa-user-pen"></i>
-                                </button>
-                            </div>
-                        @elseif ($esEstudiante && $yaEnvio)
-                            <!-- Estudiante: Después de enviar, SOLO puede ver detalles (no puede reenviar hasta que el comité rechace) -->
-                            <div class="flex justify-center items-center mt-3">
-                                <button type="button" onclick="openFase1DetailsModal()"
-                                    class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg">
-                                    <i class="fa-regular fa-eye"></i>
-                                </button>
-                            </div>
-                        @elseif ($esComite)
-                            <!-- Comité: Botones con estilos unificados -->
-                            <div class="flex justify-center items-center mt-3 gap-2">
-                                <!-- Botón Ver (gris) -->
-                                <!-- Botón Ver con spinner -->
-                                <button type="button" onclick="openFase1DetailsModal(this)"
-                                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white w-10 h-10 rounded-lg relative inline-flex items-center justify-center">
-                                    <i class="fa-regular fa-eye"></i>
-                                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute"
-                                        viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path
-                                            d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
-                                            stroke="currentColor" stroke-width="5" stroke-linecap="round"
-                                            stroke-linejoin="round"></path>
-                                        <path
-                                            d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
-                                            stroke="currentColor" stroke-width="5" stroke-linecap="round"
-                                            stroke-linejoin="round" class="text-white"></path>
-                                    </svg>
-                                </button>
-
-                                <!-- Botón Responder (gris también, mismo estilo que el ojito) -->
-                                @if ($yaEnvio)
-                                    <button type="button" onclick="openFase1AdminModal()"
-                                        class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white w-10 h-10 rounded-lg inline-flex items-center justify-center">
-                                        <i class="fa-solid fa-reply"></i>
-                                    </button>
-                                @endif
-                            </div>
-                        @endif
-                    @elseif ($fase_actual > 1)
-                        <!-- Fase ya aprobada: Solo mostrar botón de ver detalles -->
-                        <div class="flex justify-center items-center mt-3">
-                            <button type="button" onclick="openFase1DetailsModal()"
-                                class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg">
-                                <i class="fa-regular fa-eye"></i>
-                            </button>
-                        </div>
-                    @endif
-                </div>
+                <!-- Botón Responder con spinner -->
+                @if ($yaEnvio)
+                    <button type="button" onclick="openFase1AdminModal(this)"
+                        class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white w-10 h-10 rounded-lg relative inline-flex items-center justify-center">
+                        <i class="fa-solid fa-reply"></i>
+                        <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
+                        </svg>
+                    </button>
+                @endif
+            </div>
+        @endif
+    @elseif ($fase_actual > 1)
+        <!-- Fase ya aprobada: Solo mostrar botón de ver detalles con spinner -->
+        <div class="flex justify-center items-center mt-3">
+            <button type="button" onclick="openFase1DetailsModal(this)"
+                class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+                <i class="fa-regular fa-eye"></i>
+                <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                    <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
+                </svg>
+            </button>
+        </div>
+    @endif
+</div>
 
                 <!-- FASE 2: Pago de modalidad -->
-                <div id="fase-2"
-                    class="relative mx-auto flex flex-col items-center justify-center bg-white text-gray-600 rounded-lg shadow-lg h-60 w-full sm:w-50 border card-fase {{ $fase_actual >= 2 ? 'card-activated' : '' }} {{ $fase_actual == 2 ? 'card-activated-animated' : '' }}">
+<div id="fase-2"
+    class="relative mx-auto flex flex-col items-center justify-center bg-white text-gray-600 rounded-lg shadow-lg h-60 w-full sm:w-50 border card-fase {{ $fase_actual >= 2 ? 'card-activated' : '' }} {{ $fase_actual == 2 ? 'card-activated-animated' : '' }}">
 
-                    <i class="fa-solid fa-circle-check" style="font-size: 32px; margin-bottom: 10px;"></i>
+    <i class="fa-solid fa-circle-check" style="font-size: 32px; margin-bottom: 10px;"></i>
 
-                    <span class="text-center font-bold text-lg">Fase 2: Pago</span>
-                    <p class="text-center mt-2 text-xs mx-4">El estudiante sube la liquidación y soporte de pago.</p>
+    <span class="text-center font-bold text-lg">Fase 2: Pago</span>
+    <p class="text-center mt-2 text-xs mx-4">El estudiante sube la liquidación y soporte de pago.</p>
 
-                    @if ($fase_actual == 2)
-                        @php
-                            $user = auth()->user();
-                            $esEstudiante = $user->hasRole('estudiante');
-                            $esComite = $user->hasRole(['super_admin', 'admin', 'coordinador']);
-                            $yaEnvio = $submited_fase2 == 'true';
-                        @endphp
+    @if ($fase_actual == 2)
+        @php
+            $user = auth()->user();
+            $esEstudiante = $user->hasRole('estudiante');
+            $esComite = $user->hasRole(['super_admin', 'admin', 'coordinador']);
+            $yaEnvio = $submited_fase2 == 'true';
+        @endphp
 
-                        @if ($esEstudiante && !$yaEnvio)
-                            <!-- Estudiante: Mostrar botón para enviar -->
-                            <div class="flex justify-center items-center mt-3">
-                                <button type="button" onclick="openFase2EstudianteModal()"
-                                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white px-3 py-1 rounded-lg relative">
-                                    <i class="fa-solid fa-user-pen"></i>
-                                </button>
-                            </div>
-                        @elseif ($esEstudiante && $yaEnvio)
-                            <!-- Estudiante: Después de enviar, solo puede ver detalles -->
-                            <div class="flex justify-center items-center mt-3">
-                                <button type="button" onclick="openFase2DetailsModal()"
-                                    class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg">
-                                    <i class="fa-regular fa-eye"></i>
-                                </button>
-                            </div>
-                        @elseif ($esComite)
-                            <!-- Comité: Botones Ver y Responder -->
-                            <div class="flex justify-center items-center mt-3 gap-2">
-                                <!-- Botón Ver -->
-                                <button type="button" onclick="openFase2DetailsModal(this)"
-                                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white w-10 h-10 rounded-lg relative inline-flex items-center justify-center">
-                                    <i class="fa-regular fa-eye"></i>
-                                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute"
-                                        viewBox="0 0 64 64" fill="none">
-                                        <path
-                                            d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
-                                            stroke="currentColor" stroke-width="5"></path>
-                                        <path
-                                            d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
-                                            stroke="currentColor" stroke-width="5" class="text-white"></path>
-                                    </svg>
-                                </button>
+        @if ($esEstudiante && !$yaEnvio)
+            <!-- Estudiante: Mostrar botón para enviar -->
+            <div class="flex justify-center items-center mt-3">
+                <button type="button" onclick="openFase2EstudianteModal(this)"
+                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+                    <i class="fa-solid fa-user-pen"></i>
+                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
+                    </svg>
+                </button>
+            </div>
+        @elseif ($esEstudiante && $yaEnvio)
+            <!-- Estudiante: Después de enviar, solo puede ver detalles -->
+            <div class="flex justify-center items-center mt-3">
+                <button type="button" onclick="openFase2DetailsModal(this)"
+                    class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+                    <i class="fa-regular fa-eye"></i>
+                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
+                    </svg>
+                </button>
+            </div>
+        @elseif ($esComite)
+            <!-- Comité: Botones Ver y Responder -->
+            <div class="flex justify-center items-center mt-3 gap-2">
+                <!-- Botón Ver con spinner -->
+                <button type="button" onclick="openFase2DetailsModal(this)"
+                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white w-10 h-10 rounded-lg relative inline-flex items-center justify-center">
+                    <i class="fa-regular fa-eye"></i>
+                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
+                    </svg>
+                </button>
 
-                                <!-- Botón Responder (solo si el estudiante ya envió) -->
-                                @if ($yaEnvio)
-                                    <button type="button" onclick="openFase2AdminModal()"
-                                        class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white w-10 h-10 rounded-lg inline-flex items-center justify-center">
-                                        <i class="fa-solid fa-reply"></i>
-                                    </button>
-                                @endif
-                            </div>
-                        @endif
-                    @elseif ($fase_actual > 2)
-                        <!-- Fase ya aprobada: Solo mostrar botón de ver detalles -->
-                        <div class="flex justify-center items-center mt-3">
-                            <button type="button" onclick="openFase2DetailsModal()"
-                                class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg">
-                                <i class="fa-regular fa-eye"></i>
-                            </button>
-                        </div>
-                    @endif
-                </div>
+                <!-- Botón Responder con spinner (solo si el estudiante ya envió) -->
+                @if ($yaEnvio)
+                    <button type="button" onclick="openFase2AdminModal(this)"
+                        class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white w-10 h-10 rounded-lg relative inline-flex items-center justify-center">
+                        <i class="fa-solid fa-reply"></i>
+                        <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
+                        </svg>
+                    </button>
+                @endif
+            </div>
+        @endif
+    @elseif ($fase_actual > 2)
+        <!-- Fase ya aprobada: Solo mostrar botón de ver detalles con spinner -->
+        <div class="flex justify-center items-center mt-3">
+            <button type="button" onclick="openFase2DetailsModal(this)"
+                class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+                <i class="fa-regular fa-eye"></i>
+                <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                    <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
+                </svg>
+            </button>
+        </div>
+    @endif
+</div>
 
                 <!-- FASE 3 . I -->
                 <div
@@ -410,12 +421,14 @@
                         <div class="grid grid-cols-1 gap-6 mb-6">
                             <!-- Checkbox Práctica institucional -->
                             <div>
-                                <div class="flex items-center gap-2 mb-2">
-                                    <label class="flex items-center gap-2">
+                                <div class="flex items-center gap-1 mb-2">
+                                    <label class="flex items-center gap-1">
+                                        <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                        <span class="text-red-500">*</span></label>
+                                        <span class="text-sm text-gray-700">¿Es práctica institucional?</span>
                                         <input type="checkbox" name="es_institucional" id="es_institucional"
                                             class="rounded border-gray-300 text-uts-500 focus:ring-uts-500"
                                             onchange="toggleNombreEmpresa()">
-                                        <span class="text-sm text-gray-700">¿Es práctica institucional?</span>
                                     </label>
                                     <div class="relative inline-block">
                                         <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
@@ -431,7 +444,8 @@
 
                             <!-- Campo Nombre de la empresa (condicional) -->
                             <div id="nombre_empresa_container" style="display: none;">
-                                <div class="flex items-center gap-2 mb-2">
+                                <div class="flex items-center gap-1 mb-2">
+                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
                                     <label class="block font-medium text-sm text-gray-700">Nombre de la empresa</label>
                                     <div class="relative inline-block">
                                         <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
@@ -450,9 +464,10 @@
 
                             <!-- Campo para subir F-DC-126 -->
                             <div>
-                                <div class="flex items-center gap-2 mb-2">
-                                    <label class="block font-medium text-sm text-gray-700">Formato F-DC-126 <span
-                                            class="text-red-500">*</span></label>
+                                <div class="flex items-center gap-1 mb-2">
+                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                    <span class="text-red-500">*</span></label>
+                                    <label class="block font-medium text-sm text-gray-700">Formato F-DC-126 
                                     <div class="relative inline-block">
                                         <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
                                             data-tooltip="tooltip-fdc126"></i>
@@ -484,6 +499,12 @@
                                     </div>
                                 </div>
                                 <br>
+
+                                <p class="text-red-600 text-sm">
+                                    <i class="fa-solid fa-circle-info mr-1"></i>
+                                    Nota: Si selecciona, sí es práctica institucional deberá tener previa autorización parte de coordinación, de lo contrario no será aprobado.
+                                </p>
+
                                 <p class="text-sm mb-6"><strong>Nota:</strong> El formato F-DC-126 debe estar
                                     debidamente diligenciado y no debe superar los 5MB en formato Word. </p>
 
@@ -519,39 +540,37 @@
     </div>
 
     <!-- Modal FASE 1 - Detalles (Ver información enviada) -->
-    <div id="fase1DetailsModal" class="fixed z-50 inset-0 overflow-y-auto">
-        <div class="modal-overlay absolute inset-0"
-            style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;"
-            onclick="closeFase1DetailsModal()">
-            <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
-                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
-                    onclick="event.stopPropagation()">
-                    <button
-                        class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
-                        onclick="closeFase1DetailsModal()">&times;</button>
-                    <div class="p-6 mt-2">
-                        <p class="text-2xl font-bold mb-4">Detalles de la <span
-                                class="bg-uts-500 text-white px-2 py-0.5 rounded uppercase shadow">Fase 1</span></p>
-                        <div id="fase1DetailsContent" class="space-y-3">
-                            <div class="text-center py-4">
-                                <svg class="inline w-8 h-8 text-gray-400 animate-spin" viewBox="0 0 64 64"
-                                    fill="none">
-                                    <path
-                                        d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
-                                        stroke="currentColor" stroke-width="5"></path>
-                                </svg>
-                                <p class="mt-2 text-gray-500">Cargando detalles...</p>
-                            </div>
+<div id="fase1DetailsModal" class="fixed z-50 inset-0 overflow-y-auto">
+    <div class="modal-overlay absolute inset-0" onclick="closeFase1DetailsModal()">
+        <div class="flex items-center justify-center min-h-screen p-4 text-center relative">
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
+                onclick="event.stopPropagation()">
+                <button
+                    class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
+                    onclick="closeFase1DetailsModal()">&times;</button>
+                <div class="p-6 mt-2">
+                    <p class="text-2xl font-bold mb-4">Detalles de la <span
+                            class="bg-uts-500 text-white px-2 py-0.5 rounded uppercase shadow">Fase 1</span></p>
+                    <div id="fase1DetailsContent" class="space-y-3">
+                        <div class="text-center py-4">
+                            <svg class="inline w-8 h-8 text-gray-400 animate-spin" viewBox="0 0 64 64"
+                                fill="none">
+                                <path
+                                    d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
+                                    stroke="currentColor" stroke-width="5"></path>
+                            </svg>
+                            <p class="mt-2 text-gray-500">Cargando detalles...</p>
                         </div>
-                        <div class="flex justify-end mt-4">
-                            <button type="button" onclick="closeFase1DetailsModal()"
-                                class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cerrar</button>
-                        </div>
+                    </div>
+                    <div class="flex justify-end mt-4">
+                        <button type="button" onclick="closeFase1DetailsModal()"
+                            class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cerrar</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
     <!-- Modal FASE 1 - Administrador (Responder solicitud) -->
     <div id="fase1AdminModal" class="fixed z-50 inset-0 overflow-y-auto">
@@ -570,26 +589,11 @@
                         <p class="text-sm text-gray-600 mb-4">Apruebe o rechace la solicitud de práctica empresarial.
                         </p>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                            <div>
-                                <label class="block font-medium text-sm text-gray-700">Número de acta <span
-                                        class="text-red-500">*</span></label>
-                                <input type="text" name="nro_acta" id="nro_acta_fase1"
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
-                                <span id="nro_acta_fase1Error" class="text-red-500 text-sm"></span>
-                            </div>
-                            <div>
-                                <label class="block font-medium text-sm text-gray-700">Fecha del acta <span
-                                        class="text-red-500">*</span></label>
-                                <input type="date" name="fecha_acta" id="fecha_acta_fase1"
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
-                                <span id="fecha_acta_fase1Error" class="text-red-500 text-sm"></span>
-                            </div>
-                        </div>
-
                         <div class="mb-4">
-                            <label class="block font-medium text-sm text-gray-700">Estado <span
-                                    class="text-red-500">*</span></label>
+                            <label class="block font-medium text-sm text-gray-700"> 
+                                <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                                Estado de la práctica:
+                            </label>
                             <select name="estado" id="estado_fase1"
                                 class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
                                 <option value="">Seleccione un estado</option>
@@ -598,13 +602,35 @@
                             </select>
                             <span id="estado_fase1Error" class="text-red-500 text-sm"></span>
                         </div>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block font-medium text-sm text-gray-700">
+                                    <i class="fa-regular fa-file-lines mr-1 text-gray-500"></i>    
+                                    Número de acta:
+                                </label>
+                                <input type="text" name="nro_acta" id="nro_acta_fase1"
+                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500" placeholder="Ingrese el número de acta">
+                                <span id="nro_acta_fase1Error" class="text-red-500 text-sm"></span>
+                            </div>
+                            <div>
+                                <label class="block font-medium text-sm text-gray-700">
+                                    <i class="fa-regular fa-calendar-days mr-1 text-gray-500"></i>
+                                    Fecha del acta:
+                                </label>
+                                <input type="date" name="fecha_acta" id="fecha_acta_fase1"
+                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
+                                <span id="fecha_acta_fase1Error" class="text-red-500 text-sm"></span>
+                            </div>
+                        </div>
 
                         <div class="mb-4">
-                            <label class="block font-medium text-sm text-gray-700">Respuesta / Comentarios <span
-                                    class="text-red-500">*</span></label>
-                            <textarea name="respuesta" id="respuesta_fase1" rows="4"
-                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500"
-                                placeholder="Describa los motivos de su decisión..."></textarea>
+                            <label class="block font-medium text-sm text-gray-700">
+                                <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                                Comentarios de la respuesta:
+                            </label>
+                            <div id="txt-editor-fase1" class="shadow txt-editor-quill" style="height: 200px; background: white;"></div>
+                            <textarea name="respuesta_fase1" id="respuesta_fase1" class="hidden"></textarea>
                             <span id="respuesta_fase1Error" class="text-red-500 text-sm"></span>
                         </div>
 
@@ -623,7 +649,7 @@
                                         d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
                                         stroke="currentColor" stroke-width="5" class="text-white"></path>
                                 </svg>
-                                Enviar Respuesta
+                                Responder
                             </button>
                         </div>
                     </form>
@@ -632,331 +658,322 @@
         </div>
     </div>
 
-    <!-- ==================== MODALES FASE 2 ==================== -->
-
     <!-- Modal FASE 2 - Estudiante (Enviar documentos de pago) -->
-    <div id="fase2EstudianteModal" class="fixed z-50 inset-0 overflow-y-auto" style="display: none;">
-        <!-- Overlay DETRÁS del modal (sin onclick para que no cierre) -->
-        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
-            style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;">
+<div id="fase2EstudianteModal" class="fixed z-50 inset-0 overflow-y-auto">
+    <div class="modal-overlay absolute inset-0" onclick="closeFase2EstudianteModal()">
+        <div class="flex items-center justify-center min-h-screen p-4 text-center relative">
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full modal-content relative"
+                onclick="event.stopPropagation()" style="max-width: 900px !important; width: 100%;">
+                
+                <button class="modal-close-btn-custom absolute top-3 right-4 text-gray-400 hover:text-red-500 text-2xl z-10"
+                    onclick="closeFase2EstudianteModal()">&times;</button>
 
-            <!-- Contenedor del modal - centrado -->
-            <div class="flex items-center justify-center min-h-screen p-4">
-                <div class="relative bg-white rounded-lg shadow-xl w-full max-w-4xl"
-                    style="max-width: 900px !important;" onclick="event.stopPropagation()">
+                <form class="p-8" id="fase2EstudianteForm" enctype="multipart/form-data">
+                    @csrf
+                    <input type="hidden" name="practica_id" value="{{ $practica->id }}">
 
-                    <button class="absolute top-3 right-4 text-gray-400 hover:text-red-500 text-2xl z-10"
-                        onclick="closeFase2EstudianteModal()">&times;</button>
+                    <!-- Título -->
+                    <div class="mb-4 pr-4">
+                        <p class="text-2xl font-bold" id="fase2EstudianteTitle">Prácticas empresariales: <span
+                                class="bg-uts-500 text-white px-3 py-1 rounded uppercase shadow-md text-xl">Fase 2</span></p>
+                        <p class="text-gray-950 mt-6 text-sm">En este formulario el estudiante deberá subir la
+                            liquidación de pago y el soporte correspondiente.</p>
+                    </div>
 
-                    <form class="p-16" id="fase2EstudianteForm" enctype="multipart/form-data">
-                        @csrf
-                        <input type="hidden" name="practica_id" value="{{ $practica->id }}">
+                    <p class="text-sm text-gray-950"><strong>NOTA: </strong>Por cada integrante del proyecto se
+                        debe cargar la liquidación y los respectivos soportes de pago.</p>
 
-                        <!-- Título -->
-                        <div class="mb-4 pr-4">
-                            <p class="text-2xl font-bold">Prácticas empresariales: <span
-                                    class="bg-uts-500 text-white px-3 py-1 rounded uppercase shadow-md text-xl">Fase
-                                    2</span></p>
-                            <p class="text-gray-950 mt-6 text-sm">En este formulario el estudiante deberá subir la
-                                liquidación de pago y el soporte correspondiente.</p>
-                        </div>
+                    <!-- Documentos y enlaces informativos -->
+                    <div class="flex items-center my-5">
+                        <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                        <p class="font-semibold text-gray-700 flex items-center gap-2">
+                            Documentos (Liquidaciones y soportes)
+                        </p>
+                    </div>
+                    <ul class="space-y-2 text-sm mb-4">
+                        <li class="flex items-center gap-2 flex-wrap">
+                            <span class="text-gray-600">Instructivo para pagar la liquidación:</span>
+                            <a href="{{ asset('ejemplos/fase_1-1.pdf') }}" target="_blank"
+                                class="text-blue-600 hover:text-blue-800 underline flex items-center gap-1">ABRIR ARCHIVO</a>
+                        </li>
+                        <li class="flex items-center gap-2 flex-wrap">
+                            <span class="text-gray-600">Liquidación con marca de agua (Ejemplo):</span>
+                            <a href="{{ asset('ejemplos/fase_1-2.pdf') }}" target="_blank"
+                                class="text-blue-600 hover:text-blue-800 underline flex items-center gap-1">ABRIR ARCHIVO</a>
+                        </li>
+                    </ul>
 
-                        <p class="text-sm text-gray-950"><strong>NOTA: </strong>Por cada integrante del proyecto se
-                            debe cargar la liquidación y los respectivos soportes de pago.</p>
+                    <!-- Campos en GRID para desktop (2 columnas) -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
 
-                        <!-- Documentos y enlaces informativos -->
-
-                        <div class="flex items-center my-5">
-                            <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
-                            <p class="font-semibold text-gray-700 flex items-center gap-2">
-                                Documentos (Liquidaciones y soportes)
-                            </p>
-                        </div>
-                        <ul class="space-y-2 text-sm mb-4">
-                            <li class="flex items-center gap-2 flex-wrap">
-                                <span class="text-gray-600">Instructivo para pagar la liquidación:</span>
-                                <a href="{{ asset('ejemplos/fase_1-1.pdf') }}" target="_blank"
-                                    class="text-blue-600 hover:text-blue-800 underline flex items-center gap-1"> ABRIR
-                                    ARCHIVO</a>
-                            </li>
-                            <li class="flex items-center gap-2 flex-wrap">
-                                <span class="text-gray-600">Liquidación con marca de agua (Ejemplo):</span>
-                                <a href="{{ asset('ejemplos/fase_1-2.pdf') }}" target="_blank"
-                                    class="text-blue-600 hover:text-blue-800 underline flex items-center gap-1"> ABRIR
-                                    ARCHIVO</a>
-                            </li>
-
-                        </ul>
-
-                        <!-- Campos en GRID para desktop (2 columnas) -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-
-                            <!-- Campo Liquidación de pago -->
-                            <div>
-                                <div class="flex items-center gap-2 mb-2">
-                                    <label class="block font-medium text-sm text-gray-700">
-                                        <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i><span
-                                            class="text-red-500">*</span> Liquidación de pago
-                                    </label>
-                                    <div class="relative inline-block">
-                                        <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
-                                            data-tooltip="tooltip-liquidacion"></i>
-                                    </div>
-                                </div>
-                                <div
-                                    class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
-                                    <div class="grid gap-1 text-center">
-                                        <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                        <h2 class="text-center text-gray-400 text-xs">Solo archivos PDF de máximo 5MB
-                                        </h2>
-                                    </div>
-                                    <div class="text-center">
-                                        <input type="file" name="liquidacion_pago" id="liquidacion_pago"
-                                            class="absolute inset-0 opacity-0 cursor-pointer w-full" accept=".pdf" />
-                                        <div
-                                            class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
-                                            Cargar</div>
-                                    </div>
-                                </div>
-                                <span id="liquidacion_pagoError" class="text-red-500 text-xs"></span>
-                                <ul id="file-list-liquidacion" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
-                                <div id="tooltip-liquidacion"
-                                    class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                                    Suba la liquidación generada del pago de modalidad. El documento debe incluir la
-                                    marca de agua correspondiente.
+                        <!-- Campo Liquidación de pago -->
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <label class="block font-medium text-sm text-gray-700">
+                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i><span
+                                        class="text-red-500">*</span> Liquidación de pago
+                                </label>
+                                <div class="relative inline-block">
+                                    <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                        data-tooltip="tooltip-liquidacion-fase2"></i>
                                 </div>
                             </div>
-
-                            <!-- Campo Soporte de pago -->
-                            <div>
-                                <div class="flex items-center gap-2 mb-2">
-                                    <label class="block font-medium text-sm text-gray-700">
-                                        <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i><span
-                                            class="text-red-500">*</span> Soporte de pago
-                                    </label>
-                                    <div class="relative inline-block">
-                                        <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
-                                            data-tooltip="tooltip-soporte"></i>
-                                    </div>
+                            <div
+                                class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+                                <div class="grid gap-1 text-center">
+                                    <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                    <h2 class="text-center text-gray-400 text-xs">Solo archivos PDF de máximo 5MB</h2>
                                 </div>
-                                <div
-                                    class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
-                                    <div class="grid gap-1 text-center">
-                                        <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                        <h2 class="text-center text-gray-400 text-xs">Solo archivos PDF de máximo 5MB
-                                        </h2>
-                                    </div>
-                                    <div class="text-center">
-                                        <input type="file" name="soporte_pago" id="soporte_pago"
-                                            class="absolute inset-0 opacity-0 cursor-pointer w-full" accept=".pdf" />
-                                        <div
-                                            class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
-                                            Cargar</div>
-                                    </div>
-                                </div>
-                                <span id="soporte_pagoError" class="text-red-500 text-xs"></span>
-                                <ul id="file-list-soporte" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
-                                <div id="tooltip-soporte"
-                                    class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                                    Suba el soporte de pago correspondiente a la liquidación.
+                                <div class="text-center">
+                                    <input type="file" name="liquidacion_pago" id="liquidacion_pago"
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full" accept=".pdf" />
+                                    <div
+                                        class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                        Cargar</div>
                                 </div>
                             </div>
-
+                            <span id="liquidacion_pagoError" class="text-red-500 text-xs"></span>
+                            <ul id="file-list-liquidacion" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                            <div id="tooltip-liquidacion-fase2"
+                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
+                                Suba la liquidación generada del pago de modalidad. El documento debe incluir la
+                                marca de agua correspondiente.
+                            </div>
                         </div>
 
-                        <div class="mt-4">
-                            <p class="text-xs">
-                            <div class="relative inline-block">
-                                <i class="fa-solid fa-circle-question text-sm text-uts-500 cursor-pointer tooltip-icon"
-                                    data-tooltip="tooltip-liquidacion"></i>
+                        <!-- Campo Soporte de pago -->
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <label class="block font-medium text-sm text-gray-700">
+                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i><span
+                                        class="text-red-500">*</span> Soporte de pago
+                                </label>
+                                <div class="relative inline-block">
+                                    <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                        data-tooltip="tooltip-soporte-fase2"></i>
+                                </div>
                             </div>
+                            <div
+                                class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+                                <div class="grid gap-1 text-center">
+                                    <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                    <h2 class="text-center text-gray-400 text-xs">Solo archivos PDF de máximo 5MB</h2>
+                                </div>
+                                <div class="text-center">
+                                    <input type="file" name="soporte_pago" id="soporte_pago"
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full" accept=".pdf" />
+                                    <div
+                                        class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                        Cargar</div>
+                                </div>
+                            </div>
+                            <span id="soporte_pagoError" class="text-red-500 text-xs"></span>
+                            <ul id="file-list-soporte" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                            <div id="tooltip-soporte-fase2"
+                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
+                                Suba el soporte de pago correspondiente a la liquidación.
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="mt-4">
+                        <p class="text-xs">
+                            <i class="fa-solid fa-circle-question text-sm text-uts-500"></i>
                             <strong>NOTA:</strong> En caso de que el estudiante desee sugerir un director de trabajo de
                             grado, deberá adjuntar una página adicional en el archivo PDF correspondiente a los pagos de
                             la modalidad, indicando de manera formal el nombre del docente que desea sugerir como
                             director de trabajo de grado. El comité evaluará la sugerencia y responderá al estudiante.
-                            </p>
-                        </div>
+                        </p>
+                    </div>
 
-                        <!-- Botones -->
-                        <div class="flex justify-end space-x-3 mt-6 pt-4 border-t">
-                            <button type="button" onclick="closeFase2EstudianteModal()"
-                                class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-5 py-2 rounded-lg transition">Cancelar</button>
-                            <button type="submit"
-                                class="flex bg-uts-500 hover:bg-uts-600 text-white px-5 py-2 rounded-lg transition items-center gap-2">
-                                <svg id="loadingSpinner-fase2" class="hidden w-4 h-4 text-white animate-spin"
-                                    viewBox="0 0 64 64" fill="none">
-                                    <path
-                                        d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
-                                        stroke="currentColor" stroke-width="5"></path>
-                                    <path
-                                        d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
-                                        stroke="currentColor" stroke-width="5" class="text-white"></path>
-                                </svg>
-                                <i class="fa-regular fa-paper-plane"></i>
-                                Enviar
-                            </button>
-                        </div>
-                    </form>
-                </div>
+                    <!-- Botones -->
+                    <div class="flex justify-end space-x-3 mt-6 pt-4 border-t">
+                        <button type="button" onclick="closeFase2EstudianteModal()"
+                            class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-5 py-2 rounded-lg transition">Cancelar</button>
+                        <button type="submit"
+                            class="flex bg-uts-500 hover:bg-uts-800 text-white px-5 py-2 rounded-lg transition items-center gap-2">
+                            <svg id="loadingSpinner-fase2" class="hidden w-4 h-4 text-white animate-spin"
+                                viewBox="0 0 64 64" fill="none">
+                                <path
+                                    d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
+                                    stroke="currentColor" stroke-width="5"></path>
+                                <path
+                                    d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
+                                    stroke="currentColor" stroke-width="5" class="text-white"></path>
+                            </svg>
+                            Enviar
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
+</div>
 
     <!-- Modal FASE 2 - Detalles (Ver información enviada) -->
-    <div id="fase2DetailsModal" class="fixed z-50 inset-0 overflow-y-auto">
-        <div class="modal-overlay absolute inset-0" onclick="closeFase2DetailsModal()">
-            <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
-                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
-                    onclick="event.stopPropagation()">
-                    <button
-                        class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
-                        onclick="closeFase2DetailsModal()">&times;</button>
-                    <div class="p-6 mt-2">
-                        <p class="text-2xl font-bold mb-4">Detalles de la <span
-                                class="bg-uts-500 text-white px-2 py-0.5 rounded uppercase shadow">Fase 2</span></p>
-                        <div id="fase2DetailsContent" class="space-y-3">
-                            <div class="text-center py-4">
-                                <svg class="inline w-8 h-8 text-gray-400 animate-spin" viewBox="0 0 64 64"
-                                    fill="none">
-                                    <path
-                                        d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
-                                        stroke="currentColor" stroke-width="5"></path>
-                                </svg>
-                                <p class="mt-2 text-gray-500">Cargando detalles...</p>
-                            </div>
+<div id="fase2DetailsModal" class="fixed z-50 inset-0 overflow-y-auto">
+    <div class="modal-overlay absolute inset-0" onclick="closeFase2DetailsModal()">
+        <div class="flex items-center justify-center min-h-screen p-4 text-center relative">
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
+                onclick="event.stopPropagation()">
+                <button
+                    class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
+                    onclick="closeFase2DetailsModal()">&times;</button>
+                <div class="p-6 mt-2">
+                    <p class="text-2xl font-bold mb-4">Detalles de la <span
+                            class="bg-uts-500 text-white px-2 py-0.5 rounded uppercase shadow">Fase 2</span></p>
+                    <div id="fase2DetailsContent" class="space-y-3">
+                        <div class="text-center py-4">
+                            <svg class="inline w-8 h-8 text-gray-400 animate-spin" viewBox="0 0 64 64"
+                                fill="none">
+                                <path
+                                    d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
+                                    stroke="currentColor" stroke-width="5"></path>
+                            </svg>
+                            <p class="mt-2 text-gray-500">Cargando detalles...</p>
                         </div>
-                        <div class="flex justify-end mt-4">
-                            <button type="button" onclick="closeFase2DetailsModal()"
-                                class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cerrar</button>
-                        </div>
+                    </div>
+                    <div class="flex justify-end mt-4">
+                        <button type="button" onclick="closeFase2DetailsModal()"
+                            class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cerrar</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
     <!-- Modal FASE 2 - Administrador (Responder solicitud + Asignar docentes) -->
-    <div id="fase2AdminModal" class="fixed z-50 inset-0 overflow-y-auto">
-        <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeFase2AdminModal()">
-            <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
-                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
-                    onclick="event.stopPropagation()">
-                    <button
-                        class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
-                        onclick="closeFase2AdminModal()">&times;</button>
-                    <form class="p-6 mt-2" id="fase2AdminForm">
-                        @csrf
-                        <input type="hidden" name="practica_id" value="{{ $practica->id }}">
-                        <p class="text-2xl font-bold mb-4">Responder <span
-                                class="bg-uts-500 text-white px-2 py-0.5 rounded uppercase shadow">Fase 2</span></p>
-                        <p class="text-sm text-gray-600 mb-4">Apruebe o rechace el pago de modalidad. Si aprueba,
-                            deberá asignar director y evaluador.</p>
+<div id="fase2AdminModal" class="fixed z-50 inset-0 overflow-y-auto">
+    <div class="modal-overlay absolute inset-0" onclick="closeFase2AdminModal()">
+        <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
+                onclick="event.stopPropagation()">
+                <button
+                    class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
+                    onclick="closeFase2AdminModal()">&times;</button>
+                <form class="p-6 mt-2" id="fase2AdminForm">
+                    @csrf
+                    <input type="hidden" name="practica_id" value="{{ $practica->id }}">
+                    <p class="text-2xl font-bold mb-4">Responder <span
+                            class="bg-uts-500 text-white px-2 py-0.5 rounded uppercase shadow">Fase 2</span></p>
+                    <p class="text-sm text-gray-600 mb-4">Apruebe o rechace el pago de modalidad. Si aprueba,
+                        deberá asignar director y evaluador.</p>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                            <div>
-                                <label class="block font-medium text-sm text-gray-700">Número de acta <span
-                                        class="text-red-500">*</span></label>
-                                <input type="text" name="nro_acta" id="nro_acta_fase2"
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
-                                <span id="nro_acta_fase2Error" class="text-red-500 text-sm"></span>
-                            </div>
-                            <div>
-                                <label class="block font-medium text-sm text-gray-700">Fecha del acta <span
-                                        class="text-red-500">*</span></label>
-                                <input type="date" name="fecha_acta" id="fecha_acta_fase2"
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
-                                <span id="fecha_acta_fase2Error" class="text-red-500 text-sm"></span>
-                            </div>
+                    <div class="mb-4">
+                        <label class="block font-medium text-sm text-gray-700"> 
+                            <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                            Estado de la práctica:
+                        </label>
+                        <select name="estado" id="estado_fase2"
+                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
+                            <option value="">Seleccione un estado</option>
+                            <option value="Aprobada">Aprobar</option>
+                            <option value="Rechazada">Rechazar</option>
+                        </select>
+                        <span id="estado_fase2Error" class="text-red-500 text-sm"></span>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block font-medium text-sm text-gray-700">
+                                <i class="fa-regular fa-file-lines mr-1 text-gray-500"></i>    
+                                Número de acta:
+                            </label>
+                            <input type="text" name="nro_acta" id="nro_acta_fase2"
+                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500" placeholder="Ingrese el número de acta">
+                            <span id="nro_acta_fase2Error" class="text-red-500 text-sm"></span>
                         </div>
-
-                        <div class="mb-4">
-                            <label class="block font-medium text-sm text-gray-700">Estado <span
-                                    class="text-red-500">*</span></label>
-                            <select name="estado" id="estado_fase2"
+                        <div>
+                            <label class="block font-medium text-sm text-gray-700">
+                                <i class="fa-regular fa-calendar-days mr-1 text-gray-500"></i>
+                                Fecha del acta:
+                            </label>
+                            <input type="date" name="fecha_acta" id="fecha_acta_fase2"
                                 class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
-                                <option value="">Seleccione un estado</option>
-                                <option value="Aprobada">Aprobar</option>
-                                <option value="Rechazada">Rechazar</option>
+                            <span id="fecha_acta_fase2Error" class="text-red-500 text-sm"></span>
+                        </div>
+                    </div>
+
+                    <!-- Contenedor para asignación de docentes (se muestra solo si selecciona Aprobada) -->
+                    <div id="container_docentes_fase2" class="hidden mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <p class="font-bold text-sm text-gray-700 mb-3">
+                            <i class="fa-solid fa-chalkboard-user mr-2 text-gray-500"></i>
+                            Asignación de docentes:
+                        </p>
+
+                        <div class="mb-3">
+                            <label class="block font-medium text-sm text-gray-700">Director <span class="text-red-500">*</span></label>
+                            <select name="director_id" id="director_id_fase2"
+                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
+                                <option value="">Seleccione un director</option>
+                                @foreach ($docentes as $docente)
+                                    <option value="{{ $docente->id }}">{{ $docente->name }}</option>
+                                @endforeach
                             </select>
-                            <span id="estado_fase2Error" class="text-red-500 text-sm"></span>
+                            <span id="director_id_fase2Error" class="text-red-500 text-sm"></span>
                         </div>
 
-                        <!-- Contenedor para asignación de docentes (se muestra solo si selecciona Aprobada) -->
-                        <div id="container_docentes_fase2"
-                            class="hidden mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                            <p class="font-bold text-sm text-gray-700 mb-3">Asignación de docentes:</p>
-
-                            <div class="mb-3">
-                                <label class="block font-medium text-sm text-gray-700">Director <span
-                                        class="text-red-500">*</span></label>
-                                <select name="director_id" id="director_id_fase2"
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
-                                    <option value="">Seleccione un director</option>
-                                    @foreach ($docentes as $docente)
-                                        <option value="{{ $docente->id }}">{{ $docente->name }}</option>
-                                    @endforeach
-                                </select>
-                                <span id="director_id_fase2Error" class="text-red-500 text-sm"></span>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="block font-medium text-sm text-gray-700">Evaluador <span
-                                        class="text-red-500">*</span></label>
-                                <select name="evaluador_id" id="evaluador_id_fase2"
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
-                                    <option value="">Seleccione un evaluador</option>
-                                    @foreach ($docentes as $docente)
-                                        <option value="{{ $docente->id }}">{{ $docente->name }}</option>
-                                    @endforeach
-                                </select>
-                                <span id="evaluador_id_fase2Error" class="text-red-500 text-sm"></span>
-                            </div>
-
-                            <div>
-                                <label class="block font-medium text-sm text-gray-700">Codirector (opcional)</label>
-                                <select name="codirector_id" id="codirector_id_fase2"
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
-                                    <option value="">Seleccione un codirector (opcional)</option>
-                                    @foreach ($docentes as $docente)
-                                        <option value="{{ $docente->id }}">{{ $docente->name }}</option>
-                                    @endforeach
-                                </select>
-                                <span id="codirector_id_fase2Error" class="text-red-500 text-sm"></span>
-                            </div>
+                        <div class="mb-3">
+                            <label class="block font-medium text-sm text-gray-700">Evaluador <span class="text-red-500">*</span></label>
+                            <select name="evaluador_id" id="evaluador_id_fase2"
+                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
+                                <option value="">Seleccione un evaluador</option>
+                                @foreach ($docentes as $docente)
+                                    <option value="{{ $docente->id }}">{{ $docente->name }}</option>
+                                @endforeach
+                            </select>
+                            <span id="evaluador_id_fase2Error" class="text-red-500 text-sm"></span>
                         </div>
 
-                        <div class="mb-4">
-                            <label class="block font-medium text-sm text-gray-700">Respuesta / Comentarios <span
-                                    class="text-red-500">*</span></label>
-                            <textarea name="respuesta" id="respuesta_fase2" rows="4"
-                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500"
-                                placeholder="Describa los motivos de su decisión..."></textarea>
-                            <span id="respuesta_fase2Error" class="text-red-500 text-sm"></span>
+                        <div>
+                            <label class="block font-medium text-sm text-gray-700">Codirector (opcional)</label>
+                            <select name="codirector_id" id="codirector_id_fase2"
+                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
+                                <option value="">Seleccione un codirector (opcional)</option>
+                                @foreach ($docentes as $docente)
+                                    <option value="{{ $docente->id }}">{{ $docente->name }}</option>
+                                @endforeach
+                            </select>
+                            <span id="codirector_id_fase2Error" class="text-red-500 text-sm"></span>
                         </div>
+                    </div>
 
-                        <div class="flex justify-end space-x-2 mt-4">
-                            <button type="button" onclick="closeFase2AdminModal()"
-                                class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cancelar</button>
-                            <button type="submit"
-                                class="flex bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg">
-                                <svg id="loadingSpinner-fase2-admin" style="margin: 4px 10px 4px 0"
-                                    class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64"
-                                    fill="none">
-                                    <path
-                                        d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
-                                        stroke="currentColor" stroke-width="5"></path>
-                                    <path
-                                        d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
-                                        stroke="currentColor" stroke-width="5" class="text-white"></path>
-                                </svg>
-                                Enviar Respuesta
-                            </button>
-                        </div>
-                    </form>
-                </div>
+                    <div class="mb-4">
+                        <label class="block font-medium text-sm text-gray-700">
+                            <i class="fa-solid fa-message mr-2 text-gray-500"></i>
+                            Comentarios de la respuesta:
+                        </label>
+                        <div id="txt-editor-fase2" class="shadow txt-editor-quill" style="height: 200px; background: white;"></div>
+                        <textarea name="respuesta" id="respuesta_fase2" class="hidden"></textarea>
+                        <span id="respuesta_fase2Error" class="text-red-500 text-sm"></span>
+                    </div>
+
+                    <div class="flex justify-end space-x-2 mt-4">
+                        <button type="button" onclick="closeFase2AdminModal()"
+                            class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cancelar</button>
+                        <button type="submit"
+                            class="flex bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg">
+                            <svg id="loadingSpinner-fase2-admin" style="margin: 4px 10px 4px 0"
+                                class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64"
+                                fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                                <path
+                                    d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
+                                    stroke="currentColor" stroke-width="5"></path>
+                                <path
+                                    d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
+                                    stroke="currentColor" stroke-width="5" class="text-white"></path>
+                            </svg>
+                            Responder
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
+</div>
+
     <!-- Calendario Modal -->
     <div id="calendarModal" class="hidden fixed z-50 inset-0">
         <div class="absolute inset-0 bg-black bg-opacity-50" onclick="closeCalendarModal()"></div>
