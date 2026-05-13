@@ -47,7 +47,39 @@ class RoadMapPracticaController extends Controller
 
     public function index(Request $request)
 {
+    // Obtener el periodo actual
+    $periodoActual = session('periodo_academico', '2026-1');
+
+    // Buscar las fechas para el periodo actual
+    $fechasData = Fecha::where('periodo', $periodoActual)->first();
+
+    $fechas = [];
+    
+    if ($fechasData) {
+        // Como el modelo tiene cast, $fechasData->fechas ya es un array
+        $fechasArray = $fechasData->fechas;
+        
+        $fechas = [
+            'fecha_inicio_banco' => $fechasArray['fecha_inicio_banco'] ?? 'No definida',
+            'fecha_fin_banco' => $fechasArray['fecha_fin_banco'] ?? 'No definida',
+            'fecha_inicio_proyectos' => $fechasArray['fecha_inicio_proyectos'] ?? 'No definida',
+            'fecha_fin_proyectos' => $fechasArray['fecha_fin_proyectos'] ?? 'No definida',
+            'fecha_aprobacion_propuesta' => $fechasArray['fecha_aprobacion_propuesta'] ?? 'No definida',
+        ];
+    } else {
+        // Fechas por defecto
+        $fechas = [
+            'fecha_inicio_banco' => '2026-01-30',
+            'fecha_fin_banco' => '2026-09-30',
+            'fecha_inicio_proyectos' => '2026-02-09',
+            'fecha_fin_proyectos' => '2026-09-30',
+            'fecha_aprobacion_propuesta' => '2026-09-30',
+        ];
+    }
+    
     try {
+
+
         $practica = Practica::with('user.nivel', 'valoresCampos.campo')->findOrFail($request->practica_id);
 
         $codigo_practica = 'PRA-' . str_pad($practica->id, 5, '0', STR_PAD_LEFT);

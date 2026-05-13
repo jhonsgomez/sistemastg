@@ -130,20 +130,20 @@
             }
 
     /* Estilos específicos para calendarModal */
-    #calendarModal {
-        visibility: hidden !important;
-        opacity: 0 !important;
-        transform: translateY(-10px) !important;
-        transition: visibility 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
-        pointer-events: none !important;
-    }
-    
-    #calendarModal.show {
-        visibility: visible !important;
-        opacity: 1 !important;
-        transform: translateY(0) !important;
-        pointer-events: auto !important;
-    }
+#calendarModal {
+    visibility: hidden !important;
+    opacity: 0 !important;
+    transform: translateY(-20px) !important;
+    transition: visibility 0.3s ease, opacity 0.3s ease, transform 0.3s ease !important;
+    pointer-events: none !important;
+}
+
+#calendarModal.show {
+    visibility: visible !important;
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+    pointer-events: auto !important;
+}
     
     .modal-close-btn-custom:hover {
         color: #ef4444 !important;
@@ -448,23 +448,22 @@ select.dt-input:focus {
                 </svg>
             </button>
             <!--- AQUI SOLO VA LA VARIABLE $fechas--->
-            <button type="button" id="calendar" onclick="openCalendarModal()"
-                class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white px-3 py-1 rounded-lg relative"
-                style="margin-right: 0.3rem !important">
-                <i class="fa-regular fa-calendar"></i>
-                <svg id="loadingSpinner-calendarOpen" style="margin: 4px 1px"
-                    class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64" fill="none"
-                    xmlns="http://www.w3.org/2000/svg" width="24" height="24">
-                    <path
-                        d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
-                        stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
-                    <path
-                        d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
-                        stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"
-                        class="text-white">
-                    </path>
-                </svg>
-            </button>
+            <button type="button" id="calendar" onclick="openCalendarModal(this)"
+    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center"
+    style="margin-right: 0.3rem !important">
+    <i class="fa-regular fa-calendar"></i>
+    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none"
+        xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+        <path
+            d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
+            stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+        <path
+            d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
+            stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"
+            class="text-white">
+        </path>
+    </svg>
+</button>
             @if (auth()->user()->hasRole(['estudiante']))
                 @can('create_proyecto_grado')
                     <button onclick="openCreateModal()" id="openCreateModalButton"
@@ -1065,58 +1064,60 @@ select.dt-input:focus {
         </div>
     </div>
 
-    <div id="calendarModal" class="fixed z-50 inset-0 overflow-y-auto" style="visibility: hidden; opacity: 0; transform: translateY(-20px); transition: visibility 0.3s ease, opacity 0.3s ease, transform 0.3s ease; pointer-events: none;">
-    <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5);" onclick="closeCalendarModal()">
-        <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative" style="max-width: 650px !important; width: 100% !important; padding: 2rem 2rem !important;" onclick="event.stopPropagation()">
-                
-                <button class="modal-close-btn-custom" onclick="closeCalendarModal()" style="position: absolute !important; top: 10px !important; right: 28px !important; background: none !important; border: none !important; cursor: pointer !important; color: #6b7280 !important;">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-                
-                <div class="p-4 mt-2">
-                    <p class="text-2xl font-bold text-gray-800 mb-4">Calendario del Proyecto</p>
-                    <p class="font-medium text-md text-gray-700 mb-6">Aquí podrá visualizar algunas fechas importantes del proyecto en curso.</p>
-                    
-                    <div class="overflow-x-auto mb-4">
-                        <table class="min-w-full border-collapse border border-gray-300 bg-gray-50 shadow-md rounded-lg">
-                            <thead>
-                                <tr class="bg-gray-200 text-gray-700">
-                                    <th class="px-4 py-3 text-left font-semibold border border-gray-300 uppercase text-sm">Descripción</th>
-                                    <th class="px-4 py-3 text-left font-semibold border border-gray-300 uppercase text-sm">Fechas</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="bg-white">
-                                    <td class="px-4 py-3 border border-gray-300">Propuestas en banco de ideas</td>
-                                    <td class="px-4 py-3 border border-gray-300">
-                                        Desde {{ $fechas['fecha_inicio_banco'] ?? 'No definida' }} 
-                                        hasta {{ $fechas['fecha_fin_banco'] ?? 'No definida' }}
-                                    </td>
-                                </tr>
-                                <tr class="bg-gray-50">
-                                    <td class="px-4 py-3 border border-gray-300">Propuesta de proyectos de grado</td>
-                                    <td class="px-4 py-3 border border-gray-300">
-                                        Desde {{ $fechas['fecha_inicio_proyectos'] ?? 'No definida' }} 
-                                        hasta {{ $fechas['fecha_fin_proyectos'] ?? 'No definida' }}
-                                    </td>
-                                </tr>
-                                <tr class="bg-white">
-                                    <td class="px-4 py-3 border border-gray-300">Fecha máxima para aprobación de propuestas</td>
-                                    <td class="px-4 py-3 border border-gray-300">
-                                        Hasta {{ $fechas['fecha_aprobacion_propuesta'] ?? 'No definida' }}
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+    @if (isset($fechas))
+        <div id="calendarModal" class="fixed z-50 inset-0 overflow-y-auto">
+            <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5);" onclick="closeCalendarModal()">
+                <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
+                    <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative" style="width: 100% !important; padding: 2rem 2rem !important;" onclick="event.stopPropagation()">
+                        
+                        <button class="modal-close-btn-custom" onclick="closeCalendarModal()" style="position: absolute !important; top: 10px !important; right: 28px !important; background: none !important; border: none !important; cursor: pointer !important; color: #6b7280 !important;">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                        
+                        <div class="p-6 mt-2">
+                            <p class="text-2xl font-bold text-gray-800 mb-4">Calendario de la <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Práctica</span></p>
+                            <p class="font-medium text-md text-gray-700 mb-2">Aquí podrá visualizar algunas fechas importantes de la práctica en curso.</p>
+                            
+                            <div class="overflow-x-auto mb-4">
+                                <table class="min-w-full border-collapse border border-gray-300 bg-gray-50 shadow-md rounded-lg">
+                                    <thead>
+                                        <tr class="bg-gray-200 text-gray-700">
+                                            <th class="px-4 py-3 text-left font-semibold border border-gray-300 uppercase text-sm">Descripción</th>
+                                            <th class="px-4 py-3 text-left font-semibold border border-gray-300 uppercase text-sm">Fechas</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="bg-white">
+                                            <td class="px-4 py-3 border border-gray-300">Propuestas en banco de ideas</td>
+                                            <td class="px-4 py-3 border border-gray-300">
+                                                Desde <span class="font-semibold" style="font-size: 0.9rem;">{{ $fechas['fecha_inicio_banco'] ?? 'No definida' }}</span> 
+                                                hasta <span class="font-semibold" style="font-size: 0.9rem;">{{ $fechas['fecha_fin_banco'] ?? 'No definida' }}</span>
+                                            </td>
+                                        </tr>
+                                        <tr class="bg-gray-50">
+                                            <td class="px-4 py-3 border border-gray-300">Propuesta de proyectos de grado</td>
+                                            <td class="px-4 py-3 border border-gray-300">
+                                                Desde <span class="font-semibold" style="font-size: 0.9rem;">{{ $fechas['fecha_inicio_proyectos'] ?? 'No definida' }}</span> 
+                                                hasta <span class="font-semibold" style="font-size: 0.9rem;">{{ $fechas['fecha_fin_proyectos'] ?? 'No definida' }}</span>
+                                            </td>
+                                        </tr>
+                                        <tr class="bg-white">
+                                            <td class="px-4 py-3 border border-gray-300">Fecha máxima para aprobación de propuestas</td>
+                                            <td class="px-4 py-3 border border-gray-300">
+                                                Hasta <span class="font-semibold" style="font-size: 0.9rem;">{{ $fechas['fecha_aprobacion_propuesta'] ?? 'No definida' }}</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
+    @endif
     
     @push('scripts')
         <script src="{{ asset('js/fases/practicas/fase_0.js') }}"></script>
@@ -1841,23 +1842,44 @@ $(document).ready(function() {
         </script>
 
     <script>
-    function openCalendarModal() {
-        const modal = document.getElementById('calendarModal');
-        if (modal) {
-            modal.style.display = 'block';
-            console.log('Modal abierto');
-        } else {
-            console.error('Modal no encontrado');
-        }
+    function openCalendarModal(btn) {
+    // Mostrar spinner y ocultar icono en el botón
+    if (btn) {
+        const icon = btn.querySelector('i');
+        const spinner = btn.querySelector('.loading-spinner');
+        if (icon) icon.classList.add('hidden');
+        if (spinner) spinner.classList.remove('hidden');
+        btn.disabled = true;
     }
     
-    function closeCalendarModal() {
-        const modal = document.getElementById('calendarModal');
-        if (modal) {
-            modal.style.display = 'none';
-            console.log('Modal cerrado');
-        }
+    // Usar la clase 'show' en lugar de style.display
+    const modal = document.getElementById('calendarModal');
+    if (modal) {
+        modal.classList.add('show');
+        console.log('Modal abierto');
+    } else {
+        console.error('Modal no encontrado');
     }
+    
+    // Restaurar el botón después de abrir
+    if (btn) {
+        setTimeout(() => {
+            const icon = btn.querySelector('i');
+            const spinner = btn.querySelector('.loading-spinner');
+            if (icon) icon.classList.remove('hidden');
+            if (spinner) spinner.classList.add('hidden');
+            btn.disabled = false;
+        }, 200);
+    }
+}
+
+function closeCalendarModal() {
+    const modal = document.getElementById('calendarModal');
+    if (modal) {
+        modal.classList.remove('show');
+        console.log('Modal cerrado');
+    }
+}
 </script>
 
         <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
