@@ -73,8 +73,8 @@ class PracticaService
 
                     case 'file':
 
-                        if (
-                            $campo->name === 'hoja_vida' &&
+                       if (
+                            in_array($campo->name, ['hoja_vida', 'hoja_vida_2']) &&
                             $tieneEmpresa
                         ) {
                             continue 2;

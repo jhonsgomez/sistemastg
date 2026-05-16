@@ -59,6 +59,12 @@ class CamposPracticasSeeder extends Seeder
                 ['label' => 'Hoja de vida (PDF)', 'type' => 'file', 'required' => false, 'instructions' => 'Suba la hoja de vida si NO cuenta con empresa.']
             );
 
+            // 7.1 Hoja de vida segundo integrante
+            Campo::updateOrCreate(
+                ['tipo_solicitud_id' => $practicas_fase_0->id,'name' => 'hoja_vida_2'],
+                ['label' => 'Hoja de vida segundo integrante (PDF)','type' => 'file','required' => false,'instructions' => 'Suba la hoja de vida del segundo integrante si NO cuenta con empresa.']
+            );
+
             // 8. Título de la práctica
             Campo::updateOrCreate(
                 ['tipo_solicitud_id' => $practicas_fase_0->id, 'name' => 'titulo'],
@@ -224,6 +230,103 @@ class CamposPracticasSeeder extends Seeder
                 ]
             );
         }
+
+
+        // ################ FASE 3 #####################
+
+        $practicas_fase_3 = TipoSolicitud::where('nombre', 'practicas_fase_3')->first();
+        if ($practicas_fase_3) {
+            // Restaurar campos eliminados lógicamente
+            Campo::withTrashed()
+                ->where('tipo_solicitud_id', $practicas_fase_3->id)
+                ->restore();
+
+            // 1. ARL
+            Campo::updateOrCreate(
+                ['tipo_solicitud_id' => $practicas_fase_3->id, 'name' => 'arl'],
+                [
+                    'label' => 'Administradora de Riesgos Laborales',
+                    'type' => 'file',
+                    'required' => true,
+                    'instructions' => '<p>Suba el ARL en formato <strong>PDF</strong> (máx. 5 MB).</p>
+                                    <ul class="list-disc mt-2 ml-4">
+                                        <li class="ml-4">Debe contener la firma de la entidad</li>
+                                        <li class="ml-4">Asegúrese de que los datos sean legibles</li>
+                                    </ul>'
+                ]
+            );
+
+            // 1. FDC-127 FORMATO DE PROPUESTA DE PRACTICAS
+            Campo::updateOrCreate(
+                ['tipo_solicitud_id' => $practicas_fase_3->id, 'name' => 'doc_fdc127'],
+                [
+                    'label' => 'Formato F-DC-127',
+                    'type' => 'file',
+                    'required' => true,
+                    'instructions' => '<p>Suba el Formato propuesta de prácticas F-DC-127 en formato <strong>WORD</strong> (máx. 5 MB).</p>'
+                ]
+            );
+
+            // 1. FDC-195 Acta de inicio de prácticas 
+            Campo::updateOrCreate(
+                ['tipo_solicitud_id' => $practicas_fase_3->id, 'name' => 'doc_fdc195'],
+                [
+                    'label' => 'Formato F-DC-195',
+                    'type' => 'file',
+                    'required' => true,
+                    'instructions' => '<p>Suba el Formato de acta de inicio F-DC-195 en formato <strong>WORD</strong> (máx. 5 MB).</p>'
+                ]
+            );
+
+            // 3. Bandera envío
+            Campo::updateOrCreate(
+                [
+                    'tipo_solicitud_id' => $practicas_fase_3->id,
+                    'name' => 'submited_fase3'
+                ],
+                [
+                    'label' => 'Fase 3 enviada',
+                    'type' => 'hidden',
+                    'required' => false,
+                    'instructions' => null
+                ]
+            );
+
+            // 4. Respuesta director
+            Campo::updateOrCreate(
+                [
+                    'tipo_solicitud_id' => $practicas_fase_3->id,
+                    'name' => 'respuesta_director_fase3'
+                ],
+                [
+                    'label' => 'Respuesta del director',
+                    'type' => 'textarea',
+                    'required' => false,
+                    'instructions' => null
+                ]
+            );
+
+
+      
+
+
+
+
+
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
 
     }
 }

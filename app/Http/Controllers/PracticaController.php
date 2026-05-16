@@ -156,7 +156,7 @@ class PracticaController extends Controller
 
     return DataTables::of($practicas)
         ->addColumn('formatted_id', function ($p) {
-            return 'PRA-' . str_pad($p->id, 5, '0', STR_PAD_LEFT);
+            return 'GRA-00' . $p->id;
         })
         ->addColumn('descripcion', function ($p) {
             return 'Solicitud de prácticas empresariales';
@@ -476,7 +476,7 @@ public function buscarEstudiantes(Request $request)
         $integrantesHtml .= '<div class="text-gray-800 w-full sm:flex-1 sm:ml-2">';
         $integrantesHtml .= e($practica->user->name) . '<br>';
         $integrantesHtml .= 'C.C ' . e($practica->user->nro_documento ?? 'N/A') . '<br>';
-        $integrantesHtml .= e($practica->user->email) . '<br>';
+        $integrantesHtml .= '<a href="mailto:' . e($practica->user->email) . '" class="text-blue-600 underline">'. e($practica->user->email) .'</a><br>';
         $integrantesHtml .= e($practica->user->nro_celular ?? 'N/A');
         $integrantesHtml .= '</div></div>';
         
@@ -487,7 +487,7 @@ public function buscarEstudiantes(Request $request)
             $integrantesHtml .= '<div class="text-gray-800 w-full sm:flex-1 sm:ml-2">';
             $integrantesHtml .= e($integrante2->name) . '<br>';
             $integrantesHtml .= 'C.C ' . e($integrante2->nro_documento ?? 'N/A') . '<br>';
-            $integrantesHtml .= e($integrante2->email) . '<br>';
+            $integrantesHtml .= '<a href="mailto:' . e($integrante2->email) . '" class="text-blue-600 underline">'. e($integrante2->email) .'</a><br>';
             $integrantesHtml .= e($integrante2->nro_celular ?? 'N/A');
             $integrantesHtml .= '</div></div>';
         }
@@ -531,6 +531,7 @@ public function buscarEstudiantes(Request $request)
         // Empresa
         $tieneEmpresa = $data['tiene_empresa'] ?? 'false';
         $hojaVida = $data['hoja_vida'] ?? null;
+        $hojaVida2 = $data['hoja_vida_2'] ?? null;
         
         return response()->json([
             'id' => $practica->id,
@@ -546,6 +547,7 @@ public function buscarEstudiantes(Request $request)
             'modalidad' => $modalidad,
             'tiene_empresa' => $tieneEmpresa === 'true',
             'hoja_vida' => $hojaVida,
+            'hoja_vida_2' => $hojaVida2,
             'es_estudiante' => $esEstudiante
         ]);
         

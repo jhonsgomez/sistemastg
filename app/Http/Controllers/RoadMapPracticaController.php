@@ -19,6 +19,7 @@ use App\Models\Fecha;
 use App\Services\PracticaMailService;
 use App\Services\PracticaService;
 
+
 class RoadMapPracticaController extends Controller
 {
     /**
@@ -628,5 +629,263 @@ public function replyFase2(Request $request)
         'tipo_solicitud_id' => $practica->tipo_solicitud_id
     ]);
 }
+
+
+    /*FASE 3 - Estudiante: Envío de documentos*/
+    public function storeFase3(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+
+            'practica_id' => 'required|exists:practicas,id',
+            'arl' => 'required|file|mimes:pdf|max:5120',
+            'doc_fdc127' => 'required|file|mimes:doc,docx|max:5120',
+            'doc_fdc195' => 'required|file|mimes:doc,docx|max:5120',
+        ], [
+            'arl.required' => 'El ARL es obligatorio.',
+            'arl.mimes' => 'El ARL debe ser un archivo PDF.',
+            'arl.max' => 'El ARL no puede superar los 5MB.',
+
+            'doc_fdc127.required' => 'El formato F-DC-127 es obligatorio.',
+            'doc_fdc127.mimes' => 'El formato F-DC-127 debe ser un archivo WORD.',
+            'doc_fdc127.max' => 'El formato F-DC-127 no puede superar los 5MB.',
+
+            'doc_fdc195.required' => 'El formato F-DC-195 es obligatorio.',
+            'doc_fdc195.mimes' => 'El formato F-DC-195 debe ser un archivo WORD.',
+            'doc_fdc195.max' => 'El formato F-DC-195 no puede superar los 5MB.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $practica = Practica::findOrFail($request->practica_id);
+
+        // Verificar que esté en Fase 3
+        if (!in_array($practica->estado, ['Fase 3'])) {
+            return response()->json([
+                'error' => 'La práctica no está en la fase correspondiente'
+            ], 422);
+
+        }
+
+        $tipo_fase3 = $this->getType('practicas_fase_3');
+
+        $campos_fase3 = Campo::where(
+            'tipo_solicitud_id',
+            $tipo_fase3->id
+        )->get();
+
+        // ==================== 1. ARL ====================
+        if ($request->hasFile('arl')) {
+            $campoArl = $campos_fase3
+                ->where('name', 'arl')
+                ->first();
+            $valorExistente = PracticaValorCampo::where(
+                    'practica_id',
+                    $practica->id
+                )
+                ->where('campo_id', $campoArl->id)
+                ->first();
+
+            if ($valorExistente && $valorExistente->valor) {
+                Storage::disk('public')
+                    ->delete($valorExistente->valor);
+            }
+
+            $path = $request
+                ->file('arl')
+                ->store('practicas/fase3', 'public');
+
+            PracticaValorCampo::updateOrCreate(
+                [
+                    'practica_id' => $practica->id,
+                    'campo_id' => $campoArl->id
+                ],
+                [
+                    'valor' => $path
+                ]
+            );
+        }
+
+        // ==================== 2. FDC-127 ====================
+
+        if ($request->hasFile('doc_fdc127')) {
+            $campo127 = $campos_fase3
+                ->where('name', 'doc_fdc127')
+                ->first();
+            $valorExistente = PracticaValorCampo::where(
+                    'practica_id',
+                    $practica->id
+                )
+                ->where('campo_id', $campo127->id)
+                ->first();
+
+            if ($valorExistente && $valorExistente->valor) {
+                Storage::disk('public')
+                    ->delete($valorExistente->valor);
+
+            }
+            $path = $request
+                ->file('doc_fdc127')
+                ->store('practicas/fase3', 'public');
+
+            PracticaValorCampo::updateOrCreate(
+
+                [
+                    'practica_id' => $practica->id,
+                    'campo_id' => $campo127->id
+                ],
+
+                [
+                    'valor' => $path
+                ]
+            );
+        }
+
+        // ==================== 3. FDC-195 ====================
+
+        if ($request->hasFile('doc_fdc195')) {
+            $campo195 = $campos_fase3
+                ->where('name', 'doc_fdc195')
+                ->first();
+
+            $valorExistente = PracticaValorCampo::where(
+                    'practica_id',
+                    $practica->id
+                )
+                ->where('campo_id', $campo195->id)
+                ->first();
+
+            if ($valorExistente && $valorExistente->valor) {
+                Storage::disk('public')
+                    ->delete($valorExistente->valor);
+
+            }
+
+            $path = $request
+                ->file('doc_fdc195')
+                ->store('practicas/fase3', 'public');
+
+            PracticaValorCampo::updateOrCreate(
+                [
+                    'practica_id' => $practica->id,
+                    'campo_id' => $campo195->id
+                ],
+                [
+                    'valor' => $path
+                ]
+            );
+        }
+
+        // ==================== 4. MARCAR ENVÍO ====================
+
+        $campoSubmited = $campos_fase3
+            ->where('name', 'submited_fase3')
+            ->first();
+
+        PracticaValorCampo::updateOrCreate(
+            [
+                'practica_id' => $practica->id,
+                'campo_id' => $campoSubmited->id
+            ],
+
+            [
+                'valor' => 'true'
+            ]
+        );
+
+        // Actualizar timestamp
+        $practica->touch();
+        Log::info('Fase 3 - Documentos enviados', [
+            'practica_id' => $practica->id,
+            'user_id' => auth()->id()
+
+        ]);
+
+        // Envío correo
+        // $this->practicaMailService->sendFase3($practica);
+
+        return response()->json([
+            'success' => 'Documentos enviados correctamente'
+        ]);
+    }
+
+    /* FASE 3 - Ver detalles de lo enviado
+ (para estudiante y director) */
+    public function getFase3Details(Request $request)
+    {
+        try {
+
+            $practica = Practica::with('valoresCampos.campo')
+                ->findOrFail($request->practica_id);
+
+            $valores = [];
+
+            foreach ($practica->valoresCampos as $vc) {
+                $valores[$vc->campo->name] = $vc->valor;
+            }
+
+            // ===============================
+            // ARCHIVOS DEL ESTUDIANTE
+            // ===============================
+
+            $arl = $valores['arl'] ?? null;
+            $docFdc127 = $valores['doc_fdc127'] ?? null;
+            $docFdc195 = $valores['doc_fdc195'] ?? null;
+
+            // ===============================
+            // RESPUESTA DEL DIRECTOR
+            // ===============================
+
+            $respuestaDirector = $valores['respuesta_director_fase3'] ?? null;
+
+            // ===============================
+            // URLS PÚBLICAS
+            // ===============================
+
+            $arlUrl = $arl ? asset('storage/' . $arl) : null;
+
+            $docFdc127Url = $docFdc127
+                ? asset('storage/' . $docFdc127)
+                : null;
+
+            $docFdc195Url = $docFdc195
+                ? asset('storage/' . $docFdc195)
+                : null;
+
+            return response()->json([
+                'success' => true,
+
+                // Archivos
+                'arl' => $arl,
+                'arl_url' => $arlUrl,
+
+                'doc_fdc127' => $docFdc127,
+                'doc_fdc127_url' => $docFdc127Url,
+
+                'doc_fdc195' => $docFdc195,
+                'doc_fdc195_url' => $docFdc195Url,
+
+                // Respuesta director
+                'respuesta_director' => $respuestaDirector,
+
+                // Fecha
+                'fecha_envio' => $practica->updated_at->format('d/m/Y H:i')
+            ]);
+
+        } catch (Exception $e) {
+
+            Log::error('Error en getFase3Details: ' . $e->getMessage());
+
+            return response()->json([
+                'error' => 'Error al cargar los detalles'
+            ], 500);
+        }
+    }
+
+
+
 
 }

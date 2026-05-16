@@ -67,7 +67,9 @@
             #fase1AdminModal,
             #fase2AdminModal,
             #fase2DetailsModal,
-            #fase2EstudianteModal {
+            #fase2EstudianteModal,
+            #fase3EstudianteModal,
+            #fase3DetailsModal {
                 visibility: hidden !important;
                 opacity: 0 !important;
                 transform: translateY(-20px) !important;
@@ -90,7 +92,9 @@
             #fase1AdminModal.show,
             #fase2AdminModal.show,
             #fase2DetailsModal.show,
-            #fase2EstudianteModal.show {
+            #fase2EstudianteModal.show,
+            #fase3EstudianteModal.show,
+            #fase2DetailsModal.show {
                 visibility: visible !important;
                 opacity: 1 !important;
                 transform: translateY(0) scale(1) !important;
@@ -226,7 +230,7 @@
             d="M14.25 5.25a5.23 5.23 0 0 0-1.279-3.434 9.768 9.768 0 0 1 6.963 6.963A5.23 5.23 0 0 0 16.5 7.5h-1.875a.375.375 0 0 1-.375-.375V5.25Z" />
     </svg>
 
-    <span class="text-center font-bold text-lg">Fase 1: Formato <br>F-DC-126</span>
+    <span class="text-center font-bold text-lg">F-DC-126 </span>
     <p class="text-center mt-2 text-xs mx-4">El estudiante envía el formato de solicitud de practicantes.</p>
 
     @if ($fase_actual == 1)
@@ -380,13 +384,135 @@
     @endif
 </div>
 
-                <!-- FASE 3 . I -->
-                <div
-                    class="relative mx-auto flex flex-col items-center justify-center bg-white text-gray-600 rounded-lg shadow-lg h-60 w-full sm:w-50 border">
-                    <i class="fa-solid fa-hourglass-half" style="font-size: 32px; margin-bottom: 10px;"></i>
-                    <span class="text-center font-bold text-lg">Fase 3: Propuesta I</span>
-                    <p class="text-center mt-2 text-xs mx-4">El estudiante envía la propuesta al director.</p>
-                </div>
+                <!-- FASE 3: PROPUESTA I -->
+<div id="fase-3"
+    class="relative mx-auto flex flex-col items-center justify-center bg-white text-gray-600 rounded-lg shadow-lg h-60 w-full sm:w-50 border card-fase {{ $fase_actual >= 3 ? 'card-activated' : '' }} {{ $fase_actual == 3 ? 'card-activated-animated' : '' }}">
+
+    <i class="fa-solid fa-hourglass-half" style="font-size: 32px; margin-bottom: 10px;"></i>
+
+    <span class="text-center font-bold text-lg">Fase 3: Propuesta I</span>
+
+    <p class="text-center mt-2 text-xs mx-4">
+        El estudiante envía la propuesta al director.
+    </p>
+
+    @if ($fase_actual == 3)
+
+        @php
+            $user = auth()->user();
+
+            $esEstudiante = $user->hasRole('estudiante');
+
+            $esDirector = $user->hasRole([
+                'super_admin',
+                'admin',
+                'coordinador',
+                'director'
+            ]);
+
+            $yaEnvio = $submited_fase3 == 'true';
+        @endphp
+
+        {{-- ================= ESTUDIANTE ================= --}}
+        @if ($esEstudiante && !$yaEnvio)
+
+            <div class="flex justify-center items-center mt-3">
+                <button type="button"
+                    onclick="openFase3EstudianteModal(this)"
+                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+
+                    <i class="fa-solid fa-user-pen"></i>
+
+                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle   class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                    </svg>
+
+                </button>
+            </div>
+
+        @elseif ($esEstudiante && $yaEnvio)
+
+            {{-- Estudiante solo puede ver --}}
+            <div class="flex justify-center items-center mt-3">
+
+                <button type="button"
+                    onclick="openFase3DetailsModal(this)"
+                    class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+
+                    <i class="fa-regular fa-eye"></i>
+
+                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute"
+                        viewBox="0 0 64 64" fill="none">
+
+                        <path d="M32 3..." stroke="currentColor"></path>
+
+                    </svg>
+                </button>
+
+            </div>
+
+        {{-- ================= DIRECTOR ================= --}}
+        @elseif ($esDirector)
+
+            <div class="flex justify-center items-center mt-3 gap-2">
+
+                {{-- VER --}}
+                <button type="button"
+                    onclick="openFase3DetailsModal(this)"
+                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white w-10 h-10 rounded-lg relative inline-flex items-center justify-center">
+
+                    <i class="fa-regular fa-eye"></i>
+
+                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute"
+                        viewBox="0 0 64 64" fill="none">
+
+                        <path d="M32 3..." stroke="currentColor"></path>
+
+                    </svg>
+                </button>
+
+                {{-- RESPONDER --}}
+                @if ($yaEnvio)
+
+                    <button type="button"
+                        onclick="openFase3AdminModal(this)"
+                        class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white w-10 h-10 rounded-lg relative inline-flex items-center justify-center">
+
+                        <i class="fa-solid fa-reply"></i>
+
+                        <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute"
+                            viewBox="0 0 64 64" fill="none">
+
+                            <path d="M32 3..." stroke="currentColor"></path>
+
+                        </svg>
+                    </button>
+
+                @endif
+
+            </div>
+
+        @endif
+
+    @elseif ($fase_actual > 3)
+
+        {{-- Fase finalizada --}}
+        <div class="flex justify-center items-center mt-3">
+
+            <button type="button"
+                onclick="openFase3DetailsModal(this)"
+                class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+
+                <i class="fa-regular fa-eye"></i>
+
+            </button>
+
+        </div>
+
+    @endif
+
+</div>
 
                 <!-- FASE 3 . II -->
                 <div
@@ -688,7 +814,7 @@
 
     <!-- Modal FASE 2 - Estudiante (Enviar documentos de pago) -->
 <div id="fase2EstudianteModal" class="fixed z-50 inset-0 overflow-y-auto">
-    <div class="modal-overlay absolute inset-0" onclick="closeFase2EstudianteModal()">
+    <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeFase2EstudianteModal()">
         <div class="flex items-center justify-center min-h-screen p-4 text-center relative">
             <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full modal-content relative"
                 onclick="event.stopPropagation()" style="max-width: 900px !important; width: 100%;">
@@ -1002,6 +1128,165 @@
     </div>
 </div>
 
+
+  <!-- Modal FASE 3 - Estudiante (Enviar documentos de trabajo de grado) -->
+<div id="fase3EstudianteModal" class="fixed z-50 inset-0 overflow-y-auto">
+    <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeFase3EstudianteModal()">
+        <div class="flex items-center justify-center min-h-screen p-4 text-center relative">
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full modal-content relative"
+                onclick="event.stopPropagation()" style="max-width: 900px !important; width: 100%;">
+                
+                <button class="modal-close-btn-custom absolute top-3 right-4 text-gray-400 hover:text-red-500 text-2xl z-10"
+                    onclick="closeFase3EstudianteModal()">&times;</button>
+
+                <form class="p-8" id="fase3EstudianteForm" enctype="multipart/form-data">
+                    @csrf
+                    <input type="hidden" name="practica_id" value="{{ $practica->id }}">
+
+                    <!-- Título -->
+                    <div class="mb-4 pr-4">
+                        <p class="text-2xl font-bold" id="fase3EstudianteTitle">Prácticas<span
+                                class="bg-uts-500 text-white px-3 py-1 rounded uppercase shadow-md text-xl">Fase 3</span></p>
+                        <p class="text-gray-950 mt-6 text-sm">En este formulario el estudiante podrá cargar los documentos requeridos para formalizar su propuesta de prácticas empresariales. Los siguientes archivos: </p>
+                        <ul class="text-gray-950 mt-6 text-sm list-disc pl-5">
+                            <li>ARL (.PDF)</li>
+                            <li>Formato propuesta de prácticas (F-DC-127)</li>
+                            <li>Acta de inicio de prácticas (F-DC-195)</li>
+                        </ul>
+                        
+                    </div>
+
+                    <p class="text-sm text-gray-950"><strong>NOTA: </strong>El formato F-DC-127 y F-DC-195 debe estar debidamente diligenciado, firmado y no debe superar los 8MB en formato Word.</p>
+
+ 
+
+                    <!-- Campos en GRID para desktop (3 columnas) -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+
+                        <!-- Campo ARL-->
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <label class="block font-medium text-sm text-gray-700">
+                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i><span
+                                        class="text-red-500">*</span> ARL
+                                </label>
+                                <div class="relative inline-block">
+                                    <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                        data-tooltip="tooltip-arl-fase3"></i>
+                                </div>
+                            </div>
+                            <div
+                                class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+                                <div class="grid gap-1 text-center">
+                                    <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                    <h2 class="text-center text-gray-400 text-xs">Arrastra o selecciona el archivo ARL (PDF, máx. 5MB )</h2>
+                                </div>
+                                <div class="text-center">
+                                    <input type="file" name="arl" id="arl"
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full" accept=".pdf" />
+                                    <div
+                                        class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                        Cargar</div>
+                                </div>
+                            </div>
+                            <span id="arlError" class="text-red-500 text-xs"></span>
+                            <ul id="file-list-arl" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                            <div id="tooltip-arl-fase3"
+                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
+                                Suba el certificado de afiliación de la Administradora de Riesgos Laborales (ARL). El documento debe incluir la información completa y legible.
+                            </div>
+                        </div>
+
+                        <!-- Campo FDC-127 -->
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <label class="block font-medium text-sm text-gray-700">
+                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i><span
+                                        class="text-red-500">*</span> F-DC-127 
+                                </label>
+                                <div class="relative inline-block">
+                                    <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                        data-tooltip="tooltip-fdc127-fase3"></i>
+                                </div>
+                            </div>
+                            <div
+                                class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+                                <div class="grid gap-1 text-center">
+                                    <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                    <h2 class="text-center text-gray-400 text-xs">Arrastra o selecciona el archivo F-DC-127 (.doc, .docx, máx. 5MB)</h2>
+                                </div>
+                                <div class="text-center">
+                                    <input type="file" name="doc_fdc127" id="doc_fdc127"
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full" accept=".doc,.docx" />
+                                    <div
+                                        class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                        Cargar</div>
+                                </div>
+                            </div>
+                            <span id="doc_fdc127Error" class="text-red-500 text-xs"></span>
+                            <ul id="file-list-fdc127" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                            <div id="tooltip-fdc127-fase3"
+                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
+                                Suba el documento F-DC-127 en word
+                            </div>
+                        </div>
+
+
+                        <!-- Campo FDC-195 -->
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <label class="block font-medium text-sm text-gray-700">
+                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i><span
+                                        class="text-red-500">*</span> F-DC-195 
+                                </label>
+                                <div class="relative inline-block">
+                                    <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                        data-tooltip="tooltip-fdc195-fase3"></i>
+                                </div>
+                            </div>
+                            <div
+                                class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+                                <div class="grid gap-1 text-center">
+                                    <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                    <h2 class="text-center text-gray-400 text-xs">Arrastra o selecciona el archivo F-DC-195 (.doc, .docx, máx. 5MB)</h2>
+                                </div>
+                                <div class="text-center">
+                                    <input type="file" name="doc_fdc195" id="doc_fdc195"
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full" accept=".doc,.docx" />
+                                    <div
+                                        class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                        Cargar</div>
+                                </div>
+                            </div>
+                            <span id="doc_fdc195Error" class="text-red-500 text-xs"></span>
+                            <ul id="file-list-fdc195" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                            <div id="tooltip-fdc195-fase3"
+                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
+                                Suba el documento F-DC-195 en word
+                            </div>
+                        </div>
+                    </div>
+
+                 
+                    <!-- Botones -->
+                    <div class="flex justify-end space-x-3 mt-6 pt-4 border-t">
+                        <button type="button" onclick="closeFase3EstudianteModal()"
+                            class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-5 py-2 rounded-lg transition">Cancelar</button>
+                        <button type="submit"
+                            class="flex bg-uts-500 hover:bg-uts-800 text-white px-5 py-2 rounded-lg transition items-center gap-2">
+                            <!-- <svg id="loadingSpinner-fase3" class="hidden w-4 h-4 text-white animate-spin" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+                                <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3Z" stroke="currentColor" stroke-width="5"> </path>
+                                <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5"></path>
+                            </svg>-->
+                            Enviar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
     <!-- Calendario Modal -->
     @if (isset($fechas))
         <div id="calendarModal" class="fixed z-50 inset-0 overflow-y-auto">
@@ -1193,7 +1478,10 @@
                 fase1_reply: '{{ route('practicas.fase1.reply') }}',
                 fase2_store: '{{ route('practicas.fase2.store') }}',
                 fase2_details: '{{ route('practicas.fase2.details') }}',
-                fase2_reply: '{{ route('practicas.fase2.reply') }}'
+                fase2_reply: '{{ route('practicas.fase2.reply') }}',
+                fase3_store: '{{ route('practicas.fase3.store') }}',
+                fase3_details: '{{ route('practicas.fase3.details') }}',
+                fase3_reply: '{{ route('practicas.fase3.reply') }}'
             };
         </script>
 
@@ -1281,9 +1569,9 @@ function closeCalendarModal() {
 }
 </script>
 
-        <script src="{{ asset('js/fases/practicas/fase_2.js') }}"></script>
-
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script src="{{ asset('js/fases/practicas/fase_1.js') }}"></script>
+        <script src="{{ asset('js/fases/practicas/fase_2.js') }}"></script>
+        <script src="{{ asset('js/fases/practicas/fase_3.js') }}"></script>
     @endpush
 </x-app-layout>

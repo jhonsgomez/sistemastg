@@ -9,6 +9,9 @@
 
     @push('styles')
         <style>
+            div.dataTables_processing {
+                display: none !important;
+            }
             .btn-action {
                 min-width: 42px;
                 height: 38px;
@@ -666,39 +669,39 @@ select.dt-input:focus {
                             </div>
 
                             {{-- SEGUNDO INTEGRANTE (opcional) --}}
-<div>
-    <div class="flex items-center gap-2 mb-1">
-        <label class="block font-medium text-sm text-gray-700">
-            <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
-            Segundo integrante (opcional)
-        </label>
-        <div class="relative inline-block">
-            <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
-                data-tooltip="tooltip-integrante"></i>
-            <div id="tooltip-integrante"
-                class="hidden absolute z-10 max-w-[90vw] px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg left-1/2 -translate-x-1/2 bottom-full mb-2 sm:left-0 sm:translate-x-0 w-44">
-                Seleccione el compañero con quien realizará la práctica empresarial.
-            </div>
-        </div>
-    </div>
-    
-    <div class="relative">
-        <input type="text" id="search_integrante_2"
-            placeholder="Escribe el documento del integrante"
-            class="border-gray-300 focus:border-uts-800 focus:ring-uts-800 rounded-md mt-1 block w-full"
-            autocomplete="off">
-        
-        <input type="hidden" name="id_integrante_2" id="id_integrante_2" value="">
-        
-        <!-- Lista desplegable -->
-        <div id="integrantes_list" class="absolute w-full bg-white border border-gray-200 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto mt-1"></div>
-    </div>
-    
-    <!-- Contenedor para mostrar el seleccionado -->
-    <div id="selected_integrante_2" class="mt-2 hidden"></div>
-    
-    <span id="id_integrante_2Error" class="text-red-500 text-sm"></span>
-</div>
+                            <div>
+                                <div class="flex items-center gap-2 mb-2">
+                                    <label class="block font-medium text-sm text-gray-700">
+                                        <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                        Segundo integrante (opcional) 
+                                    </label>
+                                    <div class="relative inline-block">
+                                        <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                            data-tooltip="tooltip-integrante"></i>
+                                        <div id="tooltip-integrante"
+                                            class="hidden absolute z-10 max-w-[90vw] px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg left-1/2 -translate-x-1/2 bottom-full mb-2 sm:left-0 sm:translate-x-0 w-44">
+                                            Seleccione el compañero con quien realizará la práctica empresarial.
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="relative">
+                                    <input type="text" id="search_integrante_2"
+                                        placeholder="Escribe el documento del integrante"
+                                        class="border-gray-300 focus:border-uts-800 focus:ring-uts-800 rounded-md mt-1 block w-full"
+                                        autocomplete="off">
+                                    
+                                    <input type="hidden" name="id_integrante_2" id="id_integrante_2" value="">
+                                    
+                                    <!-- Lista desplegable -->
+                                    <div id="integrantes_list" class="absolute w-full bg-white border border-gray-200 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto mt-1"></div>
+                                </div>
+                                
+                                <!-- Contenedor para mostrar el seleccionado -->
+                                <div id="selected_integrante_2" class="mt-2 hidden"></div>
+                                
+                                <span id="id_integrante_2Error" class="text-red-500 text-sm"></span>
+                            </div>
 
                             {{-- ¿CUENTA CON EMPRESA? (ocupa ambas columnas) --}}
                             @php $campoTieneEmpresa = $campos->where('name', 'tiene_empresa')->first(); @endphp
@@ -714,7 +717,7 @@ select.dt-input:focus {
                                             data-tooltip="tooltip-tiene_empresa"></i>
                                         <div id="tooltip-tiene_empresa"
                                             class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg w-44">
-                                            Marque si ya cuenta con empresa donde realizar la práctica.
+                                            Seleccione la opción si ya cuenta con empresa donde realizar las prácticas empresariales.
                                         </div>
                                     </div>
                                 </div>
@@ -770,7 +773,56 @@ select.dt-input:focus {
                                 <span id="hoja_vidaError" class="text-red-500 text-sm"></span>
                                 <ul id="file-list-fase0" class="mt-4 text-gray-600 text-sm list-disc pl-5"></ul>
                                 <span id="files-size-fase0" class="text-gray-800 text-sm"></span>
+
+                                {{-- HOJA DE VIDA SEGUNDO INTEGRANTE --}}
+                                <div class="col-span-1 sm:col-span-2">
+
+                                    <div class="flex items-center gap-2" id="hojaVidaLabel2" style="display:none;">
+                                        <label class="block font-medium text-sm text-gray-700">
+                                            <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                            Hoja de vida segundo integrante
+                                        </label>
+                                    </div>
+
+                                    <div id="hojaVidaContainer2" style="display:none;"
+                                        class="w-full mt-2 relative py-9 bg-gray-50 rounded-2xl border-2 border-gray-300 gap-3 grid border-dashed">
+
+                                        <div class="grid gap-1">
+                                            <i class="mx-auto text-4xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+
+                                            <h2 class="text-center text-gray-400 text-xs leading-4">
+                                                Solo archivos PDF
+                                            </h2>
+                                        </div>
+
+                                        <div class="grid gap-2">
+                                            <h4 class="text-center text-gray-900 text-sm font-medium">
+                                                Arrastra o carga archivos aquí
+                                            </h4>
+
+                                            <div class="flex items-center justify-center">
+                                                <input type="file"
+                                                    name="hoja_vida_2"
+                                                    id="hoja_vida_2"
+                                                    class="absolute inset-0 opacity-0 cursor-pointer"
+                                                    accept=".pdf" />
+
+                                                <div class="flex w-28 h-9 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer">
+                                                    Cargar
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <span id="hoja_vida2Error" class="text-red-500 text-sm"></span>
+                                    <ul id="file-list-fase0-2" class="mt-4 text-gray-600 text-sm list-disc pl-5"></ul>
+                                    <span id="files-size-fase0-2" class="text-gray-800 text-sm"></span>
+
+            
+
+                                </div>
+
                             </div>
+
                             @endif
 
                             {{-- CAMPO OCULTO PERIODO --}}
@@ -786,13 +838,13 @@ select.dt-input:focus {
 
                         </div>
 
-                        <p class="text-red-600 text-sm mb-6">
+                        <p class="text-red-600 text-mb mb-6">
                             <i class="fa-solid fa-circle-info mr-1"></i>
-                            Si selecciona un segundo integrante, el comité tendrá que evaluar la complejidad de la propuesta de los estudiantes y posteriormente aprobará o rechazará la solicitud.
+                           Si selecciona un segundo integrante, el comité evaluará si la propuesta puede realizarse entre dos estudiantes. Luego, aprobará o rechazará la solicitud.
                         </p>
                         
                         <p class="text-sm mb-6"><strong>NOTA: </strong>El estudiante debe tener aprobado el 90% de los créditos (Tecnología: 97 / Profesional: 65).</p>
-                        <p class="text-sm mb-6"><strong>Convenios: </strong>Verifique si la empresa tiene convenio vigente en la pagina de la ORI :<a href="https://oriapp.uts.edu.co/activities_guest" target="_blank" class="text-uts-500 underline hover:text-uts-800"> Consultar convenios aquí </a></p>
+                        <p class="text-sm mb-6"><strong>CONVENIOS: </strong>Verifique si la empresa tiene convenio vigente en la pagina de la Oficina de Relaciones Interinstitucionales (ORI) :<a href="https://oriapp.uts.edu.co/activities_guest" target="_blank" class="text-uts-500 underline hover:text-uts-800"> Consultar convenios aquí </a></p>
 
                         <div class="flex justify-end space-x-2">
                             <button type="button" onclick="closeCreateModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cancelar</button>
@@ -1365,6 +1417,8 @@ select.dt-input:focus {
                     text: "No podrá editar la información una vez se envíe",
                     icon: 'warning',
                     showCancelButton: true,
+                    confirmButtonColor: '#C1D631',
+                    cancelButtonColor: '#d33',
                     confirmButtonText: 'Sí, enviar',
                     cancelButtonText: 'Cancelar'
                 }).then((result) => {
@@ -1420,25 +1474,78 @@ select.dt-input:focus {
         });
     });
 
-    function toggleHojaVida() {
-        const tieneEmpresaNo = document.querySelector('input[name="tiene_empresa"][value="0"]');
-        const container = document.getElementById('hojaVidaContainer');
-        const label = document.getElementById('hojaVidaLabel');
 
-        if (!container) return;
-        
-        if (tieneEmpresaNo && tieneEmpresaNo.checked) {
-            container.style.display = 'block';
-            if (label) label.style.display = 'flex';
+function toggleHojaVida() {
+    const tieneEmpresaNo = document.querySelector(
+        'input[name="tiene_empresa"][value="0"]'
+    );
+
+    const integrante2 = document.getElementById('id_integrante_2');
+
+    // PRIMERA HOJA DE VIDA
+    const container1 = document.getElementById('hojaVidaContainer');
+    const label1 = document.getElementById('hojaVidaLabel');
+
+    // SEGUNDA HOJA DE VIDA
+    const container2 = document.getElementById('hojaVidaContainer2');
+    const label2 = document.getElementById('hojaVidaLabel2');
+
+    if (!container1) return;
+
+    // SI NO TIENE EMPRESA
+    if (tieneEmpresaNo && tieneEmpresaNo.checked) {
+
+        // Mostrar primera hoja de vida
+        container1.style.display = 'block';
+
+        if (label1) {
+            label1.style.display = 'flex';
+        }
+        // SI EXISTE SEGUNDO INTEGRANTE
+        if (integrante2 && integrante2.value !== '') {
+
+            container2.style.display = 'block';
+
+            if (label2) {
+                label2.style.display = 'flex';
+            }
+
         } else {
-            container.style.display = 'none';
-            if (label) label.style.display = 'none';
+
+            container2.style.display = 'none';
+
+            if (label2) {
+                label2.style.display = 'none';
+            }
+        }
+    } else {
+
+        // Ocultar todo
+        container1.style.display = 'none';
+        if (label1) {
+            label1.style.display = 'none';
+        }
+        container2.style.display = 'none';
+        if (label2) {
+            label2.style.display = 'none';
         }
     }
+}
 
-    document.addEventListener('DOMContentLoaded', function() {
-        toggleHojaVida();
-    });
+document.addEventListener('DOMContentLoaded', function () {
+
+    toggleHojaVida();
+
+    // Detectar cambios del segundo integrante
+    const integrante2 = document.getElementById('id_integrante_2');
+
+    if (integrante2) {
+
+        integrante2.addEventListener('change', function () {
+            toggleHojaVida();
+        });
+    }
+});
 </script>
 
         <!--Datatables-->
@@ -1446,7 +1553,7 @@ select.dt-input:focus {
         <script>
             // Inicializar DataTable (como ya lo tienes)
 var table = $('#practicasTable').DataTable({
-    processing: true,
+    processing: false,
     serverSide: true,
     ajax: {
         url: '{{ route("practicas.data") }}',
@@ -1480,7 +1587,7 @@ var table = $('#practicasTable').DataTable({
             }
         ],
         language: {
-            "sProcessing": "Procesando...",
+            "sProcessing": "",
             "sLengthMenu": "Mostrar _MENU_ registros",
             "sZeroRecords": "No se encontraron resultados",
             "sEmptyTable": "Ningún dato disponible",
@@ -1488,7 +1595,7 @@ var table = $('#practicasTable').DataTable({
             "sInfoEmpty": "Mostrando 0 registros",
             "sInfoFiltered": "(filtrado de _MAX_ registros totales)",
             "sSearch": "Buscar:",
-            "sLoadingRecords": "Cargando...",
+            "sLoadingRecords": "",
             "oPaginate": {
                 "sFirst": "<<",
                 "sLast": ">>",
@@ -1540,7 +1647,7 @@ $('#filtroRolesPracticas').on('change', function() {
 
     $.get('/practicas/' + id + '/detalle', function(response) {
         let html = `
-            <div class="space-y-2">
+            <div class="mt-4">
                 <!-- Título -->
                 <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
                     <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Título de la práctica:</p>
@@ -1580,16 +1687,47 @@ $('#filtroRolesPracticas').on('change', function() {
                     <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">Sí</span>
                 </div>
             `;
-        } else if (response.hoja_vida) {
-            html += `
-                <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
-                    <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Hoja de vida:</p>
-                    <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">
-                        <a href="/storage/${response.hoja_vida}" target="_blank" class="text-uts-500 underline hover:text-uts-800">Ver archivo</a>
-                    </span>
-                </div>
-            `;
-        }
+        } else {
+            //Hpja de vida integrante 1
+            if (response.hoja_vida) {
+                html += `
+                    <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
+                        <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Hoja de vida:</p>
+                        <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">
+                            <a target="_blank"
+                                class="text-red-600 text-sm underline"
+                                href="/storage/${response.hoja_vida}">
+
+                                    <i class="fa-regular fa-file-pdf text-red-600 mr-1"></i>
+                                    Documento 1
+                                </a>
+                        </span>
+                    </div>
+                `;
+            }
+            //Hoja de vida integrante 2
+            if (response.hoja_vida_2) {
+
+                html += `
+                    <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
+                        <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">
+                            Hoja de vida segundo integrante:
+                        </p>
+                        <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">
+                            <a target="_blank"
+                                class="text-red-600 text-sm underline"
+                                href="/storage/${response.hoja_vida_2}">
+
+                                    <i class="fa-regular fa-file-pdf text-red-600 mr-1"></i>
+                                    Documento 2
+                            </a>
+                        </span>
+                    </div>
+                `;
+            }
+
+
+         }
         
         // Fechas
         html += `

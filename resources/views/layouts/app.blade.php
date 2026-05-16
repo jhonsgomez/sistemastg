@@ -188,7 +188,7 @@
                         @if (!auth()->user()->hasRole('docente') && !auth()->user()->hasRole('director') && !auth()->user()->hasRole('evaluador'))
                         @can('view_practicas')
                         <a href="{{ route('practicas.index') }}"
-                            class="flex items-center gap-3 w-full p-3 {{ request()->routeIs('practicas.index') || request()->routeIs('roadmap.index') ? 'bg-uts-500 text-white' : 'text-gray-600 hover:bg-uts-500 hover:text-white' }} rounded-lg transition-colors">
+                            class="flex items-center gap-3 w-full p-3 {{ request()->routeIs('practicas.index') || request()->routeIs('practicas.roadmap') ? 'bg-uts-500 text-white' : 'text-gray-600 hover:bg-uts-500 hover:text-white' }} rounded-lg transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" data-name="Layer 1" viewBox="0 0 24 24" id="graduation-cap">
                                 <path fill="currentColor" d="M20 6h-4V4a2 2 0 0 0-2-2H10a2 2 0 0 0-2 2v2H4a2 2 0 0 0-2 2v3h20V8a2 2 0 0 0-2-2zM10 4h4v2h-4V4zM2 13v5a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5H2z"></path>
                             </svg>
