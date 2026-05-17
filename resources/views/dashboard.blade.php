@@ -78,11 +78,6 @@
     <div class="p-4">
         <p class="text-gray-600 mt-2 mb-4">Bienvenido al portal de sistemas trabajo de grado, aquí podrás acceder a:</p>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <a href="{{ route('profile.show') }}" class="border bg-white p-6 text-gray-600 rounded-lg shadow-lg hover:bg-uts-500 hover:text-white transition ease-in-out duration-200 flex flex-col items-center justify-center">
-                <i class="fa-solid fa-id-card text-4xl mb-4"></i>
-                <span class="text-center font-bold text-lg">Mi Perfil</span>
-                <p class="text-center mt-2 text-sm">Cambia tu contraseña, cierra otras sesiones y actualiza tu información.</p>
-            </a>
 
             <a href="{{ route('banco.index') }}" class="border bg-white p-6 text-gray-600 rounded-lg shadow-lg hover:bg-uts-500 hover:text-white transition ease-in-out duration-200 flex flex-col items-center justify-center">
                 <i class="fa-solid fa-book text-4xl mb-4"></i>

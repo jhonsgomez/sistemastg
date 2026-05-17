@@ -165,15 +165,15 @@ class PracticaController extends Controller
             $return_html = '<div class="flex gap-2 flex-wrap items-center justify-center">';
 
             if ($p->estado === 'Rechazada') {
-                $badge = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-red-100 text-red-800 border border-red-300'>Rechazada</span>";
+                $badge = "<span class='shadow bg-red-100 text-red-800 text-sm font-medium px-2.5 py-0.5 rounded border border-red-300'>Rechazada</span>";
                 return $return_html . $badge . "</div>";
             }
 
             $htmlEstado = '';
 
             if ($p->estado === 'Pendiente') {
-                $htmlEstado = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-yellow-100 text-yellow-800 border border-yellow-300'>Pendiente</span>
-                               <span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-yellow-100 text-yellow-800 border border-yellow-300'>Comité</span>";
+                $htmlEstado = "<span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Pendiente</span>
+                               <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Comité</span>";
             } 
             elseif ($p->estado === 'Fase 1') {
                 // CORREGIDO: Verificar quién debe actuar
@@ -182,12 +182,12 @@ class PracticaController extends Controller
                 
                 if ($yaEnvio) {
                     // El estudiante ya envió, ahora le toca al COMITÉ
-                    $htmlEstado = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-uts-300 border border-uts-500'>Fase 1</span>
-                                   <span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-yellow-100 text-yellow-800 border border-yellow-300'>Comité</span>";
+                    $htmlEstado = "<span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 1</span>
+                                   <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Comité</span>";
                 } else {
                     // El estudiante aún no ha enviado
-                    $htmlEstado = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-uts-300 border border-uts-500'>Fase 1</span>
-                                   <span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-yellow-100 text-yellow-800 border border-yellow-300'>Estudiante</span>";
+                    $htmlEstado = "<span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 1</span>
+                                   <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Estudiante</span>";
                 }
             } 
             elseif ($p->estado === 'Fase 2') {
@@ -197,32 +197,32 @@ class PracticaController extends Controller
     
     if ($yaEnvio) {
         // El estudiante ya envió, ahora le toca al COMITÉ
-        $htmlEstado = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-uts-300 border border-uts-500'>Fase 2</span>
-                       <span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-yellow-100 text-yellow-800 border border-yellow-300'>Comité</span>";
+        $htmlEstado = "<span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 2</span>
+                       <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Comité</span>";
     } else {
         // El estudiante aún no ha enviado
-        $htmlEstado = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-uts-300 border border-uts-500'>Fase 2</span>
-                       <span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-yellow-100 text-yellow-800 border border-yellow-300'>Estudiante</span>";
+        $htmlEstado = "<span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 2</span>
+                       <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Estudiante</span>";
     }
 }
             elseif ($p->estado === 'Fase 3') {
-                $htmlEstado = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-uts-300 border border-uts-500'>Fase 3</span>
-                               <span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-yellow-100 text-yellow-800 border border-yellow-300'>Estudiante</span>";
+                $htmlEstado = "<span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 3</span>
+                               <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Estudiante</span>";
             } 
             elseif ($p->estado === 'Fase 4') {
-                $htmlEstado = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-uts-300 border border-uts-500'>Fase 4</span>
-                               <span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-yellow-100 text-yellow-800 border border-yellow-300'>Estudiante</span>";
+                $htmlEstado = "<span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 4</span>
+                               <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Estudiante</span>";
             } 
             elseif ($p->estado === 'Fase 5') {
-                $htmlEstado = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-uts-300 border border-uts-500'>Fase 5</span>
-                               <span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-yellow-100 text-yellow-800 border border-yellow-300'>Comité</span>";
+                $htmlEstado = "<span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 5</span>
+                               <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Comité</span>";
             } 
             elseif ($p->estado === 'Finalizado') {
                 $htmlEstado = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-green-100 text-green-800 border border-green-300'>Finalizado</span>";
             }
 
             if ($p->deshabilitado && $p->estado !== 'Rechazada') {
-                $deshabilitadoBadge = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-red-100 text-red-800 border border-red-300'>Deshabilitado</span>";
+                $deshabilitadoBadge = "<span class='shadow bg-red-100 text-red-800 text-sm font-medium px-2.5 py-0.5 rounded border border-red-300'>Deshabilitado</span>";
                 return $return_html . $htmlEstado . ' ' . $deshabilitadoBadge . "</div>";
             }
 
@@ -230,7 +230,7 @@ class PracticaController extends Controller
         })
         ->addColumn('acciones', function ($p) {
     $user = auth()->user();
-    $buttons = '<div class="flex items-center justify-center gap-1">';
+    $buttons = '<div class="flex items-center justify-center gap-2">';
 
     // ========== 1. Botón Ver (siempre visible para todos) ==========
     $buttons .= '<button onclick="openDetailsModal(this, ' . $p->id . ')" 
@@ -249,37 +249,41 @@ if ($esComite && $p->estado === 'Pendiente') {
     if ($submited && $submited->valor === 'true') {
         // Usar la función existente openResponderSolicitudModal
         $buttons .= '<button onclick="openResponderSolicitudModal(' . $p->id . ')"
-            class="btn-action shadow bg-uts-500 hover:bg-uts-800 text-white w-10 h-10 rounded-lg inline-flex items-center justify-center">
-            <i class="fa-solid fa-reply"></i>
+            class="btn-action shadow bg-uts-500 hover:bg-uts-800 text-white px-3 py-1 rounded-lg">
+            <i class="fa-solid fa-share"></i>
         </button>';
     }
 }
 
     // ========== 3. Botón Roadmap AZUL (para todos en Fase 1 en adelante) ==========
-    $esFaseActiva = in_array($p->estado, ['Fase 1', 'Fase 2', 'Fase 3', 'Fase 4', 'Fase 5', 'Finalizado']);
-    $puedeVerRoadmap = !$p->deshabilitado && $esFaseActiva;
-    
-    if ($puedeVerRoadmap) {
-        $buttons .= '
-            <form action="' . route('practicas.roadmap') . '" method="POST" class="inline-block m-0">
-                ' . csrf_field() . '
-                <input type="hidden" name="practica_id" value="' . $p->id . '">
-                <button type="submit" class="btn-action shadow bg-blue-500 hover:bg-blue-700 text-white w-10 h-10 rounded-lg inline-flex items-center justify-center">
-                    <i class="fa-solid fa-map-location-dot"></i>
-                </button>
-            </form>';
-    }
+$esFaseActiva = in_array($p->estado, ['Fase 1', 'Fase 2', 'Fase 3', 'Fase 4', 'Fase 5', 'Finalizado']);
+$puedeVerRoadmap = !$p->deshabilitado && $esFaseActiva;
+
+if ($puedeVerRoadmap) {
+    $buttons .= '
+        <form action="' . route('practicas.roadmap') . '" method="POST" class="inline-block m-0" onsubmit="return showRoadmapSpinner(this)">
+            ' . csrf_field() . '
+            <input type="hidden" name="practica_id" value="' . $p->id . '">
+            <button type="submit" class="btn-action shadow bg-indigo-500 hover:bg-indigo-800 text-white rounded-lg inline-flex items-center justify-center">
+                <i class="fa-solid fa-map-location-dot"></i>
+                <svg class="loading-spinner hidden text-white animate-spin" viewBox="0 0 64 64" fill="none">
+                    <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                    <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
+                </svg>
+            </button>
+        </form>';
+}
 
     // ========== 4. Botón Deshabilitar/Habilitar ROJO/TEAL (SOLO para Comité, en Fase 1 en adelante) ==========
     if ($esComite && $esFaseActiva && $p->estado !== 'Rechazada') {
         if (!$p->deshabilitado) {
             $buttons .= '<button onclick="deshabilitarPracticaConActa(' . $p->id . ')"
-                class="btn-action shadow bg-red-500 hover:bg-red-700 text-white w-10 h-10 rounded-lg inline-flex items-center justify-center">
+                class="btn-action shadow bg-red-500 hover:bg-red-700 text-white rounded-lg inline-flex items-center justify-center">
                 <i class="fa-regular fa-circle-xmark"></i>
             </button>';
         } else {
             $buttons .= '<button onclick="habilitarPracticaConActa(' . $p->id . ')"
-                class="btn-action shadow bg-teal-500 hover:bg-teal-700 text-white w-10 h-10 rounded-lg inline-flex items-center justify-center">
+                class="btn-action shadow bg-teal-500 hover:bg-teal-800 text-white px-3 py-1 rounded-lg relative">
                 <i class="fa-solid fa-clock-rotate-left"></i>
             </button>';
         }
@@ -472,7 +476,7 @@ public function buscarEstudiantes(Request $request)
         
         // Integrante 1
         $integrantesHtml .= '<div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">';
-        $integrantesHtml .= '<p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Integrante:</p>';
+        $integrantesHtml .= '<p class="font-semibold text-gray-700 mb-2 sm:mb-0">Integrante:</p>';
         $integrantesHtml .= '<div class="text-gray-800 w-full sm:flex-1 sm:ml-2">';
         $integrantesHtml .= e($practica->user->name) . '<br>';
         $integrantesHtml .= 'C.C ' . e($practica->user->nro_documento ?? 'N/A') . '<br>';
@@ -483,7 +487,7 @@ public function buscarEstudiantes(Request $request)
         // Integrante 2 (si existe)
         if ($integrante2) {
             $integrantesHtml .= '<div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">';
-            $integrantesHtml .= '<p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Integrante:</p>';
+            $integrantesHtml .= '<p class="font-semibold text-gray-700 mb-2 sm:mb-0">Integrante:</p>';
             $integrantesHtml .= '<div class="text-gray-800 w-full sm:flex-1 sm:ml-2">';
             $integrantesHtml .= e($integrante2->name) . '<br>';
             $integrantesHtml .= 'C.C ' . e($integrante2->nro_documento ?? 'N/A') . '<br>';
@@ -492,27 +496,41 @@ public function buscarEstudiantes(Request $request)
             $integrantesHtml .= '</div></div>';
         }
         
-        // Valores por defecto
-        $director = $data['director_id'] ?? 'No asignado';
-        $evaluador = $data['evaluador_id'] ?? 'No asignado';
-        $codirector = $data['codirector_id'] ?? 'No asignado';
+        // Obtener nombres de los docentes en lugar de IDs
+        $directorNombre = 'No asignado';
+        $evaluadorNombre = 'No asignado';
+        $codirectorNombre = 'No asignado';
         
-        // Si es estudiante, ocultar evaluador y codirector
+        if (isset($data['director_id']) && !empty($data['director_id'])) {
+            $director = \App\Models\User::find($data['director_id']);
+            $directorNombre = $director ? $director->name : 'No asignado';
+        }
+        
+        if (isset($data['evaluador_id']) && !empty($data['evaluador_id'])) {
+            $evaluador = \App\Models\User::find($data['evaluador_id']);
+            $evaluadorNombre = $evaluador ? $evaluador->name : 'No asignado';
+        }
+        
+        if (isset($data['codirector_id']) && !empty($data['codirector_id'])) {
+            $codirector = \App\Models\User::find($data['codirector_id']);
+            $codirectorNombre = $codirector ? $codirector->name : 'No asignado';
+        }
+        
+        // Si es estudiante, ocultar evaluador
         if ($esEstudiante) {
             $docentesHtml = '<div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">';
-            $docentesHtml .= '<p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Docentes:</p>';
+            $docentesHtml .= '<p class="font-semibold text-gray-700 mb-2 sm:mb-0">Docentes:</p>';
             $docentesHtml .= '<div class="text-gray-800 w-full sm:flex-1 sm:ml-2">';
-            $docentesHtml .= '<span><b>Director:</b> ' . e($director) . '</span><br>';
-            $docentesHtml .= '<span><b>Evaluador:</b> <span class="text-gray-400 italic">No disponible</span></span><br>';
-            $docentesHtml .= '<span><b>Codirector:</b> ' . e($codirector) . '</span>';
+            $docentesHtml .= '<span><b>Director:</b> ' . e($directorNombre) . '</span><br>';
+            $docentesHtml .= '<span><b>Codirector:</b> ' . e($codirectorNombre) . '</span>';
             $docentesHtml .= '</div></div>';
         } else {
             $docentesHtml = '<div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">';
-            $docentesHtml .= '<p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Docentes:</p>';
+            $docentesHtml .= '<p class="font-semibold text-gray-700 mb-2 sm:mb-0">Docentes:</p>';
             $docentesHtml .= '<div class="text-gray-800 w-full sm:flex-1 sm:ml-2">';
-            $docentesHtml .= '<span><b>Director:</b> ' . e($director) . '</span><br>';
-            $docentesHtml .= '<span><b>Evaluador:</b> ' . e($evaluador) . '</span><br>';
-            $docentesHtml .= '<span><b>Codirector:</b> ' . e($codirector) . '</span>';
+            $docentesHtml .= '<span><b>Director:</b> ' . e($directorNombre) . '</span><br>';
+            $docentesHtml .= '<span><b>Evaluador:</b> ' . e($evaluadorNombre) . '</span><br>';
+            $docentesHtml .= '<span><b>Codirector:</b> ' . e($codirectorNombre) . '</span>';
             $docentesHtml .= '</div></div>';
         }
         
@@ -552,7 +570,7 @@ public function buscarEstudiantes(Request $request)
         ]);
         
     } catch (\Exception $e) {
-        \Log::error('Error en getDetalle: ' . $e->getMessage());        \Log::error('Error en getDetalle: ' . $e->getMessage());
+        \Log::error('Error en getDetalle: ' . $e->getMessage());
         return response()->json(['error' => 'Error al cargar los detalles'], 500);
     }
 }

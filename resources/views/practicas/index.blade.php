@@ -13,8 +13,9 @@
                 display: none !important;
             }
             .btn-action {
-                min-width: 42px;
-                height: 38px;
+                width: 42px;
+                height: 32px;
+                transition: all 0.3s ease;
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
@@ -26,17 +27,16 @@
                 display: flex !important;
                 justify-content: center !important;
                 align-items: center !important;
-                gap: 0.5rem !important;
                 width: 100% !important;
             }
 
             /* Cada botón individual */
             #practicasTable .btn-action {
+                width: 42px;
+                height: 32px;
                 display: inline-flex !important;
                 justify-content: center !important;
                 align-items: center !important;
-                min-width: 42px;
-                height: 38px;
                 text-align: center !important;
             }
 
@@ -49,12 +49,12 @@
             .btn-action .loading-spinner {
                 align-items: center;
                 transform: translate(-50%, -50%);
-                width: 1.25rem;
-                height: 1.25rem;
+                width: 1rem;
+                height: 1rem;
             }
 
             .btn-action i {
-                font-size: 1.125rem;
+                font-size: 1rem;
             }
 
             .modal-overlay {
@@ -68,7 +68,8 @@
                 z-index: 999;
             }
 
-            .modal-close-btn-custom {
+            .modal-close-btn-custom,
+            .modal-close-btn-calendar {
                 position: absolute !important;
                 top: 10px !important;
                 right: 28px !important;
@@ -80,7 +81,8 @@
                 transition: color 0.3s ease !important;
             }
 
-            .modal-close-btn-custom:hover {
+            .modal-close-btn-custom:hover,
+            .modal-close-btn-calendar:hover {
                 color: #dc2626 !important;
             }
 
@@ -147,10 +149,6 @@
     transform: translateY(0) !important;
     pointer-events: auto !important;
 }
-    
-    .modal-close-btn-custom:hover {
-        color: #ef4444 !important;
-    }
             
             #integrantes_list {
     position: absolute;
@@ -435,7 +433,7 @@ select.dt-input:focus {
         <!-- ESTE ES EL ICONO ROJO -->
         <div class="flex justify-center items-center space-x-2 buttons-container">
             <button type="button" id="warning" onclick="openWarningModal()"
-                class="btn-action shadow bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded-lg relative">
+                class="btn-action shadow bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded-lg relative mx-1">
                 <i class="fa-solid fa-triangle-exclamation"></i>
                 <svg id="loadingSpinner-warningOpen" style="margin: 4px 1px"
                     class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64" fill="none"
@@ -538,8 +536,8 @@ select.dt-input:focus {
                 <div class="inline-block align-bottom bg-white rounded-lg text-left shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
                     onclick="event.stopPropagation()">
                     <button class="modal-close-btn-custom" onclick="closeDetailsModal()">&times;</button>
-                    <div class="p-6 mt-2">
-                        <p class="text-2xl font-bold" id="detailsTitle"></p>
+                    <div class="p-2 mt-2">
+                        <p class="text-2xl font-bold mt-4 mb-6" id="detailsTitle"></p>
                         <div id="content-details"></div>
                         <div class="flex justify-end space-x-2 mt-4">
                             <button type="button" onclick="closeDetailsModal()"
@@ -563,8 +561,8 @@ select.dt-input:focus {
                 @if (auth()->user()->hasRole(['estudiante']))
                     <form id="practicasForm" class="p-6 mt-2" method="POST" enctype="multipart/form-data">
                         @csrf
-                        <p class="text-2xl font-bold" style="margin: 0.8rem 0 1.5rem 0;" id="formTitle"></p>
-                        <p class="text-sm mb-2">En este formulario el estudiante registrará la información necesaria para la solicitud de prácticas empresariales.</p>
+                        <p class="text-2xl font-bold mb-6" id="formTitle"></p>
+                        <p class="text-sm mb-6">En este formulario el estudiante registrará la información necesaria para la solicitud de prácticas empresariales.</p>
                         
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6">
                             
@@ -838,13 +836,13 @@ select.dt-input:focus {
 
                         </div>
 
-                        <p class="text-red-600 text-mb mb-6">
+                        <p class="text-red-600 text-mb mb-2">
                             <i class="fa-solid fa-circle-info mr-1"></i>
                            Si selecciona un segundo integrante, el comité evaluará si la propuesta puede realizarse entre dos estudiantes. Luego, aprobará o rechazará la solicitud.
                         </p>
                         
-                        <p class="text-sm mb-6"><strong>NOTA: </strong>El estudiante debe tener aprobado el 90% de los créditos (Tecnología: 97 / Profesional: 65).</p>
-                        <p class="text-sm mb-6"><strong>CONVENIOS: </strong>Verifique si la empresa tiene convenio vigente en la pagina de la Oficina de Relaciones Interinstitucionales (ORI) :<a href="https://oriapp.uts.edu.co/activities_guest" target="_blank" class="text-uts-500 underline hover:text-uts-800"> Consultar convenios aquí </a></p>
+                        <p class="text-sm mb-2"><strong>NOTA: </strong>El estudiante debe tener aprobado el <strong>90%</strong> de los créditos (Tecnología: 97 / Profesional: 65).</p>
+                        <p class="text-sm mb-6"><strong>NOTA: </strong>Verifique si la empresa tiene convenio vigente en la pagina de la Oficina de Relaciones Interinstitucionales (ORI) :<a href="https://oriapp.uts.edu.co/activities_guest" target="_blank" class="text-uts-500 underline hover:text-uts-800"> Consultar convenios aquí </a></p>
 
                         <div class="flex justify-end space-x-2">
                             <button type="button" onclick="closeCreateModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cancelar</button>
@@ -872,7 +870,7 @@ select.dt-input:focus {
                 <div class="inline-block align-bottom bg-white rounded-lg text-left shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
                     onclick="event.stopPropagation()">
                     <button class="modal-close-btn-custom" onclick="closeResponderSolicitudModal()">&times;</button>
-                    <form id="responderSolicitudForm" class="p-6 mt-2">
+                    <form id="responderSolicitudForm" class="p-4 mt-2">
                         @csrf
                         <p class="text-2xl font-bold" style="margin: 0.8rem 0 1.5rem 0;" id="respuestaTitulo"></p>
                         <input type="hidden" name="solicitudPractica_id" id="solicitudPractica_id">
@@ -881,7 +879,7 @@ select.dt-input:focus {
                                 Solicitud</label>
                             <select name="estado" id="estado"
                             class="border-gray-300 rounded-md mt-1 block w-full focus:ring-uts-500 focus:border-uts-500">
-                            <option value="" selected disabled>Seleccione un estado</option>
+                            <option value="" selected disabled>Seleccione una opción</option>
                             <option value="Aprobada">Aprobada</option>
                             <option value="Rechazada">Rechazada</option>
                         </select>
@@ -1122,8 +1120,8 @@ select.dt-input:focus {
                 <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
                     <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative" style="width: 100% !important; padding: 2rem 2rem !important;" onclick="event.stopPropagation()">
                         
-                        <button class="modal-close-btn-custom" onclick="closeCalendarModal()" style="position: absolute !important; top: 10px !important; right: 28px !important; background: none !important; border: none !important; cursor: pointer !important; color: #6b7280 !important;">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <button class="modal-close-btn-custom" onclick="closeCalendarModal()" style="position: absolute !important; top: 30px !important; right: 28px !important; background: none !important; border: none !important; cursor: pointer !important; color: #6b7280 !important;">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                             </svg>
                         </button>
@@ -1183,7 +1181,7 @@ select.dt-input:focus {
                 var numero = mesActual <= 6 ? 1 : 2;
                 var periodo_academico = añoActual + '-' + numero;
 
-                $('#formTitle').html(`Solicitud de <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Prácticas</span>`);
+                $('#formTitle').html(`Iniciar nueva <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">práctica</span>`);
 
                 // Limpiar campos (igual que antes)
                 $('#modalidad').val('');
@@ -1315,7 +1313,7 @@ select.dt-input:focus {
             window.quill.root.innerHTML = '';
         }
         
-        $('#respuestaTitulo').html(`Responder <span class="bg-uts-500 text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Solicitud</span>`);
+        $('#respuestaTitulo').html(`Responder <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Solicitud</span>`);
         $('#solicitudPractica_id').val(id);
         $('#estado').val('');
         $('#mensaje').val('');
@@ -1334,67 +1332,109 @@ select.dt-input:focus {
     }
 
     // ========== ENVÍO DEL FORMULARIO DE RESPUESTA ==========
-    $(document).ready(function() {
-        $('#responderSolicitudForm').on('submit', function(e) {
-            e.preventDefault();
+$(document).ready(function() {
+    $('#responderSolicitudForm').on('submit', function(e) {
+        e.preventDefault();
 
-            // Obtener el contenido del editor Quill
-            if (window.quill) {
-                $('#mensaje').val(window.quill.root.innerHTML);
+        // Obtener el contenido del editor Quill
+        if (window.quill) {
+            $('#mensaje').val(window.quill.root.innerHTML);
+        }
+
+        // Validar que haya seleccionado un estado
+        const estadoSeleccionado = $('#estado').val();
+        if (!estadoSeleccionado) {
+            $('#estadoError').text('Debe seleccionar un estado');
+            return;
+        }
+
+        // Validar que el mensaje no esté vacío
+        const mensaje = $('#mensaje').val();
+        if (!mensaje || mensaje === '<p><br></p>') {
+            $('#mensajeError').text('Debe ingresar un mensaje de respuesta');
+            return;
+        }
+
+        // Personalizar el mensaje de confirmación según el estado
+        let mensajeConfirmacion = "Esta acción no se puede deshacer";
+        let tituloConfirmacion = "¿Está seguro?";
+
+        if (estadoSeleccionado === 'Aprobada') {
+            mensajeConfirmacion = "Esta acción no se podrá deshacer";
+        } else if (estadoSeleccionado === 'Rechazada') {
+            mensajeConfirmacion = "Esta acción no se podrá deshacer";
+        }
+
+        // Mostrar alerta de confirmación
+        Swal.fire({
+            heightAuto: false,
+            title: tituloConfirmacion,
+            text: mensajeConfirmacion,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#C1D631',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, enviar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Mostrar spinner en el botón
+                const button = $('#responderSolicitudButton');
+                const loadingSpinner = $('#loadingSpinner-replyProyectos');
+                button.prop('disabled', true);
+                loadingSpinner.removeClass('hidden');
+
+                // Enviar el formulario
+                $.ajax({
+                    url: '{{ route("practicas.responder") }}',
+                    method: 'POST',
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        $('#practicasTable').DataTable().ajax.reload();
+                        closeResponderSolicitudModal();
+                        
+                        // Mostrar toast de éxito
+                        showToast('Respuesta enviada exitosamente', 'success');
+                    },
+                    error: function(xhr) {
+                        $('#estadoError').text('');
+                        $('#mensajeError').text('');
+
+                        if (xhr.status === 404) {
+                            Swal.fire('Error', 'Ruta no encontrada. Limpia la caché de rutas.', 'error');
+                            return;
+                        }
+
+                        const errors = xhr.responseJSON?.errors;
+                        if (errors) {
+                            if (errors.estado) $('#estadoError').text(errors.estado[0]);
+                            if (errors.mensaje) $('#mensajeError').text(errors.mensaje[0]);
+                        } else {
+                            showToast(xhr.responseJSON?.message || 'Ocurrió un error inesperado', 'error');
+                        }
+                    },
+                    complete: function() {
+                        button.prop('disabled', false);
+                        loadingSpinner.addClass('hidden');
+                    }
+                });
             }
-
-            const button = $('#responderSolicitudButton');
-            const loadingSpinner = $('#loadingSpinner-replyProyectos');
-            button.prop('disabled', true);
-            loadingSpinner.removeClass('hidden');
-
-            $.ajax({
-                url: '{{ route("practicas.responder") }}',
-                method: 'POST',
-                data: $(this).serialize(),
-                success: function(response) {
-                    $('#practicasTable').DataTable().ajax.reload();
-                    closeResponderSolicitudModal();
-                    showToast('Respuesta enviada exitosamente');
-                },
-                error: function(xhr) {
-                    $('#estadoError').text('');
-                    $('#mensajeError').text('');
-
-                    if (xhr.status === 404) {
-                        Swal.fire('Error', 'Ruta no encontrada. Limpia la caché de rutas.', 'error');
-                        return;
-                    }
-
-                    const errors = xhr.responseJSON?.errors;
-                    if (errors) {
-                        if (errors.estado) $('#estadoError').text(errors.estado[0]);
-                        if (errors.mensaje) $('#mensajeError').text(errors.mensaje[0]);
-                    } else {
-                        Swal.fire('Error', xhr.responseJSON?.message || 'Ocurrió un error inesperado', 'error');
-                    }
-                },
-                complete: function() {
-                    button.prop('disabled', false);
-                    loadingSpinner.addClass('hidden');
-                }
-            });
         });
     });
+});
 
-    // Toast
-    
-    function showToast(message, type = 'success') {
-        Swal.fire({
-            title: type === 'success' ? '¡Éxito!' : 'Error',
-            text: message,
-            icon: type,
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 3000
-        });
-    }
+// Toast
+function showToast(message, type = 'success') {
+    Swal.fire({
+        title: type === 'success' ? '¡Éxito!' : 'Error',
+        text: message,
+        icon: type,
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000
+    });
+}
 
 </script>
 
@@ -1588,10 +1628,10 @@ var table = $('#practicasTable').DataTable({
         ],
         language: {
             "sProcessing": "",
-            "sLengthMenu": "Mostrar _MENU_ registros",
+            "sLengthMenu": "Mostrar _MENU_ registros por página",
             "sZeroRecords": "No se encontraron resultados",
             "sEmptyTable": "Ningún dato disponible",
-            "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_",
+            "sInfo": "Mostrando registros del _START_ de _END_",
             "sInfoEmpty": "Mostrando 0 registros",
             "sInfoFiltered": "(filtrado de _MAX_ registros totales)",
             "sSearch": "Buscar:",
@@ -1650,7 +1690,7 @@ $('#filtroRolesPracticas').on('change', function() {
             <div class="mt-4">
                 <!-- Título -->
                 <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
-                    <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Título de la práctica:</p>
+                    <p class="font-semibold text-gray-700 mb-2 sm:mb-0">Título de la práctica:</p>
                     <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">${escapeHtml(response.titulo)}</span>
                 </div>
                 
@@ -1659,19 +1699,19 @@ $('#filtroRolesPracticas').on('change', function() {
                 
                 <!-- Nivel académico -->
                 <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
-                <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Nivel académico:</p>
+                <p class="font-semibold text-gray-700 mb-2 sm:mb-0">Nivel académico:</p>
                 <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">${escapeHtml(response.nivel)}</span>
                 </div>
                 
                 <!-- Modalidad -->
                 <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
-                <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Modalidad:</p>
+                <p class="font-semibold text-gray-700 mb-2 sm:mb-0">Modalidad:</p>
                 <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">${escapeHtml(response.modalidad)}</span>
                 </div>
                 
                 <!-- Periodo académico -->
                 <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
-                <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Periodo académico:</p>
+                <p class="font-semibold text-gray-700 mb-2 sm:mb-0">Periodo académico:</p>
                 <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">${escapeHtml(response.periodo)}</span>
                 </div>
 
@@ -1683,7 +1723,7 @@ $('#filtroRolesPracticas').on('change', function() {
         if (response.tiene_empresa) {
             html += `
                 <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
-                    <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">¿Cuenta con empresa?</p>
+                    <p class="font-semibold text-gray-700 mb-2 sm:mb-0">¿Cuenta con empresa?</p>
                     <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">Sí</span>
                 </div>
             `;
@@ -1692,7 +1732,7 @@ $('#filtroRolesPracticas').on('change', function() {
             if (response.hoja_vida) {
                 html += `
                     <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
-                        <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Hoja de vida:</p>
+                        <p class="font-semibold text-gray-700 mb-2 sm:mb-0">Hoja de vida:</p>
                         <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">
                             <a target="_blank"
                                 class="text-red-600 text-sm underline"
@@ -1710,7 +1750,7 @@ $('#filtroRolesPracticas').on('change', function() {
 
                 html += `
                     <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
-                        <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">
+                        <p class="font-semibold text-gray-700 mb-2 sm:mb-0">
                             Hoja de vida segundo integrante:
                         </p>
                         <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">
@@ -1732,7 +1772,7 @@ $('#filtroRolesPracticas').on('change', function() {
         // Fechas
         html += `
                 <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
-                    <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Fechas propuesta:</p>
+                    <p class="font-semibold text-gray-700 mb-2 sm:mb-0">Fechas propuesta:</p>
                     <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">
                         <span><b>Envío de propuesta:</b> No disponible</span><br>
                         <span><b>Revisión director:</b> No disponible</span><br>
@@ -1740,7 +1780,7 @@ $('#filtroRolesPracticas').on('change', function() {
                     </span>
                 </div>
                 <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
-                    <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Fechas informe:</p>
+                    <p class="font-semibold text-gray-700 mb-2 sm:mb-0">Fechas informe:</p>
                     <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">
                         <span><b>Envío de informe:</b> No disponible</span><br>
                         <span><b>Revisión director:</b> No disponible</span><br>
@@ -1806,8 +1846,8 @@ function deshabilitarPracticaConActa(id) {
                     [{ 'header': 1}],  // H1
                     [{ 'header': 2}],  // H2
                     [{ 'list': 'ordered'}, { 'list': 'bullet' }],  // Numeración y viñetas
-                    ['bold', 'italic', 'underline'],  // Negrita, cursiva, subrayado
                     [{ 'color': [] }],  // Selector de color
+                    ['bold', 'italic', 'underline'],  // Negrita, cursiva, subrayado
                     ['clean']  // Eliminar formato
                 ]
             }
@@ -1842,8 +1882,8 @@ function habilitarPracticaConActa(id) {
                     [{ 'header': 1}],  // H1
                     [{ 'header': 2}],  // H2
                     [{ 'list': 'ordered'}, { 'list': 'bullet' }],  // Numeración y viñetas
-                    ['bold', 'italic', 'underline'],  // Negrita, cursiva, subrayado
                     [{ 'color': [] }],  // Selector de color
+                    ['bold', 'italic', 'underline'],  // Negrita, cursiva, subrayado
                     ['clean']  // Eliminar formato
                 ]
             }
@@ -1873,8 +1913,8 @@ function openWarningModal() {
                     [{ 'header': 1}],  // H1
                     [{ 'header': 2}],  // H2
                     ['bold', 'italic', 'underline'],  // Negrita, cursiva, subrayado
-                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],  // Numeración y viñetas
                     [{ 'color': [] }],  // Selector de color
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],  // Numeración y viñetas
                     ['clean']  // Eliminar formato
                 ]
             }
@@ -1895,83 +1935,230 @@ function closeWarningModal() {
 //ENVIO DE FORMULARIOS
 
 $(document).ready(function() {
-    // Deshabilitar práctica
+    // ========== DESHABILITAR PRÁCTICA ==========
     $('#desactivarPracticaForm').on('submit', function(e) {
         e.preventDefault();
+        
+        // Obtener el contenido del editor Quill
         if (window.quillDesactivar) {
             $('#descripcion_desactivar').val(window.quillDesactivar.root.innerHTML);
         }
-        $.ajax({
-            url: '{{ route("practicas.deshabilitar_con_acta") }}',
-            method: 'POST',
-            data: $(this).serialize(),
-            success: function(response) {
-                $('#practicasTable').DataTable().ajax.reload();
-                closeDesactivarPracticaModal();
-                showToast(response.success);
-            },
-            error: function(xhr) {
-                let errors = xhr.responseJSON?.errors;
-                if (errors) {
-                    for (let key in errors) {
-                        $('#' + key + 'Error').text(errors[key][0]);
+        
+        // Validar que el mensaje no esté vacío
+        const mensaje = $('#descripcion_desactivar').val();
+        if (!mensaje || mensaje === '<p><br></p>') {
+            $('#descripcion_desactivarError').text('Debe ingresar una justificación para deshabilitar la práctica');
+            return;
+        }
+        
+        // Validar número de acta
+        const nroActa = $('#nro_acta_desactivar').val();
+        if (!nroActa) {
+            $('#nro_acta_desactivarError').text('Debe ingresar el número de acta');
+            return;
+        }
+        
+        // Validar fecha del acta
+        const fechaActa = $('#fecha_acta_desactivar').val();
+        if (!fechaActa) {
+            $('#fecha_acta_desactivarError').text('Debe seleccionar la fecha del acta');
+            return;
+        }
+        
+        // Mostrar alerta de confirmación
+        Swal.fire({
+            heightAuto: false,
+            title: 'Desactivar práctica',
+            text: 'No podrá deshacer esta acción',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#C1D631',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Deshabilitar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const button = $('#desactivarPracticaForm').find('button[type="submit"]');
+                const spinner = $('#loadingSpinner-desactivar');
+                
+                button.prop('disabled', true);
+                if (spinner.length) spinner.removeClass('hidden');
+                
+                $.ajax({
+                    url: '{{ route("practicas.deshabilitar_con_acta") }}',
+                    method: 'POST',
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        $('#practicasTable').DataTable().ajax.reload();
+                        closeDesactivarPracticaModal();
+                        showToast(response.success || 'Práctica deshabilitada exitosamente');
+                    },
+                    error: function(xhr) {
+                        let errors = xhr.responseJSON?.errors;
+                        if (errors) {
+                            for (let key in errors) {
+                                $('#' + key + 'Error').text(errors[key][0]);
+                            }
+                            // Limpiar errores después de 5 segundos
+                            setTimeout(() => {
+                                for (let key in errors) {
+                                    $('#' + key + 'Error').text('');
+                                }
+                            }, 5000);
+                        } else {
+                            showToast(xhr.responseJSON?.message || 'Error al deshabilitar la práctica', 'error');
+                        }
+                    },
+                    complete: function() {
+                        button.prop('disabled', false);
+                        if (spinner.length) spinner.addClass('hidden');
                     }
-                } else {
-                    showToast('Error al deshabilitar la práctica', 'error');
-                }
+                });
             }
         });
     });
 
-    // Habilitar práctica
+    // ========== HABILITAR PRÁCTICA ==========
     $('#activarPracticaForm').on('submit', function(e) {
         e.preventDefault();
+        
+        // Obtener el contenido del editor Quill
         if (window.quillActivar) {
             $('#descripcion_activar').val(window.quillActivar.root.innerHTML);
         }
-        $.ajax({
-            url: '{{ route("practicas.habilitar_con_acta") }}',
-            method: 'POST',
-            data: $(this).serialize(),
-            success: function(response) {
-                $('#practicasTable').DataTable().ajax.reload();
-                closeActivarPracticaModal();
-                showToast(response.success);
-            },
-            error: function(xhr) {
-                let errors = xhr.responseJSON?.errors;
-                if (errors) {
-                    for (let key in errors) {
-                        $('#' + key + 'Error').text(errors[key][0]);
+        
+        // Validar que el mensaje no esté vacío
+        const mensaje = $('#descripcion_activar').val();
+        if (!mensaje || mensaje === '<p><br></p>') {
+            $('#descripcion_activarError').text('Debe ingresar una justificación para habilitar la práctica');
+            return;
+        }
+        
+        // Validar número de acta
+        const nroActa = $('#nro_acta_activar').val();
+        if (!nroActa) {
+            $('#nro_acta_activarError').text('Debe ingresar el número de acta');
+            return;
+        }
+        
+        // Validar fecha del acta
+        const fechaActa = $('#fecha_acta_activar').val();
+        if (!fechaActa) {
+            $('#fecha_acta_activarError').text('Debe seleccionar la fecha del acta');
+            return;
+        }
+        
+        // Mostrar alerta de confirmación
+        Swal.fire({
+            heightAuto: false,
+            title: 'Habilitar práctica',
+            text: 'No podrá deshacer esta acción',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#C1D631',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Habilitar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const button = $('#activarPracticaForm').find('button[type="submit"]');
+                const spinner = $('#loadingSpinner-activar');
+                
+                button.prop('disabled', true);
+                if (spinner.length) spinner.removeClass('hidden');
+                
+                $.ajax({
+                    url: '{{ route("practicas.habilitar_con_acta") }}',
+                    method: 'POST',
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        $('#practicasTable').DataTable().ajax.reload();
+                        closeActivarPracticaModal();
+                        showToast(response.success || 'Práctica habilitada exitosamente');
+                    },
+                    error: function(xhr) {
+                        let errors = xhr.responseJSON?.errors;
+                        if (errors) {
+                            for (let key in errors) {
+                                $('#' + key + 'Error').text(errors[key][0]);
+                            }
+                            setTimeout(() => {
+                                for (let key in errors) {
+                                    $('#' + key + 'Error').text('');
+                                }
+                            }, 5000);
+                        } else {
+                            showToast(xhr.responseJSON?.message || 'Error al habilitar la práctica', 'error');
+                        }
+                    },
+                    complete: function() {
+                        button.prop('disabled', false);
+                        if (spinner.length) spinner.addClass('hidden');
                     }
-                } else {
-                    showToast('Error al habilitar la práctica', 'error');
-                }
+                });
             }
         });
     });
 
-    // Reportar problema
+    // ========== REPORTAR PROBLEMA ==========
     $('#warningForm').on('submit', function(e) {
         e.preventDefault();
+        
+        // Obtener el contenido del editor Quill
         if (window.quillWarning) {
             $('#mensaje_warning').val(window.quillWarning.root.innerHTML);
         }
-        $.ajax({
-            url: '{{ route("practicas.reportar_problema") }}',
-            method: 'POST',
-            data: $(this).serialize(),
-            success: function(response) {
-                closeWarningModal();
-                showToast(response.success);
-            },
-            error: function(xhr) {
-                let errors = xhr.responseJSON?.errors;
-                if (errors && errors.mensaje_warning) {
-                    $('#mensaje_warningError').text(errors.mensaje_warning[0]);
-                } else {
-                    showToast('Error al enviar el reporte', 'error');
-                }
+        
+        // Validar que el mensaje no esté vacío
+        const mensaje = $('#mensaje_warning').val();
+        if (!mensaje || mensaje === '<p><br></p>') {
+            $('#mensaje_warningError').text('Debe ingresar una descripción del problema');
+            return;
+        }
+        
+        // Mostrar alerta de confirmación
+        Swal.fire({
+            heightAuto: false,
+            title: '¿Está seguro?',
+            text: 'No podrá editar la información una vez se envíe',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#C1D631',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, enviar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const button = $('#warningForm').find('button[type="submit"]');
+                const spinner = $('#loadingSpinner-warning');
+                
+                button.prop('disabled', true);
+                if (spinner.length) spinner.removeClass('hidden');
+                
+                $.ajax({
+                    url: '{{ route("practicas.reportar_problema") }}',
+                    method: 'POST',
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        closeWarningModal();
+                        showToast(response.success || 'Reporte enviado exitosamente');
+                    },
+                    error: function(xhr) {
+                        let errors = xhr.responseJSON?.errors;
+                        if (errors && errors.mensaje_warning) {
+                            $('#mensaje_warningError').text(errors.mensaje_warning[0]);
+                            setTimeout(() => {
+                                $('#mensaje_warningError').text('');
+                            }, 5000);
+                        } else {
+                            showToast(xhr.responseJSON?.message || 'Error al enviar el reporte', 'error');
+                        }
+                    },
+                    complete: function() {
+                        button.prop('disabled', false);
+                        if (spinner.length) spinner.addClass('hidden');
+                    }
+                });
             }
         });
     });
@@ -2018,6 +2205,22 @@ function closeCalendarModal() {
         console.log('Modal cerrado');
     }
 }
+</script>
+
+<script>
+
+    function showRoadmapSpinner(form) {
+        const button = form.querySelector('button');
+        const icon = button.querySelector('i');
+        const spinner = button.querySelector('.loading-spinner');
+        
+        if (icon) icon.classList.add('hidden');
+        if (spinner) spinner.classList.remove('hidden');
+        button.disabled = true;
+        
+        return true; // Permite que el formulario se envíe
+    }
+
 </script>
 
         <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
