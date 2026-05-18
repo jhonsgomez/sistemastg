@@ -476,7 +476,7 @@ public function buscarEstudiantes(Request $request)
         
         // Integrante 1
         $integrantesHtml .= '<div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">';
-        $integrantesHtml .= '<p class="font-semibold text-gray-700 mb-2 sm:mb-0">Integrante:</p>';
+        $integrantesHtml .= '<p class="font-semibold text-gray-700 mb-2 sm:mb-0 w-1/3 min-w-[100px]">Integrante:</p>';
         $integrantesHtml .= '<div class="text-gray-800 w-full sm:flex-1 sm:ml-2">';
         $integrantesHtml .= e($practica->user->name) . '<br>';
         $integrantesHtml .= 'C.C ' . e($practica->user->nro_documento ?? 'N/A') . '<br>';
@@ -487,7 +487,7 @@ public function buscarEstudiantes(Request $request)
         // Integrante 2 (si existe)
         if ($integrante2) {
             $integrantesHtml .= '<div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">';
-            $integrantesHtml .= '<p class="font-semibold text-gray-700 mb-2 sm:mb-0">Integrante:</p>';
+            $integrantesHtml .= '<p class="font-semibold text-gray-700 mb-2 sm:mb-0 w-1/3 min-w-[100px]">Integrante:</p>';
             $integrantesHtml .= '<div class="text-gray-800 w-full sm:flex-1 sm:ml-2">';
             $integrantesHtml .= e($integrante2->name) . '<br>';
             $integrantesHtml .= 'C.C ' . e($integrante2->nro_documento ?? 'N/A') . '<br>';
@@ -519,14 +519,14 @@ public function buscarEstudiantes(Request $request)
         // Si es estudiante, ocultar evaluador
         if ($esEstudiante) {
             $docentesHtml = '<div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">';
-            $docentesHtml .= '<p class="font-semibold text-gray-700 mb-2 sm:mb-0">Docentes:</p>';
+            $docentesHtml .= '<p class="font-semibold text-gray-700 mb-2 sm:mb-0 w-1/3 min-w-[100px]">Docentes:</p>';
             $docentesHtml .= '<div class="text-gray-800 w-full sm:flex-1 sm:ml-2">';
             $docentesHtml .= '<span><b>Director:</b> ' . e($directorNombre) . '</span><br>';
             $docentesHtml .= '<span><b>Codirector:</b> ' . e($codirectorNombre) . '</span>';
             $docentesHtml .= '</div></div>';
         } else {
             $docentesHtml = '<div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">';
-            $docentesHtml .= '<p class="font-semibold text-gray-700 mb-2 sm:mb-0">Docentes:</p>';
+            $docentesHtml .= '<p class="font-semibold text-gray-700 mb-2 sm:mb-0 w-1/3 min-w-[100px]">Docentes:</p>';
             $docentesHtml .= '<div class="text-gray-800 w-full sm:flex-1 sm:ml-2">';
             $docentesHtml .= '<span><b>Director:</b> ' . e($directorNombre) . '</span><br>';
             $docentesHtml .= '<span><b>Evaluador:</b> ' . e($evaluadorNombre) . '</span><br>';

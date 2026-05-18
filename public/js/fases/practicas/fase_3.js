@@ -242,6 +242,7 @@ $('#doc_fdc195').on('change', function(e) {
 
 // Abrir modal de detalles con spinner en el botón (exactamente como Fase 1)
 function openFase3DetailsModal(btn) {
+    console.log('click')
     // Mostrar spinner y ocultar icono en el botón
     if (btn) {
         const icon = btn.querySelector('i');
@@ -260,46 +261,76 @@ function openFase3DetailsModal(btn) {
             practica_id: $('input[name="practica_id"]').first().val()
         },
         success: function(response) {
+            console.log(response);
             let html = `
                 <div class="flex flex-col space-y-3">
+
                     <div class="flex flex-col sm:flex-row items-start justify-between p-3 bg-gray-50 rounded-lg">
-                        <p class="font-semibold text-gray-700 w-1/3">ARL:</p>
+                        <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">
+                            ARL:
+                        </p>
 
                         ${response.arl_url
-                            ? `<a href="${response.arl_url}" target="_blank"
-                                class="text-uts-500 underline hover:text-uts-800">
-                                Ver ARL
-                            </a>`
-                            : '<span class="text-gray-500">No disponible</span>'
+                            ? `
+                                <div class="items-details text-gray-800 w-full sm:flex-1 sm:ml-2">
+                                    <i class="fa-regular fa-file-pdf text-red-600 mr-2"></i>
+                                    <a href="${response.arl_url}" target="_blank"
+                                        class="text-red-600 underline hover:text-red-800">
+                                        Ver ARL
+                                    </a>
+                                </div>
+                            `
+                            : `
+                                <span class="text-gray-500 w-full sm:flex-1 sm:ml-2">
+                                    No disponible
+                                </span>
+                            `
                         }
                     </div>
 
                     <div class="flex flex-col sm:flex-row items-start justify-between p-3 bg-gray-50 rounded-lg">
-                        <p class="font-semibold text-gray-700 w-1/3">
-                            Formato F-DC-127:
+                        <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">
+                            F-DC-127:
                         </p>
-                
+
                         ${response.doc_fdc127_url
-                            ? `<a href="${response.doc_fdc127_url}" target="_blank"
-                                class="text-uts-500 underline hover:text-uts-800">
-                                Ver documento
-                            </a>`
-                            : '<span class="text-gray-500">No disponible</span>'
+                            ? `
+                                <div class="items-details text-gray-800 w-full sm:flex-1 sm:ml-2">
+                                    <i class="fa-regular fa-file-word text-blue-600 mr-2"></i>
+                                    <a href="${response.doc_fdc127_url}" target="_blank"
+                                        class="text-blue-600 underline hover:text-blue-800">
+                                        Ver documento
+                                    </a>
+                                </div>
+                            `
+                            : `
+                                <span class="text-gray-500 w-full sm:flex-1 sm:ml-2">
+                                    No disponible
+                                </span>
+                            `
                         }
-                       
                     </div>
 
                     <div class="flex flex-col sm:flex-row items-start justify-between p-3 bg-gray-50 rounded-lg">
-                        <p class="font-semibold text-gray-700 w-1/3">
-                            Formato F-DC-195:
+                        <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">
+                            F-DC-195:
                         </p>
 
                         ${response.doc_fdc195_url
-                            ? `<a href="${response.doc_fdc195_url}" target="_blank"
-                                class="text-uts-500 underline hover:text-uts-800">
-                                Ver documento
-                            </a>`
-                            : '<span class="text-gray-500">No disponible</span>'
+                            ? `
+                                <div class="items-details text-gray-800 w-full sm:flex-1 sm:ml-2">
+                                    <i class="fa-regular fa-file-word text-blue-600 mr-2"></i>
+                                    <a href="${response.doc_fdc195_url}" target="_blank"
+                                        class="text-blue-600 underline hover:text-blue-800">
+                                        Ver documento
+                                    </a>
+                                </div>
+                            `
+                            : `
+                                <span class="text-gray-500 w-full sm:flex-1 sm:ml-2">
+                                    No disponible
+                                </span>
+                            `
                         }
                     </div>
 

@@ -68,17 +68,17 @@ function openFase1DetailsModal(btn) {
             let html = `
                 <div class="flex flex-col space-y-3">
                     <div class="flex flex-col sm:flex-row items-start justify-between p-3 bg-gray-50 rounded-lg">
-                        <p class="font-semibold text-gray-700 w-1/3">¿Es práctica institucional?:</p>
-                        <span class="text-gray-800">${response.es_institucional ? 'Sí' : 'No'}</span>
+                        <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">¿Es práctica institucional?:</p>
+                        <span class="items-details text-gray-800 w-full sm:flex-1 sm:ml-2" >${response.es_institucional ? 'Sí' : 'No'}</span>
                     </div>
                     <div class="flex flex-col sm:flex-row items-start justify-between p-3 bg-gray-50 rounded-lg">
-                        <p class="font-semibold text-gray-700 w-1/3">Empresa:</p>
-                        <span class="text-gray-800">${escapeHtml(response.nombre_empresa)}</span>
+                        <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Empresa:</p>
+                        <span class="items-details text-gray-800 w-full sm:flex-1 sm:ml-2">${escapeHtml(response.nombre_empresa)}</span>
                     </div>
                     <div class="flex flex-col sm:flex-row items-start justify-between p-3 bg-gray-50 rounded-lg">
-                        <p class="font-semibold text-gray-700 w-1/3">Formato F-DC-126:</p>
+                        <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Formato F-DC-126:</p>
                         ${response.doc_fdc126 ? 
-                            `<div class="flex items-center"><i class="fa-regular fa-file-word text-blue-500 mr-2"></i> <a href="/storage/${response.doc_fdc126}" target="_blank" class="text-blue-500 underline hover:text-blue-800">Ver archivo</a></div>` : 
+                            `<div class="items-details text-gray-800 w-full sm:flex-1 sm:ml-2" ><i class="fa-regular fa-file-word text-blue-500 mr-2"></i> <a href="/storage/${response.doc_fdc126}" target="_blank" class="text-blue-500 underline hover:text-blue-800">Documento 1</a></div>` : 
                             '<span class="text-gray-500">No disponible</span>'}
                     </div>
                 </div>
@@ -254,9 +254,17 @@ $('#fase1AdminForm').on('submit', function(e) {
         return;
     }
     
-    // Validar que el mensaje no esté vacío
-    const mensaje = $('#respuesta_fase1').val();
-    if (!mensaje || mensaje === '<p><br></p>') {
+   
+    // Obtener contenido de Quill
+    const mensaje = quillFase1.root.innerHTML;
+
+    // Pasarlo al textarea oculto
+    $('#respuesta_fase1').val(mensaje);
+
+    // Validar contenido limpio
+    const mensajeLimpio = quillFase1.getText().trim();
+
+    if (!mensajeLimpio) {
         $('#respuesta_fase1Error').text('Debe ingresar un mensaje de respuesta');
         return;
     }
@@ -300,7 +308,7 @@ $('#fase1AdminForm').on('submit', function(e) {
                         if (errors.nro_acta) $('#nro_acta_fase1Error').text(errors.nro_acta[0]);
                         if (errors.fecha_acta) $('#fecha_acta_fase1Error').text(errors.fecha_acta[0]);
                         if (errors.estado) $('#estado_fase1Error').text(errors.estado[0]);
-                        if (errors.respuesta) $('#respuesta_fase1Error').text(errors.respuesta[0]);
+                        if (errors.respuesta_fase1) $('#respuesta_fase1Error').text(errors.respuesta_fase1[0]);
                     } else {
                         showToast(xhr.responseJSON?.error || 'Error al enviar respuesta', 'error');
                     }

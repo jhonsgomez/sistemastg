@@ -21,7 +21,7 @@ function openFase2EstudianteModal(btn) {
     $('#liquidacion_pagoError').text('');
     $('#soporte_pagoError').text('');
     
-    $('#fase2EstudianteTitle').html(`Prácticas empresariales: <span class="bg-uts-500 text-white px-3 py-1 rounded uppercase shadow-md text-xl">Fase 2</span>`);
+    $('#fase2EstudianteTitle').html(`Prácticas <span class="bg-uts-500 text-white px-3 py-1 rounded uppercase shadow-md text-xl">Fase 2</span>`);
     $('#fase2EstudianteModal').addClass('show');
     
     if (btn) {
@@ -58,22 +58,55 @@ function openFase2DetailsModal(btn) {
             practica_id: $('input[name="practica_id"]').first().val()
         },
         success: function(response) {
-            let html = `
-                <div class="flex flex-col space-y-3">
-                    <div class="flex flex-col sm:flex-row items-start justify-between p-3 bg-gray-50 rounded-lg">
-                        <p class="font-semibold text-gray-700 w-1/3">Liquidación de pago:</p>
-                        ${response.liquidacion_url ? 
-                            `<div class="flex items-center"><i class="fa-regular fa-file-pdf text-red-600 mr-1"></i> <a href="${response.liquidacion_url}" target="_blank" class="text-red-600 underline hover:text-red-800">Ver Liquidación</a></div>` : 
-                            '<span class="text-gray-500">No disponible</span>'}
-                    </div>
-                    <div class="flex flex-col sm:flex-row items-start justify-between p-3 bg-gray-50 rounded-lg">
-                        <p class="font-semibold text-gray-700 w-1/3">Soporte de pago:</p>
-                        ${response.soporte_url ? 
-                            `<div class="flex items-center"><i class="fa-regular fa-file-pdf text-red-600 mr-1"></i><a href="${response.soporte_url}" target="_blank" class="text-red-600 underline hover:text-red-800">Ver Soporte de pago</a></div>` : 
-                            '<span class="text-gray-500">No disponible</span>'}
-                    </div>
+           let html = `
+            <div class="flex flex-col space-y-3">
+                <div class="flex flex-col sm:flex-row items-start justify-between p-3 bg-gray-50 rounded-lg">
+                    <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">
+                        Liquidación de pago:
+                    </p>
+
+                    ${response.liquidacion_url
+                        ? `
+                            <div class="items-details text-gray-800 w-full sm:flex-1 sm:ml-2">
+                                <i class="fa-regular fa-file-pdf text-red-600 mr-2"></i>
+                                <a href="${response.liquidacion_url}" target="_blank"
+                                    class="text-red-600 underline hover:text-red-800">
+                                    Ver Liquidación
+                                </a>
+                            </div>
+                        `
+                        : `
+                            <span class="text-gray-500 w-full sm:flex-1 sm:ml-2">
+                                No disponible
+                            </span>
+                        `
+                    }
                 </div>
-            `;
+
+                <div class="flex flex-col sm:flex-row items-start justify-between p-3 bg-gray-50 rounded-lg">
+                    <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">
+                        Soporte de pago:
+                    </p>
+
+                    ${response.soporte_url
+                        ? `
+                            <div class="items-details text-gray-800 w-full sm:flex-1 sm:ml-2">
+                                <i class="fa-regular fa-file-pdf text-red-600 mr-2"></i>
+                                <a href="${response.soporte_url}" target="_blank"
+                                    class="text-red-600 underline hover:text-red-800">
+                                    Ver Soporte de pago
+                                </a>
+                            </div>
+                        `
+                        : `
+                            <span class="text-gray-500 w-full sm:flex-1 sm:ml-2">
+                                No disponible
+                            </span>
+                        `
+                    }
+                </div>
+            </div>
+        `;
             $('#fase2DetailsContent').html(html);
             $('#fase2DetailsModal').addClass('show');
         },

@@ -1690,8 +1690,8 @@ $('#filtroRolesPracticas').on('change', function() {
             <div class="mt-4">
                 <!-- Título -->
                 <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
-                    <p class="font-semibold text-gray-700 mb-2 sm:mb-0">Título de la práctica:</p>
-                    <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">${escapeHtml(response.titulo)}</span>
+                    <p class="font-semibold text-gray-700 mb-2 sm:mb-0  w-1/3 min-w-[100px] ">Título de la práctica:</p>
+                    <span class="text-gray-800 w-full sm:flex-1 sm:ml-2 ">${escapeHtml(response.titulo)}</span>
                 </div>
                 
                 
@@ -1699,19 +1699,19 @@ $('#filtroRolesPracticas').on('change', function() {
                 
                 <!-- Nivel académico -->
                 <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
-                <p class="font-semibold text-gray-700 mb-2 sm:mb-0">Nivel académico:</p>
-                <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">${escapeHtml(response.nivel)}</span>
+                <p class="font-semibold text-gray-700 mb-2 sm:mb-0  w-1/3 min-w-[100px] ">Nivel académico:</p>
+                <span class="text-gray-800 w-full sm:flex-1 sm:ml-2 ">${escapeHtml(response.nivel)}</span>
                 </div>
                 
                 <!-- Modalidad -->
                 <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
-                <p class="font-semibold text-gray-700 mb-2 sm:mb-0">Modalidad:</p>
+                <p class="font-semibold text-gray-700 mb-2 sm:mb-0  w-1/3 min-w-[100px] ">Modalidad:</p>
                 <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">${escapeHtml(response.modalidad)}</span>
                 </div>
                 
                 <!-- Periodo académico -->
                 <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
-                <p class="font-semibold text-gray-700 mb-2 sm:mb-0">Periodo académico:</p>
+                <p class="font-semibold text-gray-700 mb-2 sm:mb-0  w-1/3 min-w-[100px]">Periodo académico:</p>
                 <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">${escapeHtml(response.periodo)}</span>
                 </div>
 
@@ -1723,7 +1723,7 @@ $('#filtroRolesPracticas').on('change', function() {
         if (response.tiene_empresa) {
             html += `
                 <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
-                    <p class="font-semibold text-gray-700 mb-2 sm:mb-0">¿Cuenta con empresa?</p>
+                    <p class="font-semibold text-gray-700 mb-2 sm:mb-0  w-1/3 min-w-[100px]">¿Cuenta con empresa?</p>
                     <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">Sí</span>
                 </div>
             `;
@@ -1732,7 +1732,7 @@ $('#filtroRolesPracticas').on('change', function() {
             if (response.hoja_vida) {
                 html += `
                     <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
-                        <p class="font-semibold text-gray-700 mb-2 sm:mb-0">Hoja de vida:</p>
+                        <p class="font-semibold text-gray-700 mb-2 sm:mb-0  w-1/3 min-w-[100px]">Hoja de vida:</p>
                         <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">
                             <a target="_blank"
                                 class="text-red-600 text-sm underline"
@@ -1750,7 +1750,7 @@ $('#filtroRolesPracticas').on('change', function() {
 
                 html += `
                     <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
-                        <p class="font-semibold text-gray-700 mb-2 sm:mb-0">
+                        <p class="font-semibold text-gray-700 mb-2 sm:mb-0  w-1/3 min-w-[100px]">
                             Hoja de vida segundo integrante:
                         </p>
                         <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">
@@ -1772,7 +1772,7 @@ $('#filtroRolesPracticas').on('change', function() {
         // Fechas
         html += `
                 <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
-                    <p class="font-semibold text-gray-700 mb-2 sm:mb-0">Fechas propuesta:</p>
+                    <p class="font-semibold text-gray-700 mb-2 sm:mb-0  w-1/3 min-w-[100px]">Fechas propuesta:</p>
                     <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">
                         <span><b>Envío de propuesta:</b> No disponible</span><br>
                         <span><b>Revisión director:</b> No disponible</span><br>
@@ -1780,7 +1780,7 @@ $('#filtroRolesPracticas').on('change', function() {
                     </span>
                 </div>
                 <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
-                    <p class="font-semibold text-gray-700 mb-2 sm:mb-0">Fechas informe:</p>
+                    <p class="font-semibold text-gray-700 mb-2 sm:mb-0  w-1/3 min-w-[100px]">Fechas informe:</p>
                     <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">
                         <span><b>Envío de informe:</b> No disponible</span><br>
                         <span><b>Revisión director:</b> No disponible</span><br>

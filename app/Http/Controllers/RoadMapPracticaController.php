@@ -272,7 +272,7 @@ class RoadMapPracticaController extends Controller
         'estado' => 'required|in:Aprobada,Rechazada',
         'nro_acta' => 'required|string',
         'fecha_acta' => 'required|date',
-        'respuesta' => 'required|string',
+        'respuesta_fase1' => 'required|string',
     ]);
 
     if ($validator->fails()) {
@@ -295,7 +295,7 @@ class RoadMapPracticaController extends Controller
     if ($campoRespuesta) {
         PracticaValorCampo::updateOrCreate(
             ['practica_id' => $practica->id, 'campo_id' => $campoRespuesta->id],
-            ['valor' => $request->respuesta]
+            ['valor' => $request->respuesta_fase1]
         );
     }
 
@@ -304,7 +304,7 @@ class RoadMapPracticaController extends Controller
         'practica_id' => $practica->id,
         'numero' => $request->nro_acta,
         'fecha' => $request->fecha_acta,
-        'descripcion' => $request->respuesta,
+        'descripcion' => $request->respuesta_fase1,
     ]);
 
     // ========== LÓGICA PRINCIPAL ==========
@@ -634,6 +634,8 @@ public function replyFase2(Request $request)
     /*FASE 3 - Estudiante: Envío de documentos*/
     public function storeFase3(Request $request)
     {
+    
+
         $validator = Validator::make($request->all(), [
 
             'practica_id' => 'required|exists:practicas,id',
@@ -682,6 +684,7 @@ public function replyFase2(Request $request)
             $campoArl = $campos_fase3
                 ->where('name', 'arl')
                 ->first();
+
             $valorExistente = PracticaValorCampo::where(
                     'practica_id',
                     $practica->id
@@ -878,7 +881,7 @@ public function replyFase2(Request $request)
         } catch (Exception $e) {
 
             Log::error('Error en getFase3Details: ' . $e->getMessage());
-
+            dd($practica->valoresCampos);
             return response()->json([
                 'error' => 'Error al cargar los detalles'
             ], 500);

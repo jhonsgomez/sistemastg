@@ -94,7 +94,7 @@
             #fase2DetailsModal.show,
             #fase2EstudianteModal.show,
             #fase3EstudianteModal.show,
-            #fase2DetailsModal.show {
+            #fase3DetailsModal.show {
                 visibility: visible !important;
                 opacity: 1 !important;
                 transform: translateY(0) scale(1) !important;
@@ -650,6 +650,8 @@
                                         </div>
                                     </div>
                                 </div>
+                                <span id="doc_fdc126Error" class="text-red-500 text-sm"></span>
+                                <ul id="file-list-fase1" class="mt-4 text-gray-600 text-sm list-disc pl-5"></ul>
                                 <br>
 
                                 <p class="text-red-600 text-sm mb-2">
@@ -658,10 +660,9 @@
                                 </p>
 
                                 <p class="text-sm mb-6"><strong>NOTA:</strong> El formato F-DC-126 debe estar
-                                    debidamente diligenciadoy firmado.</p>
+                                    debidamente diligenciado y firmado.</p>
 
-                                <span id="doc_fdc126Error" class="text-red-500 text-sm"></span>
-                                <ul id="file-list-fase1" class="mt-4 text-gray-600 text-sm list-disc pl-5"></ul>
+                                
                             </div>
                         </div>
 
@@ -726,7 +727,7 @@
 
     <!-- Modal FASE 1 - Administrador (Responder solicitud) -->
     <div id="fase1AdminModal" class="fixed z-50 inset-0 overflow-y-auto">
-        <div class="modal-overlay absolute inset-0" onclick="closeFase1AdminModal()">
+        <div class="modal-overlay absolute inset-0"  style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeFase1AdminModal()">
             <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
                 <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
                     onclick="event.stopPropagation()">
@@ -826,8 +827,7 @@
 
                     <!-- Título -->
                     <div class="mb-4 pr-4">
-                        <p class="text-2xl font-bold" id="fase2EstudianteTitle">Prácticas <span
-                                class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Fase 2</span></p>
+                        <p class="text-2xl font-bold" id="fase2EstudianteTitle"> 
                         <p class="text-gray-950 mt-6 text-sm">En este formulario el estudiante deberá subir la
                             liquidación de pago y el soporte correspondiente.</p>
                     </div>
@@ -868,6 +868,12 @@
                                 <div class="relative inline-block">
                                     <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
                                         data-tooltip="tooltip-liquidacion-fase2"></i>
+
+                                    <div id="tooltip-liquidacion-fase2"
+                                        class="tooltip-content hidden absolute left-6 top-0 z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
+                                        Suba la liquidación generada del pago de modalidad. El documento debe incluir la
+                                        marca de agua correspondiente.
+                                    </div>
                                 </div>
                             </div>
                             <div
@@ -886,11 +892,7 @@
                             </div>
                             <span id="liquidacion_pagoError" class="text-red-500 text-xs"></span>
                             <ul id="file-list-liquidacion" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
-                            <div id="tooltip-liquidacion-fase2"
-                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                                Suba la liquidación generada del pago de modalidad. El documento debe incluir la
-                                marca de agua correspondiente.
-                            </div>
+                            
                         </div>
 
                         <!-- Campo Soporte de pago -->
@@ -903,6 +905,11 @@
                                 <div class="relative inline-block">
                                     <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
                                         data-tooltip="tooltip-soporte-fase2"></i>
+
+                                    <div id="tooltip-soporte-fase2"
+                                        class="tooltip-content hidden absolute left-6 top-0 z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
+                                        Suba el soporte de pago correspondiente a la liquidación.
+                                    </div>
                                 </div>
                             </div>
                             <div
@@ -921,10 +928,7 @@
                             </div>
                             <span id="soporte_pagoError" class="text-red-500 text-xs"></span>
                             <ul id="file-list-soporte" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
-                            <div id="tooltip-soporte-fase2"
-                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                                Suba el soporte de pago correspondiente a la liquidación.
-                            </div>
+                            
                         </div>
 
                     </div>
@@ -997,7 +1001,7 @@
 
     <!-- Modal FASE 2 - Administrador (Responder solicitud + Asignar docentes) -->
 <div id="fase2AdminModal" class="fixed z-50 inset-0 overflow-y-auto">
-    <div class="modal-overlay absolute inset-0" onclick="closeFase2AdminModal()">
+    <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;"  onclick="closeFase2AdminModal()">
         <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
             <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
                 onclick="event.stopPropagation()">
@@ -1279,6 +1283,39 @@
                         </button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <!-- Modal FASE 3 - Detalles (Ver información enviada) -->
+<div id="fase3DetailsModal" class="fixed z-50 inset-0 overflow-y-auto">
+    <div class="modal-overlay absolute inset-0" onclick="closeFase3DetailsModal()">
+        <div class="flex items-center justify-center min-h-screen p-4 text-center relative">
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
+                onclick="event.stopPropagation()">
+                <button
+                    class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
+                    onclick="closeFase3DetailsModal()">&times;</button>
+                <div class="p-6 mt-2">
+                    <p class="text-2xl font-bold mb-4">Detalles de la <span
+                            class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Práctica</span></p>
+                    <div id="fase3DetailsContent" class="space-y-3">
+                        <div class="text-center py-4">
+                            <svg class="inline w-8 h-8 text-gray-400 animate-spin" viewBox="0 0 64 64"
+                                fill="none">
+                                <path
+                                    d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
+                                    stroke="currentColor" stroke-width="5"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="flex justify-end mt-4">
+                        <button type="button" onclick="closeFase3DetailsModal()"
+                            class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cerrar</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
