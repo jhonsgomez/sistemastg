@@ -242,6 +242,8 @@ Route::middleware('permission:view_practicas')
         Route::post('/fase3/store',[RoadMapPracticaController::class, 'storeFase3'])->name('practicas.fase3.store');
         Route::post('/fase3/details',[RoadMapPracticaController::class, 'getFase3Details'])->name('practicas.fase3.details');
         Route::post('/fase3/reply',[RoadMapPracticaController::class, 'replyFase3'])->name('practicas.fase3.reply');
+
+      
         
         
         // Rutas POST para seguimiento (sin duplicar)
@@ -292,12 +294,26 @@ Route::middleware('permission:view_practicas')
         Route::get('/{periodo}', [FechasController::class, 'getFechas'])->name('fechas.info');
     });
 
+
     // Rutas para directores
     Route::prefix('director')->group(function () {
-        Route::get('/', [ProyectoGradoController::class, 'index'])->name('director.index');
+
+        Route::get('/', [ProyectoGradoController::class, 'index'])
+            ->name('director.index');
+
+        // Director prácticas
+        Route::prefix('director/practicas')->group(function () {
+
+            Route::get('/',
+                [RoadMapPracticaController::class, 'indexDirector']
+            )->name('director.practicas.index');
+
+        });
 
         // Rutas para RoadMap
-        Route::post('/seguimiento', [RoadMapController::class, 'index'])->name('director.roadmap');
+        Route::post('/seguimiento', [RoadMapController::class, 'index'])
+            ->name('director.roadmap');
+
         Route::get('/seguimiento', function () {
             return redirect()->route('dashboard');
         })->name('director.roadmap.get');

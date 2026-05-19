@@ -292,7 +292,77 @@ class CamposPracticasSeeder extends Seeder
                 ]
             );
 
-            // 4. Respuesta director
+            // 4. Estado director fase 3
+            Campo::updateOrCreate(
+                [
+                    'tipo_solicitud_id' => $practicas_fase_3->id,
+                    'name' => 'estado_director_fase3'
+                ],
+                [
+                    'label' => 'Estado respuesta director fase 3',
+                    'type' => 'select',
+                    'required' => false,
+                    'instructions' => null
+                ]
+            );
+
+            // 5. Título propuesta director fase 3
+            Campo::updateOrCreate(
+                [
+                    'tipo_solicitud_id' => $practicas_fase_3->id,
+                    'name' => 'titulo_propuesta_director_fase3'
+                ],
+                [
+                    'label' => 'Título propuesta director fase 3',
+                    'type' => 'text',
+                    'required' => false,
+                    'instructions' => null
+                ]
+            );
+
+            // 6. FDC127 firmado/comentado director
+            Campo::updateOrCreate(
+                [
+                    'tipo_solicitud_id' => $practicas_fase_3->id,
+                    'name' => 'fdc127_director_fase3'
+                ],
+                [
+                    'label' => 'FDC127 director fase 3',
+                    'type' => 'file',
+                    'required' => false,
+                    'instructions' => '<p>Suba el F-DC-127 firmado o con comentarios.</p>'
+                ]
+            );
+
+            // 7. FDC195 firmado/comentado director
+            Campo::updateOrCreate(
+                [
+                    'tipo_solicitud_id' => $practicas_fase_3->id,
+                    'name' => 'fdc195_director_fase3'
+                ],
+                [
+                    'label' => 'FDC195 director fase 3',
+                    'type' => 'file',
+                    'required' => false,
+                    'instructions' => '<p>Suba el F-DC-195 firmado o con comentarios.</p>'
+                ]
+            );
+
+            // 8. Turnitin director fase 3
+            Campo::updateOrCreate(
+                [
+                    'tipo_solicitud_id' => $practicas_fase_3->id,
+                    'name' => 'turnitin_director_fase3'
+                ],
+                [
+                    'label' => 'Turnitin director fase 3',
+                    'type' => 'file',
+                    'required' => false,
+                    'instructions' => '<p>Suba el informe Turnitin en PDF.</p>'
+                ]
+            );
+
+            // 9. Respuesta director
             Campo::updateOrCreate(
                 [
                     'tipo_solicitud_id' => $practicas_fase_3->id,

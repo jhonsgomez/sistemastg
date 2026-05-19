@@ -191,24 +191,39 @@ class PracticaController extends Controller
                 }
             } 
             elseif ($p->estado === 'Fase 2') {
-    // Verificar si el estudiante ya envió los documentos
-    $submited = $p->valoresCampos->where('campo.name', 'submited_fase2')->first();
-    $yaEnvio = $submited && $submited->valor === 'true';
-    
-    if ($yaEnvio) {
-        // El estudiante ya envió, ahora le toca al COMITÉ
-        $htmlEstado = "<span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 2</span>
-                       <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Comité</span>";
-    } else {
-        // El estudiante aún no ha enviado
-        $htmlEstado = "<span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 2</span>
-                       <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Estudiante</span>";
-    }
-}
+                // Verificar si el estudiante ya envió los documentos
+                $submited = $p->valoresCampos->where('campo.name', 'submited_fase2')->first();
+                $yaEnvio = $submited && $submited->valor === 'true';
+                
+                if ($yaEnvio) {
+                    // El estudiante ya envió, ahora le toca al COMITÉ
+                    $htmlEstado = "<span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 2</span>
+                                <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Comité</span>";
+                } else {
+                    // El estudiante aún no ha enviado
+                    $htmlEstado = "<span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 2</span>
+                                <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Estudiante</span>";
+                }
+            }
             elseif ($p->estado === 'Fase 3') {
-                $htmlEstado = "<span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 3</span>
-                               <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Estudiante</span>";
-            } 
+
+                // Verificar si el estudiante ya envió los documentos
+                $submited = $p->valoresCampos->where('campo.name', 'submited_fase3')->first();
+                $yaEnvio = $submited && $submited->valor === 'true';
+
+                if ($yaEnvio) {
+                    // Ya envió → ahora le toca al DIRECTOR
+                    $htmlEstado = "<span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 3</span>
+                                <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Director</span>";
+                } else {
+                    // Aún no envía → le toca al estudiante
+                    $htmlEstado = "<span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 3</span>
+                                <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Estudiante</span>";
+                }
+            }
+
+
+
             elseif ($p->estado === 'Fase 4') {
                 $htmlEstado = "<span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 4</span>
                                <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Estudiante</span>";

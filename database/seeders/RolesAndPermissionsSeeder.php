@@ -24,7 +24,9 @@ class RolesAndPermissionsSeeder extends Seeder
             'docente',
             'lider_investigacion',
             'director',
+            'director_practica',
             'evaluador',
+            'evaluador_practica',
             'estudiante'
         ];
 
@@ -127,8 +129,10 @@ class RolesAndPermissionsSeeder extends Seeder
         $adminPermissions = array_merge($assignRoles, $userPermissions, $bancoPermissions, $bancoDocentePermissions, $bancoAdminPermissions, $proyectosPermissions, $practicasPermissions, $proyectosAdminPermissions, $historicoPermissions);
         $liderPermissions = array_merge($bancoPermissions, $bancoDocentePermissions, $bancoAdminPermissions, $proyectosPermissions, $proyectosAdminPermissions);
         $docentePermissions = array_merge($bancoPermissions, $bancoDocentePermissions, $practicasPermissions);
-        $directorPermissions = array_merge($proyectosPermissions, $practicasPermissions);
-        $evaluadorPermissions = array_merge($proyectosPermissions, $practicasPermissions);
+        $directorPermissions = array_merge($proyectosPermissions);
+        $directorPracticaPermissions = array_merge($practicasPermissions);
+        $evaluadorPermissions = array_merge($proyectosPermissions);
+        $evaluadorPracticaPermissions = array_merge($practicasPermissions);
         $estudiantePermissions = array_merge($bancoPermissions, $proyectosPermissions, $proyectosEstudiantePermissions, $practicasPermissions);
 
         // Asignar los permisos al rol
@@ -150,8 +154,14 @@ class RolesAndPermissionsSeeder extends Seeder
         $directorRole = Role::findByName('director');
         $directorRole->syncPermissions($directorPermissions);
 
+        $directorPracticaRole = Role::findByName('director_practica');
+        $directorPracticaRole->syncPermissions($directorPracticaPermissions);
+
         $evaluadorRole = Role::findByName('evaluador');
         $evaluadorRole->syncPermissions($evaluadorPermissions);
+
+        $evaluadorPracticaRole = Role::findByName('evaluador_practica');
+        $evaluadorPracticaRole->syncPermissions($evaluadorPracticaPermissions);
 
         $estudianteRole = Role::findByName('estudiante');
         $estudianteRole->syncPermissions($estudiantePermissions);

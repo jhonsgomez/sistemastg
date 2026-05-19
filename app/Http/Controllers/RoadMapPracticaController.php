@@ -142,6 +142,22 @@ class RoadMapPracticaController extends Controller
     }
 }
 
+public function indexDirector()
+{
+    $directorId = auth()->id();
+
+    $campoDirector = Campo::where('name', 'director_id')->first();
+
+    $practicas = Practica::whereHas('valoresCampos', function ($query) use ($directorId, $campoDirector) {
+
+        $query->where('campo_id', $campoDirector->id)
+              ->where('valor', $directorId);
+
+    })->get();
+
+    return view('practicas.index', compact('practicas'));
+}
+
     /**
      * FASE 1 - Estudiante: Envío del formato F-DC-126
      */
@@ -487,6 +503,11 @@ public function storeFase2(Request $request)
 
 public function replyFase2(Request $request)
 {
+    Log::info('DIRECTOR DATA', [
+    'director_id' => $request->director_id,
+    'evaluador_id' => $request->evaluador_id,
+]);
+
     Log::info('=== replyFase2 INICIO ===', $request->all());
     
     $validator = Validator::make($request->all(), [
@@ -534,25 +555,53 @@ public function replyFase2(Request $request)
         // ✅ APROBADA: Asignar docentes y cambiar a Fase 3
         
         // Asignar director
+       
         $campoDirector = Campo::where('tipo_solicitud_id', $tipo_fase2->id)
             ->where('name', 'director_id')
             ->first();
+
         if ($campoDirector) {
             PracticaValorCampo::updateOrCreate(
                 ['practica_id' => $practica->id, 'campo_id' => $campoDirector->id],
                 ['valor' => $request->director_id]
             );
+
+            // ASIGNAR ROL DIRECTOR
+            if ($request->director_id) {
+                $director = User::find($request->director_id);
+
+                if ($director && !$director->hasRole('director_practica')) {
+                    $director->assignRole('director_practica');
+                }
+            }
         }
 
         // Asignar evaluador
         $campoEvaluador = Campo::where('tipo_solicitud_id', $tipo_fase2->id)
             ->where('name', 'evaluador_id')
             ->first();
+
         if ($campoEvaluador) {
+
             PracticaValorCampo::updateOrCreate(
-                ['practica_id' => $practica->id, 'campo_id' => $campoEvaluador->id],
-                ['valor' => $request->evaluador_id]
+                [
+                    'practica_id' => $practica->id,
+                    'campo_id' => $campoEvaluador->id
+                ],
+                [
+                    'valor' => $request->evaluador_id
+                ]
             );
+
+            // ASIGNAR ROL EVALUADOR
+            if ($request->evaluador_id) {
+
+                $evaluador = User::find($request->evaluador_id);
+
+                if ($evaluador && !$evaluador->hasRole('evaluador_practica')) {
+                    $evaluador->assignRole('evaluador_practica');
+                }
+            }
         }
 
         // Asignar codirector (opcional)
@@ -886,6 +935,106 @@ public function replyFase2(Request $request)
                 'error' => 'Error al cargar los detalles'
             ], 500);
         }
+    }
+
+
+    public function replyFase3(Request $request)
+    {
+        $request->validate([
+            'practica_id' => 'required|exists:practicas,id',
+            'estado' => 'required|in:Aprobada,Rechazada',
+            'titulo_propuesta' => 'required|string|max:255',
+            'fdc127' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
+            'fdc195' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
+            'turnitin' => 'nullable|file|mimes:pdf|max:5120',
+            'respuesta' => 'nullable|string'
+        ]);
+
+        $practica = Practica::findOrFail($request->practica_id);
+
+        // ================= ARCHIVOS =================
+
+        $fdc127 = null;
+        $fdc195 = null;
+        $turnitin = null;
+
+        if ($request->hasFile('fdc127')) {
+
+            $fdc127 = $request->file('fdc127')
+                ->store('practicas/fase3/director/fdc127', 'public');
+        }
+
+        if ($request->hasFile('fdc195')) {
+
+            $fdc195 = $request->file('fdc195')
+                ->store('practicas/fase3/director/fdc195', 'public');
+        }
+
+        if ($request->hasFile('turnitin')) {
+
+            $turnitin = $request->file('turnitin')
+                ->store('practicas/fase3/director/turnitin', 'public');
+        }
+
+        // ================= GUARDAR CAMPOS =================
+
+        $campos = [
+
+            'estado_director_fase3' =>
+                $request->estado,
+
+            'titulo_propuesta_director_fase3' =>
+                $request->titulo_propuesta,
+
+            'respuesta_director_fase3' =>
+                $request->respuesta,
+
+            'fdc127_director_fase3' =>
+                $fdc127,
+
+            'fdc195_director_fase3' =>
+                $fdc195,
+
+            'turnitin_director_fase3' =>
+                $turnitin,
+        ];
+
+        foreach ($campos as $nombreCampo => $valor) {
+
+            if ($valor !== null) {
+
+                $campo = Campo::where(
+                    'name',
+                    $nombreCampo
+                )->first();
+
+                if ($campo) {
+
+                    PracticaValorCampo::create([
+                        'practica_id' => $practica->id,
+                        'campo_id' => $campo->id,
+                        'valor' => $valor
+                    ]);
+                }
+            }
+        }
+
+        // ================= CAMBIAR ESTADO =================
+
+        if ($request->estado === 'Aprobada') {
+
+            $practica->estado = 'Fase 4';
+
+        } else {
+
+            $practica->estado = 'Fase 3 Rechazada';
+        }
+
+        $practica->save();
+
+        return response()->json([
+            'success' => 'Respuesta enviada correctamente'
+        ]);
     }
 
 

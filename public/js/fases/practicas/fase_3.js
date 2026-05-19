@@ -55,54 +55,12 @@ function closeFase3EstudianteModal() {
 
 // ==================== TOOLTIPS PARA FASE 3 ====================
 $(document).ready(function() {
-    // Tooltips para Fase 3
-    $('.tooltip-icon').on('mouseenter', function() {
-        const tooltipId = $(this).data('tooltip');
-        $('#' + tooltipId).removeClass('hidden');
-    }).on('mouseleave', function() {
-        const tooltipId = $(this).data('tooltip');
-        $('#' + tooltipId).addClass('hidden');
-    });
-    
-    // Vista previa de archivos para ARL
-    $('#arl').on('change', function(e) {
-        const file = e.target.files[0];
-        const fileList = $('#file-list-arl');
+// ==================== FDC127 DIRECTOR ====================
 
-        fileList.empty();
-
-        if (file) {
-
-            const fileSizeMB = file.size / (1024 * 1024);
-
-            if (fileSizeMB > 5) {
-                Swal.fire('Error', 'El archivo no puede superar los 5MB', 'error');
-                $(this).val('');
-                return;
-            }
-
-            const extension = file.name.split('.').pop().toLowerCase();
-
-            if (extension !== 'pdf') {
-                Swal.fire('Error', 'El ARL debe ser PDF', 'error');
-                $(this).val('');
-                return;
-            }
-
-            fileList.append(`
-                <li>
-                    <i class="fa-regular fa-file-pdf text-red-500 mr-2"></i>
-                    ${file.name}
-                </li>
-            `);
-        }
-    });
-    
-    // Vista previa de archivos para fdc-127
-    $('#doc_fdc127').on('change', function(e) {
+$('#fdc127_fase3').on('change', function(e) {
 
     const file = e.target.files[0];
-    const fileList = $('#file-list-fdc127');
+    const fileList = $('#file-list-fdc127-fase3');
 
     fileList.empty();
 
@@ -111,32 +69,57 @@ $(document).ready(function() {
         const fileSizeMB = file.size / (1024 * 1024);
 
         if (fileSizeMB > 5) {
-            Swal.fire('Error', 'El archivo no puede superar los 5MB', 'error');
+
+            Swal.fire(
+                'Error',
+                'El archivo no puede superar los 5MB',
+                'error'
+            );
+
             $(this).val('');
+
             return;
         }
 
-        const extension = file.name.split('.').pop().toLowerCase();
+        const extension = file.name
+            .split('.')
+            .pop()
+            .toLowerCase();
 
-        if (!['doc', 'docx'].includes(extension)) {
-            Swal.fire('Error', 'El documento debe ser WORD', 'error');
+        if (!['pdf', 'doc', 'docx'].includes(extension)) {
+
+            Swal.fire(
+                'Error',
+                'Solo PDF, DOC o DOCX',
+                'error'
+            );
+
             $(this).val('');
+
             return;
+        }
+
+        let icon = 'fa-file-word text-blue-500';
+
+        if (extension === 'pdf') {
+            icon = 'fa-file-pdf text-red-500';
         }
 
         fileList.append(`
             <li>
-                <i class="fa-regular fa-file-word text-blue-500 mr-2"></i>
+                <i class="fa-regular ${icon} mr-2"></i>
                 ${file.name}
             </li>
         `);
     }
 });
 
-$('#doc_fdc195').on('change', function(e) {
+// ==================== FDC195 DIRECTOR ====================
+
+$('#fdc195_fase3').on('change', function(e) {
 
     const file = e.target.files[0];
-    const fileList = $('#file-list-fdc195');
+    const fileList = $('#file-list-fdc195-fase3');
 
     fileList.empty();
 
@@ -145,22 +128,98 @@ $('#doc_fdc195').on('change', function(e) {
         const fileSizeMB = file.size / (1024 * 1024);
 
         if (fileSizeMB > 5) {
-            Swal.fire('Error', 'El archivo no puede superar los 5MB', 'error');
+
+            Swal.fire(
+                'Error',
+                'El archivo no puede superar los 5MB',
+                'error'
+            );
+
             $(this).val('');
+
             return;
         }
 
-        const extension = file.name.split('.').pop().toLowerCase();
+        const extension = file.name
+            .split('.')
+            .pop()
+            .toLowerCase();
 
-        if (!['doc', 'docx'].includes(extension)) {
-            Swal.fire('Error', 'El documento debe ser WORD', 'error');
+        if (!['pdf', 'doc', 'docx'].includes(extension)) {
+
+            Swal.fire(
+                'Error',
+                'Solo PDF, DOC o DOCX',
+                'error'
+            );
+
             $(this).val('');
+
+            return;
+        }
+
+        let icon = 'fa-file-word text-blue-500';
+
+        if (extension === 'pdf') {
+            icon = 'fa-file-pdf text-red-500';
+        }
+
+        fileList.append(`
+            <li>
+                <i class="fa-regular ${icon} mr-2"></i>
+                ${file.name}
+            </li>
+        `);
+    }
+});
+
+// ==================== TURNITIN ====================
+
+$('#turnitin_fase3').on('change', function(e) {
+
+    const file = e.target.files[0];
+    const fileList = $('#file-list-turnitin-fase3');
+
+    fileList.empty();
+
+    if (file) {
+
+        const fileSizeMB = file.size / (1024 * 1024);
+
+        if (fileSizeMB > 5) {
+
+            Swal.fire(
+                'Error',
+                'El archivo no puede superar los 5MB',
+                'error'
+            );
+
+            $(this).val('');
+
+            return;
+        }
+
+        const extension = file.name
+            .split('.')
+            .pop()
+            .toLowerCase();
+
+        if (extension !== 'pdf') {
+
+            Swal.fire(
+                'Error',
+                'El Turnitin debe ser PDF',
+                'error'
+            );
+
+            $(this).val('');
+
             return;
         }
 
         fileList.append(`
             <li>
-                <i class="fa-regular fa-file-word text-blue-500 mr-2"></i>
+                <i class="fa-regular fa-file-pdf text-red-500 mr-2"></i>
                 ${file.name}
             </li>
         `);
@@ -362,251 +421,252 @@ function closeFase3DetailsModal() {
     $('#fase3DetailsModal').removeClass('show');
 }
 
-// ==================== MODAL ADMINISTRADOR ====================
+// ==================== MODAL DIRECTOR FASE 3 ====================
 
-// ==================== MODAL ADMINISTRADOR FASE 2 ====================
-/*
-let quillFase3 = null;
+let quillFase3Dir = null;
 
-function openFase3AdminModal(btn) {
-    // Mostrar spinner y ocultar icono en el botón
+function openFase3DirModal(btn) {
+
+    // Spinner botón
     if (btn) {
         const icon = btn.querySelector('i');
         const spinner = btn.querySelector('.loading-spinner');
+
         if (icon) icon.classList.add('hidden');
         if (spinner) spinner.classList.remove('hidden');
+
         btn.disabled = true;
     }
-    
-    // Limpiar campos
-    $('#nro_acta_fase3').val('');
-    $('#fecha_acta_fase3').val('');
-    $('#estado_fase3').val('');
-    $('#respuesta_fase3').val('');
-    $('#director_id_fase3').val('');
-    $('#evaluador_id_fase3').val('');
-    $('#codirector_id_fase3').val('');
-    $('#nro_acta_fase3Error').text('');
-    $('#fecha_acta_fase3Error').text('');
-    $('#estado_fase3Error').text('');
-    $('#respuesta_fase3Error').text('');
-    $('#director_id_fase3Error').text('');
-    $('#evaluador_id_fase3Error').text('');
-    $('#codirector_id_fase3Error').text('');
-    
-    // Ocultar contenedor de docentes inicialmente
-    $('#container_docentes_fase3').addClass('hidden');
-    
-    // PRIMERO abrir el modal
-    $('#fase3AdminModal').addClass('show');
-    
-    // ESPERAR a que el modal esté visible y luego inicializar Quill
-    setTimeout(function() {
-        // Verificar si el elemento existe
-        if ($('#txt-editor-fase3').length > 0) {
-            if (quillFase3 === null) {
-                quillFase3 = new Quill('#txt-editor-fase3', {
+
+    // ================= LIMPIAR CAMPOS =================
+
+    $('#estado_fase3_dir').val('');
+    $('#titulo_propuesta_fase3').val('');
+    $('#respuesta_fase3_dir').val('');
+
+    $('#fdc127_fase3').val('');
+    $('#fdc195_fase3').val('');
+    $('#turnitin_fase3').val('');
+
+    // ================= LIMPIAR ERRORES =================
+
+    $('#estado_fase3_dirError').text('');
+    $('#titulo_propuesta_fase3Error').text('');
+    $('#respuesta_fase3_dirError').text('');
+
+    $('#fdc127_fase3Error').text('');
+    $('#fdc195_fase3Error').text('');
+    $('#turnitin_fase3Error').text('');
+
+    // ================= LIMPIAR LISTAS =================
+
+    $('#file-list-fdc127-fase3').html('');
+    $('#file-list-fdc195-fase3').html('');
+    $('#file-list-turnitin-fase3').html('');
+
+    // ================= ABRIR MODAL =================
+
+    $('#fase3DirModal').addClass('show');
+
+    // ================= QUILL =================
+
+    setTimeout(function () {
+
+        if ($('#txt-editor-fase3-dir').length > 0) {
+
+            if (quillFase3Dir === null) {
+
+                quillFase3Dir = new Quill('#txt-editor-fase3-dir', {
                     theme: 'snow',
-                placeholder: 'Ingrese el mensaje de respuesta indicando detalles al destinatario.',
-                modules: {
-                    toolbar: [
-                        [{ 'header': 1}],
-                        [{ 'header': 2}],
-                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                        ['bold', 'italic', 'underline'],
-                        [{ 'color': [] }],
-                        ['clean']
-                    ]
-                }
+                    placeholder: 'Ingrese comentarios de respuesta...',
+                    modules: {
+                        toolbar: [
+                            [{ header: [1, 2, false] }],
+                            ['bold', 'italic', 'underline'],
+                            [{ list: 'ordered' }, { list: 'bullet' }],
+                            [{ color: [] }],
+                            ['clean']
+                        ]
+                    }
                 });
+
             } else {
-                quillFase3.root.innerHTML = '';
+
+                quillFase3Dir.root.innerHTML = '';
+
             }
-            quillFase3.update();
-        } else {
-            console.error('No se encontró el elemento #txt-editor-fase3');
+
+            quillFase3Dir.update();
+
         }
+
     }, 200);
-    
-    // Restaurar el botón después de abrir el modal
+
+    // ================= RESTAURAR BOTÓN =================
+
     if (btn) {
+
         setTimeout(() => {
+
             const icon = btn.querySelector('i');
             const spinner = btn.querySelector('.loading-spinner');
+
             if (icon) icon.classList.remove('hidden');
             if (spinner) spinner.classList.add('hidden');
+
             btn.disabled = false;
+
         }, 200);
+
     }
 }
 
-function closeFase3AdminModal() {
-    $('#fase3AdminModal').removeClass('show');
-    if (quillFase3) {
-        quillFase3.root.innerHTML = '';
+// ==================== CERRAR MODAL ====================
+
+function closeFase3DirModal() {
+
+    $('#fase3DirModal').removeClass('show');
+
+    if (quillFase3Dir) {
+        quillFase3Dir.root.innerHTML = '';
     }
 }
 
-// Mostrar/ocultar contenedor de docentes según el estado seleccionado
-$(document).ready(function() {
-    $('#estado_fase3').on('change', function() {
-        if ($(this).val() === 'Aprobada') {
-            $('#container_docentes_fase3').removeClass('hidden');
-        } else {
-            $('#container_docentes_fase3').addClass('hidden');
-            // Limpiar selecciones de docentes cuando se oculta
-            $('#director_id_fase3').val('');
-            $('#evaluador_id_fase3').val('');
-            $('#codirector_id_fase3').val('');
-        }
-    });
-});
+// ==================== SUBMIT ====================
 
-// Manejo del formulario de administrador Fase 2
-$('#fase3AdminForm').on('submit', function(e) {
+$('#fase3DirForm').on('submit', function (e) {
+
     e.preventDefault();
-    
-    // Obtener el contenido del editor Quill
-    if (quillFase3) {
-        $('#respuesta_fase3').val(quillFase3.root.innerHTML);
+
+    // Guardar contenido quill
+    if (quillFase3Dir) {
+        $('#respuesta_fase3_dir').val(
+            quillFase3Dir.root.innerHTML
+        );
     }
-    
-    // Validar que haya seleccionado un estado
-    const estadoSeleccionado = $('#estado_fase3').val();
-    if (!estadoSeleccionado) {
-        $('#estado_fase3Error').text('Debe seleccionar un estado');
+
+    // Validar estado
+    const estado = $('#estado_fase3_dir').val();
+
+    if (!estado) {
+
+        $('#estado_fase3_dirError')
+            .text('Debe seleccionar un estado');
+
         return;
     }
-    
-    // Si está aprobado, validar que haya seleccionado director y evaluador
-    if (estadoSeleccionado === 'Aprobada') {
-        if (!$('#director_id_fase3').val()) {
-            $('#director_id_fase3Error').text('Debe seleccionar un director');
-            return;
-        }
-        if (!$('#evaluador_id_fase3').val()) {
-            $('#evaluador_id_fase3Error').text('Debe seleccionar un evaluador');
-            return;
-        }
-    }
-    
-    let mensajeConfirmacion = "Esta acción no se puede deshacer";
-    if (estadoSeleccionado === 'Aprobada') {
-        mensajeConfirmacion = "Al aprobar, se asignarán los docentes seleccionados. Esta acción no se puede deshacer.";
-    } else if (estadoSeleccionado === 'Rechazada') {
-        mensajeConfirmacion = "Esta acción no se puede deshacer.";
-    }
-    
+
     Swal.fire({
         heightAuto: false,
         title: '¿Está seguro?',
-        text: mensajeConfirmacion,
+        text: 'Esta acción no se puede deshacer',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#C1D631',
         cancelButtonColor: '#d33',
         confirmButtonText: 'Sí, responder',
         cancelButtonText: 'Cancelar'
+
     }).then((result) => {
+
         if (result.isConfirmed) {
+
             const button = $(this).find('button[type="submit"]');
             const spinner = $('#loadingSpinner-fase3-admin');
-            const formData = $(this).serialize();
-            
+
+            // IMPORTANTE para archivos
+            const formData = new FormData(this);
+
             button.prop('disabled', true);
-            if (spinner.length) spinner.removeClass('hidden');
-            
+
+            if (spinner.length)
+                spinner.removeClass('hidden');
+
             $.ajax({
+
                 url: ROUTES.fase3_reply,
+
                 method: 'POST',
+
                 data: formData,
-                success: function(response) {
-                    closeFase3AdminModal();
+
+                processData: false,
+                contentType: false,
+
+                success: function (response) {
+
+                    closeFase3DirModal();
+
                     Swal.fire({
                         title: '¡Éxito!',
                         text: response.success || 'Respuesta enviada exitosamente',
                         icon: 'success',
                         confirmButtonText: 'Ok',
                         confirmButtonColor: '#C1D631'
+
                     }).then(() => {
+
                         location.reload();
+
                     });
+
                 },
-                error: function(xhr) {
+
+                error: function (xhr) {
+
                     if (xhr.status === 422 && xhr.responseJSON.errors) {
+
                         const errors = xhr.responseJSON.errors;
-                        if (errors.nro_acta) $('#nro_acta_fase3Error').text(errors.nro_acta[0]);
-                        if (errors.fecha_acta) $('#fecha_acta_fase3Error').text(errors.fecha_acta[0]);
-                        if (errors.estado) $('#estado_fase3Error').text(errors.estado[0]);
-                        if (errors.respuesta) $('#respuesta_fase3Error').text(errors.respuesta[0]);
-                        if (errors.director_id) $('#director_id_fase3Error').text(errors.director_id[0]);
-                        if (errors.evaluador_id) $('#evaluador_id_fase3Error').text(errors.evaluador_id[0]);
-                        if (errors.codirector_id) $('#codirector_id_fase3Error').text(errors.codirector_id[0]);
-                        
-                        setTimeout(() => {
-                            $('#nro_acta_fase3Error, #fecha_acta_fase3Error, #estado_fase3Error, #respuesta_fase3Error, #director_id_fase3Error, #evaluador_id_fase3Error, #codirector_id_fase3Error').text('');
-                        }, 5000);
+
+                        if (errors.estado)
+                            $('#estado_fase3_dirError')
+                                .text(errors.estado[0]);
+
+                        if (errors.titulo_propuesta)
+                            $('#titulo_propuesta_fase3Error')
+                                .text(errors.titulo_propuesta[0]);
+
+                        if (errors.respuesta)
+                            $('#respuesta_fase3_dirError')
+                                .text(errors.respuesta[0]);
+
+                        if (errors.fdc127)
+                            $('#fdc127_fase3Error')
+                                .text(errors.fdc127[0]);
+
+                        if (errors.fdc195)
+                            $('#fdc195_fase3Error')
+                                .text(errors.fdc195[0]);
+
+                        if (errors.turnitin)
+                            $('#turnitin_fase3Error')
+                                .text(errors.turnitin[0]);
+
                     } else {
-                        Swal.fire('Error', xhr.responseJSON?.error || 'Error al enviar respuesta', 'error');
+
+                        Swal.fire(
+                            'Error',
+                            xhr.responseJSON?.error || 'Error al enviar respuesta',
+                            'error'
+                        );
+
                     }
+
                 },
-                complete: function() {
+
+                complete: function () {
+
                     button.prop('disabled', false);
-                    if (spinner.length) spinner.addClass('hidden');
+
+                    if (spinner.length)
+                        spinner.addClass('hidden');
+
                 }
+
             });
+
         }
+
     });
+
 });
-
-// ==================== FUNCIONES DE LIMPIEZA ====================
-
-function clearFase3EstudianteErrors() {
-    const errorFields = ['arl', 'doc_fdc127', 'doc_fdc195'];
-    errorFields.forEach(field => {
-        const errorSpan = document.getElementById(`${field}Error`);
-        if (errorSpan) errorSpan.innerHTML = '';
-    });
-}
-
-function clearFase3AdminErrors() {
-    const errorFields = ['nro_acta_fase3', 'fecha_acta_fase3', 'estado_fase3', 'director_id_fase3', 'evaluador_id_fase3', 'respuesta_fase3'];
-    errorFields.forEach(field => {
-        const errorSpan = document.getElementById(`${field}Error`);
-        if (errorSpan) errorSpan.innerHTML = '';
-    });
-}
-
-// ==================== EVENT LISTENERS ====================
-
-// Mostrar/ocultar campos de docentes según el estado seleccionado
-document.addEventListener('DOMContentLoaded', function() {
-    const estadoSelect = document.getElementById('estado_fase3');
-    if (estadoSelect) {
-        estadoSelect.addEventListener('change', function() {
-            const container = document.getElementById('container_docentes_fase3');
-            if (this.value === 'Aprobada') {
-                container.classList.remove('hidden');
-            } else {
-                container.classList.add('hidden');
-            }
-        });
-    }
-    
-    // Tooltips
-    document.querySelectorAll('.tooltip-icon').forEach(icon => {
-        icon.addEventListener('mouseenter', function() {
-            const tooltipId = this.getAttribute('data-tooltip');
-            const tooltip = document.getElementById(tooltipId);
-            if (tooltip) tooltip.classList.remove('hidden');
-        });
-        
-        icon.addEventListener('mouseleave', function() {
-            const tooltipId = this.getAttribute('data-tooltip');
-            const tooltip = document.getElementById(tooltipId);
-            if (tooltip) tooltip.classList.add('hidden');
-        });
-    });
-    
-
-});*/

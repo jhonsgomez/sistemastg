@@ -118,6 +118,7 @@
                 <span class="text-center font-bold text-lg">Prácticas</span>
                 <p class="text-center mt-2 text-sm">Accede al módulo de tus prácticas y seguimiento de las mismas.</p>
                 @else
+              
                 <span class="text-center font-bold text-lg">Prácticas</span>
                 <p class="text-center mt-2 text-sm">Accede al módulo de tus prácticas y seguimiento de las mismas.</p>
                 @endif

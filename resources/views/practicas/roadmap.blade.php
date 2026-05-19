@@ -69,7 +69,8 @@
             #fase2DetailsModal,
             #fase2EstudianteModal,
             #fase3EstudianteModal,
-            #fase3DetailsModal {
+            #fase3DetailsModal,
+            #fase3DirModal {
                 visibility: hidden !important;
                 opacity: 0 !important;
                 transform: translateY(-20px) !important;
@@ -94,7 +95,8 @@
             #fase2DetailsModal.show,
             #fase2EstudianteModal.show,
             #fase3EstudianteModal.show,
-            #fase3DetailsModal.show {
+            #fase3DetailsModal.show,
+            #fase3DirModal.show {
                 visibility: visible !important;
                 opacity: 1 !important;
                 transform: translateY(0) scale(1) !important;
@@ -405,7 +407,7 @@
                 'super_admin',
                 'admin',
                 'coordinador',
-                'director'
+                'director_practica'
             ]);
 
             $yaEnvio = $submited_fase3 == 'true';
@@ -474,7 +476,7 @@
                 @if ($yaEnvio)
 
                     <button type="button"
-                        onclick="openFase3AdminModal(this)"
+                        onclick="openFase3DirModal(this)"
                         class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white rounded-lg relative inline-flex items-center justify-center">
 
                         <i class="fa-solid fa-share"></i>
@@ -693,7 +695,7 @@
     </div>
     
 
-    <!-- Modal FASE 1 - Detalles (Ver información enviada) -->
+    <!-- MODALES FASE 1 - Detalles (Ver información enviada) -->
 <div id="fase1DetailsModal" class="fixed z-50 inset-0 overflow-y-auto">
     <div class="modal-overlay absolute inset-0" onclick="closeFase1DetailsModal()">
         <div class="flex items-center justify-center min-h-screen p-4 text-center relative">
@@ -725,7 +727,7 @@
     </div>
 </div>
 
-    <!-- Modal FASE 1 - Administrador (Responder solicitud) -->
+    <!-- MODALES FASE 1 - Administrador (Responder solicitud) -->
     <div id="fase1AdminModal" class="fixed z-50 inset-0 overflow-y-auto">
         <div class="modal-overlay absolute inset-0"  style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeFase1AdminModal()">
             <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
@@ -811,7 +813,7 @@
         </div>
     </div>
 
-    <!-- Modal FASE 2 - Estudiante (Enviar documentos de pago) -->
+    <!-- MODALES FASE 2 - Estudiante (Enviar documentos de pago) -->
 <div id="fase2EstudianteModal" class="fixed z-50 inset-0 overflow-y-auto">
     <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeFase2EstudianteModal()">
         <div class="flex items-center justify-center min-h-screen p-4 text-center relative">
@@ -967,7 +969,7 @@
     </div>
 </div>
 
-    <!-- Modal FASE 2 - Detalles (Ver información enviada) -->
+    <!-- MODALES FASE 2 - Detalles (Ver información enviada) -->
 <div id="fase2DetailsModal" class="fixed z-50 inset-0 overflow-y-auto">
     <div class="modal-overlay absolute inset-0" onclick="closeFase2DetailsModal()">
         <div class="flex items-center justify-center min-h-screen p-4 text-center relative">
@@ -999,7 +1001,7 @@
     </div>
 </div>
 
-    <!-- Modal FASE 2 - Administrador (Responder solicitud + Asignar docentes) -->
+    <!-- MODALES FASE 2 - Administrador (Responder solicitud + Asignar docentes) -->
 <div id="fase2AdminModal" class="fixed z-50 inset-0 overflow-y-auto">
     <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;"  onclick="closeFase2AdminModal()">
         <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
@@ -1130,7 +1132,7 @@
 </div>
 
 
-  <!-- Modal FASE 3 - Estudiante (Enviar documentos de trabajo de grado) -->
+  <!-- MODALES FASE 3 - Estudiante (Enviar documentos de trabajo de grado) -->
 <div id="fase3EstudianteModal" class="fixed z-50 inset-0 overflow-y-auto">
     <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeFase3EstudianteModal()">
         <div class="flex items-center justify-center min-h-screen p-4 text-center relative">
@@ -1289,7 +1291,7 @@
 </div>
 
 
-    <!-- Modal FASE 3 - Detalles (Ver información enviada) -->
+    <!-- MODALES FASE 3 - Detalles (Ver información enviada) -->
 <div id="fase3DetailsModal" class="fixed z-50 inset-0 overflow-y-auto">
     <div class="modal-overlay absolute inset-0" onclick="closeFase3DetailsModal()">
         <div class="flex items-center justify-center min-h-screen p-4 text-center relative">
@@ -1316,6 +1318,275 @@
                             class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cerrar</button>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODALES Fase 3 Responder Director -->
+
+<div id="fase3DirModal" class="fixed z-50 inset-0 overflow-y-auto">
+    <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;"  onclick="closeFase3DirModal()">
+        <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
+                onclick="event.stopPropagation()">
+                <button
+                    class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
+                    onclick="closeFase3DirModal()">&times;</button>
+                <form class="p-6 mt-2" id="fase3DirForm" enctype="multipart/form-data">
+                    @csrf
+
+                    <input type="hidden" name="practica_id" value="{{ $practica->id }}">
+
+                    <p class="text-2xl font-bold mb-4">
+                        Responder
+                        <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">
+                            Fase 3
+                        </span>
+                    </p>
+
+                    <p class="text-sm text-gray-600 mb-4">
+                        Respuesta del director.
+                    </p>
+
+                    <!-- ESTADO -->
+                    <div class="mb-4">
+                        <label class="block font-medium text-sm text-gray-700">
+                            <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                            Estado:
+                        </label>
+
+                        <select
+                            name="estado"
+                            id="estado_fase3_dir"
+                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500"
+                        >
+                            <option value="">Seleccione un estado</option>
+                            <option value="Aprobada">Aprobar</option>
+                            <option value="Rechazada">Rechazar</option>
+                        </select>
+
+                        <span id="estado_fase3_dirError" class="text-red-500 text-sm"></span>
+                    </div>
+
+                    <!-- TITULO -->
+                    <div class="mb-4">
+                        <label class="block font-medium text-sm text-gray-700">
+                            <i class="fa-solid fa-heading mr-2 text-gray-500"></i>
+                            Título de la propuesta:
+                        </label>
+
+                        <input
+                            type="text"
+                            name="titulo_propuesta"
+                            id="titulo_propuesta_fase3"
+                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500"
+                            placeholder="Ingrese el título"
+                        >
+
+                        <span id="titulo_propuesta_fase3Error" class="text-red-500 text-sm"></span>
+                    </div>
+
+                    <!-- F-DC-127 -->
+                    <div>
+                        <div class="flex items-center gap-2 mb-2">
+                            <label class="block font-medium text-sm text-gray-700">
+                                <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                <span class="text-red-500">*</span>
+                                Propuesta (F-DC-127)
+                            </label>
+
+                            <div class="relative inline-block">
+                                <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                    data-tooltip="tooltip-fdc127-dir-fase3"></i>
+                            </div>
+                        </div>
+
+                        <div
+                            class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+
+                            <div class="grid gap-1 text-center">
+                                <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+
+                                <h2 class="text-center text-gray-400 text-xs">
+                                    Arrastra o selecciona el archivo F-DC-127 con comentarios o firmado
+                                    (.pdf, .doc, .docx, máx. 5MB)
+                                </h2>
+                            </div>
+
+                            <div class="text-center">
+                                <input
+                                    type="file"
+                                    name="fdc127"
+                                    id="fdc127_fase3"
+                                    class="absolute inset-0 opacity-0 cursor-pointer w-full"
+                                    accept=".pdf,.doc,.docx"
+                                />
+
+                                <div
+                                    class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                    Cargar
+                                </div>
+                            </div>
+                        </div>
+
+                        <span id="fdc127_fase3Error" class="text-red-500 text-xs"></span>
+
+                        <ul id="file-list-fdc127-fase3" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+
+                        <div id="tooltip-fdc127-dir-fase3"
+                            class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
+                            Suba el documento F-DC-127 firmado o con comentarios del director.
+                        </div>
+                    </div>
+
+                    <!-- F-DC-195 -->
+                    <div>
+                        <div class="flex items-center gap-2 mb-2">
+                            <label class="block font-medium text-sm text-gray-700">
+                                <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                <span class="text-red-500">*</span>
+                                Acta de Inicio (F-DC-195)
+                            </label>
+
+                            <div class="relative inline-block">
+                                <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                    data-tooltip="tooltip-fdc195-dir-fase3"></i>
+                            </div>
+                        </div>
+
+                        <div
+                            class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+
+                            <div class="grid gap-1 text-center">
+                                <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+
+                                <h2 class="text-center text-gray-400 text-xs">
+                                    Arrastra o selecciona el archivo F-DC-195 con comentarios o firmado
+                                    (.pdf, .doc, .docx, máx. 5MB)
+                                </h2>
+                            </div>
+
+                            <div class="text-center">
+                                <input
+                                    type="file"
+                                    name="fdc195"
+                                    id="fdc195_fase3"
+                                    class="absolute inset-0 opacity-0 cursor-pointer w-full"
+                                    accept=".pdf,.doc,.docx"
+                                />
+
+                                <div
+                                    class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                    Cargar
+                                </div>
+                            </div>
+                        </div>
+
+                        <span id="fdc195_fase3Error" class="text-red-500 text-xs"></span>
+
+                        <ul id="file-list-fdc195-fase3" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+
+                        <div id="tooltip-fdc195-dir-fase3"
+                            class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
+                            Suba el acta de inicio F-DC-195 firmada o con comentarios.
+                        </div>
+                    </div>
+
+                    <!-- TURNITIN -->
+                    <div>
+                        <div class="flex items-center gap-2 mb-2">
+                            <label class="block font-medium text-sm text-gray-700">
+                                <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                <span class="text-red-500">*</span>
+                                Informe de plagio (Turnitin)
+                            </label>
+
+                            <div class="relative inline-block">
+                                <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                    data-tooltip="tooltip-turnitin-dir-fase3"></i>
+                            </div>
+                        </div>
+
+                        <div
+                            class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+
+                            <div class="grid gap-1 text-center">
+                                <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+
+                                <h2 class="text-center text-gray-400 text-xs">
+                                    Arrastra o selecciona el informe Turnitin (.pdf, máx. 5MB)
+                                </h2>
+                            </div>
+
+                            <div class="text-center">
+                                <input
+                                    type="file"
+                                    name="turnitin"
+                                    id="turnitin_fase3"
+                                    class="absolute inset-0 opacity-0 cursor-pointer w-full"
+                                    accept=".pdf"
+                                />
+
+                                <div
+                                    class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                    Cargar
+                                </div>
+                            </div>
+                        </div>
+
+                        <span id="turnitin_fase3Error" class="text-red-500 text-xs"></span>
+
+                        <ul id="file-list-turnitin-fase3" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+
+                        <div id="tooltip-turnitin-dir-fase3"
+                            class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
+                            Suba el informe de similitud generado por Turnitin en formato PDF.
+                        </div>
+                    </div>
+
+                    <!-- RESPUESTA -->
+                    <div class="mb-4">
+                        <label class="block font-medium text-sm text-gray-700">
+                            <i class="fa-solid fa-message mr-2 text-gray-500"></i>
+                            Comentarios de la respuesta:
+                        </label>
+
+                        <div
+                            id="txt-editor-fase3-dir"
+                            class="shadow txt-editor-quill"
+                            style="height: 200px; background: white;"
+                        ></div>
+
+                        <textarea
+                            name="respuesta"
+                            id="respuesta_fase3_dir"
+                            class="hidden"
+                        ></textarea>
+
+                        <span id="respuesta_fase3_dirError" class="text-red-500 text-sm"></span>
+                    </div>
+
+                    <!-- BOTONES -->
+                    <div class="flex justify-end space-x-2 mt-4">
+
+                        <button
+                            type="button"
+                            onclick="closeFase3DirModal()"
+                            class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg"
+                        >
+                            Cancelar
+                        </button>
+
+                        <button
+                            type="submit"
+                            class="flex bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg"
+                        >
+                            Responder
+                        </button>
+
+                    </div>
+                </form>
             </div>
         </div>
     </div>
