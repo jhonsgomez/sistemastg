@@ -259,6 +259,30 @@
                         </a>
                     </li>
                     @endif
+
+                    @if (auth()->user()->hasRole('evaluador_practica'))
+                        <li>
+                            <a href="{{ route('evaluador.practicas.index') }}"
+                                class="flex items-center gap-3 w-full p-3 
+                                {{ request()->routeIs('evaluador.practicas.index') 
+                                    ? 'bg-uts-500 text-white' 
+                                    : 'text-gray-600 hover:bg-uts-500 hover:text-white' }} 
+                                rounded-lg transition-colors">
+
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+
+                                    <path fill="currentColor"
+                                        d="M20 6h-4V4a2 2 0 0 0-2-2H10a2 2 0 0 0-2 2v2H4a2 2 0 0 0-2 2v3h20V8a2 2 0 0 0-2-2zM2 13v5a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5H2z">
+                                    </path>
+
+                                </svg>
+
+                                <span class="nav-text">Evaluador prácticas</span>
+                            </a>
+                        </li>
+                        @endif
+
                     <li>
                         <a href="{{ route('documental.index') }}"
                             class="flex items-center gap-3 w-full p-3 {{ request()->routeIs('documental.index') ? 'bg-uts-500 text-white' : 'text-gray-600 hover:bg-uts-500 hover:text-white' }} rounded-lg transition-colors">

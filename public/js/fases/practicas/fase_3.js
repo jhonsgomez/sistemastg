@@ -299,6 +299,95 @@ $('#turnitin_fase3').on('change', function(e) {
     });
 });
 
+// ==================== TOOLTIPS CERCA DEL CURSOR ====================
+$(document).ready(function() {
+    $('.tooltip-icon').on('mouseenter', function(e) {
+        const tooltipId = $(this).data('tooltip');
+        const $tooltip = $('#' + tooltipId);
+        
+        // Ocultar todos
+        $('[id^="tooltip-"]').addClass('hidden');
+        
+        // Mostrar este
+        $tooltip.removeClass('hidden');
+        
+        // Posicionar JUSTO cerca del cursor (sin desplazamiento grande)
+        const mouseX = e.clientX;
+        const mouseY = e.clientY;
+        const tooltipHeight = $tooltip.outerHeight();
+        const tooltipWidth = $tooltip.outerWidth();
+        
+        // Posición: arriba del cursor con poco espacio
+        let top = mouseY - tooltipHeight * 1.8;
+        let left = mouseX - (tooltipWidth * 2);
+        
+        $tooltip.css({
+            position: 'fixed',
+            top: top + 'px',
+            left: left + 'px',
+            zIndex: 99999
+        });
+    }).on('mouseleave', function() {
+        const tooltipId = $(this).data('tooltip');
+        $('#' + tooltipId).addClass('hidden');
+    });
+});
+
+/// ==================== FUNCIÓN PARA MOSTRAR ARCHIVOS CON FORMATO SIMPLE ====================
+function setupSimpleFileInput(inputId, listId, maxSizeMB = 8, allowedExtensions = []) {
+    $(`#${inputId}`).on('change', function(e) {
+        const file = e.target.files[0];
+        const $fileList = $(`#${listId}`);
+        
+        if (!file) {
+            $fileList.empty();
+            return;
+        }
+        
+        const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+        
+        // Validar tamaño
+        if (file.size > maxSizeMB * 1024 * 1024) {
+            Swal.fire('Error', `El archivo no puede superar los ${maxSizeMB}MB`, 'error');
+            $(this).val('');
+            $fileList.empty();
+            return;
+        }
+        
+        // Validar extensión
+        const extension = file.name.split('.').pop().toLowerCase();
+        if (allowedExtensions.length > 0 && !allowedExtensions.includes(extension)) {
+            Swal.fire('Error', `Solo archivos ${allowedExtensions.join(', ')}`, 'error');
+            $(this).val('');
+            $fileList.empty();
+            return;
+        }
+        
+        // Mostrar solo el nombre del archivo y el tamaño total
+        $fileList.html(`
+            <li class="text-sm text-gray-600">
+                <i class="fa-regular ${extension === 'pdf' ? 'fa-file-pdf text-red-500' : 'fa-file-word text-blue-500'} mr-2"></i>
+                ${file.name}
+                <br>
+                <span class="text-xs text-gray-400">Tamaño total: ${fileSizeMB}MB de ${maxSizeMB}MB permitidos.</span>
+            </li>
+        `);
+    });
+}
+
+// Inicializar todos los inputs al cargar la página
+$(document).ready(function() {
+    // Fase 3 Estudiante
+    setupSimpleFileInput('arl', 'file-list-arl', 5, ['pdf']);
+    setupSimpleFileInput('doc_fdc127', 'file-list-fdc127', 5, ['doc', 'docx']);
+    setupSimpleFileInput('doc_fdc195', 'file-list-fdc195', 5, ['doc', 'docx']);
+    
+    // Fase 3 Director
+    setupSimpleFileInput('fdc127_fase3', 'file-list-fdc127-fase3', 5, ['pdf', 'doc', 'docx']);
+    setupSimpleFileInput('fdc195_fase3', 'file-list-fdc195-fase3', 5, ['pdf', 'doc', 'docx']);
+    setupSimpleFileInput('turnitin_fase3', 'file-list-turnitin-fase3', 5, ['pdf']);
+});
+
 // Abrir modal de detalles con spinner en el botón (exactamente como Fase 1)
 function openFase3DetailsModal(btn) {
     console.log('click')
@@ -480,14 +569,15 @@ function openFase3DirModal(btn) {
                     theme: 'snow',
                     placeholder: 'Ingrese comentarios de respuesta...',
                     modules: {
-                        toolbar: [
-                            [{ header: [1, 2, false] }],
-                            ['bold', 'italic', 'underline'],
-                            [{ list: 'ordered' }, { list: 'bullet' }],
-                            [{ color: [] }],
-                            ['clean']
-                        ]
-                    }
+                    toolbar: [
+                        [{ 'header': 1}],
+                        [{ 'header': 2}],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        [{ 'color': [] }],
+                        ['bold', 'italic', 'underline'],
+                        ['clean']
+                    ]
+                }
                 });
 
             } else {

@@ -57,9 +57,7 @@ class RoadMapPracticaController extends Controller
     $fechas = [];
     
     if ($fechasData) {
-        // Como el modelo tiene cast, $fechasData->fechas ya es un array
         $fechasArray = $fechasData->fechas;
-        
         $fechas = [
             'fecha_inicio_banco' => $fechasArray['fecha_inicio_banco'] ?? 'No definida',
             'fecha_fin_banco' => $fechasArray['fecha_fin_banco'] ?? 'No definida',
@@ -68,7 +66,6 @@ class RoadMapPracticaController extends Controller
             'fecha_aprobacion_propuesta' => $fechasArray['fecha_aprobacion_propuesta'] ?? 'No definida',
         ];
     } else {
-        // Fechas por defecto
         $fechas = [
             'fecha_inicio_banco' => '2026-01-30',
             'fecha_fin_banco' => '2026-09-30',
@@ -79,8 +76,6 @@ class RoadMapPracticaController extends Controller
     }
     
     try {
-
-
         $practica = Practica::with('user.nivel', 'valoresCampos.campo')->findOrFail($request->practica_id);
 
         $codigo_practica = 'PRA-' . str_pad($practica->id, 5, '0', STR_PAD_LEFT);
@@ -104,38 +99,58 @@ class RoadMapPracticaController extends Controller
                 ->with('info', 'La práctica aún no ha sido aprobada para iniciar el seguimiento.');
         }
 
-        // Cargar TODOS los valores de campos (incluyendo los de Fase 1)
+        // Cargar TODOS los valores de campos
         $valores = [];
         foreach ($practica->valoresCampos as $vc) {
             $valores[$vc->campo->name] = $vc->valor;
         }
 
-        // Para depuración: registrar en log
-        \Log::info('Roadmap - Valores cargados:', [
-            'practica_id' => $practica->id,
-            'estado' => $practica->estado,
-            'tipo_solicitud_id' => $practica->tipo_solicitud_id,
-            'submited_fase1' => $valores['submited_fase1'] ?? 'no existe',
-            'doc_fdc126' => isset($valores['doc_fdc126']) ? 'presente' : 'ausente'
-        ]);
-
+        // Variables para Fase 1, 2, 3, 4 y 5
         $submited_fase1 = $valores['submited_fase1'] ?? 'false';
         $submited_fase2 = $valores['submited_fase2'] ?? 'false';
         $submited_fase3 = $valores['submited_fase3'] ?? 'false';
         $submited_fase4 = $valores['submited_fase4'] ?? 'false';
         $submited_fase5 = $valores['submited_fase5'] ?? 'false';
+        
+        // Variables para Fase 3 - Director
+        $estado_director_fase3 = $valores['estado_director_fase3'] ?? '';
+        
+        // Variables para Fase 4 - Evaluador
+        $estado_evaluador_fase4 = $valores['estado_evaluador_fase4'] ?? '';
 
         $director_actual = $valores['director_id'] ?? null;
         $evaluador_actual = $valores['evaluador_id'] ?? null;
         $docentes = User::role('docente')->get();
 
+        // Log para depuración
+        \Log::info('Roadmap - Variables cargadas:', [
+            'practica_id' => $practica->id,
+            'estado' => $practica->estado,
+            'fase_actual' => $fase_actual,
+            'submited_fase3' => $submited_fase3,
+            'estado_director_fase3' => $estado_director_fase3,
+            'submited_fase4' => $submited_fase4,
+            'estado_evaluador_fase4' => $estado_evaluador_fase4
+        ]);
+
         return view('practicas.roadmap', compact(
-            'practica', 'fase_actual', 'valores',
-            'submited_fase1', 'submited_fase2', 'submited_fase3',
-            'submited_fase4', 'submited_fase5',
-            'director_actual', 'evaluador_actual', 'docentes',
-            'codigo_practica'
+            'practica', 
+            'fase_actual', 
+            'valores',
+            'submited_fase1', 
+            'submited_fase2', 
+            'submited_fase3',
+            'submited_fase4', 
+            'submited_fase5',
+            'estado_director_fase3',
+            'estado_evaluador_fase4',
+            'director_actual', 
+            'evaluador_actual', 
+            'docentes',
+            'codigo_practica', 
+            'fechas'
         ));
+        
     } catch (Exception $e) {
         \Log::error('Error en roadmap: ' . $e->getMessage());
         return redirect()->route('practicas.index')->with('error', 'No se pudo cargar el seguimiento.');
@@ -158,6 +173,24 @@ public function indexDirector()
     return view('practicas.index', compact('practicas'));
 }
 
+    public function indexEvaluador()
+{
+    $evaluadorId = auth()->id();
+
+    $campoEvaluador = Campo::where('name', 'evaluador_id')->first();
+
+    if (!$campoEvaluador) {
+        $practicas = collect();
+    } else {
+        $practicas = Practica::whereHas('valoresCampos', function ($query) use ($evaluadorId, $campoEvaluador) {
+            $query->where('campo_id', $campoEvaluador->id)
+                  ->where('valor', $evaluadorId);
+        })->orderBy('id', 'desc')->get();
+    }
+
+    // Esta es la línea CORRECTA - usa la misma vista que director
+    return view('practicas.index', compact('practicas'));
+}
     /**
      * FASE 1 - Estudiante: Envío del formato F-DC-126
      */
@@ -552,7 +585,7 @@ public function replyFase2(Request $request)
 
     // ========== LÓGICA PRINCIPAL ==========
     if ($request->estado === 'Aprobada') {
-        // ✅ APROBADA: Asignar docentes y cambiar a Fase 3
+        // APROBADA: Asignar docentes y cambiar a Fase 3
         
         // Asignar director
        
@@ -634,7 +667,7 @@ public function replyFase2(Request $request)
         ]);
         
     } else {
-        // ❌ RECHAZADA: Resetear submited_fase2 a 'false' para que el estudiante pueda reenviar
+        // RECHAZADA: Resetear submited_fase2 a 'false' para que el estudiante pueda reenviar
         
         $campoSubmited = Campo::where('tipo_solicitud_id', $tipo_fase2->id)
             ->where('name', 'submited_fase2')
@@ -1037,6 +1070,61 @@ public function replyFase2(Request $request)
         ]);
     }
 
+    public function replyFase4(Request $request)
+{
+    $request->validate([
+        'practica_id' => 'required|exists:practicas,id',
+        'estado' => 'required|in:Aprobada,Rechazada',
+        'respuesta' => 'nullable|string'
+    ]);
+
+    $practica = Practica::findOrFail($request->practica_id);
+
+    // Verificar que esté en Fase 4
+    if ($practica->estado !== 'Fase 4') {
+        return response()->json([
+            'error' => 'La práctica no está en la fase correspondiente'
+        ], 422);
+    }
+
+    // Guardar respuesta del evaluador
+    $tipo_fase4 = $this->getType('practicas_fase_4');
+    if ($tipo_fase4) {
+        $campos_fase4 = Campo::where('tipo_solicitud_id', $tipo_fase4->id)->get();
+
+        // Estado del evaluador
+        $campoEstado = $campos_fase4->where('name', 'estado_evaluador_fase4')->first();
+        if ($campoEstado) {
+            PracticaValorCampo::updateOrCreate(
+                ['practica_id' => $practica->id, 'campo_id' => $campoEstado->id],
+                ['valor' => $request->estado]
+            );
+        }
+
+        // Respuesta del evaluador
+        $campoRespuesta = $campos_fase4->where('name', 'respuesta_evaluador_fase4')->first();
+        if ($campoRespuesta && $request->respuesta) {
+            PracticaValorCampo::updateOrCreate(
+                ['practica_id' => $practica->id, 'campo_id' => $campoRespuesta->id],
+                ['valor' => $request->respuesta]
+            );
+        }
+    }
+
+    // Cambiar estado de la práctica
+    if ($request->estado === 'Aprobada') {
+        $practica->estado = 'Fase 5';
+    } else {
+        $practica->estado = 'Fase 3'; // Rechazado, vuelve a estudiante
+    }
+    $practica->save();
+
+    return response()->json([
+        'success' => 'Respuesta enviada correctamente',
+        'nuevo_estado' => $practica->estado
+    ]);
+}
+    
 
 
 

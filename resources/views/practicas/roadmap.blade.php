@@ -230,7 +230,7 @@
             d="M14.25 5.25a5.23 5.23 0 0 0-1.279-3.434 9.768 9.768 0 0 1 6.963 6.963A5.23 5.23 0 0 0 16.5 7.5h-1.875a.375.375 0 0 1-.375-.375V5.25Z" />
     </svg>
 
-    <span class="text-center font-bold text-lg">F-DC-126 </span>
+    <span class="text-center font-bold text-lg">Fase 1: F-DC-126</span>
     <p class="text-center mt-2 text-xs mx-4">El estudiante envía el formato de solicitud de practicantes.</p>
 
     @if ($fase_actual == 1)
@@ -400,127 +400,289 @@
 
         @php
             $user = auth()->user();
-
+            
             $esEstudiante = $user->hasRole('estudiante');
-
-            $esDirector = $user->hasRole([
-                'super_admin',
-                'admin',
-                'coordinador',
-                'director_practica'
-            ]);
-
-            $yaEnvio = $submited_fase3 == 'true';
+            $esDirector = $user->hasRole(['super_admin', 'admin', 'coordinador', 'director_practica']);
+            $esEvaluador = $user->hasRole(['evaluador_practica']);
+            $esComite = $user->hasRole(['super_admin', 'admin', 'coordinador']);
+            
+            // Obtener valores desde la práctica
+            $submited_fase3_valor = $practica->valoresCampos->where('campo.name', 'submited_fase3')->first();
+            $estado_director_valor = $practica->valoresCampos->where('campo.name', 'estado_director_fase3')->first();
+            
+            $estudianteYaEnvio = $submited_fase3_valor && $submited_fase3_valor->valor == 'true';
+            $directorYaRespondio = $estado_director_valor && ($estado_director_valor->valor == 'Aprobada' || $estado_director_valor->valor == 'Rechazada');
+            $directorAprobo = $estado_director_valor && $estado_director_valor->valor == 'Aprobada';
         @endphp
 
         {{-- ================= ESTUDIANTE ================= --}}
-        @if ($esEstudiante && !$yaEnvio)
-
+        @if ($esEstudiante && !$estudianteYaEnvio)
+            {{-- Estudiante puede enviar --}}
             <div class="flex justify-center items-center mt-3">
                 <button type="button"
                     onclick="openFase3EstudianteModal(this)"
-                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
-
+                    class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
                     <i class="fa-solid fa-user-pen"></i>
-
-                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle   class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"stroke-width="4"></circle>
+                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
                     </svg>
-
                 </button>
             </div>
 
-        @elseif ($esEstudiante && $yaEnvio)
-
-            {{-- Estudiante solo puede ver --}}
+        @elseif ($esEstudiante && $estudianteYaEnvio)
+            {{-- Estudiante solo puede ver lo que envió --}}
             <div class="flex justify-center items-center mt-3">
-
                 <button type="button"
                     onclick="openFase3DetailsModal(this)"
                     class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
-
                     <i class="fa-solid fa-eye"></i>
-
-                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute"
-                        viewBox="0 0 64 64" fill="none">
-
-                        <path d="M32 3..." stroke="currentColor"></path>
-
+                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
+                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
+                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
                     </svg>
                 </button>
-
             </div>
 
         {{-- ================= DIRECTOR ================= --}}
-        @elseif ($esDirector)
-
+        @elseif ($esDirector && $estudianteYaEnvio && !$directorYaRespondio)
+            {{-- Director puede ver y responder --}}
             <div class="flex justify-center items-center mt-3 gap-2">
-
                 {{-- VER --}}
                 <button type="button"
                     onclick="openFase3DetailsModal(this)"
-                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white rounded-lg relative inline-flex items-center justify-center">
-
+                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white rounded-lg relative inline-flex items-center justify-center w-10 h-10">
                     <i class="fa-solid fa-eye"></i>
-
-                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute"
-                        viewBox="0 0 64 64" fill="none">
-
-                        <path d="M32 3..." stroke="currentColor"></path>
-
+                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
+                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
+                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
                     </svg>
                 </button>
 
                 {{-- RESPONDER --}}
-                @if ($yaEnvio)
-
-                    <button type="button"
-                        onclick="openFase3DirModal(this)"
-                        class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white rounded-lg relative inline-flex items-center justify-center">
-
-                        <i class="fa-solid fa-share"></i>
-
-                        <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute"
-                            viewBox="0 0 64 64" fill="none">
-
-                            <path d="M32 3..." stroke="currentColor"></path>
-
-                        </svg>
-                    </button>
-
-                @endif
-
+                <button type="button"
+                    onclick="openFase3DirModal(this)"
+                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white rounded-lg relative inline-flex items-center justify-center w-10 h-10">
+                    <i class="fa-solid fa-share"></i>
+                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
+                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
+                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
+                    </svg>
+                </button>
             </div>
 
+        @elseif ($esDirector && $directorYaRespondio)
+            {{-- Director solo puede ver lo que respondió --}}
+            <div class="flex justify-center items-center mt-3">
+                <button type="button"
+                    onclick="openFase3DetailsModal(this)"
+                    class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+                    <i class="fa-solid fa-eye"></i>
+                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
+                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
+                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
+                    </svg>
+                </button>
+            </div>
+
+        {{-- ================= EVALUADOR Y COMITÉ ================= --}}
+        @elseif (($esEvaluador || $esComite) && $estudianteYaEnvio)
+            <div class="flex justify-center items-center mt-3">
+                <button type="button"
+                    onclick="openFase3DetailsModal(this)"
+                    class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+                    <i class="fa-solid fa-eye"></i>
+                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
+                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
+                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
+                    </svg>
+                </button>
+            </div>
         @endif
 
     @elseif ($fase_actual > 3)
-
-        {{-- Fase finalizada --}}
+        {{-- Fase ya pasada - todos pueden ver detalles --}}
         <div class="flex justify-center items-center mt-3">
-
             <button type="button"
                 onclick="openFase3DetailsModal(this)"
                 class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
-
                 <i class="fa-solid fa-eye"></i>
-
+                <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
+                    <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
+                    <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
+                </svg>
             </button>
-
         </div>
-
     @endif
-
 </div>
 
-                <!-- FASE 3 . II -->
-                <div
-                    class="relative mx-auto flex flex-col items-center justify-center bg-white text-gray-600 rounded-lg shadow-lg h-60 w-full sm:w-50 border">
-                    <i class="fa-solid fa-paper-plane" style="font-size: 32px; margin-bottom: 10px;"></i>
-                    <span class="text-center font-bold text-lg">Fase 4: Propuesta II</span>
-                    <p class="text-center mt-2 text-xs mx-4">El director envía propuesta al evaluador y comité.</p>
+                <!-- FASE 4: PROPUESTA II -->
+<div id="fase-4"
+    class="relative mx-auto flex flex-col items-center justify-center bg-white text-gray-600 rounded-lg shadow-lg h-60 w-full sm:w-50 border card-fase {{ $fase_actual >= 4 ? 'card-activated' : '' }} {{ $fase_actual == 4 ? 'card-activated-animated' : '' }}">
+
+    <i class="fa-solid fa-paper-plane" style="font-size: 32px; margin-bottom: 10px;"></i>
+
+    <span class="text-center font-bold text-lg">Fase 4: Propuesta II</span>
+
+    <p class="text-center mt-2 text-xs mx-4">
+        El evaluador revisa la propuesta del director.
+    </p>
+
+    @if ($fase_actual == 4)
+
+        @php
+            $user = auth()->user();
+            
+            $esDirector = $user->hasRole(['super_admin', 'admin', 'coordinador', 'director_practica']);
+            $esEvaluador = $user->hasRole(['evaluador_practica']);
+            $esComite = $user->hasRole(['super_admin', 'admin', 'coordinador']);
+            $esEstudiante = $user->hasRole('estudiante');
+            
+            // Estados de la fase
+            $directorYaEnvioFase4 = $submited_fase4 == 'true'; // Director ya envió los documentos firmados + turnitin
+            $evaluadorYaRespondio = $estado_evaluador_fase4 == 'Aprobada' || $estado_evaluador_fase4 == 'Rechazada';
+            $evaluadorAprobo = $estado_evaluador_fase4 == 'Aprobada';
+        @endphp
+
+        {{-- ================= DIRECTOR (solo puede ver después de enviar) ================= --}}
+        @if ($esDirector)
+            @if ($directorYaEnvioFase4 && !$evaluadorYaRespondio)
+                {{-- Director esperando respuesta del evaluador --}}
+                <div class="flex justify-center items-center mt-3">
+                    <button type="button"
+                        onclick="openFase4DetailsModal(this)"
+                        class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+                        <i class="fa-solid fa-eye"></i>
+                        <span class="ml-2">Ver Estado</span>
+                        <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
+                            <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
+                            <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
+                        </svg>
+                    </button>
                 </div>
+            @elseif ($directorYaEnvioFase4 && $evaluadorYaRespondio)
+                {{-- Director puede ver el resultado --}}
+                <div class="flex justify-center items-center mt-3">
+                    <button type="button"
+                        onclick="openFase4DetailsModal(this)"
+                        class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+                        <i class="fa-solid fa-eye"></i>
+                        <span class="ml-2">Ver Resultado</span>
+                        <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
+                            <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
+                            <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
+                        </svg>
+                    </button>
+                </div>
+            @endif
+
+        {{-- ================= EVALUADOR ================= --}}
+        @elseif ($esEvaluador && $directorYaEnvioFase4 && !$evaluadorYaRespondio)
+            {{-- Evaluador puede ver lo que envió el director y responder --}}
+            <div class="flex justify-center items-center mt-3 gap-2">
+                {{-- VER documentos del director --}}
+                <button type="button"
+                    onclick="openFase4DetailsModal(this)"
+                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white rounded-lg relative inline-flex items-center justify-center w-10 h-10">
+                    <i class="fa-solid fa-eye"></i>
+                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
+                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
+                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
+                    </svg>
+                </button>
+
+                {{-- RESPONDER (aprobar/rechazar) --}}
+                <button type="button"
+                    onclick="openFase4EvaluadorModal(this)"
+                    class="btn-action shadow bg-uts-500 hover:bg-uts-700 text-white rounded-lg relative inline-flex items-center justify-center w-10 h-10">
+                    <i class="fa-solid fa-share"></i>
+                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
+                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
+                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
+                    </svg>
+                </button>
+            </div>
+
+        @elseif ($esEvaluador && $evaluadorYaRespondio)
+            {{-- Evaluador solo puede ver lo que respondió --}}
+            <div class="flex justify-center items-center mt-3">
+                <button type="button"
+                    onclick="openFase4DetailsModal(this)"
+                    class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+                    <i class="fa-solid fa-eye"></i>
+                    <span class="ml-2">Ver</span>
+                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
+                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
+                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
+                    </svg>
+                </button>
+            </div>
+
+        {{-- ================= COMITÉ (solo puede ver después de que evaluador aprueba) ================= --}}
+        @elseif ($esComite && $directorYaEnvioFase4 && $evaluadorAprobo)
+            {{-- Comité puede ver los documentos cuando evaluador ya aprobó --}}
+            <div class="flex justify-center items-center mt-3">
+                <button type="button"
+                    onclick="openFase4DetailsModal(this)"
+                    class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+                    <i class="fa-solid fa-eye"></i>
+                    <span class="ml-2">Ver Documentos</span>
+                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
+                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
+                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
+                    </svg>
+                </button>
+            </div>
+
+        @elseif ($esComite && !$evaluadorAprobo && $directorYaEnvioFase4)
+            {{-- Comité NO puede ver nada hasta que evaluador apruebe --}}
+            <div class="flex justify-center items-center mt-3">
+                <div class="text-xs text-gray-400 text-center px-2">
+                    <i class="fa-solid fa-lock"></i> Esperando evaluación
+                </div>
+            </div>
+
+        {{-- ================= ESTUDIANTE (solo puede ver después de que evaluador aprueba) ================= --}}
+        @elseif ($esEstudiante && $directorYaEnvioFase4 && $evaluadorAprobo)
+            {{-- Estudiante puede ver los documentos cuando evaluador ya aprobó --}}
+            <div class="flex justify-center items-center mt-3">
+                <button type="button"
+                    onclick="openFase4DetailsModal(this)"
+                    class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+                    <i class="fa-solid fa-eye"></i>
+                    <span class="ml-2">Ver</span>
+                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
+                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
+                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
+                    </svg>
+                </button>
+            </div>
+
+        @elseif ($esEstudiante && !$evaluadorAprobo && $directorYaEnvioFase4)
+            {{-- Estudiante NO puede ver nada hasta que evaluador apruebe --}}
+            <div class="flex justify-center items-center mt-3">
+                <div class="text-xs text-gray-400 text-center px-2">
+                    <i class="fa-solid fa-lock"></i> En evaluación
+                </div>
+            </div>
+        @endif
+
+    @elseif ($fase_actual > 4)
+        {{-- Fase ya pasada - todos pueden ver detalles --}}
+        <div class="flex justify-center items-center mt-3">
+            <button type="button"
+                onclick="openFase4DetailsModal(this)"
+                class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+                <i class="fa-solid fa-eye"></i>
+                <span class="ml-2">Ver</span>
+                <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
+                    <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
+                    <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
+                </svg>
+            </button>
+        </div>
+    @endif
+</div>
 
                 <!-- FASE 4 . I -->
                 <div
@@ -1592,6 +1754,49 @@
     </div>
 </div>
 
+    <!-- Modal Responder Evaluador Fase 4 -->
+<div id="fase4EvaluadorModal" class="fixed z-50 inset-0 overflow-y-auto hidden">
+    <div class="modal-overlay absolute inset-0 bg-gray-500 bg-opacity-75" onclick="closeFase4EvaluadorModal()"></div>
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="relative bg-white rounded-lg shadow-xl max-w-lg w-full">
+            <div class="flex justify-between items-center p-4 border-b">
+                <h3 class="text-xl font-bold">Responder como Evaluador</h3>
+                <button onclick="closeFase4EvaluadorModal()" class="text-gray-400 hover:text-gray-600">&times;</button>
+            </div>
+            <form id="fase4EvaluadorForm" class="p-4">
+                @csrf
+                <input type="hidden" name="practica_id" id="practica_id_fase4" value="{{ $practica->id }}">
+                
+                <div class="mb-4">
+                    <label class="block font-medium text-sm text-gray-700 mb-2">Estado:</label>
+                    <select name="estado" id="estado_fase4" 
+                        class="border-gray-300 rounded-md w-full focus:ring-uts-500 focus:border-uts-500">
+                        <option value="">Seleccione un estado</option>
+                        <option value="Aprobada">Aprobar</option>
+                        <option value="Rechazada">Rechazar</option>
+                    </select>
+                    <span id="estado_fase4Error" class="text-red-500 text-sm"></span>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block font-medium text-sm text-gray-700 mb-2">Comentarios:</label>
+                    <textarea name="respuesta" id="respuesta_fase4" rows="4"
+                        class="border-gray-300 rounded-md w-full focus:ring-uts-500 focus:border-uts-500"
+                        placeholder="Ingrese sus comentarios..."></textarea>
+                    <span id="respuesta_fase4Error" class="text-red-500 text-sm"></span>
+                </div>
+                
+                <div class="flex justify-end gap-2">
+                    <button type="button" onclick="closeFase4EvaluadorModal()" 
+                        class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cancelar</button>
+                    <button type="submit" 
+                        class="bg-uts-500 hover:bg-uts-700 text-white px-4 py-2 rounded-lg">Responder</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
     <!-- Calendario Modal -->
     @if (isset($fechas))
         <div id="calendarModal" class="fixed z-50 inset-0 overflow-y-auto">
@@ -1744,11 +1949,30 @@
                 width: 100% !important;
             }
 
-            .tooltip-icon {
-                cursor: pointer;
-            }
+            /* Tooltips */
+[id^="tooltip-"] {
+    background-color: #4b5563;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    max-width: 200px;
+    white-space: normal;
+    word-wrap: break-word;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
 
-        
+[id^="tooltip-"]::before {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px 6px 0 6px;
+    border-style: solid;
+    border-color: #4b5563 transparent transparent transparent;
+}
 
             .show {
                 display: block !important;
@@ -1779,7 +2003,8 @@
                 fase2_reply: '{{ route('practicas.fase2.reply') }}',
                 fase3_store: '{{ route('practicas.fase3.store') }}',
                 fase3_details: '{{ route('practicas.fase3.details') }}',
-                fase3_reply: '{{ route('practicas.fase3.reply') }}'
+                fase3_reply: '{{ route('practicas.fase3.reply') }}',
+                fase4_reply: '{{ route('practicas.fase4.reply') }}'
             };
         </script>
 
@@ -1871,5 +2096,6 @@ function closeCalendarModal() {
         <script src="{{ asset('js/fases/practicas/fase_1.js') }}"></script>
         <script src="{{ asset('js/fases/practicas/fase_2.js') }}"></script>
         <script src="{{ asset('js/fases/practicas/fase_3.js') }}"></script>
+        <script src="{{ asset('js/fases/practicas/fase_4.js') }}"></script>
     @endpush
 </x-app-layout>

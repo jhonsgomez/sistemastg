@@ -243,6 +243,10 @@ Route::middleware('permission:view_practicas')
         Route::post('/fase3/details',[RoadMapPracticaController::class, 'getFase3Details'])->name('practicas.fase3.details');
         Route::post('/fase3/reply',[RoadMapPracticaController::class, 'replyFase3'])->name('practicas.fase3.reply');
 
+        // Rutas para Fase 4 del roadmap
+
+        Route::post('/fase4/reply', [RoadMapPracticaController::class, 'replyFase4'])->name('practicas.fase4.reply');
+
       
         
         
@@ -320,13 +324,20 @@ Route::middleware('permission:view_practicas')
     });
 
     // Rutas para evaluadores
-    Route::prefix('evaluador')->group(function () {
-        Route::get('/', [ProyectoGradoController::class, 'index'])->name('evaluador.index');
+Route::prefix('evaluador')->group(function () {
+    Route::get('/', [ProyectoGradoController::class, 'index'])->name('evaluador.index');
 
-        // Rutas para RoadMap
-        Route::post('/seguimiento', [RoadMapController::class, 'index'])->name('evaluador.roadmap');
-        Route::get('/seguimiento', function () {
-            return redirect()->route('dashboard');
-        })->name('evaluador.roadmap.get');
+    // Evaluador prácticas - AQUÍ ESTÁ EL PROBLEMA
+    Route::prefix('practicas')->group(function () {
+        Route::get('/', [RoadMapPracticaController::class, 'indexEvaluador'])
+            ->name('evaluador.practicas.index');
     });
+    
+    // Rutas para RoadMap
+    Route::post('/seguimiento', [RoadMapController::class, 'index'])->name('evaluador.roadmap');
+    Route::get('/seguimiento', function () {
+        return redirect()->route('dashboard');
+    })->name('evaluador.roadmap.get');
+});
+
 });
