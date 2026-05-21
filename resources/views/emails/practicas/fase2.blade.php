@@ -8,6 +8,15 @@
         body {
             font-family: Calibri, sans-serif;
         }
+
+        .email {
+            color: blue;
+            text-decoration: underline;
+        }
+
+        .uppercase {
+            text-transform: uppercase;
+        }
     </style>
 </head>
 
@@ -15,27 +24,17 @@
 
     <p>Buen día,</p>
 
-    <p>
-        Estimado usuario, en este correo se le informa que se ha realizado
-        el envío de documentos correspondientes a la <strong>FASE 2</strong>
-        de prácticas empresariales.
-    </p>
+    <p>Estimado usuario, en este correo se le informa que se ha realizado el envío de documentos correspondientes a la <strong>FASE 2</strong> de prácticas empresariales.</p>
 
     <ul>
-        <li>
-            <strong>Tipo de solicitud:</strong>
-            PAGO DE LA MODALIDAD
-        </li>
+        <li><strong>Tipo de solicitud:</strong>PAGO DE LA MODALIDAD</li>
 
-        <li>
-            <strong>Estado actual:</strong>
-            {{ $data['cuerpo_correo']['estado'] ?? '' }}
-        </li>
+        <li><strong>Estado actual:</strong>{{ $data['cuerpo_correo']['estado'] ?? '' }}</li>
     </ul>
 
     <br>
 
-    <p><strong>Estudiante:</strong></p>
+    <p><strong>Integrantes:</strong></p>
         <ul>
             <li><strong>Nombre:</strong> {{ $data['cuerpo_correo']['estudiante']->name ?? '' }}</li>
 
@@ -51,7 +50,6 @@
             @if (!empty($data['cuerpo_correo']['integrante_2']))
                 <li>
                     <strong>Nombre:</strong>
-
                     {{ is_object($data['cuerpo_correo']['integrante_2'])
                         ? $data['cuerpo_correo']['integrante_2']->name
                         : $data['cuerpo_correo']['integrante_2'] }}
@@ -64,9 +62,7 @@
 
     <br>
 
-    <p>
-        El estudiante ha adjuntado los siguientes documentos:
-    </p>
+    <p>El estudiante ha adjuntado los siguientes documentos:</p>
 
     <ul>
         <li>Liquidación de pago</li>
@@ -89,12 +85,9 @@
 
     <p>
         Comité de Trabajos de Grado<br>
-
         Programa de Tecnología en Desarrollo de Sistemas Informáticos e Ingeniería de Sistemas<br>
-
         Unidades Tecnológicas de Santander
     </p>
 
 </body>
-
 </html>

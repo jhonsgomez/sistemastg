@@ -8,6 +8,17 @@
         body {
             font-family: Calibri, sans-serif;
         }
+
+        .email {
+            color: blue;
+            text-decoration: underline;
+        }
+
+        .uppercase {
+            text-transform: uppercase;
+        }
+
+
     </style>
 </head>
 
@@ -17,7 +28,7 @@
 
     <p>
         Estimado usuario, en este correo se le informa que su solicitud
-        de prácticas empresariales en FASE 1
+        de prácticas empresariales en <strong>FASE 1</strong> 
         ha sido:
 
         <strong>
@@ -89,34 +100,20 @@
     <br>
 
     @if (($data['cuerpo_correo']['estado'] ?? '') === 'Aprobada')
-        <p>
-            Su práctica ha avanzado correctamente a la
-            <strong>FASE 2</strong>.
-        </p>
+        <p> Su práctica ha avanzado correctamente a la<strong>FASE 2</strong>.</p>
 
-        <p>
-            Se recomienda ingresar al sistema para continuar
-            el proceso correspondiente.
-        </p>
+        <p>Se recomienda ingresar al sistema para continuarel proceso correspondiente.</p>
     @else
         <p>
             La solicitud fue rechazada.
         </p>
 
-        <p>
-            Debe ingresar nuevamente al sistema,
-            corregir la información solicitada
-            y reenviar la FASE 1.
-        </p>
+        <p>Debe ingresar nuevamente al sistema,corregir la información solicitada y reenviar la FASE 1.</p>
     @endif
 
     <br>
 
-    <p>
-        Este es un correo generado automáticamente
-        por el sistema de prácticas,
-        por favor no responder.
-    </p>
+    <p> Este es un correo generado automáticamente por el sistema de prácticas,por favor no responder.</p>
 
     <br>
 
@@ -124,9 +121,7 @@
 
     <p>
         Comité de Trabajos de Grado<br>
-
         Programa de Tecnología en Desarrollo de Sistemas Informáticos e Ingeniería de Sistemas<br>
-
         Unidades Tecnológicas de Santander
     </p>
 

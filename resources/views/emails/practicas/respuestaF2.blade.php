@@ -8,17 +8,22 @@
         body {
             font-family: Calibri, sans-serif;
         }
+
+        .email {
+            color: blue;
+            text-decoration: underline;
+        }
+
+        .uppercase {
+            text-transform: uppercase;
+        }
     </style>
 </head>
 
 <body>
 
     <p>Buen día,</p>
-    <p>
-    Estimado estudiante, en este correo se le informa
-    la respuesta de su solicitud correspondiente a la
-    <strong>FASE 2</strong> de prácticas empresariales.
-    </p>
+    <p>Estimado estudiante, en este correo se le informa la respuesta de su solicitud correspondiente a la<strong>FASE 2</strong> de prácticas empresariales.</p>
 
     <p>
         Su solicitud

@@ -96,7 +96,7 @@
             </li>
         @endif
     @empty
-    <p>No hay información adicional.</p>
+  
     @endforelse
 
     @if (!empty($data['comentarios']))

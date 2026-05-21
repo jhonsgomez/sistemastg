@@ -23,7 +23,11 @@
         .uppercase {
             text-transform: uppercase;
         }
-
+        .email {
+            color: blue;
+            text-decoration: underline;
+        }
+       
     </style>
 
 </head>
@@ -48,7 +52,7 @@
             <li><strong>Estado:</strong> {{ $data['cuerpo_correo']['estado'] ?? '' }}</li>
         </ul>
         <br>
-        <p>Integrantes del proyecto: </p>
+        <p>Integrantes:</p>
         <ul>
             <li><strong>Nombre:</strong> {{ $data['cuerpo_correo']['estudiante']->name ?? '' }}</li>
 
@@ -100,7 +104,7 @@
             </li>
         @endif
     @empty
-    <p>No hay información adicional.</p>
+   
     @endforelse
 
     @if (!empty($data['comentarios']))
