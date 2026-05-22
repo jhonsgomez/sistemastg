@@ -239,9 +239,25 @@ class PracticaController extends Controller
                 }
             }
             elseif ($p->estado === 'Fase 4') {
-                $htmlEstado = "<span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 4</span>
-                               <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Estudiante</span>";
-            } 
+                $respondioEvaluador = $p->valoresCampos
+                    ->where('campo.name', 'respuesta_evaluador')
+                    ->first();
+
+                if ($respondioEvaluador) {
+                    // Ya respondió evaluador -> pasa a comité
+                    $htmlEstado = "
+                        <span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 4</span>
+                        <span class='shadow bg-purple-100 text-purple-800 text-sm font-medium px-2.5 py-0.5 rounded border border-purple-300'>Comité</span>";
+                } else {
+
+                    // Aún está pendiente evaluador
+                    $htmlEstado = "
+                        <span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 4</span>
+                        <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Evaluador</span>";
+                }
+            }
+
+
             elseif ($p->estado === 'Fase 5') {
                 $htmlEstado = "<span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 5</span>
                                <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Comité</span>";

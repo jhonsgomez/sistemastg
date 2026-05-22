@@ -70,7 +70,8 @@
             #fase2EstudianteModal,
             #fase3EstudianteModal,
             #fase3DetailsModal,
-            #fase3DirModal {
+            #fase3DirModal,
+            #fase4EvaluadorModal {
                 visibility: hidden !important;
                 opacity: 0 !important;
                 transform: translateY(-20px) !important;
@@ -96,7 +97,8 @@
             #fase2EstudianteModal.show,
             #fase3EstudianteModal.show,
             #fase3DetailsModal.show,
-            #fase3DirModal.show {
+            #fase3DirModal.show,
+            #fase4EvaluadorModal.show {
                 visibility: visible !important;
                 opacity: 1 !important;
                 transform: translateY(0) scale(1) !important;
@@ -517,19 +519,12 @@
 </div>
 
                 <!-- FASE 4: PROPUESTA II -->
-<div id="fase-4"
-    class="relative mx-auto flex flex-col items-center justify-center bg-white text-gray-600 rounded-lg shadow-lg h-60 w-full sm:w-50 border card-fase {{ $fase_actual >= 4 ? 'card-activated' : '' }} {{ $fase_actual == 4 ? 'card-activated-animated' : '' }}">
-
+<div id="fase-4" class="relative mx-auto flex flex-col items-center justify-center bg-white text-gray-600 rounded-lg shadow-lg h-60 w-full sm:w-50 border card-fase {{ $fase_actual >= 4 ? 'card-activated' : '' }} {{ $fase_actual == 4 ? 'card-activated-animated' : '' }}">
     <i class="fa-solid fa-paper-plane" style="font-size: 32px; margin-bottom: 10px;"></i>
-
     <span class="text-center font-bold text-lg">Fase 4: Propuesta II</span>
-
-    <p class="text-center mt-2 text-xs mx-4">
-        El evaluador revisa la propuesta del director.
-    </p>
-
+    <p class="text-center mt-2 text-xs mx-4">El evaluador revisa la propuesta del director.</p>
+            
     @if ($fase_actual == 4)
-
         @php
             $user = auth()->user();
             
@@ -539,7 +534,8 @@
             $esEstudiante = $user->hasRole('estudiante');
             
             // Estados de la fase
-            $directorYaEnvioFase4 = $submited_fase4 == 'true'; // Director ya envió los documentos firmados + turnitin
+            $directorYaEnvioFase4 = $submited_fase3 == 'true'; // Director ya envió los documentos firmados + turnitin
+
             $evaluadorYaRespondio = $estado_evaluador_fase4 == 'Aprobada' || $estado_evaluador_fase4 == 'Rechazada';
             $evaluadorAprobo = $estado_evaluador_fase4 == 'Aprobada';
         @endphp
@@ -575,6 +571,8 @@
                     </button>
                 </div>
             @endif
+        
+
 
         {{-- ================= EVALUADOR ================= --}}
         @elseif ($esEvaluador && $directorYaEnvioFase4 && !$evaluadorYaRespondio)
@@ -594,7 +592,7 @@
                 {{-- RESPONDER (aprobar/rechazar) --}}
                 <button type="button"
                     onclick="openFase4EvaluadorModal(this)"
-                    class="btn-action shadow bg-uts-500 hover:bg-uts-700 text-white rounded-lg relative inline-flex items-center justify-center w-10 h-10">
+                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white rounded-lg relative inline-flex items-center justify-center w-10 h-10">
                     <i class="fa-solid fa-share"></i>
                     <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
                         <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
@@ -604,6 +602,7 @@
             </div>
 
         @elseif ($esEvaluador && $evaluadorYaRespondio)
+
             {{-- Evaluador solo puede ver lo que respondió --}}
             <div class="flex justify-center items-center mt-3">
                 <button type="button"
@@ -682,9 +681,10 @@
             </button>
         </div>
     @endif
+
 </div>
 
-                <!-- FASE 4 . I -->
+                <!-- FASE 5. I -->
                 <div
                     class="relative mx-auto flex flex-col items-center justify-center bg-white text-gray-600 rounded-lg shadow-lg h-60 w-full sm:w-50 border">
                     <i class="fa-solid fa-hourglass-half" style="font-size: 32px; margin-bottom: 10px;"></i>
@@ -692,7 +692,7 @@
                     <p class="text-center mt-2 text-xs mx-4">El estudiante envía el informe al director.</p>
                 </div>
 
-                <!-- FASE 4 . II -->
+                <!-- FASE 6 . II -->
                 <div
                     class="relative mx-auto flex flex-col items-center justify-center bg-white text-gray-600 rounded-lg shadow-lg h-60 w-full sm:w-50 border">
                     <i class="fa-solid fa-paper-plane" style="font-size: 32px; margin-bottom: 10px;"></i>
@@ -713,7 +713,7 @@
 
     </div>
 
-    <!-- ==================== MODALES FASE 1 ==================== -->
+    <!-- ==================== Moda FASE 1 ==================== -->
 
     <!-- Modal FASE 1 - Estudiante (Enviar documentos) -->
     <div id="fase1EstudianteModal" class="fixed z-50 inset-0 overflow-y-auto">
@@ -857,7 +857,7 @@
     </div>
     
 
-    <!-- MODALES FASE 1 - Detalles (Ver información enviada) -->
+    <!-- Moda FASE 1 - Detalles (Ver información enviada) -->
 <div id="fase1DetailsModal" class="fixed z-50 inset-0 overflow-y-auto">
     <div class="modal-overlay absolute inset-0" onclick="closeFase1DetailsModal()">
         <div class="flex items-center justify-center min-h-screen p-4 text-center relative">
@@ -889,7 +889,7 @@
     </div>
 </div>
 
-    <!-- MODALES FASE 1 - Administrador (Responder solicitud) -->
+    <!-- Moda FASE 1 - Administrador (Responder solicitud) -->
     <div id="fase1AdminModal" class="fixed z-50 inset-0 overflow-y-auto">
         <div class="modal-overlay absolute inset-0"  style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeFase1AdminModal()">
             <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
@@ -975,7 +975,7 @@
         </div>
     </div>
 
-    <!-- MODALES FASE 2 - Estudiante (Enviar documentos de pago) -->
+    <!-- Moda FASE 2 - Estudiante (Enviar documentos de pago) -->
 <div id="fase2EstudianteModal" class="fixed z-50 inset-0 overflow-y-auto">
     <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeFase2EstudianteModal()">
         <div class="flex items-center justify-center min-h-screen p-4 text-center relative">
@@ -1131,7 +1131,7 @@
     </div>
 </div>
 
-    <!-- MODALES FASE 2 - Detalles (Ver información enviada) -->
+    <!-- Moda FASE 2 - Detalles (Ver información enviada) -->
 <div id="fase2DetailsModal" class="fixed z-50 inset-0 overflow-y-auto">
     <div class="modal-overlay absolute inset-0" onclick="closeFase2DetailsModal()">
         <div class="flex items-center justify-center min-h-screen p-4 text-center relative">
@@ -1163,7 +1163,7 @@
     </div>
 </div>
 
-    <!-- MODALES FASE 2 - Administrador (Responder solicitud + Asignar docentes) -->
+    <!-- Moda FASE 2 - Administrador (Responder solicitud + Asignar docentes) -->
 <div id="fase2AdminModal" class="fixed z-50 inset-0 overflow-y-auto">
     <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;"  onclick="closeFase2AdminModal()">
         <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
@@ -1294,7 +1294,7 @@
 </div>
 
 
-  <!-- MODALES FASE 3 - Estudiante (Enviar documentos de trabajo de grado) -->
+  <!-- Moda FASE 3 - Estudiante (Enviar documentos de trabajo de grado) -->
 <div id="fase3EstudianteModal" class="fixed z-50 inset-0 overflow-y-auto">
     <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeFase3EstudianteModal()">
         <div class="flex items-center justify-center min-h-screen p-4 text-center relative">
@@ -1453,7 +1453,7 @@
 </div>
 
 
-    <!-- MODALES FASE 3 - Detalles (Ver información enviada) -->
+    <!-- Moda FASE 3 - Detalles (Ver información enviada) -->
 <div id="fase3DetailsModal" class="fixed z-50 inset-0 overflow-y-auto">
     <div class="modal-overlay absolute inset-0" onclick="closeFase3DetailsModal()">
         <div class="flex items-center justify-center min-h-screen p-4 text-center relative">
@@ -1485,7 +1485,7 @@
     </div>
 </div>
 
-<!-- MODALES Fase 3 Responder Director -->
+<!-- Moda Fase 3 Responder Director -->
 
 <div id="fase3DirModal" class="fixed z-50 inset-0 overflow-y-auto">
     <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;"  onclick="closeFase3DirModal()">
@@ -1754,45 +1754,210 @@
     </div>
 </div>
 
-    <!-- Modal Responder Evaluador Fase 4 -->
-<div id="fase4EvaluadorModal" class="fixed z-50 inset-0 overflow-y-auto hidden">
-    <div class="modal-overlay absolute inset-0 bg-gray-500 bg-opacity-75" onclick="closeFase4EvaluadorModal()"></div>
-    <div class="flex items-center justify-center min-h-screen p-4">
-        <div class="relative bg-white rounded-lg shadow-xl max-w-lg w-full">
-            <div class="flex justify-between items-center p-4 border-b">
-                <h3 class="text-xl font-bold">Responder como Evaluador</h3>
-                <button onclick="closeFase4EvaluadorModal()" class="text-gray-400 hover:text-gray-600">&times;</button>
+
+
+<!-- Modal Responder Evaluador Fase 4 -->
+<div id="fase4EvaluadorModal" class="fixed z-50 inset-0 overflow-y-auto">
+    <div class="modal-overlay absolute inset-0"
+        style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;"
+        onclick="closeFase4EvaluadorModal()">
+
+        <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
+
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
+                onclick="event.stopPropagation()">
+
+                <!-- BOTÓN CERRAR -->
+                <button
+                    class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
+                    onclick="closeFase4EvaluadorModal()">
+                    &times;
+                </button>
+
+                <!-- FORM -->
+                <form class="p-6 mt-2" id="fase4EvaluadorForm" enctype="multipart/form-data">
+                    @csrf
+
+                    <input type="hidden" name="practica_id" id="practica_id_fase4"
+                        value="{{ $practica->id }}">
+
+                    <!-- TITULO -->
+                    <p class="text-2xl font-bold mb-4">
+                        Responder
+                        <span
+                            class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">
+                            Fase 4
+                        </span>
+                    </p>
+
+                    <!-- ESTADO -->
+                    <div class="mb-4">
+                        <label class="block font-medium text-sm text-gray-700">
+                            <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                            Estado:
+                        </label>
+
+                        <select
+                            name="estado"
+                            id="estado_fase4"
+                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
+
+                            <option value="">Seleccione un estado</option>
+                            <option value="Aprobada">Aprobar</option>
+                            <option value="Rechazada">Rechazar</option>
+                        </select>
+
+                        <span id="estado_fase4Error" class="text-red-500 text-sm"></span>
+                    </div>
+
+@php
+
+$campoTitulo = \App\Models\Campo::where(
+    'name',
+    'titulo_propuesta_director_fase3'
+)->first();
+
+$valorTitulo = null;
+
+if($campoTitulo){
+
+    $valorTitulo = DB::table('practica_valores_campos')
+        ->where('practica_id', $practica->id)
+        ->where('campo_id', $campoTitulo->id)
+        ->value('valor');
+}
+
+@endphp
+
+
+
+                    <!-- TITULO PROPUEST AQUI SOLO SE MUESTRA -->
+                    <div class="mb-4">
+                        <label class="block font-medium text-sm text-gray-700">
+                            <i class="fa-solid fa-heading mr-2 text-gray-500"></i>
+                            Título de la propuesta:
+                        </label>
+                        
+                        <input
+                            type="text"
+                            name="titulo_propuesta"
+                            id="titulo_propuesta_fase4"
+                            value="{{ trim($valorTitulo ?? '') }}"
+                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500 bg-gray-100"
+                            readonly
+                        >
+
+                        <span id="titulo_propuesta_fase4Error" class="text-red-500 text-sm"></span>
+                    </div>
+
+                    <!-- F-DC-127 -->
+                    <div class="mb-4">
+
+                        <div class="flex items-center gap-2 mb-2">
+                            <label class="block font-medium text-sm text-gray-700">
+                                <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                <span class="text-red-500">*</span>
+                                Propuesta (F-DC-127)
+                            </label>
+
+                            <div class="relative inline-block">
+                                <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                    data-tooltip="tooltip-fdc127-evaluador-fase4"></i>
+                            </div>
+                        </div>
+
+                        <div
+                            class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+
+                            <div class="grid gap-1 text-center">
+
+                                <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+
+                                <h2 class="text-center text-gray-400 text-xs">
+                                    Arrastra o selecciona el archivo F-DC-127 con comentarios o firmado
+                                    (.doc, .docx, máx. 5MB)
+                                </h2>
+
+                            </div>
+
+                            <div class="text-center">
+
+                                <input
+                                    type="file"
+                                    name="fdc127"
+                                    id="fdc127_fase4"
+                                    class="absolute inset-0 opacity-0 cursor-pointer w-full"
+                                    accept=".pdf,.doc,.docx">
+
+                                <div
+                                    class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                    Cargar
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <span id="fdc127_fase4Error" class="text-red-500 text-xs"></span>
+
+                        <ul id="file-list-fdc127-fase4"
+                            class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+
+                        <!-- TOOLTIP -->
+                        <div id="tooltip-fdc127-evaluador-fase4"
+                            class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
+
+                            Suba el documento F-DC-127 firmado o con comentarios del evaluador.
+
+                        </div>
+                    </div>
+
+                    <!-- COMENTARIOS -->
+                    <div class="mb-4">
+
+                        <label class="block font-medium text-sm text-gray-700">
+                            <i class="fa-solid fa-message mr-2 text-gray-500"></i>
+                            Comentarios de la respuesta:
+                        </label>
+
+                        <div
+                            id="txt-editor-fase4-evaluador"
+                            class="shadow txt-editor-quill"
+                            style="height: 200px; background: white;">
+                        </div>
+
+                        <textarea
+                            name="respuesta"
+                            id="respuesta_fase4"
+                            class="hidden"></textarea>
+
+                        <span id="respuesta_fase4Error" class="text-red-500 text-sm"></span>
+
+                    </div>
+
+                    <!-- BOTONES -->
+                    <div class="flex justify-end space-x-2 mt-4">
+
+                        <button
+                            type="button"
+                            onclick="closeFase4EvaluadorModal()"
+                            class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">
+
+                            Cancelar
+
+                        </button>
+
+                        <button
+                            type="submit"
+                            class="flex bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg">
+
+                            Responder
+
+                        </button>
+
+                    </div>
+
+                </form>
             </div>
-            <form id="fase4EvaluadorForm" class="p-4">
-                @csrf
-                <input type="hidden" name="practica_id" id="practica_id_fase4" value="{{ $practica->id }}">
-                
-                <div class="mb-4">
-                    <label class="block font-medium text-sm text-gray-700 mb-2">Estado:</label>
-                    <select name="estado" id="estado_fase4" 
-                        class="border-gray-300 rounded-md w-full focus:ring-uts-500 focus:border-uts-500">
-                        <option value="">Seleccione un estado</option>
-                        <option value="Aprobada">Aprobar</option>
-                        <option value="Rechazada">Rechazar</option>
-                    </select>
-                    <span id="estado_fase4Error" class="text-red-500 text-sm"></span>
-                </div>
-                
-                <div class="mb-4">
-                    <label class="block font-medium text-sm text-gray-700 mb-2">Comentarios:</label>
-                    <textarea name="respuesta" id="respuesta_fase4" rows="4"
-                        class="border-gray-300 rounded-md w-full focus:ring-uts-500 focus:border-uts-500"
-                        placeholder="Ingrese sus comentarios..."></textarea>
-                    <span id="respuesta_fase4Error" class="text-red-500 text-sm"></span>
-                </div>
-                
-                <div class="flex justify-end gap-2">
-                    <button type="button" onclick="closeFase4EvaluadorModal()" 
-                        class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cancelar</button>
-                    <button type="submit" 
-                        class="bg-uts-500 hover:bg-uts-700 text-white px-4 py-2 rounded-lg">Responder</button>
-                </div>
-            </form>
         </div>
     </div>
 </div>

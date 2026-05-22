@@ -324,11 +324,11 @@ Route::middleware('permission:view_practicas')
     });
 
     // Rutas para evaluadores
-Route::prefix('evaluador')->group(function () {
+    Route::prefix('evaluador')->group(function () {
     Route::get('/', [ProyectoGradoController::class, 'index'])->name('evaluador.index');
 
-    // Evaluador prácticas - AQUÍ ESTÁ EL PROBLEMA
-    Route::prefix('practicas')->group(function () {
+    // Evaluador prácticas 
+    Route::prefix('evaluador/practicas')->group(function () {
         Route::get('/', [RoadMapPracticaController::class, 'indexEvaluador'])
             ->name('evaluador.practicas.index');
     });

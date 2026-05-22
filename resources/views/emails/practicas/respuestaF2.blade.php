@@ -23,11 +23,7 @@
 <body>
 
     <p>Buen día,</p>
-    <p>Estimado estudiante, en este correo se le informa la respuesta de su solicitud correspondiente a la<strong>FASE 2</strong> de prácticas empresariales.</p>
-
-    <p>
-        Su solicitud
-
+    <p>Estimado estudiante, en este correo se le informa la respuesta de su solicitud correspondiente a la<strong>FASE 2</strong> de prácticas empresariales 
         {!! ($data['cuerpo_correo']['estado'] ?? '') === 'Aprobada'
             ? 'ha sido <strong>APROBADA</strong>'
             : 'ha sido <strong>RECHAZADA</strong>' !!}
