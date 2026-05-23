@@ -228,75 +228,71 @@ $('#turnitin_fase3').on('change', function(e) {
    
     
     // ========== ENVÍO DEL FORMULARIO DEL ESTUDIANTE CON CONFIRMACIÓN ==========
-    $('#fase3EstudianteForm').on('submit', function(e) {
-        e.preventDefault();
-        
-        Swal.fire({
-            heightAuto: false,
-            title: '¿Está seguro?',
-            text: "No podrá editar la información una vez se envíe",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#C1D631',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Sí, enviar',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const button = $('#fase3EstudianteForm').find('button[type="submit"]');
-                const spinner = $('#loadingSpinner-fase3');
-                const formData = new FormData(this);
-                
-                button.prop('disabled', true);
-                if (spinner.length) spinner.removeClass('hidden');
-                
-                $.ajax({
-                    url: ROUTES.fase3_store,
-                    method: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-                        closeFase3EstudianteModal();
-                        Swal.fire({
-                            title: '¡Éxito!',
-                            text: 'Documentos enviados correctamente. Tendrá respuesta en los próximos 5 días hábiles.',
-                            icon: 'success',
-                            confirmButtonText: 'Ok',
-                            confirmButtonColor: '#C1D631'
-                        }).then(() => {
-                            location.reload();
-                        });
-                    },
-                    error: function(xhr) {
-                        if (xhr.status === 422 && xhr.responseJSON.errors) {
-                            const errors = xhr.responseJSON.errors;
-                            if (errors.arl) 
-                                $('#arlError').text(errors.arl[0]);
+$('#fase3EstudianteForm').on('submit', function(e) {
+    e.preventDefault();
+    
+    Swal.fire({
+        heightAuto: false,
+        title: '¿Está seguro?',
+        text: "No podrá editar la información una vez se envíe",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#C1D631',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, enviar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const button = $('#fase3EstudianteForm').find('button[type="submit"]');
+            const spinner = $('#loadingSpinner-fase3');
+            const formData = new FormData(this);
+            
+            button.prop('disabled', true);
+            if (spinner.length) spinner.removeClass('hidden');
+            
+            $.ajax({
+                url: ROUTES.fase3_store,
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    closeFase3EstudianteModal();
+                    showToast('Documentos enviados correctamente. Tendrá respuesta en los próximos 5 días hábiles.', 'success');
+                    setTimeout(() => {
+                        location.reload();
+                    }, 3000);
+                },
+                error: function(xhr) {
+                    if (xhr.status === 422 && xhr.responseJSON.errors) {
+                        const errors = xhr.responseJSON.errors;
+                        if (errors.arl) 
+                            $('#arlError').text(errors.arl[0]);
 
-                            if (errors.doc_fdc127)
-                                $('#doc_fdc127Error').text(errors.doc_fdc127[0]);
+                        if (errors.doc_fdc127)
+                            $('#doc_fdc127Error').text(errors.doc_fdc127[0]);
 
-                            if (errors.doc_fdc195)
-                                $('#doc_fdc195Error').text(errors.doc_fdc195[0]);
-                            // Limpiar errores después de 5 segundos
-                            setTimeout(() => {
-                                $('#arlError').text('');
-                                $('#doc_fdc127Error').text('');
-                                $('#doc_fdc195Error').text('');
-                            }, 5000);
-                        } else {
-                            Swal.fire('Error', xhr.responseJSON?.error || 'Error al enviar', 'error');
-                        }
-                    },
-                    complete: function() {
-                        button.prop('disabled', false);
-                        if (spinner.length) spinner.addClass('hidden');
+                        if (errors.doc_fdc195)
+                            $('#doc_fdc195Error').text(errors.doc_fdc195[0]);
+                        // Limpiar errores después de 5 segundos
+                        setTimeout(() => {
+                            $('#arlError').text('');
+                            $('#doc_fdc127Error').text('');
+                            $('#doc_fdc195Error').text('');
+                        }, 5000);
+                    } else {
+                        showToast(xhr.responseJSON?.error || 'Error al enviar', 'error');
                     }
-                });
-            }
-        });
+                },
+                complete: function() {
+                    button.prop('disabled', false);
+                    if (spinner.length) spinner.addClass('hidden');
+                }
+            });
+        }
     });
+});
+
 });
 
 // ==================== TOOLTIPS CERCA DEL CURSOR ====================
@@ -318,8 +314,8 @@ $(document).ready(function() {
         const tooltipWidth = $tooltip.outerWidth();
         
         // Posición: arriba del cursor con poco espacio
-        let top = mouseY - tooltipHeight * 1.8;
-        let left = mouseX - (tooltipWidth * 2);
+        let top = mouseY - tooltipHeight;
+        let left = mouseX - (tooltipWidth);
         
         $tooltip.css({
             position: 'fixed',
@@ -760,3 +756,15 @@ $('#fase3DirForm').on('submit', function (e) {
     });
 
 });
+
+function showToast(message, type = 'success') {
+    Swal.fire({
+        title: type === 'success' ? '¡Éxito!' : 'Error',
+        text: message,
+        icon: type,
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000
+    });
+}
