@@ -876,8 +876,9 @@ public function replyFase2(Request $request)
 
         ]);
 
-        // Envío correo
-        // $this->practicaMailService->sendFase3($practica);
+        // Envío correo - DESCOMENTAR CUANDO SE UTILICE
+       //  $this->practicaMailService->sendFase3($practica);
+        
 
         return response()->json([
             'success' => 'Documentos enviados correctamente'
@@ -962,14 +963,6 @@ public function replyFase2(Request $request)
 
 
 
-
-
-
-
-
-
-
-    
 
 
     public function replyFase3(Request $request)
@@ -1090,6 +1083,10 @@ if ($request->estado === 'Aprobada') {
     }
     
     $practica->save();
+
+    //CORREO DESCOMENTAR CUANDO SE UTILICE - APRUEBA EL DIRECTOR
+
+  //  $this->practicaMailService->sendRespuestaFase3($practica, $request);
     
     // ========== GUARDAR submited_fase4 = 'true' PARA QUE EL EVALUADOR SEPA QUE EL DIRECTOR YA ENVIÓ ==========
     $campoSubmitedFase4 = Campo::where('name', 'submited_fase4')->first();

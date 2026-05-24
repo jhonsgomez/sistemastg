@@ -167,9 +167,12 @@ $(document).ready(function () {
     // ==================== SUBMIT ====================
     $('#fase4EvaluadorForm').on('submit', function (e) {
         e.preventDefault();
+        console.log('responder');
+
+
 
         // ================= GUARDAR QUILL =================
-        if (quillFase4Evaluador) {
+        if (typeof quillFase4Evaluador !== 'undefined' && quillFase4Evaluador) {
             $('#respuesta_fase4').val(quillFase4Evaluador.root.innerHTML);
         }
 
@@ -180,8 +183,10 @@ $(document).ready(function () {
             return;
         }
 
+        //JUAN DAVID ESTO GENERA PROBLEMA EL SWAL DEL EVALUADOR A LA HORA DE RESPONDER
+
         // ================= VALIDAR ACTA SI APRUEBA =================
-        if (estado === 'Aprobada') {
+        /*if (estado === 'Aprobada') {
             const nroActa = $('#nro_acta_fase4').val();
             if (!nroActa) {
                 $('#nro_acta_fase4Error').text('Debe ingresar el número de acta');
@@ -192,7 +197,7 @@ $(document).ready(function () {
                 $('#fecha_acta_fase4Error').text('Debe seleccionar la fecha del acta');
                 return;
             }
-        }
+        }*/
 
         let mensajeConfirmacion = "Esta acción no se puede deshacer";
         if (estado === 'Aprobada') {
@@ -200,9 +205,13 @@ $(document).ready(function () {
         } else {
             mensajeConfirmacion = "Al rechazar, la práctica volverá a Fase 3 y el estudiante deberá reiniciar el ciclo.";
         }
+  
 
         Swal.fire({
+            target: document.body,
             heightAuto: false,
+            backdrop: true,
+            allowOutsideClick: false,
             title: '¿Está seguro?',
             text: mensajeConfirmacion,
             icon: 'warning',
@@ -210,7 +219,7 @@ $(document).ready(function () {
             confirmButtonColor: '#C1D631',
             cancelButtonColor: '#d33',
             confirmButtonText: 'Sí, responder',
-            cancelButtonText: 'Cancelar'
+            cancelButtonText: 'Cancelar',
         }).then((result) => {
             if (result.isConfirmed) {
                 const button = $(this).find('button[type="submit"]');

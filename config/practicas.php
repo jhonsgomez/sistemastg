@@ -58,6 +58,26 @@ return [
                 'emails.practicas.respuestaF2',
         ],
 
+           'practicas_fase_3' => [
+
+            'subject' =>
+                'PRÁCTICAS EMPRESARIALES - FASE 3: DOCUMENTOS F-DC-127',
+
+            'view' =>
+                'emails.practicas.fase3',
+        ],
+
+         'respuesta_fase_3' => [
+
+            'subject' =>
+                'RESPUESTA PRÁCTICAS - FASE 3',
+
+            'view' =>
+                'emails.practicas.respuestaF3',
+        ],
+
+
+
 
     ],
 ];

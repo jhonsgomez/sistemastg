@@ -23,7 +23,10 @@
 <body>
 
     <p>Buen día,</p>
-    <p>Estimado estudiante, en este correo se le informa la respuesta de su solicitud correspondiente a la<strong>FASE 2</strong> de prácticas empresariales 
+
+    <p>
+        Estimado estudiante, en este correo se le informa la respuesta de su solicitud correspondiente a la
+        <strong>FASE 3</strong> de prácticas empresariales
         {!! ($data['cuerpo_correo']['estado'] ?? '') === 'Aprobada'
             ? 'ha sido <strong>APROBADA</strong>'
             : 'ha sido <strong>RECHAZADA</strong>' !!}
@@ -45,28 +48,25 @@
 
     <br>
 
-    <p><strong>Integrantes:</strong></p>
+    <p><strong>Datos del estudiante:</strong></p>
+
     <ul>
 
-        <li><strong>Nombre:</strong>{{ $data['cuerpo_correo']['estudiante']->name ?? '' }}</li>
+        <li>
+            <strong>Nombre:</strong>
+            {{ $data['cuerpo_correo']['estudiante']->name ?? '' }}
+        </li>
+
         <li>
             <strong>Documento:</strong>
             {{ optional($data['cuerpo_correo']['estudiante']->tipo_documento)->tag }}
             {{ $data['cuerpo_correo']['estudiante']->nro_documento ?? '' }}
         </li>
-        <li><strong>Correo:</strong>{{ $data['cuerpo_correo']['correo'] ?? '' }}</li>
 
-        @if (!empty($data['cuerpo_correo']['integrante_2']))
-            <li>
-                <strong>Nombre:</strong>
-                {{ is_object($data['cuerpo_correo']['integrante_2'])
-                    ? $data['cuerpo_correo']['integrante_2']->name
-                    : $data['cuerpo_correo']['integrante_2'] }}
-            </li>
-            <li><strong>Documento:</strong> {{ $data['cuerpo_correo']['integrante_2_documento'] ?? '' }}</li>
-            <li><strong>Correo:</strong> {{ $data['cuerpo_correo']['integrante_2_correo'] ?? '' }}</li>
-            <li><strong>Celular:</strong> {{ $data['cuerpo_correo']['integrante_2_celular'] ?? '' }}</li>
-        @endif
+        <li>
+            <strong>Correo:</strong>
+            {{ $data['cuerpo_correo']['correo'] ?? '' }}
+        </li>
 
     </ul>
 
@@ -82,34 +82,18 @@
 
     <br>
 
-    @if (!empty($data['cuerpo_correo']['director']))
-        <p>
-            <strong>Director asignado:</strong>
-            {{ $data['cuerpo_correo']['director'] }}
-        </p>
-    @endif
-
-    @if (!empty($data['cuerpo_correo']['codirector']))
-        <p>
-            <strong>Codirector asignado:</strong>
-            {{ $data['cuerpo_correo']['codirector'] }}
-        </p>
-    @endif
-
-    <br>
-
     @if (($data['cuerpo_correo']['estado'] ?? '') === 'Aprobada')
 
         <p>
-            Puede continuar con la siguiente fase del proceso
-            de prácticas empresariales.
+            Los documentos correspondientes a la fase 3 han sido aprobados correctamente.
+            Puede continuar con la siguiente fase del proceso de prácticas empresariales.
         </p>
 
     @else
 
         <p>
-            Debe revisar las observaciones realizadas por el comité
-            y volver a realizar el proceso correspondiente.
+            Debe revisar las observaciones realizadas por el comité,
+            corregir los documentos solicitados y realizar nuevamente el proceso correspondiente.
         </p>
 
     @endif

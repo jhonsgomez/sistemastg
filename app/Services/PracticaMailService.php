@@ -18,6 +18,144 @@ class PracticaMailService
         );
     }
 
+        private function send(string $tipoCorreo,$practica, array $extraData = []): void {
+            try {
+
+                $user = $practica->user;
+
+                $campos = $practica->camposConValores();
+
+                $data = [
+
+                    'tipo_correo' => $tipoCorreo,
+
+                    'comentarios' =>
+                        $extraData['comentarios'] ?? null,
+
+                    'es_respuesta' =>
+                        $extraData['es_respuesta'] ?? false,
+
+                    'adjuntos' => [],
+
+                    'cuerpo_correo' => [
+
+                        'estudiante' => $user,
+
+                        'correo' => $user->email ?? '',
+
+                        'estado' =>
+                            $extraData['estado']
+                            ?? $practica->estado,
+
+                        'nuevo_estado' =>
+                            $extraData['nuevo_estado']
+                            ?? null,
+
+                        'mensaje' =>
+                            $extraData['mensaje']
+                            ?? null,
+
+                        'celular' =>
+                            $user->nro_celular ?? '',
+
+                        'nivel' =>
+                            $user->nivel->nombre ?? '',
+
+                        'periodo' =>
+                            $practica->periodo ?? '2026-1',
+
+                        'integrante_2' => null,
+
+                        'integrante_2_documento' => null,
+
+                        'integrante_2_correo' => null,
+
+                        'integrante_2_celular' => null,
+
+                        'campos' => $campos,
+                    ],
+                ];
+
+                foreach ($campos as $campo) {
+
+                    $nombreCampo = $campo['campo'];
+
+                    $valorCampo = $campo['valor'];
+
+                    switch ($nombreCampo) {
+
+                        case 'nivel':
+
+                            $data['cuerpo_correo']['nivel'] =
+                                Nivel::find($valorCampo)->nombre
+                                ?? $valorCampo;
+
+                            break;
+
+                        case 'empresa':
+
+                            $data['cuerpo_correo']['empresa'] =
+                                $valorCampo;
+
+                            break;
+
+                        case 'hoja_vida':
+
+                            $data['adjuntos'][] =
+                                $valorCampo;
+
+                            break;
+
+                        case 'id_integrante_2':
+
+                            if (!empty($valorCampo)) {
+
+                                $integrante =
+                                    User::find($valorCampo);
+
+                                if ($integrante) {
+
+                                    $data['cuerpo_correo']['integrante_2'] =
+                                        $integrante;
+
+                                    $data['cuerpo_correo']['integrante_2_documento'] =
+                                        ($integrante->tipo_documento->tag ?? '')
+                                        . ' ' .
+                                        ($integrante->nro_documento ?? '');
+
+                                    $data['cuerpo_correo']['integrante_2_correo'] =
+                                        $integrante->email ?? '';
+
+                                    $data['cuerpo_correo']['integrante_2_celular'] =
+                                        $integrante->nro_celular ?? '';
+                                }
+                            }
+
+                            break;
+
+                        default:
+
+                            $data['cuerpo_correo'][$nombreCampo] =
+                                $valorCampo;
+
+                            break;
+                    }
+                }
+
+                Mail::to([$user->email])
+                    ->queue(new PracticasMail($data));
+
+            } catch (\Throwable $e) {
+
+                dd(
+                    $e->getMessage(),
+                    $e->getFile(),
+                    $e->getLine()
+                );
+
+            }
+        }
+
     public function sendFase1($practica)
     {
         $practica->load([
@@ -139,6 +277,73 @@ class PracticaMailService
             ->queue(new PracticasMail($data));
     }
 
+    public function sendFase3($practica)
+    {
+        $practica->load([
+            'user.tipo_documento',
+            'valoresCampos.campo'
+        ]);
+
+        // Obtener valores dinámicos
+        $campos = [];
+
+        foreach ($practica->valoresCampos as $valorCampo) {
+
+            $campos[] = [
+                'campo' => $valorCampo->campo->name,
+                'valor' => $valorCampo->valor,
+            ];
+        }
+
+        // ================= DOCUMENTOS =================
+
+        $arl = collect($campos)
+            ->firstWhere('campo', 'arl');
+
+        $fdc127 = collect($campos)
+            ->firstWhere('campo', 'doc_fdc127');
+
+        $fdc195 = collect($campos)
+            ->firstWhere('campo', 'doc_fdc195');
+
+        // ================= DATA CORREO =================
+
+        $data = [
+
+            'tipo_correo' => 'practicas_fase_3',
+
+            'cuerpo_correo' => [
+
+                'estado' => $practica->estado,
+
+                'correo' => $practica->user->email,
+
+                'estudiante' => $practica->user,
+
+                'campos' => $campos,
+            ],
+
+            // ================= ADJUNTOS =================
+
+            'adjuntos' => [
+
+                $arl['valor'] ?? null,
+
+                $fdc127['valor'] ?? null,
+
+                $fdc195['valor'] ?? null,
+            ],
+        ];
+
+        // Limpiar adjuntos null
+        $data['adjuntos'] = array_filter(
+            $data['adjuntos']
+        );
+
+        Mail::to(config('mail.from.address'))
+            ->queue(new PracticasMail($data));
+    }
+
    
 
 
@@ -234,7 +439,7 @@ class PracticaMailService
 
                 'estudiante' => $practica->user,
 
-                // 👇 CAMBIAR ESTO
+                
                 'director' => $respuesta['director'] ?? null,
 
                 'evaluador' => $respuesta['evaluador'] ?? null,
@@ -248,145 +453,54 @@ class PracticaMailService
         Mail::to($practica->user->email)
             ->queue(new PracticasMail($data));
     }
-        
+    
+    public function sendRespuestaFase3($practica, $respuesta)
+    {
+        $practica->load([
+            'user.tipo_documento',
+            'valoresCampos.campo'
+        ]);
 
-    private function send(string $tipoCorreo,$practica, array $extraData = []): void {
-    try {
+        // Obtener valores dinámicos
+        $campos = [];
 
-        $user = $practica->user;
+        foreach ($practica->valoresCampos as $valorCampo) {
 
-        $campos = $practica->camposConValores();
+            $campos[] = [
+                'campo' => $valorCampo->campo->name,
+                'valor' => $valorCampo->valor,
+            ];
+        }
 
         $data = [
 
-            'tipo_correo' => $tipoCorreo,
-
-            'comentarios' =>
-                $extraData['comentarios'] ?? null,
-
-            'es_respuesta' =>
-                $extraData['es_respuesta'] ?? false,
-
-            'adjuntos' => [],
+            'tipo_correo' => 'respuesta_fase_3',
 
             'cuerpo_correo' => [
 
-                'estudiante' => $user,
+                'estado' => $respuesta['estado'],
 
-                'correo' => $user->email ?? '',
+                'respuesta' => $respuesta['respuesta'],
 
-                'estado' =>
-                    $extraData['estado']
-                    ?? $practica->estado,
+                'correo' => $practica->user->email,
 
-                'nuevo_estado' =>
-                    $extraData['nuevo_estado']
-                    ?? null,
+                'estudiante' => $practica->user,
 
-                'mensaje' =>
-                    $extraData['mensaje']
-                    ?? null,
+                'director' => $respuesta['director'] ?? null,
 
-                'celular' =>
-                    $user->nro_celular ?? '',
+                'evaluador' => $respuesta['evaluador'] ?? null,
 
-                'nivel' =>
-                    $user->nivel->nombre ?? '',
-
-                'periodo' =>
-                    $practica->periodo ?? '2026-1',
-
-                'integrante_2' => null,
-
-                'integrante_2_documento' => null,
-
-                'integrante_2_correo' => null,
-
-                'integrante_2_celular' => null,
+                'codirector' => $respuesta['codirector'] ?? null,
 
                 'campos' => $campos,
             ],
         ];
 
-        foreach ($campos as $campo) {
-
-            $nombreCampo = $campo['campo'];
-
-            $valorCampo = $campo['valor'];
-
-            switch ($nombreCampo) {
-
-                case 'nivel':
-
-                    $data['cuerpo_correo']['nivel'] =
-                        Nivel::find($valorCampo)->nombre
-                        ?? $valorCampo;
-
-                    break;
-
-                case 'empresa':
-
-                    $data['cuerpo_correo']['empresa'] =
-                        $valorCampo;
-
-                    break;
-
-                case 'hoja_vida':
-
-                    $data['adjuntos'][] =
-                        $valorCampo;
-
-                    break;
-
-                case 'id_integrante_2':
-
-                    if (!empty($valorCampo)) {
-
-                        $integrante =
-                            User::find($valorCampo);
-
-                        if ($integrante) {
-
-                            $data['cuerpo_correo']['integrante_2'] =
-                                $integrante;
-
-                            $data['cuerpo_correo']['integrante_2_documento'] =
-                                ($integrante->tipo_documento->tag ?? '')
-                                . ' ' .
-                                ($integrante->nro_documento ?? '');
-
-                            $data['cuerpo_correo']['integrante_2_correo'] =
-                                $integrante->email ?? '';
-
-                            $data['cuerpo_correo']['integrante_2_celular'] =
-                                $integrante->nro_celular ?? '';
-                        }
-                    }
-
-                    break;
-
-                default:
-
-                    $data['cuerpo_correo'][$nombreCampo] =
-                        $valorCampo;
-
-                    break;
-            }
-        }
-
-        Mail::to([$user->email])
+        Mail::to($practica->user->email)
             ->queue(new PracticasMail($data));
-
-    } catch (\Throwable $e) {
-
-        dd(
-            $e->getMessage(),
-            $e->getFile(),
-            $e->getLine()
-        );
-
     }
-}
+
+
 
 
 }

@@ -1590,7 +1590,7 @@
 
 <!-- Modal Responder Evaluador Fase 4 -->
 <div id="fase4EvaluadorModal" class="fixed z-50 inset-0 overflow-y-auto">
-    <div class="modal-overlay absolute inset-0" onclick="closeFase4EvaluadorModal()">
+    <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeFase4EvaluadorModal()">
         <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
             <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
                 onclick="event.stopPropagation()">
@@ -2025,6 +2025,7 @@ function closeCalendarModal() {
 </script>
 
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        
         <script src="{{ asset('js/fases/practicas/fase_1.js') }}"></script>
         <script src="{{ asset('js/fases/practicas/fase_2.js') }}"></script>
         <script src="{{ asset('js/fases/practicas/fase_3.js') }}"></script>

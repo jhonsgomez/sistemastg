@@ -24,10 +24,10 @@
 
     <p>Buen día,</p>
 
-    <p>Estimado usuario, en este correo se le informa que se ha realizado el envío de documentos correspondientes a la <strong>FASE 2</strong> de prácticas empresariales.</p>
+    <p>Estimado usuario, en este correo se le informa que se ha realizado el envío de documentos correspondientes a la <strong>FASE 3</strong> de prácticas empresariales.</p>
 
     <ul>
-        <li><strong>Tipo de solicitud:</strong>PAGO DE LA MODALIDAD</li>
+        <li><strong>Tipo de solicitud:</strong>ENVIO DE DOCUMENTOS DE GRADO</li>
 
         <li><strong>Estado actual:</strong>{{ $data['cuerpo_correo']['estado'] ?? '' }}</li>
     </ul>
@@ -44,7 +44,7 @@
                 {{ $data['cuerpo_correo']['estudiante']->nro_documento ?? '' }}
             </li>
             <li><strong>Correo:</strong> {{ $data['cuerpo_correo']['correo'] ?? '' }}</li>
-            <li><strong>Celular:</strong> {{ $data['cuerpo_correo']['nro_celular'] ?? '' }}</li>
+            <li><strong>Celular:</strong> {{ $data['cuerpo_correo']['celular'] ?? '' }}</li>
             <br>
 
             @if (!empty($data['cuerpo_correo']['integrante_2']))
@@ -65,8 +65,9 @@
     <p>El estudiante ha adjuntado los siguientes documentos:</p>
 
     <ul>
-        <li>Liquidación de pago</li>
-        <li>Soporte de pago</li>
+        <li>ARL</li>
+        <li>F-DC-127</li>
+        <li>F-DC-127</li>
     </ul>
 
     <p>
