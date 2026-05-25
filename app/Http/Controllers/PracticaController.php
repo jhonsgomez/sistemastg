@@ -409,7 +409,7 @@ public function buscarEstudiantes(Request $request)
             return response()->json(['error' => 'Error interno del servidor'], 500);
         }
     }
-
+    
     
     
     

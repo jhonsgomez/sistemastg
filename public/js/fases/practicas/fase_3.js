@@ -31,7 +31,7 @@ function openFase3EstudianteModal(btn) {
     $('#doc_fdc195Error').text('');
     
     // Cambiar el título si es necesario
-    $('#fase3EstudianteTitle').html(`Prácticas empresariales: <span class="bg-uts-500 text-white px-3 py-1 rounded uppercase shadow-md text-xl">Fase 3</span>`);
+    $('#fase3EstudianteTitle').html(`Prácticas <span class="bg-uts-500 text-white px-3 py-1 rounded uppercase shadow-md text-xl">Fase 3</span>`);
     
     // Abrir el modal con animación
     $('#fase3EstudianteModal').addClass('show');
@@ -258,7 +258,7 @@ $('#fase3EstudianteForm').on('submit', function(e) {
                 contentType: false,
                 success: function(response) {
                     closeFase3EstudianteModal();
-                    showToast('Documentos enviados correctamente. Tendrá respuesta en los próximos 5 días hábiles.', 'success');
+                    showToast('Documentos enviados correctamente.', 'success');
                     setTimeout(() => {
                         location.reload();
                     }, 3000);
@@ -379,8 +379,8 @@ $(document).ready(function() {
     setupSimpleFileInput('doc_fdc195', 'file-list-fdc195', 5, ['doc', 'docx']);
     
     // Fase 3 Director
-    setupSimpleFileInput('fdc127_fase3', 'file-list-fdc127-fase3', 5, ['pdf', 'doc', 'docx']);
-    setupSimpleFileInput('fdc195_fase3', 'file-list-fdc195-fase3', 5, ['pdf', 'doc', 'docx']);
+    setupSimpleFileInput('fdc127_fase3', 'file-list-fdc127-fase3', 5, ['doc', 'docx']);
+    setupSimpleFileInput('fdc195_fase3', 'file-list-fdc195-fase3', 5, ['doc', 'docx']);
     setupSimpleFileInput('turnitin_fase3', 'file-list-turnitin-fase3', 5, ['pdf']);
 });
 
@@ -635,10 +635,7 @@ $('#fase3DirForm').on('submit', function (e) {
     const estado = $('#estado_fase3_dir').val();
 
     if (!estado) {
-
-        $('#estado_fase3_dirError')
-            .text('Debe seleccionar un estado');
-
+        $('#estado_fase3_dirError').text('Debe seleccionar un estado');
         return;
     }
 
@@ -682,19 +679,13 @@ $('#fase3DirForm').on('submit', function (e) {
                 success: function (response) {
 
                     closeFase3DirModal();
-
-                    Swal.fire({
-                        title: '¡Éxito!',
-                        text: response.success || 'Respuesta enviada exitosamente',
-                        icon: 'success',
-                        confirmButtonText: 'Ok',
-                        confirmButtonColor: '#C1D631'
-
-                    }).then(() => {
-
+                    
+                    // ÉXITO: Toast (no modal)
+                    showToast(response.success || 'Respuesta enviada exitosamente', 'success');
+                    
+                    setTimeout(() => {
                         location.reload();
-
-                    });
+                    }, 3000);
 
                 },
 
@@ -705,31 +696,26 @@ $('#fase3DirForm').on('submit', function (e) {
                         const errors = xhr.responseJSON.errors;
 
                         if (errors.estado)
-                            $('#estado_fase3_dirError')
-                                .text(errors.estado[0]);
+                            $('#estado_fase3_dirError').text(errors.estado[0]);
 
                         if (errors.titulo_propuesta)
-                            $('#titulo_propuesta_fase3Error')
-                                .text(errors.titulo_propuesta[0]);
+                            $('#titulo_propuesta_fase3Error').text(errors.titulo_propuesta[0]);
 
                         if (errors.respuesta)
-                            $('#respuesta_fase3_dirError')
-                                .text(errors.respuesta[0]);
+                            $('#respuesta_fase3_dirError').text(errors.respuesta[0]);
 
                         if (errors.fdc127)
-                            $('#fdc127_fase3Error')
-                                .text(errors.fdc127[0]);
+                            $('#fdc127_fase3Error').text(errors.fdc127[0]);
 
                         if (errors.fdc195)
-                            $('#fdc195_fase3Error')
-                                .text(errors.fdc195[0]);
+                            $('#fdc195_fase3Error').text(errors.fdc195[0]);
 
                         if (errors.turnitin)
-                            $('#turnitin_fase3Error')
-                                .text(errors.turnitin[0]);
+                            $('#turnitin_fase3Error').text(errors.turnitin[0]);
 
                     } else {
 
+                        // ERROR: Swal.fire modal (se mantiene igual)
                         Swal.fire(
                             'Error',
                             xhr.responseJSON?.error || 'Error al enviar respuesta',

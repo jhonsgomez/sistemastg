@@ -133,6 +133,7 @@ function closeFase2DetailsModal() {
 // ==================== MODAL ADMINISTRADOR ====================
 
 function openFase2AdminModal(btn) {
+    // Mostrar spinner y ocultar icono en el botón
     if (btn) {
         const icon = btn.querySelector('i');
         const spinner = btn.querySelector('.loading-spinner');
@@ -141,6 +142,7 @@ function openFase2AdminModal(btn) {
         btn.disabled = true;
     }
     
+    // Limpiar campos
     $('#nro_acta_fase2').val('');
     $('#fecha_acta_fase2').val('');
     $('#estado_fase2').val('');
@@ -148,6 +150,7 @@ function openFase2AdminModal(btn) {
     $('#director_id_fase2').val('');
     $('#evaluador_id_fase2').val('');
     $('#codirector_id_fase2').val('');
+    // NO limpiar el código de modalidad porque ya viene de la vista
     $('#nro_acta_fase2Error').text('');
     $('#fecha_acta_fase2Error').text('');
     $('#estado_fase2Error').text('');
@@ -156,25 +159,29 @@ function openFase2AdminModal(btn) {
     $('#evaluador_id_fase2Error').text('');
     $('#codirector_id_fase2Error').text('');
     
+    // Ocultar contenedores inicialmente
     $('#container_docentes_fase2').addClass('hidden');
+    $('#container_codigo_modalidad_fase2').addClass('hidden');
+    
+    // Abrir el modal
     $('#fase2AdminModal').addClass('show');
     
+    // Inicializar Quill
     setTimeout(function() {
         if ($('#txt-editor-fase2').length > 0) {
             if (quillFase2 === null) {
                 quillFase2 = new Quill('#txt-editor-fase2', {
                     theme: 'snow',
-                    placeholder: 'Ingrese el mensaje de respuesta indicando detalles al destinatario.',
+                    placeholder: 'Ingrese el mensaje de respuesta...',
                     modules: {
-                    toolbar: [
-                        [{ 'header': 1}],
-                        [{ 'header': 2}],
-                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                        [{ 'color': [] }],
-                        ['bold', 'italic', 'underline'],
-                        ['clean']
-                    ]
-                }
+                        toolbar: [
+                            [{ 'header': [1, 2, false] }],
+                            ['bold', 'italic', 'underline'],
+                            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                            [{ 'color': [] }],
+                            ['clean']
+                        ]
+                    }
                 });
             } else {
                 quillFase2.root.innerHTML = '';
@@ -183,6 +190,7 @@ function openFase2AdminModal(btn) {
         }
     }, 200);
     
+    // Restaurar el botón
     if (btn) {
         setTimeout(() => {
             const icon = btn.querySelector('i');
@@ -260,17 +268,31 @@ $(document).ready(function() {
         }
     });
     
-    // Mostrar/ocultar docentes según estado
+    // Mostrar/ocultar docentes y código de modalidad según estado
+$(document).ready(function() {
     $('#estado_fase2').on('change', function() {
         if ($(this).val() === 'Aprobada') {
+            // Mostrar contenedores
             $('#container_docentes_fase2').removeClass('hidden');
-        } else {
-            $('#container_docentes_fase2').addClass('hidden');
+            $('#container_codigo_modalidad_fase2').removeClass('hidden');
+            
+            // Limpiar campos anteriores de docentes
             $('#director_id_fase2').val('');
             $('#evaluador_id_fase2').val('');
             $('#codirector_id_fase2').val('');
+            
+            // El código ya está en el input desde el servidor, no necesita AJAX
+        } else {
+            // Ocultar contenedores y limpiar campos
+            $('#container_docentes_fase2').addClass('hidden');
+            $('#container_codigo_modalidad_fase2').addClass('hidden');
+            $('#director_id_fase2').val('');
+            $('#evaluador_id_fase2').val('');
+            $('#codirector_id_fase2').val('');
+            // No limpiar el código porque se oculta
         }
     });
+});
     
     // ========== ENVÍO FORMULARIO ESTUDIANTE FASE 2 ==========
     $('#fase2EstudianteForm').on('submit', function(e) {
@@ -362,9 +384,6 @@ $(document).ready(function() {
         }
         
         let mensajeConfirmacion = "Esta acción no se puede deshacer";
-        if (estadoSeleccionado === 'Aprobada') {
-            mensajeConfirmacion = "Al aprobar, se asignarán los docentes seleccionados. Esta acción no se puede deshacer.";
-        }
         
         Swal.fire({
             heightAuto: false,

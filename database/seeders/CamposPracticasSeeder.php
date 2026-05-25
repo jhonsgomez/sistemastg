@@ -229,6 +229,18 @@ class CamposPracticasSeeder extends Seeder
                     'instructions' => 'Docente asignado como codirector de la práctica empresarial (opcional)'
                 ]
             );
+
+            // 4. Código de modalidad (se genera automáticamente al aprobar)
+        Campo::updateOrCreate(
+            ['tipo_solicitud_id' => $practicas_fase_2->id, 'name' => 'codigo_modalidad'],
+            [
+                'label' => 'Código de modalidad',
+                'type' => 'text',
+                'required' => false,
+                'instructions' => 'Código generado automáticamente para la práctica empresarial (ej: 65-2025-001)'
+            ]
+        );
+
         }
 
 

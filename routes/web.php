@@ -237,7 +237,7 @@ Route::middleware('permission:view_practicas')
         Route::post('/fase2/store', [RoadMapPracticaController::class, 'storeFase2'])->name('practicas.fase2.store');
         Route::post('/fase2/details', [RoadMapPracticaController::class, 'getFase2Details'])->name('practicas.fase2.details');
         Route::post('/fase2/reply', [RoadMapPracticaController::class, 'replyFase2'])->name('practicas.fase2.reply');
-
+        
         // Rutas para Fase 3 del roadmap
         Route::post('/fase3/store',[RoadMapPracticaController::class, 'storeFase3'])->name('practicas.fase3.store');
         Route::post('/fase3/details',[RoadMapPracticaController::class, 'getFase3Details'])->name('practicas.fase3.details');

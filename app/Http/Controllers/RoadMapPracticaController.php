@@ -78,6 +78,9 @@ class RoadMapPracticaController extends Controller
     try {
         $practica = Practica::with('user.nivel', 'valoresCampos.campo')->findOrFail($request->practica_id);
 
+        // Generar el código de modalidad (sin guardar aún) - SOLO UNA VEZ
+        $codigo_modalidad_generado = $this->generarCodigoModalidadPractica($practica->id);
+        
         $codigo_practica = 'PRA-' . str_pad($practica->id, 5, '0', STR_PAD_LEFT);
 
         if ($practica->deshabilitado) {
@@ -148,13 +151,51 @@ class RoadMapPracticaController extends Controller
             'evaluador_actual', 
             'docentes',
             'codigo_practica', 
-            'fechas'
+            'fechas',
+
+            'codigo_modalidad_generado'  // ← Pasar a la vista
+
         ));
         
     } catch (Exception $e) {
         \Log::error('Error en roadmap: ' . $e->getMessage());
         return redirect()->route('practicas.index')->with('error', 'No se pudo cargar el seguimiento.');
     }
+}
+
+    // En app/Http/Controllers/RoadMapPracticaController.php
+// Función auxiliar para generar el código
+public static function generarCodigoModalidadPractica($practicaId)
+{
+    $practica = Practica::with('user.nivel')->findOrFail($practicaId);
+    $nivelId = $practica->user->nivel_id;
+
+    $prefijo = match ($nivelId) {
+        1 => '65',
+        2 => '125',
+        default => throw new \Exception("Nivel académico desconocido."),
+    };
+
+    $anioActual = Carbon::now()->year;
+
+    $ultimoCodigo = PracticaValorCampo::whereHas('campo', function ($query) {
+        $query->where('name', 'codigo_modalidad');
+    })
+        ->whereYear('created_at', $anioActual)
+        ->orderBy('created_at', 'desc')
+        ->pluck('valor')
+        ->map(function ($valor) {
+            if (preg_match('/\d{2,3}-\d{4}-(\d+)/', $valor, $matches)) {
+                return intval($matches[1]);
+            }
+            return 0;
+        })
+        ->filter()
+        ->max();
+
+    $nuevoConsecutivo = str_pad(($ultimoCodigo ?? 0) + 1, 3, '0', STR_PAD_LEFT);
+
+    return "{$prefijo}-{$anioActual}-{$nuevoConsecutivo}";
 }
 
 public function indexDirector()
@@ -637,6 +678,22 @@ public function replyFase2(Request $request)
             }
         }
 
+        // Dentro del bloque APROBADA, después de asignar docentes, agregar:
+
+// Guardar código de modalidad
+if ($request->filled('codigo_modalidad')) {
+    $campoCodigo = Campo::where('tipo_solicitud_id', $tipo_fase2->id)
+        ->where('name', 'codigo_modalidad')
+        ->first();
+    
+    if ($campoCodigo) {
+        PracticaValorCampo::updateOrCreate(
+            ['practica_id' => $practica->id, 'campo_id' => $campoCodigo->id],
+            ['valor' => $request->codigo_modalidad]
+        );
+    }
+}
+        
         // Cambiar a Fase 3
         $practica->estado = 'Fase 3';
         
@@ -1018,58 +1075,59 @@ public function replyFase2(Request $request)
             );
         }
 
-        // ================= GUARDAR DOCUMENTOS =================
-        if ($request->hasFile('fdc127')) {
-            $fdc127Path = $request->file('fdc127')->store('practicas/fase3/director/fdc127', 'public');
-            $campoFdc127 = Campo::where('tipo_solicitud_id', $tipo_fase3->id)
-                ->where('name', 'fdc127_director_fase3')->first();
-            if ($campoFdc127) {
-                // Eliminar archivo anterior si existe
-                $valorExistente = PracticaValorCampo::where('practica_id', $practica->id)
-                    ->where('campo_id', $campoFdc127->id)->first();
-                if ($valorExistente && $valorExistente->valor) {
-                    Storage::disk('public')->delete($valorExistente->valor);
-                }
-                PracticaValorCampo::updateOrCreate(
-                    ['practica_id' => $practica->id, 'campo_id' => $campoFdc127->id],
-                    ['valor' => $fdc127Path]
-                );
-            }
+        // ================= GUARDAR DOCUMENTOS - ACTUALIZAR LOS CAMPOS EXISTENTES =================
+if ($request->hasFile('fdc127')) {
+    $fdc127Path = $request->file('fdc127')->store('practicas/fase3/documentos', 'public');
+    
+    // Buscar el campo existente doc_fdc127 (no el del director)
+    $campoDoc = Campo::where('name', 'doc_fdc127')->first();
+    if ($campoDoc) {
+        // Eliminar archivo anterior si existe
+        $valorExistente = PracticaValorCampo::where('practica_id', $practica->id)
+            ->where('campo_id', $campoDoc->id)->first();
+        if ($valorExistente && $valorExistente->valor) {
+            Storage::disk('public')->delete($valorExistente->valor);
         }
+        PracticaValorCampo::updateOrCreate(
+            ['practica_id' => $practica->id, 'campo_id' => $campoDoc->id],
+            ['valor' => $fdc127Path]
+        );
+    }
+}
 
-        if ($request->hasFile('fdc195')) {
-            $fdc195Path = $request->file('fdc195')->store('practicas/fase3/director/fdc195', 'public');
-            $campoFdc195 = Campo::where('tipo_solicitud_id', $tipo_fase3->id)
-                ->where('name', 'fdc195_director_fase3')->first();
-            if ($campoFdc195) {
-                $valorExistente = PracticaValorCampo::where('practica_id', $practica->id)
-                    ->where('campo_id', $campoFdc195->id)->first();
-                if ($valorExistente && $valorExistente->valor) {
-                    Storage::disk('public')->delete($valorExistente->valor);
-                }
-                PracticaValorCampo::updateOrCreate(
-                    ['practica_id' => $practica->id, 'campo_id' => $campoFdc195->id],
-                    ['valor' => $fdc195Path]
-                );
-            }
+if ($request->hasFile('fdc195')) {
+    $fdc195Path = $request->file('fdc195')->store('practicas/fase3/documentos', 'public');
+    
+    $campoDoc = Campo::where('name', 'doc_fdc195')->first();
+    if ($campoDoc) {
+        $valorExistente = PracticaValorCampo::where('practica_id', $practica->id)
+            ->where('campo_id', $campoDoc->id)->first();
+        if ($valorExistente && $valorExistente->valor) {
+            Storage::disk('public')->delete($valorExistente->valor);
         }
+        PracticaValorCampo::updateOrCreate(
+            ['practica_id' => $practica->id, 'campo_id' => $campoDoc->id],
+            ['valor' => $fdc195Path]
+        );
+    }
+}
 
-        if ($request->hasFile('turnitin')) {
-            $turnitinPath = $request->file('turnitin')->store('practicas/fase3/director/turnitin', 'public');
-            $campoTurnitin = Campo::where('tipo_solicitud_id', $tipo_fase3->id)
-                ->where('name', 'turnitin_director_fase3')->first();
-            if ($campoTurnitin) {
-                $valorExistente = PracticaValorCampo::where('practica_id', $practica->id)
-                    ->where('campo_id', $campoTurnitin->id)->first();
-                if ($valorExistente && $valorExistente->valor) {
-                    Storage::disk('public')->delete($valorExistente->valor);
-                }
-                PracticaValorCampo::updateOrCreate(
-                    ['practica_id' => $practica->id, 'campo_id' => $campoTurnitin->id],
-                    ['valor' => $turnitinPath]
-                );
-            }
+if ($request->hasFile('turnitin')) {
+    $turnitinPath = $request->file('turnitin')->store('practicas/fase3/documentos', 'public');
+    
+    $campoTurnitin = Campo::where('name', 'turnitin')->first();
+    if ($campoTurnitin) {
+        $valorExistente = PracticaValorCampo::where('practica_id', $practica->id)
+            ->where('campo_id', $campoTurnitin->id)->first();
+        if ($valorExistente && $valorExistente->valor) {
+            Storage::disk('public')->delete($valorExistente->valor);
         }
+        PracticaValorCampo::updateOrCreate(
+            ['practica_id' => $practica->id, 'campo_id' => $campoTurnitin->id],
+            ['valor' => $turnitinPath]
+        );
+    }
+}
 
         // ================= ACTUALIZAR ESTADO DE LA PRÁCTICA =================
 if ($request->estado === 'Aprobada') {
@@ -1231,30 +1289,40 @@ if ($request->estado === 'Aprobada') {
             );
         }
 
-        // Guardar documentos
-        if ($request->hasFile('fdc127')) {
-            $fdc127Path = $request->file('fdc127')->store('practicas/fase4/evaluador/fdc127', 'public');
-            $campoFdc127 = Campo::where('tipo_solicitud_id', $tipo_fase4->id)
-                ->where('name', 'fdc127_evaluador_fase4')->first();
-            if ($campoFdc127) {
-                PracticaValorCampo::updateOrCreate(
-                    ['practica_id' => $practica->id, 'campo_id' => $campoFdc127->id],
-                    ['valor' => $fdc127Path]
-                );
-            }
+        // ================= GUARDAR DOCUMENTOS - ACTUALIZAR LOS CAMPOS EXISTENTES =================
+if ($request->hasFile('fdc127')) {
+    $fdc127Path = $request->file('fdc127')->store('practicas/fase4/documentos', 'public');
+    
+    $campoDoc = Campo::where('name', 'doc_fdc127')->first();
+    if ($campoDoc) {
+        $valorExistente = PracticaValorCampo::where('practica_id', $practica->id)
+            ->where('campo_id', $campoDoc->id)->first();
+        if ($valorExistente && $valorExistente->valor) {
+            Storage::disk('public')->delete($valorExistente->valor);
         }
+        PracticaValorCampo::updateOrCreate(
+            ['practica_id' => $practica->id, 'campo_id' => $campoDoc->id],
+            ['valor' => $fdc127Path]
+        );
+    }
+}
 
-        if ($request->hasFile('fdc195')) {
-            $fdc195Path = $request->file('fdc195')->store('practicas/fase4/evaluador/fdc195', 'public');
-            $campoFdc195 = Campo::where('tipo_solicitud_id', $tipo_fase4->id)
-                ->where('name', 'fdc195_evaluador_fase4')->first();
-            if ($campoFdc195) {
-                PracticaValorCampo::updateOrCreate(
-                    ['practica_id' => $practica->id, 'campo_id' => $campoFdc195->id],
-                    ['valor' => $fdc195Path]
-                );
-            }
+if ($request->hasFile('fdc195')) {
+    $fdc195Path = $request->file('fdc195')->store('practicas/fase4/documentos', 'public');
+    
+    $campoDoc = Campo::where('name', 'doc_fdc195')->first();
+    if ($campoDoc) {
+        $valorExistente = PracticaValorCampo::where('practica_id', $practica->id)
+            ->where('campo_id', $campoDoc->id)->first();
+        if ($valorExistente && $valorExistente->valor) {
+            Storage::disk('public')->delete($valorExistente->valor);
         }
+        PracticaValorCampo::updateOrCreate(
+            ['practica_id' => $practica->id, 'campo_id' => $campoDoc->id],
+            ['valor' => $fdc195Path]
+        );
+    }
+}
 
         // Actualizar estado
         if ($request->estado === 'Aprobada') {
@@ -1386,30 +1454,40 @@ public function replyFase4Comite(Request $request)
             );
         }
 
-        // Guardar documentos del comité
-        if ($request->hasFile('fdc127')) {
-            $fdc127Path = $request->file('fdc127')->store('practicas/fase4/comite/fdc127', 'public');
-            $campoFdc127 = Campo::where('tipo_solicitud_id', $tipo_fase4->id)
-                ->where('name', 'fdc127_comite_fase4')->first();
-            if ($campoFdc127) {
-                PracticaValorCampo::updateOrCreate(
-                    ['practica_id' => $practica->id, 'campo_id' => $campoFdc127->id],
-                    ['valor' => $fdc127Path]
-                );
-            }
+        // ================= GUARDAR DOCUMENTOS - ACTUALIZAR LOS CAMPOS EXISTENTES =================
+if ($request->hasFile('fdc127')) {
+    $fdc127Path = $request->file('fdc127')->store('practicas/fase4/comite/documentos', 'public');
+    
+    $campoDoc = Campo::where('name', 'doc_fdc127')->first();
+    if ($campoDoc) {
+        $valorExistente = PracticaValorCampo::where('practica_id', $practica->id)
+            ->where('campo_id', $campoDoc->id)->first();
+        if ($valorExistente && $valorExistente->valor) {
+            Storage::disk('public')->delete($valorExistente->valor);
         }
+        PracticaValorCampo::updateOrCreate(
+            ['practica_id' => $practica->id, 'campo_id' => $campoDoc->id],
+            ['valor' => $fdc127Path]
+        );
+    }
+}
 
-        if ($request->hasFile('fdc195')) {
-            $fdc195Path = $request->file('fdc195')->store('practicas/fase4/comite/fdc195', 'public');
-            $campoFdc195 = Campo::where('tipo_solicitud_id', $tipo_fase4->id)
-                ->where('name', 'fdc195_comite_fase4')->first();
-            if ($campoFdc195) {
-                PracticaValorCampo::updateOrCreate(
-                    ['practica_id' => $practica->id, 'campo_id' => $campoFdc195->id],
-                    ['valor' => $fdc195Path]
-                );
-            }
+if ($request->hasFile('fdc195')) {
+    $fdc195Path = $request->file('fdc195')->store('practicas/fase4/comite/documentos', 'public');
+    
+    $campoDoc = Campo::where('name', 'doc_fdc195')->first();
+    if ($campoDoc) {
+        $valorExistente = PracticaValorCampo::where('practica_id', $practica->id)
+            ->where('campo_id', $campoDoc->id)->first();
+        if ($valorExistente && $valorExistente->valor) {
+            Storage::disk('public')->delete($valorExistente->valor);
         }
+        PracticaValorCampo::updateOrCreate(
+            ['practica_id' => $practica->id, 'campo_id' => $campoDoc->id],
+            ['valor' => $fdc195Path]
+        );
+    }
+}
 
         if ($request->estado === 'Aprobada') {
             // Guardar título de la propuesta

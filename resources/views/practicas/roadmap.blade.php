@@ -420,7 +420,17 @@
         {{-- ESTUDIANTE --}}
         @if ($esEstudiante && !$estudianteYaEnvio)
             {{-- Estudiante: btn lápiz (puede enviar) --}}
-            <div class="flex justify-center items-center mt-3">
+            <div class="flex justify-center items-center mt-3 gap-2">
+                <button type="button"
+                    onclick="openFase3DetailsModal(this)"
+                    class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+                    <i class="fa-solid fa-eye"></i>
+                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
+                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
+                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
+                    </svg>
+                </button>
+                
                 <button type="button"
                     onclick="openFase3EstudianteModal(this)"
                     class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
@@ -431,7 +441,7 @@
                     </svg>
                 </button>
             </div>
-
+            
         @elseif ($esEstudiante && $estudianteYaEnvio)
             {{-- Estudiante: solo ojo (ya envió, esperando respuesta) --}}
             <div class="flex justify-center items-center mt-3">
@@ -703,6 +713,7 @@
                             <div id="nombre_empresa_container" style="display: none;">
                                 <div class="flex items-center gap-1 mb-2">
                                     <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                    <span class="text-red-500">*</span></label>
                                     <label class="block font-medium text-sm text-gray-700">Nombre de la empresa</label>
                                     <div class="relative inline-block">
                                         <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
@@ -1156,6 +1167,20 @@
                         </div>
                     </div>
 
+<!-- Código de modalidad (se muestra solo si aprueba) -->
+<div class="mb-4 hidden" id="container_codigo_modalidad_fase2">
+    <label class="block font-medium text-sm text-gray-700">
+        <i class="fa-solid fa-hashtag mr-1 text-gray-500"></i>
+        Código de modalidad:
+    </label>
+    <input type="text" name="codigo_modalidad" id="codigo_modalidad_fase2"
+        class="bg-gray-100 border-gray-300 rounded-md shadow-sm mt-1 block w-full focus:ring-uts-500 focus:border-uts-500 cursor-default"
+        readonly
+        value="{{ $codigo_modalidad_generado ?? '' }}"
+        placeholder="Se generará automáticamente">
+    <span id="codigo_modalidad_fase2Error" class="text-red-500 text-sm"></span>
+</div>
+                    
                     <!-- Contenedor para asignación de docentes (se muestra solo si selecciona Aprobada) -->
                     <div id="container_docentes_fase2" class="hidden mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
                         <p class="font-bold text-sm text-gray-700 mb-3">
@@ -1450,6 +1475,7 @@
                         <div class="flex items-center gap-2 mb-2">
                             <label class="block font-medium text-sm text-gray-700">
                                 <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                <span class="text-red-500">*</span></label>
                                 Propuesta (F-DC-127)
                             </label>
                             <div class="relative inline-block">
@@ -1462,13 +1488,13 @@
                                 <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
                                 <h2 class="text-center text-gray-400 text-xs">
                                     Arrastra o selecciona el archivo F-DC-127 con comentarios o firmado
-                                    (.pdf, .doc, .docx, máx. 5MB)
+                                    (.doc, .docx, máx. 5MB)
                                 </h2>
                             </div>
                             <div class="text-center">
                                 <input type="file" name="fdc127" id="fdc127_fase3"
                                     class="absolute inset-0 opacity-0 cursor-pointer w-full"
-                                    accept=".pdf,.doc,.docx" />
+                                    accept=".doc,.docx" />
                                 <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
                                     Cargar
                                 </div>
@@ -1487,6 +1513,7 @@
                         <div class="flex items-center gap-2 mb-2">
                             <label class="block font-medium text-sm text-gray-700">
                                 <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                <span class="text-red-500">*</span></label>
                                 Acta de Inicio (F-DC-195)
                             </label>
                             <div class="relative inline-block">
@@ -1499,13 +1526,13 @@
                                 <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
                                 <h2 class="text-center text-gray-400 text-xs">
                                     Arrastra o selecciona el archivo F-DC-195 con comentarios o firmado
-                                    (.pdf, .doc, .docx, máx. 5MB)
+                                    (.doc, .docx, máx. 5MB)
                                 </h2>
                             </div>
                             <div class="text-center">
                                 <input type="file" name="fdc195" id="fdc195_fase3"
                                     class="absolute inset-0 opacity-0 cursor-pointer w-full"
-                                    accept=".pdf,.doc,.docx" />
+                                    accept=".doc,.docx" />
                                 <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
                                     Cargar
                                 </div>
@@ -1524,6 +1551,7 @@
                         <div class="flex items-center gap-2 mb-2">
                             <label class="block font-medium text-sm text-gray-700">
                                 <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                <span class="text-red-500">*</span></label>
                                 Informe de plagio (Turnitin)
                             </label>
                             <div class="relative inline-block">
@@ -1629,6 +1657,7 @@
                         <div class="flex items-center gap-2 mb-2">
                             <label class="block font-medium text-sm text-gray-700">
                                 <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                <span class="text-red-500">*</span></label>
                                 Propuesta (F-DC-127)
                             </label>
                             <div class="relative inline-block">
@@ -1666,6 +1695,7 @@
                         <div class="flex items-center gap-2 mb-2">
                             <label class="block font-medium text-sm text-gray-700">
                                 <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                <span class="text-red-500">*</span></label>
                                 Acta de Inicio (F-DC-195)
                             </label>
                             <div class="relative inline-block">
@@ -1730,7 +1760,7 @@
 </div>
 
     <!-- Modal Responder Comité Fase 4 -->
-<div id="fase4ComiteModal" class="fixed z-50 inset-0 overflow-y-auto">
+ <!--<div id="fase4ComiteModal" class="fixed z-50 inset-0 overflow-y-auto">
     <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeFase4ComiteModal()">
         <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
             <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
@@ -1750,7 +1780,7 @@
 
                     <p class="text-sm text-gray-600 mb-4">El comité revisa la propuesta y asigna el título oficial.</p>
 
-                    <!-- ESTADO -->
+                     ESTADO 
                     <div class="mb-4">
                         <label class="block font-medium text-sm text-gray-700">
                             <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
@@ -1765,7 +1795,7 @@
                         <span id="estado_fase4_comiteError" class="text-red-500 text-sm"></span>
                     </div>
 
-                    <!-- TÍTULO DE LA PROPUESTA -->
+                     TÍTULO DE LA PROPUESTA 
                     <div class="mb-4">
                         <label class="block font-medium text-sm text-gray-700">
                             <i class="fa-solid fa-heading mr-2 text-gray-500"></i>
@@ -1777,7 +1807,7 @@
                         <span id="titulo_propuesta_fase4_comiteError" class="text-red-500 text-sm"></span>
                     </div>
 
-                    <!-- NÚMERO Y FECHA DE ACTA -->
+                     NÚMERO Y FECHA DE ACTA 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                         <div>
                             <label class="block font-medium text-sm text-gray-700">
@@ -1800,11 +1830,11 @@
                         </div>
                     </div>
 
-                    <!-- F-DC-127 -->
+                     F-DC-127 
                     <div class="mb-4">
                         <div class="flex items-center gap-2 mb-2">
                             <label class="block font-medium text-sm text-gray-700">
-                                <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
                                 Propuesta (F-DC-127)
                             </label>
                             <div class="relative inline-block">
@@ -1837,11 +1867,11 @@
                         </div>
                     </div>
 
-                    <!-- F-DC-195 -->
+                     F-DC-195 
                     <div class="mb-4">
                         <div class="flex items-center gap-2 mb-2">
                             <label class="block font-medium text-sm text-gray-700">
-                                <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
                                 Acta de Inicio (F-DC-195)
                             </label>
                             <div class="relative inline-block">
@@ -1874,7 +1904,7 @@
                         </div>
                     </div>
 
-                    <!-- RESPUESTA CON QUILL -->
+                     RESPUESTA CON QUILL 
                     <div class="mb-4">
                         <label class="block font-medium text-sm text-gray-700">
                             <i class="fa-solid fa-message mr-2 text-gray-500"></i>
@@ -1885,7 +1915,7 @@
                         <span id="respuesta_fase4_comiteError" class="text-red-500 text-sm"></span>
                     </div>
 
-                    <!-- BOTONES -->
+                    BOTONES 
                     <div class="flex justify-end space-x-2 mt-4">
                         <button type="button" onclick="closeFase4ComiteModal()"
                             class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cancelar</button>
@@ -1903,7 +1933,7 @@
             </div>
         </div>
     </div>
-</div>
+</div>-->
 
     <!-- Calendario Modal -->
     @if (isset($fechas))
