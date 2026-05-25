@@ -1729,6 +1729,182 @@
     </div>
 </div>
 
+    <!-- Modal Responder Comité Fase 4 -->
+<div id="fase4ComiteModal" class="fixed z-50 inset-0 overflow-y-auto">
+    <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeFase4ComiteModal()">
+        <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
+                onclick="event.stopPropagation()">
+
+                <button class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
+                    onclick="closeFase4ComiteModal()">&times;</button>
+
+                <form class="p-6 mt-2" id="fase4ComiteForm" enctype="multipart/form-data">
+                    @csrf
+                    <input type="hidden" name="practica_id" id="practica_id_fase4_comite" value="{{ $practica->id }}">
+
+                    <p class="text-2xl font-bold mb-4">
+                        Responder
+                        <span class="bg-uts-500 text-white px-2 py-0.5 rounded uppercase shadow">Fase 4 - Comité</span>
+                    </p>
+
+                    <p class="text-sm text-gray-600 mb-4">El comité revisa la propuesta y asigna el título oficial.</p>
+
+                    <!-- ESTADO -->
+                    <div class="mb-4">
+                        <label class="block font-medium text-sm text-gray-700">
+                            <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                            Estado de la práctica:
+                        </label>
+                        <select name="estado" id="estado_fase4_comite"
+                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
+                            <option value="">Seleccione un estado</option>
+                            <option value="Aprobada">Aprobar</option>
+                            <option value="Rechazada">Rechazar</option>
+                        </select>
+                        <span id="estado_fase4_comiteError" class="text-red-500 text-sm"></span>
+                    </div>
+
+                    <!-- TÍTULO DE LA PROPUESTA -->
+                    <div class="mb-4">
+                        <label class="block font-medium text-sm text-gray-700">
+                            <i class="fa-solid fa-heading mr-2 text-gray-500"></i>
+                            Título oficial de la propuesta:
+                        </label>
+                        <input type="text" name="titulo_propuesta" id="titulo_propuesta_fase4_comite"
+                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500"
+                            placeholder="Ingrese el título oficial de la propuesta">
+                        <span id="titulo_propuesta_fase4_comiteError" class="text-red-500 text-sm"></span>
+                    </div>
+
+                    <!-- NÚMERO Y FECHA DE ACTA -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block font-medium text-sm text-gray-700">
+                                <i class="fa-regular fa-file-lines mr-1 text-gray-500"></i>
+                                Número de acta:
+                            </label>
+                            <input type="text" name="nro_acta" id="nro_acta_fase4_comite"
+                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500"
+                                placeholder="Ingrese el número de acta">
+                            <span id="nro_acta_fase4_comiteError" class="text-red-500 text-sm"></span>
+                        </div>
+                        <div>
+                            <label class="block font-medium text-sm text-gray-700">
+                                <i class="fa-regular fa-calendar-days mr-1 text-gray-500"></i>
+                                Fecha del acta:
+                            </label>
+                            <input type="date" name="fecha_acta" id="fecha_acta_fase4_comite"
+                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
+                            <span id="fecha_acta_fase4_comiteError" class="text-red-500 text-sm"></span>
+                        </div>
+                    </div>
+
+                    <!-- F-DC-127 -->
+                    <div class="mb-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <label class="block font-medium text-sm text-gray-700">
+                                <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                Propuesta (F-DC-127)
+                            </label>
+                            <div class="relative inline-block">
+                                <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                    data-tooltip="tooltip-fdc127-comite-fase4"></i>
+                            </div>
+                        </div>
+                        <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+                            <div class="grid gap-1 text-center">
+                                <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                <h2 class="text-center text-gray-400 text-xs">
+                                    Arrastra o selecciona el archivo F-DC-127 con comentarios o firmado
+                                    (.doc, .docx, máx. 5MB)
+                                </h2>
+                            </div>
+                            <div class="text-center">
+                                <input type="file" name="fdc127" id="fdc127_fase4_comite"
+                                    class="absolute inset-0 opacity-0 cursor-pointer w-full"
+                                    accept=".doc,.docx" />
+                                <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                    Cargar
+                                </div>
+                            </div>
+                        </div>
+                        <span id="fdc127_fase4_comiteError" class="text-red-500 text-xs"></span>
+                        <ul id="file-list-fdc127-fase4-comite" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                        <div id="tooltip-fdc127-comite-fase4"
+                            class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
+                            Suba el documento F-DC-127 firmado o con comentarios del comité.
+                        </div>
+                    </div>
+
+                    <!-- F-DC-195 -->
+                    <div class="mb-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <label class="block font-medium text-sm text-gray-700">
+                                <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                Acta de Inicio (F-DC-195)
+                            </label>
+                            <div class="relative inline-block">
+                                <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                    data-tooltip="tooltip-fdc195-comite-fase4"></i>
+                            </div>
+                        </div>
+                        <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+                            <div class="grid gap-1 text-center">
+                                <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                <h2 class="text-center text-gray-400 text-xs">
+                                    Arrastra o selecciona el archivo F-DC-195 con comentarios o firmado
+                                    (.doc, .docx, máx. 5MB)
+                                </h2>
+                            </div>
+                            <div class="text-center">
+                                <input type="file" name="fdc195" id="fdc195_fase4_comite"
+                                    class="absolute inset-0 opacity-0 cursor-pointer w-full"
+                                    accept=".doc,.docx" />
+                                <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                    Cargar
+                                </div>
+                            </div>
+                        </div>
+                        <span id="fdc195_fase4_comiteError" class="text-red-500 text-xs"></span>
+                        <ul id="file-list-fdc195-fase4-comite" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                        <div id="tooltip-fdc195-comite-fase4"
+                            class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
+                            Suba el acta de inicio F-DC-195 firmada o con comentarios del comité.
+                        </div>
+                    </div>
+
+                    <!-- RESPUESTA CON QUILL -->
+                    <div class="mb-4">
+                        <label class="block font-medium text-sm text-gray-700">
+                            <i class="fa-solid fa-message mr-2 text-gray-500"></i>
+                            Comentarios de la respuesta:
+                        </label>
+                        <div id="txt-editor-fase4-comite" class="shadow txt-editor-quill" style="height: 200px; background: white;"></div>
+                        <textarea name="respuesta" id="respuesta_fase4_comite" class="hidden"></textarea>
+                        <span id="respuesta_fase4_comiteError" class="text-red-500 text-sm"></span>
+                    </div>
+
+                    <!-- BOTONES -->
+                    <div class="flex justify-end space-x-2 mt-4">
+                        <button type="button" onclick="closeFase4ComiteModal()"
+                            class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cancelar</button>
+                        <button type="submit"
+                            class="flex bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg">
+                            <svg id="loadingSpinner-fase4-comite" style="margin: 4px 10px 4px 0"
+                                class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64" fill="none">
+                                <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
+                                <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
+                            </svg>
+                            Responder
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
     <!-- Calendario Modal -->
     @if (isset($fechas))
         <div id="calendarModal" class="fixed z-50 inset-0 overflow-y-auto">

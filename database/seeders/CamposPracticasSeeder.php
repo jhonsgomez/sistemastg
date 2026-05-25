@@ -386,6 +386,27 @@ class CamposPracticasSeeder extends Seeder
 
         }
 
+        // ################ FASE 4 #####################
+
+        $practicas_fase_4 = TipoSolicitud::where('nombre', 'practicas_fase_4')->first();
+        if ($practicas_fase_4) {
+
+        // 1. Respuesta evaluador
+        Campo::updateOrCreate(
+            [
+                'tipo_solicitud_id' => $practicas_fase_4->id,
+                'name' => 'respuesta_evaluador_fase4'
+            ],
+            [
+                'label' => 'Respuesta del evaluador',
+                'type' => 'textarea',
+                'required' => false,
+                'instructions' => null
+            ]
+        );
+        
+        }
+
 
 
 

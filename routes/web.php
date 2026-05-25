@@ -247,6 +247,9 @@ Route::middleware('permission:view_practicas')
 
         Route::post('/fase4/reply', [RoadMapPracticaController::class, 'replyFase4'])->name('practicas.fase4.reply');
 
+        Route::post('/fase4/comite/reply', [PracticaController::class, 'replyFase4Comite'])->name('practicas.fase4.comite.reply');
+        
+
       
         
         
