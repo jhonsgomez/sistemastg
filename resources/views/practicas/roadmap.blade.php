@@ -590,6 +590,9 @@
             </button>
         </div>
 
+        {{$esEvaluador}}
+        {{$evaluadorYaRespondio}}
+
         {{-- ================= EVALUADOR (ya respondió, solo ver) ================= --}}
         @elseif ($esEvaluador && $evaluadorYaRespondio)
         <div class="flex justify-center items-center mt-3">
@@ -634,6 +637,8 @@
         @endif
     @endif
 </div>
+
+
 
                 <!-- FASE 5. I -->
                 <div

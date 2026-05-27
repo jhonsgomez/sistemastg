@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use App\Support\LivewireSubdirectoryConfig;
 
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -21,5 +22,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         LivewireSubdirectoryConfig::configure(config('app.url_prefix'));
-    }
+	
+}
 }

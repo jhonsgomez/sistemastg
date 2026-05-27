@@ -389,13 +389,7 @@ class CamposPracticasSeeder extends Seeder
             );
 
 
-      
-
-
-
-
-
-
+    
         }
 
         // ################ FASE 4 #####################
@@ -416,6 +410,21 @@ class CamposPracticasSeeder extends Seeder
                 'instructions' => null
             ]
         );
+
+        // 4. Estado evaluador fase 4
+            Campo::updateOrCreate(
+                [
+                    'tipo_solicitud_id' => $practicas_fase_4->id,
+                    'name' => 'estado_evaluador_fase4'
+                ],
+                [
+                    'label' => 'Estado respuesta evaluador fase 4',
+                    'type' => 'select',
+                    'required' => false,
+                    'instructions' => null
+                ]
+            );
+
         
         }
 

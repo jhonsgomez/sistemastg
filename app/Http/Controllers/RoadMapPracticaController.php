@@ -1224,22 +1224,9 @@ if ($request->estado === 'Aprobada') {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     public function replyFase4(Request $request)
 {
+    Log::info('REQUEST FASE 4', $request->all());
     try {
         Log::info('=== replyFase4 INICIO ===', $request->all());
         
@@ -1291,7 +1278,7 @@ if ($request->estado === 'Aprobada') {
 
         // ================= GUARDAR DOCUMENTOS - ACTUALIZAR LOS CAMPOS EXISTENTES =================
 if ($request->hasFile('fdc127')) {
-    $fdc127Path = $request->file('fdc127')->store('practicas/fase4/documentos', 'public');
+    $fdc127Path = $request->file('fdc127')->store('practicas/fase4', 'public');
     
     $campoDoc = Campo::where('name', 'doc_fdc127')->first();
     if ($campoDoc) {
@@ -1308,7 +1295,7 @@ if ($request->hasFile('fdc127')) {
 }
 
 if ($request->hasFile('fdc195')) {
-    $fdc195Path = $request->file('fdc195')->store('practicas/fase4/documentos', 'public');
+    $fdc195Path = $request->file('fdc195')->store('practicas/fase4', 'public');
     
     $campoDoc = Campo::where('name', 'doc_fdc195')->first();
     if ($campoDoc) {
@@ -1403,6 +1390,8 @@ if ($request->hasFile('fdc195')) {
         'nuevo_estado' => $practica->estado
     ]);
 }
+
+        $practica->refresh();
 
         return response()->json([
             'success' => 'Respuesta enviada correctamente', 

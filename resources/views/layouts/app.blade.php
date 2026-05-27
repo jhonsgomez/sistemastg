@@ -101,6 +101,7 @@
         </div>
     </div>
 
+
     <div class="flex gap-4 flex-1 min-h-0">
         <aside id="sidebarMenu"
             class="w-64 bg-white rounded-xl shadow-md p-4 overflow-y-auto transition-width duration-300 ease-in-out">
@@ -225,6 +226,16 @@
                     </li>
                     @endif
 
+@php
+$tieneAccesoEvaluador = \App\Models\Practica::where('estado', 'Fase 3')
+    ->whereHas('valoresCampos', function ($vc) {
+        $vc->whereHas('campo', function ($c) {
+            $c->where('name', 'director_id');
+        })->where('valor', auth()->id());
+    })
+    ->exists();
+@endphp
+
                     @if (auth()->user()->hasRole('director_practica'))
                         <li>
                             <a href="{{ route('director.practicas.index') }}"
@@ -260,7 +271,7 @@
                     </li>
                     @endif
 
-                    @if (auth()->user()->hasRole('evaluador_practica'))
+                    @if (auth()->user()->hasRole('evaluador_practica')  && $tieneAccesoEvaluador)
                         <li>
                             <a href="{{ route('evaluador.practicas.index') }}"
                                 class="flex items-center gap-3 w-full p-3 

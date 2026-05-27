@@ -83,10 +83,15 @@ class PracticaController extends Controller
     
     public function getData(Request $request)
 {
+
+  
     // CORREGIDO: Mostrar TODAS las prácticas, no solo tipo_solicitud_id = 9
     $practicas = Practica::with('user')
         ->where('tipo_solicitud_id', '>=', 9);  // Todas las fases de prácticas (9, 10, 11, 12, 13, 14)
 
+        \Log::info('ESTADO PRACTICAS', 
+    $practicas->pluck('estado')->toArray()
+);
     if (auth()->user()->hasRole('estudiante')) {
         // Mostrar prácticas donde:
         // 1. El usuario es el creador (user_id)
@@ -101,22 +106,33 @@ class PracticaController extends Controller
         });
     }
 
-    // FILTRO PARA DIRECTOR - Solo ver prácticas donde está asignado como director
+    // DIRECTOR
     if (auth()->user()->hasRole('director_practica')) {
+
+
         $practicas->whereHas('valoresCampos', function ($vc) {
+
             $vc->whereHas('campo', function ($c) {
                 $c->where('name', 'director_id');
             })->where('valor', auth()->id());
+
         });
+
     }
 
-    // FILTRO PARA EVALUADOR - Solo ver prácticas donde está asignado como evaluador
+    // EVALUADOR
     if (auth()->user()->hasRole('evaluador_practica')) {
+
+        
+
         $practicas->whereHas('valoresCampos', function ($vc) {
+
             $vc->whereHas('campo', function ($c) {
                 $c->where('name', 'evaluador_id');
             })->where('valor', auth()->id());
+
         });
+
     }
 
     // FILTRO PARA CODIRECTOR (si lo necesitas)
@@ -179,7 +195,8 @@ class PracticaController extends Controller
     }
 
     // ORDEN DESCENDENTE: del más reciente al más antiguo
-    $practicas->orderBy('id', 'desc');
+    $practicas= Practica::with('valoresCampos.campo')
+    ->orderBy('id', 'desc');
 
     return DataTables::of($practicas)
         ->addColumn('formatted_id', function ($p) {
@@ -238,25 +255,24 @@ class PracticaController extends Controller
                                 <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Estudiante</span>";
                 }
             }
+         
             elseif ($p->estado === 'Fase 4') {
-                $respondioEvaluador = $p->valoresCampos
-                    ->where('campo.name', 'respuesta_evaluador')
+                $estadoEvaluador = $p->valoresCampos
+                    ->where('campo.name', 'estado_evaluador_fase4')
                     ->first();
 
+                $respondioEvaluador = $estadoEvaluador && !empty($estadoEvaluador->valor);
+
                 if ($respondioEvaluador) {
-                    // Ya respondió evaluador -> pasa a comité
                     $htmlEstado = "
                         <span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 4</span>
                         <span class='shadow bg-purple-100 text-purple-800 text-sm font-medium px-2.5 py-0.5 rounded border border-purple-300'>Comité</span>";
                 } else {
-
-                    // Aún está pendiente evaluador
                     $htmlEstado = "
                         <span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 4</span>
                         <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Evaluador</span>";
                 }
             }
-
 
             elseif ($p->estado === 'Fase 5') {
                 $htmlEstado = "<span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 5</span>

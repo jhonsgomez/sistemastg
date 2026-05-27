@@ -179,6 +179,7 @@ $(document).ready(function () {
 
         // ================= VALIDAR ESTADO =================
         const estado = $('#estado_fase4').val();
+        
         if (!estado) {
             $('#estado_fase4Error').text('Debe seleccionar un estado');
             return;
@@ -187,7 +188,7 @@ $(document).ready(function () {
         //JUAN DAVID ESTO GENERA PROBLEMA EL SWAL DEL EVALUADOR A LA HORA DE RESPONDER
 
         // ================= VALIDAR ACTA SI APRUEBA =================
-        /*if (estado === 'Aprobada') {
+       /* if (estado === 'Aprobada') {
             const nroActa = $('#nro_acta_fase4').val();
             if (!nroActa) {
                 $('#nro_acta_fase4Error').text('Debe ingresar el número de acta');
@@ -223,6 +224,10 @@ Swal.fire({
 
         button.prop('disabled', true);
         if (spinner.length) spinner.removeClass('hidden');
+
+        for (let pair of formData.entries()) {
+            console.log(pair[0] + ': ' + pair[1]);
+        }
 
         $.ajax({
             url: ROUTES.fase4_reply,
