@@ -71,7 +71,8 @@
             #fase3EstudianteModal,
             #fase3DetailsModal,
             #fase3DirModal,
-            #fase4EvaluadorModal {
+            #fase4EvaluadorModal,
+            #fase4ComiteModal {
                 visibility: hidden !important;
                 opacity: 0 !important;
                 transform: translateY(-20px) !important;
@@ -98,7 +99,8 @@
             #fase3EstudianteModal.show,
             #fase3DetailsModal.show,
             #fase3DirModal.show,
-            #fase4EvaluadorModal.show {
+            #fase4EvaluadorModal.show,
+            #fase4ComiteModal.show {
                 visibility: visible !important;
                 opacity: 1 !important;
                 transform: translateY(0) scale(1) !important;
@@ -590,8 +592,6 @@
             </button>
         </div>
 
-        {{$esEvaluador}}
-        {{$evaluadorYaRespondio}}
 
         {{-- ================= EVALUADOR (ya respondió, solo ver) ================= --}}
         @elseif ($esEvaluador && $evaluadorYaRespondio)
@@ -608,7 +608,7 @@
                 </div>
                 
                 {{-- ================= DIRECTOR ================= --}}
-                @elseif ($esDirector)
+                @elseif ($esDirector && !$esComite)
                     <div class="flex justify-center items-center mt-3">
                         <button type="button"
                             onclick="openFase3DetailsModal(this)"
@@ -621,31 +621,151 @@
                         </button>
                     </div>
                 
-        {{-- ================= COMITÉ Y ESTUDIANTE (solo ver si el evaluador aprobó) ================= --}}
-        @elseif (($esComite || $esEstudiante) && $evaluadorAprobo)
-            <div class="flex justify-center items-center mt-3">
+        {{-- ================= COMITÉ FASE 4 ================= --}}
+        @elseif ($esComite && $evaluadorAprobo)
+            <div class="flex justify-center items-center mt-3 gap-2">
+
+                {{-- VER --}}
+                 <div class="flex justify-center items-center mt-3">
+            <button type="button"
+            onclick="openFase3DetailsModal(this)"
+            class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+            <i class="fa-solid fa-eye"></i>
+            <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
+                <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
+                <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
+            </svg>
+                    </button>
+                </div>
+
+                {{-- EDITAR / RESPONDER --}}
                 <button type="button"
-                    onclick="openFase3DetailsModal(this)"
-                    class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
-                    <i class="fa-solid fa-eye"></i>
+                    onclick="openFase4ComiteModal(this)"
+                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white rounded-lg relative inline-flex items-center justify-center w-10 h-10">
+                    <i class="fa-solid fa-reply"></i>
                     <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
                         <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
                         <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
                     </svg>
                 </button>
+
+            </div>
+
+        {{-- ================= ESTUDIANTE ================= --}}
+        @elseif ($esEstudiante && $evaluadorAprobo)
+            <div class="flex justify-center items-center mt-3">
+                <button type="button"
+                    onclick="openFase3DetailsModal(this)"
+                    class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+                    <i class="fa-solid fa-eye"></i>
+                </button>
             </div>
         @endif
+        
+   
+    @elseif ($fase_actual > 4)
+        <div class="flex justify-center items-center mt-3">
+            <button type="button"
+                onclick="openFase3DetailsModal(this)"
+                class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+                <i class="fa-solid fa-eye"></i>
+                <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
+                    <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
+                    <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
+                </svg>
+            </button>
+        </div>
     @endif
+    
+    
 </div>
 
 
 
                 <!-- FASE 5. I -->
                 <div
-                    class="relative mx-auto flex flex-col items-center justify-center bg-white text-gray-600 rounded-lg shadow-lg h-60 w-full sm:w-50 border">
+                    class="relative mx-auto flex flex-col items-center justify-center bg-white text-gray-600 rounded-lg shadow-lg h-60 w-full sm:w-50 border card-fase {{ $fase_actual >= 5 ? 'card-activated' : '' }} {{ $fase_actual == 5 ? 'card-activated-animated' : '' }}">
                     <i class="fa-solid fa-hourglass-half" style="font-size: 32px; margin-bottom: 10px;"></i>
                     <span class="text-center font-bold text-lg">Fase 5: Informe I</span>
                     <p class="text-center mt-2 text-xs mx-4">El estudiante envía el informe al director.</p>
+
+                        @if ($fase_actual == 5)
+
+                        @php
+                            $user = auth()->user();
+                            $esEstudiante = $user->hasRole('estudiante');
+                            $esDirector = $user->hasRole('director_practica');
+                            $yaEnvio = $submited_fase5 == 'true';
+                            $estadoDirector = $practica->valoresCampos
+                                ->where('campo.name', 'estado_director_fase5')
+                                ->first();
+
+                            $directorRespondio = $estadoDirector && !empty($estadoDirector->valor);
+                        @endphp
+
+                        {{-- ESTUDIANTE --}}
+                        @if ($esEstudiante && !$yaEnvio)
+                            <div class="flex justify-center items-center mt-3">
+                                <button type="button"
+                                    onclick="openFase5EstudianteModal(this)"
+                                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+                                    <i class="fa-solid fa-user-pen"></i>
+                                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute"
+                                        viewBox="0 0 64 64" fill="none">
+                                        <path d="M32 3..." />
+                                    </svg>
+                                </button>
+                            </div>
+
+                        @elseif ($esEstudiante && $yaEnvio)
+
+                            <div class="flex justify-center items-center mt-3">
+                                <button type="button"
+                                    onclick="openFase5DetailsModal(this)"
+                                    class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                            </div>
+
+                        {{-- DIRECTOR --}}
+                        @elseif ($esDirector)
+
+                            <div class="flex justify-center items-center mt-3 gap-2">
+                                {{-- VER --}}
+                                <button type="button"
+                                    onclick="openFase5DetailsModal(this)"
+                                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white rounded-lg relative inline-flex items-center justify-center">
+                                    <i class="fa-solid fa-eye"></i>
+
+                                </button>
+
+                                {{-- RESPONDER --}}
+                                @if ($yaEnvio && !$directorRespondio)
+
+                                    <button type="button"
+                                        onclick="openFase5DirectorModal(this)"
+                                        class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white rounded-lg relative inline-flex items-center justify-center">
+                                        <i class="fa-solid fa-share"></i>
+
+                                    </button>
+                                @endif
+                            </div>
+                        @endif
+
+                    @elseif ($fase_actual > 5)
+
+                        {{-- SOLO VER --}}
+                        <div class="flex justify-center items-center mt-3">
+                            <button type="button"
+                                onclick="openFase5DetailsModal(this)"
+                                class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+                                <i class="fa-solid fa-eye"></i>
+
+                            </button>
+
+                        </div>
+
+                    @endif
                 </div>
 
                 <!-- FASE 6 . II -->
@@ -1765,7 +1885,7 @@
 </div>
 
     <!-- Modal Responder Comité Fase 4 -->
- <!--<div id="fase4ComiteModal" class="fixed z-50 inset-0 overflow-y-auto">
+    <div id="fase4ComiteModal" class="fixed z-50 inset-0 overflow-y-auto">
     <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeFase4ComiteModal()">
         <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
             <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
@@ -1785,7 +1905,7 @@
 
                     <p class="text-sm text-gray-600 mb-4">El comité revisa la propuesta y asigna el título oficial.</p>
 
-                     ESTADO 
+              
                     <div class="mb-4">
                         <label class="block font-medium text-sm text-gray-700">
                             <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
@@ -1800,19 +1920,16 @@
                         <span id="estado_fase4_comiteError" class="text-red-500 text-sm"></span>
                     </div>
 
-                     TÍTULO DE LA PROPUESTA 
                     <div class="mb-4">
                         <label class="block font-medium text-sm text-gray-700">
                             <i class="fa-solid fa-heading mr-2 text-gray-500"></i>
-                            Título oficial de la propuesta:
+                            Título de la propuesta:
                         </label>
                         <input type="text" name="titulo_propuesta" id="titulo_propuesta_fase4_comite"
                             class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500"
                             placeholder="Ingrese el título oficial de la propuesta">
                         <span id="titulo_propuesta_fase4_comiteError" class="text-red-500 text-sm"></span>
                     </div>
-
-                     NÚMERO Y FECHA DE ACTA 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                         <div>
                             <label class="block font-medium text-sm text-gray-700">
@@ -1835,7 +1952,6 @@
                         </div>
                     </div>
 
-                     F-DC-127 
                     <div class="mb-4">
                         <div class="flex items-center gap-2 mb-2">
                             <label class="block font-medium text-sm text-gray-700">
@@ -1871,8 +1987,6 @@
                             Suba el documento F-DC-127 firmado o con comentarios del comité.
                         </div>
                     </div>
-
-                     F-DC-195 
                     <div class="mb-4">
                         <div class="flex items-center gap-2 mb-2">
                             <label class="block font-medium text-sm text-gray-700">
@@ -1909,7 +2023,6 @@
                         </div>
                     </div>
 
-                     RESPUESTA CON QUILL 
                     <div class="mb-4">
                         <label class="block font-medium text-sm text-gray-700">
                             <i class="fa-solid fa-message mr-2 text-gray-500"></i>
@@ -1920,7 +2033,6 @@
                         <span id="respuesta_fase4_comiteError" class="text-red-500 text-sm"></span>
                     </div>
 
-                    BOTONES 
                     <div class="flex justify-end space-x-2 mt-4">
                         <button type="button" onclick="closeFase4ComiteModal()"
                             class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cancelar</button>
@@ -1938,7 +2050,7 @@
             </div>
         </div>
     </div>
-</div>-->
+</div>
 
     <!-- Calendario Modal -->
     @if (isset($fechas))
@@ -2147,7 +2259,8 @@
                 fase3_store: '{{ route('practicas.fase3.store') }}',
                 fase3_details: '{{ route('practicas.fase3.details') }}',
                 fase3_reply: '{{ route('practicas.fase3.reply') }}',
-                fase4_reply: '{{ route('practicas.fase4.reply') }}'
+                fase4_reply: '{{ route('practicas.fase4.reply') }}',
+                fase4_comite_reply: "{{ route('practicas.fase4.comite.reply') }}"
             };
         </script>
 

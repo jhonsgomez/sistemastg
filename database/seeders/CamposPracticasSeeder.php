@@ -397,6 +397,7 @@ class CamposPracticasSeeder extends Seeder
         $practicas_fase_4 = TipoSolicitud::where('nombre', 'practicas_fase_4')->first();
         if ($practicas_fase_4) {
 
+        //---------------------EVALUADOR ---------------------------------------
         // 1. Respuesta evaluador
         Campo::updateOrCreate(
             [
@@ -424,6 +425,52 @@ class CamposPracticasSeeder extends Seeder
                     'instructions' => null
                 ]
             );
+
+        // ================= COMITÉ =================
+
+            // Estado comité
+            Campo::updateOrCreate(
+                [
+                    'tipo_solicitud_id' => $practicas_fase_4->id,
+                    'name' => 'estado_comite_fase4'
+                ],
+                [
+                    'label' => 'Estado respuesta comité fase 4',
+                    'type' => 'select',
+                    'required' => false,
+                    'instructions' => null
+                ]
+            );
+
+             // Título propuesta
+            Campo::updateOrCreate(
+                [
+                    'tipo_solicitud_id' => $practicas_fase_4->id,
+                    'name' => 'titulo_propuesta_fase4'
+                ],
+                [
+                    'label' => 'Título de la propuesta',
+                    'type' => 'text',
+                    'required' => false,
+                    'instructions' => null
+                ]
+            );
+
+
+            // Respuesta comité
+            Campo::updateOrCreate(
+                [
+                    'tipo_solicitud_id' => $practicas_fase_4->id,
+                    'name' => 'respuesta_comite_fase4'
+                ],
+                [
+                    'label' => 'Respuesta del comité',
+                    'type' => 'textarea',
+                    'required' => false,
+                    'instructions' => null
+                ]
+            );
+
 
         
         }

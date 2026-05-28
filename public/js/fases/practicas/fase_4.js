@@ -282,6 +282,8 @@ function showToast(message, type = 'success') {
     });
 }
 
+
+// -------- FASE 4 COMITE -----
 let quillFase4Comite = null;
 
 function openFase4ComiteModal(btn) {
@@ -454,9 +456,10 @@ $(document).ready(function() {
                 
                 button.prop('disabled', true);
                 spinner.removeClass('hidden');
-                
+                console.log(ROUTES.fase4_comite_reply);
                 $.ajax({
                     url: ROUTES.fase4_comite_reply,
+                    
                     method: 'POST',
                     data: formData,
                     processData: false,

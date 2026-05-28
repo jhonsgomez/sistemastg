@@ -194,9 +194,52 @@ class PracticaController extends Controller
         });
     }
 
-    // ORDEN DESCENDENTE: del más reciente al más antiguo
-    $practicas= Practica::with('valoresCampos.campo')
-    ->orderBy('id', 'desc');
+    // DATATABLE - AQUI LE SALE LAS PRACTICAS A CADA USUARIO
+ // DATATABLE - AQUI LE SALE LAS PRACTICAS A CADA USUARIO
+
+        if (auth()->user()->hasRole('estudiante')) {
+
+            $practicas = Practica::with('valoresCampos.campo')
+                ->where('user_id', auth()->id())
+                ->orderBy('id', 'desc')
+                ->get();
+
+        } elseif (auth()->user()->hasRole('director_practica')) {
+
+            $practicas = Practica::with('valoresCampos.campo')
+                ->whereHas('valoresCampos', function ($vc) {
+
+                    $vc->whereHas('campo', function ($c) {
+                        $c->where('name', 'director_id');
+                    })
+
+                    ->where('valor', auth()->id());
+
+                })
+                ->orderBy('id', 'desc')
+                ->get();
+
+        } elseif (auth()->user()->hasRole('evaluador_practica')) {
+
+            $practicas = Practica::with('valoresCampos.campo')
+                ->whereHas('valoresCampos', function ($vc) {
+
+                    $vc->whereHas('campo', function ($c) {
+                        $c->where('name', 'evaluador_id');
+                    })
+
+                    ->where('valor', auth()->id());
+
+                })
+                ->orderBy('id', 'desc')
+                ->get();
+
+        } else {
+
+            $practicas = Practica::with('valoresCampos.campo')
+                ->orderBy('id', 'desc')
+                ->get();
+        }
 
     return DataTables::of($practicas)
         ->addColumn('formatted_id', function ($p) {
@@ -276,8 +319,9 @@ class PracticaController extends Controller
 
             elseif ($p->estado === 'Fase 5') {
                 $htmlEstado = "<span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 5</span>
-                               <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Comité</span>";
+                               <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Estudiante</span>";
             } 
+
             elseif ($p->estado === 'Finalizado') {
                 $htmlEstado = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-green-100 text-green-800 border border-green-300'>Finalizado</span>";
             }
