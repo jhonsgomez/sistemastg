@@ -318,9 +318,40 @@ class PracticaController extends Controller
             }
 
             elseif ($p->estado === 'Fase 5') {
-                $htmlEstado = "<span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 5</span>
-                               <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Estudiante</span>";
-            } 
+                $submited = $p->valoresCampos
+                    ->where('campo.name', 'submited_fase5')
+                    ->first();
+                $yaEnvio = $submited && $submited->valor === 'true';
+
+                if ($yaEnvio) {
+                    $htmlEstado = "
+                        <span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 5</span>
+                        <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'> Director</span>
+                    ";
+                } else {
+                    $htmlEstado = "
+                        <span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 5</span>
+                        <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Estudiante</span>
+                    ";
+                }
+            }
+             elseif ($p->estado === 'Fase 6') {
+                $estadoEvaluador = $p->valoresCampos
+                    ->where('campo.name', 'estado_evaluador_fase5')
+                    ->first();
+
+                $respondioEvaluador = $estadoEvaluador && !empty($estadoEvaluador->valor);
+
+                if ($respondioEvaluador) {
+                    $htmlEstado = "
+                        <span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 6</span>
+                        <span class='shadow bg-purple-100 text-purple-800 text-sm font-medium px-2.5 py-0.5 rounded border border-purple-300'>Comité</span>";
+                } else {
+                    $htmlEstado = "
+                        <span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 6</span>
+                        <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Evaluador</span>";
+                }
+            }
 
             elseif ($p->estado === 'Finalizado') {
                 $htmlEstado = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-green-100 text-green-800 border border-green-300'>Finalizado</span>";
@@ -360,7 +391,7 @@ class PracticaController extends Controller
             }
 
             // Botón Roadmap AZUL
-            $esFaseActiva = in_array($p->estado, ['Fase 1', 'Fase 2', 'Fase 3', 'Fase 4', 'Fase 5', 'Finalizado']);
+            $esFaseActiva = in_array($p->estado, ['Fase 1', 'Fase 2', 'Fase 3', 'Fase 4', 'Fase 5', 'Fase 6', 'Finalizado']);
             $puedeVerRoadmap = !$p->deshabilitado && $esFaseActiva;
 
             if ($puedeVerRoadmap) {

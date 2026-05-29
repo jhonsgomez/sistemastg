@@ -226,44 +226,6 @@
                     </li>
                     @endif
 
-@php
-
-// CASO 1:
-// Usuario asignado como evaluador
-$esEvaluadorAsignado = \App\Models\Practica::whereHas('valoresCampos', function ($vc) {
-    $vc->whereHas('campo', function ($c) {
-        $c->where('name', 'evaluador_id');
-    })->where('valor', auth()->id());
-})->exists();
-
-
-// CASO 2:
-// Usuario asignado también como director
-$esDirectorAsignado = \App\Models\Practica::whereHas('valoresCampos', function ($vc) {
-    $vc->whereHas('campo', function ($c) {
-        $c->where('name', 'director_id');
-    })->where('valor', auth()->id());
-})->exists();
-
-
-// CASO 3:
-// Ya puede entrar como evaluador porque pasó fase 3
-$pasoFaseDirector = \App\Models\Practica::where('estado', 'Fase 3')
-    ->whereHas('valoresCampos', function ($vc) {
-        $vc->whereHas('campo', function ($c) {
-            $c->where('name', 'director_id');
-        })->where('valor', auth()->id());
-    })->exists();
-
-
-// LÓGICA FINAL
-$tieneAccesoEvaluador =
-    $esEvaluadorAsignado &&
-    (
-        !$esDirectorAsignado || $pasoFaseDirector
-    );
-
-@endphp
 
                     @if (auth()->user()->hasRole('director_practica'))
                         <li>
@@ -300,7 +262,7 @@ $tieneAccesoEvaluador =
                     </li>
                     @endif
 
-                    @if (auth()->user()->hasRole('evaluador_practica')  && $tieneAccesoEvaluador)
+                    @if (auth()->user()->hasRole('evaluador_practica') )
                         <li>
                             <a href="{{ route('evaluador.practicas.index') }}"
                                 class="flex items-center gap-3 w-full p-3 

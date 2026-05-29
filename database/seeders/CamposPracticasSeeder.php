@@ -475,6 +475,207 @@ class CamposPracticasSeeder extends Seeder
         
         }
 
+        // ############## FASE 5 - ESTUDIANTE ENVIA AL DIRECTOR ##############33
+ 
+
+        $practicas_fase_5 = TipoSolicitud::where('nombre', 'practicas_fase_5')->first();
+
+        if ($practicas_fase_5) {
+
+            // Restaurar campos eliminados lógicamente
+            Campo::withTrashed()
+                ->where('tipo_solicitud_id', $practicas_fase_5->id)
+                ->restore();
+
+           
+
+            // 1. INFORME FINAL
+            Campo::updateOrCreate(
+
+                [
+                    'tipo_solicitud_id' => $practicas_fase_5->id,
+                    'name' => 'doc_fdc128'
+                ],
+
+                [
+                    'label' => 'Informe Final',
+                    'type' => 'file',
+                    'required' => true,
+                    'instructions' => '
+                        <p>
+                            Suba el informe final en formato
+                            <strong>WORD</strong> (máx. 10 MB).
+                        </p>
+
+                        <ul class="list-disc mt-2 ml-4">
+
+                            <li class="ml-4">
+                                El documento debe estar completo
+                            </li>
+
+                            <li class="ml-4">
+                                Verifique que el archivo sea legible
+                            </li>
+
+                        </ul>
+                    '
+                ]
+
+            );
+            
+            // 2. REJILLA EVALUACIÓN
+            Campo::updateOrCreate(
+
+                [
+                    'tipo_solicitud_id' => $practicas_fase_5->id,
+                    'name' => 'doc_fdc129'
+                ],
+
+                [
+                    'label' => 'Rejilla de Evaluación',
+                    'type' => 'file',
+                    'required' => true,
+                    'instructions' => '
+                        <p>
+                            Suba la rejilla de evaluación en formato
+                            <strong>WORD</strong> (máx. 5 MB).
+                        </p>
+                    '
+                ]
+
+            );
+
+             // 3. ACTA TERMINACIÓN
+            Campo::updateOrCreate(
+
+                [
+                    'tipo_solicitud_id' => $practicas_fase_5->id,
+                    'name' => 'doc_fdc196'
+                ],
+
+                [
+                    'label' => 'Acta de Terminación',
+                    'type' => 'file',
+                    'required' => true,
+                    'instructions' => '
+                        <p>
+                            Suba el acta de terminación en formato
+                            <strong>WORD</strong> (máx. 5 MB).
+                        </p>
+
+                        <ul class="list-disc mt-2 ml-4">
+                            <li class="ml-4">
+                                Debe contener firmas correspondientes
+                            </li>
+
+                            <li class="ml-4">
+                                Verifique que el documento sea legible
+                            </li>
+                        </ul>
+                    '
+                ]
+
+            );
+
+            // 4. BANDERA ENVÍO
+            Campo::updateOrCreate(
+
+                [
+                    'tipo_solicitud_id' => $practicas_fase_5->id,
+                    'name' => 'submited_fase5'
+                ],
+
+                [
+                    'label' => 'Fase 5 enviada',
+                    'type' => 'hidden',
+                    'required' => false,
+                    'instructions' => null
+                ]
+
+            );
+
+            // 5. ESTADO DIRECTOR FASE 5
+            Campo::updateOrCreate(
+
+                [
+                    'tipo_solicitud_id' => $practicas_fase_5->id,
+                    'name' => 'estado_director_fase5'
+                ],
+
+                [
+                    'label' => 'Estado respuesta director fase 5',
+                    'type' => 'select',
+                    'required' => false,
+                    'instructions' => null
+                ]
+
+            );
+
+            // 6. RESPUESTA DIRECTOR
+            Campo::updateOrCreate(
+
+                [
+                    'tipo_solicitud_id' => $practicas_fase_5->id,
+                    'name' => 'respuesta_director_fase5'
+                ],
+
+                [
+                    'label' => 'Respuesta del director',
+                    'type' => 'textarea',
+                    'required' => false,
+                    'instructions' => null
+                ]
+
+            );
+
+            // 7. INFORME FINAL DIRECTOR
+            Campo::updateOrCreate(
+
+                [
+                    'tipo_solicitud_id' => $practicas_fase_5->id,
+                    'name' => 'informe_final_director_fase5'
+                ],
+
+                [
+                    'label' => 'Informe final revisado director',
+                    'type' => 'file',
+                    'required' => false,
+                    'instructions' => '
+                        <p>
+                            Suba el informe final firmado o con observaciones.
+                        </p>
+                    '
+                ]
+
+            );
+
+            // 8. TURNITIN DIRECTOR
+            Campo::updateOrCreate(
+
+                [
+                    'tipo_solicitud_id' => $practicas_fase_5->id,
+                    'name' => 'turnitin_director_fase5'
+                ],
+
+                [
+                    'label' => 'Turnitin director fase 5',
+                    'type' => 'file',
+                    'required' => false,
+                    'instructions' => '
+                        <p>
+                            Suba el informe Turnitin en PDF.
+                        </p>
+                    '
+                ]
+
+            );
+
+        }
+
+
+        ################### FASE 6 ###############################
+        $tipoFase6 = TipoSolicitud::where('nombre','practicas_fase_6')->first();
+
 
 
 

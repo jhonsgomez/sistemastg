@@ -246,8 +246,12 @@ Route::middleware('permission:view_practicas')
         // Rutas para Fase 4 del roadmap
 
         Route::post('/fase4/reply', [RoadMapPracticaController::class, 'replyFase4'])->name('practicas.fase4.reply');
-
         Route::post('/fase4/comite/reply', [RoadMapPracticaController::class, 'replyFase4Comite'])->name('practicas.fase4.comite.reply');
+
+        //Rutas para fase 5
+        Route::post('/fase5/store',[RoadMapPracticaController::class, 'storeFase5'])->name('practicas.fase5.store');
+        Route::post('/fase5/details',[RoadMapPracticaController::class, 'getFase5Details'])->name('practicas.fase5.details');
+        Route::post('/fase5/reply',[RoadMapPracticaController::class, 'replyFase5'])->name('practicas.fase5.reply');
         
 
       
