@@ -74,7 +74,10 @@
             #fase4EvaluadorModal,
             #fase4ComiteModal,
             #fase5EstudianteModal,
-            #fase5DetailsModal {
+            #fase5DetailsModal,
+#icfesEstudianteModal,
+#icfesAdminModal
+            {
                 visibility: hidden !important;
                 opacity: 0 !important;
                 transform: translateY(-20px) !important;
@@ -104,7 +107,9 @@
             #fase4EvaluadorModal.show,
             #fase4ComiteModal.show,
             #fase5EstudianteModal.show,
-            #fase5DetailsModal.show {
+            #fase5DetailsModal.show,
+            #icfesEstudianteModal.show,
+#icfesAdminModal.show {
                 visibility: visible !important;
                 opacity: 1 !important;
                 transform: translateY(0) scale(1) !important;
@@ -183,6 +188,34 @@
                     </svg>
                 </button>
 
+                @if (isset($submited_icfes_practicas))
+    @if ($fase_actual >= 5 && $fase_actual <= 6)
+        @if ($submited_icfes_practicas === "false")
+            @if (auth()->user()->hasRole(['estudiante']))
+                <button type="button" id="icfes-estudiante-button" onclick="openIcfesEstudianteModal()"
+                    class="btn-action shadow bg-green-700 hover:bg-green-800 text-white px-3 py-1 rounded-lg relative">
+                    <i class="fa-solid fa-flag-checkered"></i>
+                    <svg id="loadingSpinner-icfes-estudiante" style="margin: 4px 1px" class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
+                    </svg>
+                </button>
+            @else
+                @if (auth()->user()->hasRole(['super_admin', 'admin']))
+                    <button type="button" id="icfes-admin-button" onclick="openIcfesAdminModal()"
+                        class="btn-action shadow bg-green-700 hover:bg-green-800 text-white px-3 py-1 rounded-lg relative">
+                        <i class="fa-solid fa-flag-checkered"></i>
+                        <svg id="loadingSpinner-icfes-admin" style="margin: 4px 1px" class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                            <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
+                        </svg>
+                    </button>
+                @endif
+            @endif
+        @endif
+    @endif
+@endif
+                
                 <!-- Botón Calendario (Verde) -->
                 <!--- AQUI SOLO VA LA VARIABLE $fechas--->
             <button type="button" id="calendar" onclick="openCalendarModal(this)"
@@ -630,7 +663,7 @@
             <div class="flex justify-center items-center mt-3 gap-2">
 
                 {{-- VER --}}
-                 <div class="flex justify-center items-center mt-3">
+                 <div class="flex justify-center items-center">
             <button type="button"
             onclick="openFase3DetailsModal(this)"
             class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
@@ -645,7 +678,7 @@
                 {{-- EDITAR / RESPONDER --}}
                 <button type="button"
                     onclick="openFase4ComiteModal(this)"
-                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white rounded-lg relative inline-flex items-center justify-center w-10 h-10">
+                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white rounded-lg relative inline-flex items-center justify-center">
                     <i class="fa-solid fa-reply"></i>
                     <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
                         <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
@@ -2974,6 +3007,166 @@
         </div>
     </div>
 
+    <!-- ICFES MODAL - Para prácticas (Fases 5 y 6) -->
+@if ($fase_actual >= 5 && $fase_actual <= 6)
+    @if ($submited_icfes_practicas === "false")
+        <!-- Modal Estudiante -->
+        <div id="icfesEstudianteModal" class="fixed z-50 inset-0 overflow-y-auto">
+            <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeIcfesEstudianteModal()">
+                <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
+                    <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative" onclick="event.stopPropagation()">
+                        <button class="modal-close-btn-custom" onclick="closeIcfesEstudianteModal()">&times;</button>
+                        <form id="icfesEstudianteForm" class="p-6 mt-2">
+                            @csrf
+                            <p class="text-2xl font-bold" style="margin: 0.8rem 0 1.5rem 0;" id="icfesEstudianteTitle"></p>
+                            <p class="font-medium text-sm text-gray-700 text-justify">En este formulario el estudiante podrá cargar los resultados de su prueba saber TyT/Pro en dado caso de que pueda hacer parte de los beneficios establecidos en el <a href="https://www.uts.edu.co/sitio/estudiantes/" target="_blank" class="text-blue-500 underline uppercase">reglamento de estímulos</a>. Debe cargar un solo archivo en formato PDF, el comité de trabajos de grado revisará la validez del documento y dará respuesta al estudiante. Tenga en cuenta la siguiente información:</p>
+                            <p class="font-medium text-sm text-gray-700 my-4">Si en su práctica hay más de un integrante debe tener presente lo siguiente:</p>
+                            <ul class="list-disc">
+                                <li class="ml-4 font-medium text-sm text-gray-700 text-justify">Si <strong>UN</strong> solo integrante cumple con el puntaje requerido, únicamente ese integrante deberá cargar desde su cuenta los resultados en formato PDF. El otro u otros integrantes deberán continuar el desarrollo de la práctica de forma normal.</li>
+                                <li class="ml-4 font-medium text-sm text-gray-700 text-justify">Si <strong>TODOS</strong> los integrantes cumplen con el puntaje, cada uno deberá cargar los resultados desde su propia cuenta en formato PDF. El comité se encargará de finalizar toda la práctica.</li>
+                                <li class="ml-4 font-medium text-sm text-gray-700 text-justify">Si <strong>NINGUNO</strong> cumple con el puntaje, el comité no aprobará ningún beneficio a los estudiantes.</li>
+                            </ul>
+                            <input type="hidden" name="practica_id" id="practica_id" value="{{ $practica->id }}">
+                            <input type="hidden" name="submited_icfes_practicas" id="submited_icfes_practicas" value="{{ auth()->user()->id }}_true">
+                            <div class="grid grid-cols-1 gap-6 mt-4">
+                                <div class="flex items-center gap-2">
+                                    <label for="doc_icfes_practicas" class="block font-medium text-sm text-gray-700">
+                                        <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                        <span class="text-red-600 mr-1 text-lg">*</span>Evidencias de resultados pruebas TyT/Pro
+                                    </label>
+                                    <div class="relative inline-block">
+                                        <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon" data-tooltip="tooltip-doc_icfes_practicas"></i>
+                                        <div id="tooltip-doc_icfes_practicas" style="width: 10rem; left: -100px;" class="hidden absolute z-10 max-w-[90vw] px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg left-1/2 -translate-x-1/2 bottom-full mb-2 sm:translate-x-0">
+                                            <p class="uppercase font-bold mb-2">Instrucciones:</p>
+                                            Solo se debe subir un archivo en formato PDF.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="w-full relative py-9 bg-gray-50 rounded-2xl border border-2 border-gray-300 gap-3 grid border-dashed" id="dropzone_doc_icfes_practicas">
+                                    <div class="grid gap-1">
+                                        <i class="mx-auto text-4xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                        <h2 class="text-center text-gray-400 text-xs leading-4">Solo archivos PDF de máximo 4MB</h2>
+                                    </div>
+                                    <div class="grid gap-2">
+                                        <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
+                                        <div class="flex items-center justify-center">
+                                            <input type="file" name="doc_icfes_practicas[]" id="doc_icfes_practicas" class="absolute inset-0 opacity-0 cursor-pointer" accept=".pdf" />
+                                            <div class="flex w-28 h-9 px-1 flex-col bg-uts-500 rounded-full shadow text-white text-sm font-semibold leading-4 items-center justify-center cursor-pointer focus:outline-none">Cargar</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <span id="doc_icfes_practicasError" class="text-red-500 text-sm"></span>
+                            <ul id="doc_icfes_practicas-file-list" class="mt-4 text-gray-600 text-sm list-disc pl-5"></ul>
+                            <span id="doc_icfes_practicas-files-size" class="text-gray-800 text-sm"></span>
+                            <div class="mt-8 flex justify-end space-x-2">
+                                <button type="button" onclick="closeIcfesEstudianteModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cancelar</button>
+                                <button id="icfesEstudianteButton" type="submit" class="flex bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg">
+                                    <svg id="loadingSpinner-icfesEstudiante" style="margin: 4px 10px 4px 0" class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+    <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+    <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
+</svg>
+                                    Enviar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Admin -->
+<div id="icfesAdminModal" class="fixed z-50 inset-0 overflow-y-auto">
+    <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeIcfesAdminModal()">
+        <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative" onclick="event.stopPropagation()">
+                <button class="modal-close-btn-custom" onclick="closeIcfesAdminModal()">&times;</button>
+                <form id="icfesAdminForm" class="p-6 mt-2">
+                    @csrf
+                    <p class="text-2xl font-bold" style="margin: 0.8rem 0 1.5rem 0;" id="icfesAdminTitle"></p>
+
+                    <input type="hidden" name="practica_id" id="practica_id" value="{{ $practica->id }}">
+
+                    <div class="mb-4">
+                        <label for="estado_icfes_practicas" class="block font-medium text-sm text-gray-700">
+                            <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                            Estado de la solicitud:
+                        </label>
+                        <select name="estado_icfes_practicas" id="estado_icfes_practicas" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full focus:ring-uts-500 focus:border-uts-500">
+                            <option value="" selected disabled>Selecciona una opción</option>
+                            <option value="Aprobado">Aprobado</option>
+                            <option value="Rechazado">Rechazado</option>
+                        </select>
+                        <span id="estado_icfes_practicasError" class="text-red-500 text-sm"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="estudiante_id_practicas" class="block font-medium text-sm text-gray-700">
+                            <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                            Integrante de la práctica:
+                        </label>
+                        <select name="estudiante_id" id="estudiante_id_practicas" lang="es" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full focus:ring-uts-500 focus:border-uts-500">
+                            <option value="" selected disabled>Selecciona una opción</option>
+                            @foreach ($lista_integrantes as $integrante)
+                                <option value="{{ $integrante->id }}">{{ $integrante->name }}</option>
+                            @endforeach
+                        </select>
+                        <span id="estudiante_id_practicasError" class="text-red-500 text-sm"></span>
+                    </div>
+
+                    <!-- ========== CAMPOS DE ACTA (igual que en proyectos de grado) ========== -->
+
+                    <div class="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-6">
+    <div>
+        <label for="nro_acta_icfes_practicas" class="block font-medium text-sm text-gray-700">
+            <i class="fa-regular fa-file-lines mr-1 text-gray-500"></i>
+            Número de acta:
+        </label>
+        <input type="number" name="nro_acta_icfes_practicas" id="nro_acta_icfes_practicas"
+            class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full focus:ring-uts-500 focus:border-uts-500"
+            placeholder="Ingrese el número de acta">
+        <span id="nro_acta_icfes_practicasError" class="text-red-500 text-sm"></span>
+    </div>
+    <div>
+        <label for="fecha_acta_icfes_practicas" class="block font-medium text-sm text-gray-700">
+            <i class="fa-regular fa-calendar-days mr-1 text-gray-500"></i>
+            Fecha del acta:
+        </label>
+        <input type="date" name="fecha_acta_icfes_practicas" id="fecha_acta_icfes_practicas"
+            class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full focus:ring-uts-500 focus:border-uts-500">
+        <span id="fecha_acta_icfes_practicasError" class="text-red-500 text-sm"></span>
+    </div>
+</div>
+
+
+                    <div class="mb-4">
+                        <label for="respuesta_icfes_practicas" class="block font-medium text-sm text-gray-700" style="margin-bottom: 5px;">
+                            <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                            Comentarios de la respuesta:
+                        </label>
+                        <div id="txt-editor-icfes-practicas" class="txt-editor-quill shadow"></div>
+                        <textarea name="respuesta_icfes_practicas" id="respuesta_icfes_practicas" class="hidden"></textarea>
+                        <span id="respuesta_icfes_practicasError" class="text-red-500 text-sm"></span>
+                    </div>
+
+                    <div class="mt-2 flex justify-end space-x-2">
+                        <button type="button" onclick="closeIcfesAdminModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cancelar</button>
+                        <button id="icfesAprobarButton" type="submit" class="flex bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg">
+                            <svg id="loadingSpinner-icfesAdmin" style="margin: 4px 10px 4px 0" class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                                <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
+                            </svg>
+                            Responder
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+    @endif
+@endif
+    
     @push('styles')
         <style>
             .hidden {
@@ -3161,6 +3354,222 @@ function closeCalendarModal() {
     }
 }
 </script>
+
+        <script>
+
+            // ESTUDIANTE - Enviar solicitud
+// En lugar de usar .on('submit'), usa .submit() con return false
+
+$(document).ready(function() {
+    // ESTUDIANTE
+    $('#icfesEstudianteForm').submit(function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        console.log('Formulario ICFES estudiante - Enviando AJAX');
+        
+        const loadingSpinner = document.getElementById('loadingSpinner-icfesEstudiante');
+        const url = '/practicas/icfes';
+        const formData = new FormData(this);
+
+        // Validar archivo
+        const fileInput = document.getElementById('doc_icfes_practicas');
+        if (!fileInput.files || fileInput.files.length === 0) {
+            Swal.fire({
+                title: 'Error',
+                text: 'Debe seleccionar un archivo PDF',
+                icon: 'error',
+                confirmButtonColor: '#C1D631'
+            });
+            return false;
+        }
+
+        Swal.fire({
+            heightAuto: false,
+            title: '¿Está seguro?',
+            text: "No podrá editar la información una vez se envíe",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#C1D631',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, enviar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                if (loadingSpinner) loadingSpinner.classList.remove('hidden');
+                
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        Swal.fire({
+                            title: '¡Enviado!',
+                            text: response.success || 'Información enviada correctamente',
+                            icon: 'success',
+                            confirmButtonColor: '#C1D631'
+                        });
+                        closeIcfesEstudianteModal();
+                        setTimeout(() => location.reload(), 1500);
+                    },
+                    error: function(xhr) {
+                        if (xhr.responseJSON && xhr.responseJSON.errors) {
+                            const errors = xhr.responseJSON.errors;
+                            if (errors.doc_icfes_practicas) {
+                                $('#doc_icfes_practicasError').text(errors.doc_icfes_practicas[0]);
+                            }
+                        } else {
+                            Swal.fire({
+                                title: 'Error',
+                                text: xhr.responseJSON?.error || 'Ocurrió un error',
+                                icon: 'error',
+                                confirmButtonColor: '#C1D631'
+                            });
+                        }
+                    },
+                    complete: function() {
+                        if (loadingSpinner) loadingSpinner.classList.add('hidden');
+                    }
+                });
+            }
+        });
+        
+        return false; // Importante: evitar doble envío
+    });
+    
+    // ADMIN
+    $('#icfesAdminForm').submit(function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        console.log('Formulario ICFES admin - Enviando AJAX');
+        
+        const loadingSpinner = document.getElementById('loadingSpinner-icfesAdmin');
+        const url = '/practicas/icfes/responder';
+        const formData = new FormData(this);
+
+        // Validar campos requeridos
+        const estado = $('#estado_icfes_practicas').val();
+        if (!estado) {
+            $('#estado_icfes_practicasError').text('Debe seleccionar un estado');
+            return false;
+        }
+        
+        const estudianteId = $('#estudiante_id_practicas').val();
+        if (!estudianteId) {
+            $('#estudiante_id_practicasError').text('Debe seleccionar un integrante');
+            return false;
+        }
+
+        Swal.fire({
+            heightAuto: false,
+            title: '¿Está seguro?',
+            text: "Esta acción no se puede deshacer",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#C1D631',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, responder',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                if (loadingSpinner) loadingSpinner.classList.remove('hidden');
+                
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        Swal.fire({
+                            title: '¡Respondido!',
+                            text: response.success || 'Respuesta enviada correctamente',
+                            icon: 'success',
+                            confirmButtonColor: '#C1D631'
+                        });
+                        closeIcfesAdminModal();
+                        setTimeout(() => location.reload(), 1500);
+                    },
+                    error: function(xhr) {
+                        if (xhr.status === 422 && xhr.responseJSON.errors) {
+                            const errors = xhr.responseJSON.errors;
+                            if (errors.estado_icfes_practicas) $('#estado_icfes_practicasError').text(errors.estado_icfes_practicas[0]);
+                            if (errors.estudiante_id) $('#estudiante_id_practicasError').text(errors.estudiante_id[0]);
+                            if (errors.nro_acta_icfes_practicas) $('#nro_acta_icfes_practicasError').text(errors.nro_acta_icfes_practicas[0]);
+                            if (errors.fecha_acta_icfes_practicas) $('#fecha_acta_icfes_practicasError').text(errors.fecha_acta_icfes_practicas[0]);
+                            if (errors.respuesta_icfes_practicas) $('#respuesta_icfes_practicasError').text(errors.respuesta_icfes_practicas[0]);
+                        } else {
+                            Swal.fire({
+                                title: 'Error',
+                                text: xhr.responseJSON?.error || 'Ocurrió un error',
+                                icon: 'error',
+                                confirmButtonColor: '#C1D631'
+                            });
+                        }
+                    },
+                    complete: function() {
+                        if (loadingSpinner) loadingSpinner.classList.add('hidden');
+                    }
+                });
+            }
+        });
+        
+        return false;
+    });
+});
+
+            // ESTUDIANTE
+            function openIcfesEstudianteModal() {
+                new fileInput('doc_icfes_practicas', 'dropzone_doc_icfes_practicas', 'pdf', 1, 4, 'doc_icfes_practicas-file-list', 'doc_icfes_practicas-files-size');
+
+                $('#icfesEstudianteTitle').html(`Beneficio saber <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">TYT/PRO</span>`);
+
+                $('#doc_icfes_practicas').val('');
+                $('#doc_icfes_practicasError').text('');
+
+                $('#icfesEstudianteModal').addClass('show');
+            }
+
+            function closeIcfesEstudianteModal() {
+                $('#icfesEstudianteModal').removeClass('show');
+            }
+
+            // ADMIN
+            function openIcfesAdminModal() {
+    initQuillEditor(undefined, "Describa los detalles de la respuesta para el estudiante.", 'txt-editor-icfes-practicas', 'respuesta_icfes_practicas');
+
+    $('#icfesAdminTitle').html(`Beneficio saber <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">TYT/PRO</span>`);
+
+    // Limpiar campos
+    $('#estado_icfes_practicas').val('');
+    $('#estudiante_id_practicas').val('').trigger('change');
+    $('#nro_acta_icfes_practicas').val('');      // ← Nuevo
+    $('#fecha_acta_icfes_practicas').val('');    // ← Nuevo
+    $('#respuesta_icfes_practicas').val('');
+
+    // Limpiar errores
+    $('#estado_icfes_practicasError').text('');
+    $('#estudiante_id_practicasError').text('');
+    $('#nro_acta_icfes_practicasError').text('');   // ← Nuevo
+    $('#fecha_acta_icfes_practicasError').text(''); // ← Nuevo
+    $('#respuesta_icfes_practicasError').text('');
+
+    $('#icfesAdminModal').addClass('show');
+}
+
+            function closeIcfesAdminModal() {
+                $('#icfesAdminModal').removeClass('show');
+            }
+        </script>
 
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         

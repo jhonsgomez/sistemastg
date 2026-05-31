@@ -252,7 +252,11 @@ Route::middleware('permission:view_practicas')
         Route::post('/fase5/store',[RoadMapPracticaController::class, 'storeFase5'])->name('practicas.fase5.store');
         Route::post('/fase5/details',[RoadMapPracticaController::class, 'getFase5Details'])->name('practicas.fase5.details');
         Route::post('/fase5/reply',[RoadMapPracticaController::class, 'replyFase5'])->name('practicas.fase5.reply');
-        
+
+        // Rutas para estímulo ICFES en prácticas
+// Rutas para estímulo ICFES en prácticas
+Route::post('/practicas/icfes', [RoadMapPracticaController::class, 'storeIcfesSolicitud'])->name('practicas.icfes.store');
+Route::post('/practicas/icfes/responder', [RoadMapPracticaController::class, 'responderIcfesSolicitud'])->name('practicas.icfes.responder');
 
       
         

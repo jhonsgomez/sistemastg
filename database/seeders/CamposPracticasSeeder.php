@@ -670,14 +670,55 @@ class CamposPracticasSeeder extends Seeder
 
             );
 
+            /* BENEFICIO ICFES */
+
+    // 1. DOCUMENTO ICFES (PDF con resultados Saber TyT/Pro)
+    Campo::updateOrCreate(
+        [
+            'tipo_solicitud_id' => $practicas_fase_5->id,
+            'name' => 'doc_icfes_practicas'
+        ],
+        [
+            'label' => 'Evidencias de resultados pruebas TyT/Pro',
+            'type' => 'file',
+            'required' => false,
+            'instructions' => '<p><strong>Instrucciones:</strong> Solo se debe subir un archivo en formato PDF con los resultados de la prueba Saber TyT/Pro. Tamaño máximo 4MB.</p>'
+        ]
+    );
+
+    // 2. BANDERA PARA VALIDAR EL ENVÍO ICFES (almacena JSON con IDs de estudiantes que enviaron)
+    Campo::updateOrCreate(
+        [
+            'tipo_solicitud_id' => $practicas_fase_5->id,
+            'name' => 'submited_icfes_practicas'
+        ],
+        [
+            'label' => 'Bandera para validar el envío ICFES',
+            'type' => 'hidden',
+            'required' => false,
+            'instructions' => null
+        ]
+    );
+
+    // 3. BANDERA PARA VALIDAR BENEFICIARIOS ICFES (almacena JSON con IDs de estudiantes beneficiados)
+    Campo::updateOrCreate(
+        [
+            'tipo_solicitud_id' => $practicas_fase_5->id,
+            'name' => 'beneficiarios_icfes_practicas'
+        ],
+        [
+            'label' => 'Bandera para validar beneficiario ICFES',
+            'type' => 'hidden',
+            'required' => false,
+            'instructions' => null
+        ]
+    );
+            
         }
 
 
         ################### FASE 6 ###############################
         $tipoFase6 = TipoSolicitud::where('nombre','practicas_fase_6')->first();
-
-
-
 
 
 

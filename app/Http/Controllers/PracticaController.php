@@ -251,6 +251,12 @@ class PracticaController extends Controller
         ->addColumn('estado', function ($p) {
             $return_html = '<div class="flex gap-2 flex-wrap items-center justify-center">';
 
+            // ========== BADGE BENEFICIARIO ICFES ==========
+            $acceso = $this->esBeneficiarioIcfesListaPractica($p);
+            
+            // Badge para beneficiario ICFES (solo estudiantes en Fase 5 o 6)
+            $badge_beneficiario_icfes = '<span class="shadow bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded border border-blue-300">Beneficiario ICFES</span>';
+            
             if ($p->estado === 'Rechazada') {
                 $badge = "<span class='shadow bg-red-100 text-red-800 text-sm font-medium px-2.5 py-0.5 rounded border border-red-300'>Rechazada</span>";
                 return $return_html . $badge . "</div>";
@@ -309,7 +315,7 @@ class PracticaController extends Controller
                 if ($respondioEvaluador) {
                     $htmlEstado = "
                         <span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 4</span>
-                        <span class='shadow bg-purple-100 text-purple-800 text-sm font-medium px-2.5 py-0.5 rounded border border-purple-300'>Comité</span>";
+                        <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Comité</span>";
                 } else {
                     $htmlEstado = "
                         <span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 4</span>
@@ -318,11 +324,18 @@ class PracticaController extends Controller
             }
 
             elseif ($p->estado === 'Fase 5') {
+
+                
+
                 $submited = $p->valoresCampos
                     ->where('campo.name', 'submited_fase5')
                     ->first();
                 $yaEnvio = $submited && $submited->valor === 'true';
 
+                // Verificar si es beneficiario ICFES
+    $esBeneficiario = $this->esBeneficiarioIcfesListaPractica($p);
+    $badgeBeneficiario = $esBeneficiario ? '<span class="shadow bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded border border-blue-300">Beneficiario ICFES</span>' : '';
+                
                 if ($yaEnvio) {
                     $htmlEstado = "
                         <span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 5</span>
@@ -342,6 +355,10 @@ class PracticaController extends Controller
 
                 $respondioEvaluador = $estadoEvaluador && !empty($estadoEvaluador->valor);
 
+                // Verificar si es beneficiario ICFES
+    $esBeneficiario = $this->esBeneficiarioIcfesListaPractica($p);
+    $badgeBeneficiario = $esBeneficiario ? '<span class="shadow bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded border border-blue-300">Beneficiario ICFES</span>' : '';
+                
                 if ($respondioEvaluador) {
                     $htmlEstado = "
                         <span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 6</span>
@@ -429,6 +446,35 @@ class PracticaController extends Controller
         })
         ->rawColumns(['estado', 'acciones', 'descripcion'])
         ->make(true);
+}
+
+    // Dentro del método getData(), después de las funciones existentes
+// Agrega esta función auxiliar
+
+private function esBeneficiarioIcfesListaPractica($practica)
+{
+    if (!auth()->user()->hasRole('estudiante')) {
+        return false;
+    }
+
+    $campoBeneficiario = Campo::where('name', 'beneficiarios_icfes_practicas')
+        ->where('tipo_solicitud_id', $practica->tipo_solicitud_id)
+        ->first();
+
+    if (!$campoBeneficiario) {
+        return false;
+    }
+
+    $valorBeneficiario = $practica->valoresCampos
+        ->where('campo_id', $campoBeneficiario->id)
+        ->first();
+
+    if (!$valorBeneficiario || !$valorBeneficiario->valor) {
+        return false;
+    }
+
+    $beneficiarios = json_decode($valorBeneficiario->valor, true) ?? [];
+    return in_array(auth()->user()->id, $beneficiarios);
 }
 
 
