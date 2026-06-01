@@ -717,10 +717,77 @@ class CamposPracticasSeeder extends Seeder
         }
 
 
-        ################### FASE 6 ###############################
-        $tipoFase6 = TipoSolicitud::where('nombre','practicas_fase_6')->first();
 
 
+        // ################ FASE 6 #####################
+
+        $practicas_fase_6 = TipoSolicitud::where('nombre', 'practicas_fase_6')->first();
+        if ($practicas_fase_6) {
+
+            //--------------------- EVALUADOR ---------------------------------------
+
+            // Respuesta evaluador
+            Campo::updateOrCreate(
+                [
+                    'tipo_solicitud_id' => $practicas_fase_6->id,
+                    'name' => 'respuesta_evaluador_fase6'
+                ],
+                [
+                    'label' => 'Respuesta del evaluador',
+                    'type' => 'textarea',
+                    'required' => false,
+                    'instructions' => null
+                ]
+            );
+
+            // Estado evaluador fase 6
+            Campo::updateOrCreate(
+                [
+                    'tipo_solicitud_id' => $practicas_fase_6->id,
+                    'name' => 'estado_evaluador_fase6'
+                ],
+                [
+                    'label' => 'Estado respuesta evaluador fase 6',
+                    'type' => 'select',
+                    'required' => false,
+                    'instructions' => null
+                ]
+            );
+
+            // ================= COMITÉ =================
+
+            // Estado comité fase 6
+            Campo::updateOrCreate(
+                [
+                    'tipo_solicitud_id' => $practicas_fase_6->id,
+                    'name' => 'estado_comite_fase6'
+                ],
+                [
+                    'label' => 'Estado respuesta comité fase 6',
+                    'type' => 'select',
+                    'required' => false,
+                    'instructions' => null
+                ]
+            );
+
+            // Respuesta comité fase 6
+            Campo::updateOrCreate(
+                [
+                    'tipo_solicitud_id' => $practicas_fase_6->id,
+                    'name' => 'respuesta_comite_fase6'
+                ],
+                [
+                    'label' => 'Respuesta del comité',
+                    'type' => 'textarea',
+                    'required' => false,
+                    'instructions' => null
+                ]
+            );
+
+        }
+
+        // Fase Final Practicas
+        TipoSolicitud::updateOrCreate(['nombre' => 'practicas_finalizada'],['descripcion' => 'Práctica finalizada']);
 
 
 

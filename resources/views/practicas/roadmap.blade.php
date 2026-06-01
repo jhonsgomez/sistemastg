@@ -1,8 +1,6 @@
 <!-- Vista Roadmap - seguimiento de prácticas -->
 <x-app-layout>
-
     <x-slot name="header">
-
     </x-slot>
 
     @push('styles')
@@ -75,8 +73,11 @@
             #fase4ComiteModal,
             #fase5EstudianteModal,
             #fase5DetailsModal,
-#icfesEstudianteModal,
-#icfesAdminModal
+            #fase6EvaluadorModal,
+            #fase6DetailsModal,
+            #fase6ComiteModal,
+            #icfesEstudianteModal,
+            #icfesAdminModal
             {
                 visibility: hidden !important;
                 opacity: 0 !important;
@@ -108,8 +109,11 @@
             #fase4ComiteModal.show,
             #fase5EstudianteModal.show,
             #fase5DetailsModal.show,
+            #fase6EvaluadorModal.show,
+            #fase6ComiteModal.show,
+            #fase6DetailsModal.show,
             #icfesEstudianteModal.show,
-#icfesAdminModal.show {
+            #icfesAdminModal.show {
                 visibility: visible !important;
                 opacity: 1 !important;
                 transform: translateY(0) scale(1) !important;
@@ -158,15 +162,10 @@
 
         </style>
     @endPush
-
+    <!-- ==================== ROADMAP LAS FASES ==================== -->
     <div>
-
         <div class="flex flex-col sm:flex-row justify-between items-center p-4 border-b">
-            <h2 class="font-semibold text-2xl text-gray-800 leading-tight text-center">
-                Seguimiento de <span
-                    class="bg-uts-500 text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase">Prácticas</span>
-            </h2>
-
+            <h2 class="font-semibold text-2xl text-gray-800 leading-tight text-center">Seguimiento de <span class="bg-uts-500 text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase">Prácticas</span></h2>
             <!-- Botones de acción en el header -->
             <div class="flex justify-center items-center space-x-2 buttons-container">
                 <!-- Botón Alertas (Rojo) -->
@@ -189,50 +188,50 @@
                 </button>
 
                 @if (isset($submited_icfes_practicas))
-    @if ($fase_actual >= 5 && $fase_actual <= 6)
-        @if ($submited_icfes_practicas === "false")
-            @if (auth()->user()->hasRole(['estudiante']))
-                <button type="button" id="icfes-estudiante-button" onclick="openIcfesEstudianteModal()"
-                    class="btn-action shadow bg-green-700 hover:bg-green-800 text-white px-3 py-1 rounded-lg relative">
-                    <i class="fa-solid fa-flag-checkered"></i>
-                    <svg id="loadingSpinner-icfes-estudiante" style="margin: 4px 1px" class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
-                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
-                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
-                    </svg>
-                </button>
-            @else
-                @if (auth()->user()->hasRole(['super_admin', 'admin']))
-                    <button type="button" id="icfes-admin-button" onclick="openIcfesAdminModal()"
-                        class="btn-action shadow bg-green-700 hover:bg-green-800 text-white px-3 py-1 rounded-lg relative">
-                        <i class="fa-solid fa-flag-checkered"></i>
-                        <svg id="loadingSpinner-icfes-admin" style="margin: 4px 1px" class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
-                            <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
-                            <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
-                        </svg>
-                    </button>
+                    @if ($fase_actual >= 5 && $fase_actual <= 6)
+                        @if ($submited_icfes_practicas === "false")
+                            @if (auth()->user()->hasRole(['estudiante']))
+                                <button type="button" id="icfes-estudiante-button" onclick="openIcfesEstudianteModal()"
+                                    class="btn-action shadow bg-green-700 hover:bg-green-800 text-white px-3 py-1 rounded-lg relative">
+                                    <i class="fa-solid fa-flag-checkered"></i>
+                                    <svg id="loadingSpinner-icfes-estudiante" style="margin: 4px 1px" class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
+                                    </svg>
+                                </button>
+                            @else
+                                @if (auth()->user()->hasRole(['super_admin', 'admin']))
+                                    <button type="button" id="icfes-admin-button" onclick="openIcfesAdminModal()"
+                                        class="btn-action shadow bg-green-700 hover:bg-green-800 text-white px-3 py-1 rounded-lg relative">
+                                        <i class="fa-solid fa-flag-checkered"></i>
+                                        <svg id="loadingSpinner-icfes-admin" style="margin: 4px 1px" class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                                            <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                            <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
+                                        </svg>
+                                    </button>
+                                @endif
+                            @endif
+                        @endif
+                    @endif
                 @endif
-            @endif
-        @endif
-    @endif
-@endif
                 
                 <!-- Botón Calendario (Verde) -->
                 <!--- AQUI SOLO VA LA VARIABLE $fechas--->
-            <button type="button" id="calendar" onclick="openCalendarModal(this)"
-    class="btn-action shadow bg-uts-500 hover:bg-uts-800 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
-    <i class="fa-regular fa-calendar"></i>
-    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none"
-        xmlns="http://www.w3.org/2000/svg" width="24" height="24">
-        <path
-            d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
-            stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
-        <path
-            d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
-            stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"
-            class="text-white">
-        </path>
-    </svg>
-</button>
+                <button type="button" id="calendar" onclick="openCalendarModal(this)"
+                    class="btn-action shadow bg-uts-500 hover:bg-uts-800 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+                    <i class="fa-regular fa-calendar"></i>
+                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none"
+                        xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                        <path
+                            d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
+                            stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <path
+                            d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
+                            stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"
+                            class="text-white">
+                        </path>
+                    </svg>
+                </button>
 
                 <!-- Botón Configuración (Gris) -->
                 <button onclick="openConfiguracionModal()"
@@ -249,405 +248,379 @@
             </div>
         </div>
         
-        
         <!-- Nota informativa -->
         
-        <!-- Container donde aparecen las fases -->
+        <!-- Roadmap de las Fases de Practicas Empresariales-->
         <div id="px-6">
-            <p class="text-gray-700 mt-6">
-                Aquí podrás llevar el seguimiento de tus prácticas empresariales en curso.
-            </p>
+            <p class="text-gray-700 mt-6">Aquí podrás llevar el seguimiento de tus prácticas empresariales en curso.</p>
             <div class="mt-6 grid w-full grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
 
-                <!-- FASE 1 -->
-<div id="fase-1"
-    class="relative mx-auto flex flex-col items-center justify-center bg-white text-gray-600 rounded-lg shadow-lg h-60 w-full sm:w-50 border card-fase {{ $fase_actual >= 1 ? 'card-activated' : '' }} {{ $fase_actual == 1 ? 'card-activated-animated' : '' }}">
-
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-10">
-        <path fill-rule="evenodd"
-            d="M5.625 1.5H9a3.75 3.75 0 0 1 3.75 3.75v1.875c0 1.036.84 1.875 1.875 1.875H16.5a3.75 3.75 0 0 1 3.75 3.75v7.875c0 1.035-.84 1.875-1.875 1.875H5.625a1.875 1.875 0 0 1-1.875-1.875V3.375c0-1.036.84-1.875 1.875-1.875Zm6.905 9.97a.75.75 0 0 0-1.06 0l-3 3a.75.75 0 1 0 1.06 1.06l1.72-1.72V18a.75.75 0 0 0 1.5 0v-4.19l1.72 1.72a.75.75 0 1 0 1.06-1.06l-3-3Z"
-            clip-rule="evenodd" />
-        <path
-            d="M14.25 5.25a5.23 5.23 0 0 0-1.279-3.434 9.768 9.768 0 0 1 6.963 6.963A5.23 5.23 0 0 0 16.5 7.5h-1.875a.375.375 0 0 1-.375-.375V5.25Z" />
-    </svg>
-
-    <span class="text-center font-bold text-lg">Fase 1: F-DC-126</span>
-    <p class="text-center mt-2 text-xs mx-4">El estudiante envía el formato de solicitud de practicantes.</p>
-
-    @if ($fase_actual == 1)
-        @php
-            $user = auth()->user();
-            $esEstudiante = $user->hasRole('estudiante');
-            $esComite = $user->hasRole(['super_admin', 'admin', 'coordinador']);
-            $yaEnvio = $submited_fase1 == 'true';
-        @endphp
-
-        @if ($esEstudiante && !$yaEnvio)
-            <!-- Estudiante: Mostrar botón para enviar SOLO si no ha enviado o fue rechazado -->
-            <div class="flex justify-center items-center mt-3">
-                <button type="button" onclick="openFase1EstudianteModal()"
-                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
-                    <i class="fa-solid fa-user-pen"></i>
-                </button>
-            </div>
-        @elseif ($esEstudiante && $yaEnvio)
-            <!-- Estudiante: Después de enviar, SOLO puede ver detalles (no puede reenviar hasta que el comité rechace) -->
-            <div class="flex justify-center items-center mt-3">
-                <button type="button" onclick="openFase1DetailsModal(this)"
-                    class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
-                    <i class="fa-solid fa-eye"></i>
-                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
-                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
+                <!-- ROADMAP FASE 1 F-DC-126 -->
+                <div id="fase-1" class="relative mx-auto flex flex-col items-center justify-center bg-white text-gray-600 rounded-lg shadow-lg h-60 w-full sm:w-50 border card-fase {{ $fase_actual >= 1 ? 'card-activated' : '' }} {{ $fase_actual == 1 ? 'card-activated-animated' : '' }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-10">
+                        <path fill-rule="evenodd"
+                            d="M5.625 1.5H9a3.75 3.75 0 0 1 3.75 3.75v1.875c0 1.036.84 1.875 1.875 1.875H16.5a3.75 3.75 0 0 1 3.75 3.75v7.875c0 1.035-.84 1.875-1.875 1.875H5.625a1.875 1.875 0 0 1-1.875-1.875V3.375c0-1.036.84-1.875 1.875-1.875Zm6.905 9.97a.75.75 0 0 0-1.06 0l-3 3a.75.75 0 1 0 1.06 1.06l1.72-1.72V18a.75.75 0 0 0 1.5 0v-4.19l1.72 1.72a.75.75 0 1 0 1.06-1.06l-3-3Z"
+                            clip-rule="evenodd" />
+                        <path
+                            d="M14.25 5.25a5.23 5.23 0 0 0-1.279-3.434 9.768 9.768 0 0 1 6.963 6.963A5.23 5.23 0 0 0 16.5 7.5h-1.875a.375.375 0 0 1-.375-.375V5.25Z" />
                     </svg>
-                </button>
-            </div>
-        @elseif ($esComite)
-            <!-- Comité: Botones con estilos unificados -->
-            <div class="flex justify-center items-center mt-3 gap-2">
-                <!-- Botón Ver con spinner -->
-                <button type="button" onclick="openFase1DetailsModal(this)"
-                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white rounded-lg relative inline-flex items-center justify-center">
-                    <i class="fa-solid fa-eye"></i>
-                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
-                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
-                    </svg>
-                </button>
 
-                <!-- Botón Responder con spinner -->
-                @if ($yaEnvio)
-                    <button type="button" onclick="openFase1AdminModal(this)"
-                        class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white rounded-lg relative inline-flex items-center justify-center">
-                        <i class="fa-solid fa-share"></i>
-                        <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
-                            <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
-                        </svg>
-                    </button>
-                @endif
-            </div>
-        @endif
-    @elseif ($fase_actual > 1)
-        <!-- Fase ya aprobada: Solo mostrar botón de ver detalles con spinner -->
-        <div class="flex justify-center items-center mt-3">
-            <button type="button" onclick="openFase1DetailsModal(this)"
-                class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
-                <i class="fa-solid fa-eye"></i>
-                <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
-                    <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
-                </svg>
-            </button>
-        </div>
-    @endif
-</div>
+                    <span class="text-center font-bold text-lg">Fase 1: F-DC-126</span>
+                    <p class="text-center mt-2 text-xs mx-4">El estudiante envía el formato de solicitud de practicantes.</p>
 
-                <!-- FASE 2: Pago de modalidad -->
-<div id="fase-2"
-    class="relative mx-auto flex flex-col items-center justify-center bg-white text-gray-600 rounded-lg shadow-lg h-60 w-full sm:w-50 border card-fase {{ $fase_actual >= 2 ? 'card-activated' : '' }} {{ $fase_actual == 2 ? 'card-activated-animated' : '' }}">
+                    @if ($fase_actual == 1)
+                        @php
+                            $user = auth()->user();
+                            $esEstudiante = $user->hasRole('estudiante');
+                            $esComite = $user->hasRole(['super_admin', 'admin', 'coordinador']);
+                            $yaEnvio = $submited_fase1 == 'true';
+                        @endphp
 
-    <i class="fa-solid fa-circle-check" style="font-size: 32px; margin-bottom: 10px;"></i>
+                        @if ($esEstudiante && !$yaEnvio)
+                            <!-- Estudiante: Mostrar botón para enviar SOLO si no ha enviado o fue rechazado -->
+                            <div class="flex justify-center items-center mt-3">
+                                <button type="button" onclick="openFase1EstudianteModal()"
+                                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+                                    <i class="fa-solid fa-user-pen"></i>
+                                </button>
+                            </div>
+                        @elseif ($esEstudiante && $yaEnvio)
+                            <!-- Estudiante: Después de enviar, SOLO puede ver detalles (no puede reenviar hasta que el comité rechace) -->
+                            <div class="flex justify-center items-center mt-3">
+                                <button type="button" onclick="openFase1DetailsModal(this)"
+                                    class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+                                    <i class="fa-solid fa-eye"></i>
+                                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        @elseif ($esComite)
+                            <!-- Comité: Botones con estilos unificados -->
+                            <div class="flex justify-center items-center mt-3 gap-2">
+                                <!-- Botón Ver con spinner -->
+                                <button type="button" onclick="openFase1DetailsModal(this)"
+                                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white rounded-lg relative inline-flex items-center justify-center">
+                                    <i class="fa-solid fa-eye"></i>
+                                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
+                                    </svg>
+                                </button>
 
-    <span class="text-center font-bold text-lg">Fase 2: Pago</span>
-    <p class="text-center mt-2 text-xs mx-4">El estudiante sube la liquidación y soporte de pago.</p>
+                                <!-- Botón Responder con spinner -->
+                                @if ($yaEnvio)
+                                    <button type="button" onclick="openFase1AdminModal(this)"
+                                        class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white rounded-lg relative inline-flex items-center justify-center">
+                                        <i class="fa-solid fa-share"></i>
+                                        <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                            <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
+                                        </svg>
+                                    </button>
+                                @endif
+                            </div>
+                        @endif
+                    @elseif ($fase_actual > 1)
+                        <!-- Fase ya aprobada: Solo mostrar botón de ver detalles con spinner -->
+                        <div class="flex justify-center items-center mt-3">
+                            <button type="button" onclick="openFase1DetailsModal(this)"
+                                class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+                                <i class="fa-solid fa-eye"></i>
+                                <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    @endif
+                </div>
 
-    @if ($fase_actual == 2)
-        @php
-            $user = auth()->user();
-            $esEstudiante = $user->hasRole('estudiante');
-            $esComite = $user->hasRole(['super_admin', 'admin', 'coordinador']);
-            $yaEnvio = $submited_fase2 == 'true';
-        @endphp
+                <!-- ROADMAP  FASE 2: PAGO  -->
+                <div id="fase-2" class="relative mx-auto flex flex-col items-center justify-center bg-white text-gray-600 rounded-lg shadow-lg h-60 w-full sm:w-50 border card-fase {{ $fase_actual >= 2 ? 'card-activated' : '' }} {{ $fase_actual == 2 ? 'card-activated-animated' : '' }}">
+                    <i class="fa-solid fa-circle-check" style="font-size: 32px; margin-bottom: 10px;"></i>
 
-        @if ($esEstudiante && !$yaEnvio)
-            <!-- Estudiante: Mostrar botón para enviar -->
-            <div class="flex justify-center items-center mt-3">
-                <button type="button" onclick="openFase2EstudianteModal(this)"
-                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
-                    <i class="fa-solid fa-user-pen"></i>
-                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
-                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
-                    </svg>
-                </button>
-            </div>
-        @elseif ($esEstudiante && $yaEnvio)
-            <!-- Estudiante: Después de enviar, solo puede ver detalles -->
-            <div class="flex justify-center items-center mt-3">
-                <button type="button" onclick="openFase2DetailsModal(this)"
-                    class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
-                    <i class="fa-solid fa-eye"></i>
-                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
-                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
-                    </svg>
-                </button>
-            </div>
-        @elseif ($esComite)
-            <!-- Comité: Botones Ver y Responder -->
-            <div class="flex justify-center items-center mt-3 gap-2">
-                <!-- Botón Ver con spinner -->
-                <button type="button" onclick="openFase2DetailsModal(this)"
-                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white rounded-lg relative inline-flex items-center justify-center">
-                    <i class="fa-solid fa-eye"></i>
-                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
-                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
-                    </svg>
-                </button>
+                    <span class="text-center font-bold text-lg">Fase 2: Pago</span>
+                    <p class="text-center mt-2 text-xs mx-4">El estudiante sube la liquidación y soporte de pago.</p>
 
-                <!-- Botón Responder con spinner (solo si el estudiante ya envió) -->
-                @if ($yaEnvio)
-                    <button type="button" onclick="openFase2AdminModal(this)"
-                        class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white rounded-lg relative inline-flex items-center justify-center">
-                        <i class="fa-solid fa-share"></i>
-                        <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
-                            <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
-                        </svg>
-                    </button>
-                @endif
-            </div>
-        @endif
-    @elseif ($fase_actual > 2)
-        <!-- Fase ya aprobada: Solo mostrar botón de ver detalles con spinner -->
-        <div class="flex justify-center items-center mt-3">
-            <button type="button" onclick="openFase2DetailsModal(this)"
-                class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
-                <i class="fa-solid fa-eye"></i>
-                <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
-                    <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
-                </svg>
-            </button>
-        </div>
-    @endif
-</div>
+                    @if ($fase_actual == 2)
+                        @php
+                            $user = auth()->user();
+                            $esEstudiante = $user->hasRole('estudiante');
+                            $esComite = $user->hasRole(['super_admin', 'admin', 'coordinador']);
+                            $yaEnvio = $submited_fase2 == 'true';
+                        @endphp
+
+                        @if ($esEstudiante && !$yaEnvio)
+                            <!-- Estudiante: Mostrar botón para enviar -->
+                            <div class="flex justify-center items-center mt-3">
+                                <button type="button" onclick="openFase2EstudianteModal(this)"
+                                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+                                    <i class="fa-solid fa-user-pen"></i>
+                                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        @elseif ($esEstudiante && $yaEnvio)
+                            <!-- Estudiante: Después de enviar, solo puede ver detalles -->
+                            <div class="flex justify-center items-center mt-3">
+                                <button type="button" onclick="openFase2DetailsModal(this)"
+                                    class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+                                    <i class="fa-solid fa-eye"></i>
+                                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        @elseif ($esComite)
+                            <!-- Comité: Botones Ver y Responder -->
+                            <div class="flex justify-center items-center mt-3 gap-2">
+                                <!-- Botón Ver con spinner -->
+                                <button type="button" onclick="openFase2DetailsModal(this)"
+                                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white rounded-lg relative inline-flex items-center justify-center">
+                                    <i class="fa-solid fa-eye"></i>
+                                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
+                                    </svg>
+                                </button>
+
+                                <!-- Botón Responder con spinner (solo si el estudiante ya envió) -->
+                                @if ($yaEnvio)
+                                    <button type="button" onclick="openFase2AdminModal(this)"
+                                        class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white rounded-lg relative inline-flex items-center justify-center">
+                                        <i class="fa-solid fa-share"></i>
+                                        <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                            <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
+                                        </svg>
+                                    </button>
+                                @endif
+                            </div>
+                        @endif
+                    @elseif ($fase_actual > 2)
+                        <!-- Fase ya aprobada: Solo mostrar botón de ver detalles con spinner -->
+                        <div class="flex justify-center items-center mt-3">
+                            <button type="button" onclick="openFase2DetailsModal(this)"
+                                class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+                                <i class="fa-solid fa-eye"></i>
+                                <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    @endif
+                </div>
 
                 <!-- FASE 3: PROPUESTA I -->
-<div id="fase-3"
-    class="relative mx-auto flex flex-col items-center justify-center bg-white text-gray-600 rounded-lg shadow-lg h-60 w-full sm:w-50 border card-fase {{ $fase_actual >= 3 ? 'card-activated' : '' }} {{ $fase_actual == 3 ? 'card-activated-animated' : '' }}">
+                <div id="fase-3" class="relative mx-auto flex flex-col items-center justify-center bg-white text-gray-600 rounded-lg shadow-lg h-60 w-full sm:w-50 border card-fase {{ $fase_actual >= 3 ? 'card-activated' : '' }} {{ $fase_actual == 3 ? 'card-activated-animated' : '' }}">
+                    <i class="fa-solid fa-hourglass-half" style="font-size: 32px; margin-bottom: 10px;"></i>
+                    
+                    <span class="text-center font-bold text-lg">Fase 3: Propuesta I</span>
+                    <p class="text-center mt-2 text-xs mx-4">El estudiante envía la propuesta al director.</p>
 
-    <i class="fa-solid fa-hourglass-half" style="font-size: 32px; margin-bottom: 10px;"></i>
+                    @if ($fase_actual == 3)
 
-    <span class="text-center font-bold text-lg">Fase 3: Propuesta I</span>
+                        @php
+                            $user = auth()->user();
+                            
+                            $esEstudiante = $user->hasRole('estudiante');
+                            $esDirector = $user->hasRole(['super_admin', 'admin', 'coordinador', 'director_practica']);
+                            $esEvaluador = $user->hasRole(['evaluador_practica']);
+                            $esComite = $user->hasRole(['super_admin', 'admin', 'coordinador']);
+                            
+                            // Obtener valores desde la práctica
+                            $submited_fase3_valor = $practica->valoresCampos->where('campo.name', 'submited_fase3')->first();
+                            $estado_director_valor = $practica->valoresCampos->where('campo.name', 'estado_director_fase3')->first();
+                            
+                            $estudianteYaEnvio = $submited_fase3_valor && $submited_fase3_valor->valor == 'true';
+                            $directorYaRespondio = $estado_director_valor && ($estado_director_valor->valor == 'Aprobada' || $estado_director_valor->valor == 'Rechazada');
+                            $directorAprobo = $estado_director_valor && $estado_director_valor->valor == 'Aprobada';
+                        @endphp
 
-    <p class="text-center mt-2 text-xs mx-4">
-        El estudiante envía la propuesta al director.
-    </p>
+                        {{-- ESTUDIANTE --}}
+                        @if ($esEstudiante && !$estudianteYaEnvio)
+                            {{-- Estudiante: btn lápiz (puede enviar) --}}
+                            <div class="flex justify-center items-center mt-3 gap-2">
+                                <button type="button"
+                                    onclick="openFase3DetailsModal(this)"
+                                    class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+                                    <i class="fa-solid fa-eye"></i>
+                                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
+                                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
+                                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
+                                    </svg>
+                                </button>
+                                
+                                <button type="button"
+                                    onclick="openFase3EstudianteModal(this)"
+                                    class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+                                    <i class="fa-solid fa-user-pen"></i>
+                                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            
+                        @elseif ($esEstudiante && $estudianteYaEnvio)
+                            {{-- Estudiante: solo ojo (ya envió, esperando respuesta) --}}
+                            <div class="flex justify-center items-center mt-3">
+                                <button type="button"
+                                    onclick="openFase3DetailsModal(this)"
+                                    class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+                                    <i class="fa-solid fa-eye"></i>
+                                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
+                                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
+                                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
+                                    </svg>
+                                </button>
+                            </div>
 
-    @if ($fase_actual == 3)
+                            {{-- DIRECTOR --}}
+                        @elseif ($esDirector && $estudianteYaEnvio && !$directorYaRespondio)
+                            {{-- Director: ojo + responder --}}
+                            <div class="flex justify-center items-center mt-3 gap-2">
+                                <button type="button"
+                                    onclick="openFase3DetailsModal(this)"
+                                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white rounded-lg relative inline-flex items-center justify-center w-10 h-10">
+                                    <i class="fa-solid fa-eye"></i>
+                                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
+                                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
+                                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
+                                    </svg>
+                                </button>
 
-        @php
-            $user = auth()->user();
-            
-            $esEstudiante = $user->hasRole('estudiante');
-            $esDirector = $user->hasRole(['super_admin', 'admin', 'coordinador', 'director_practica']);
-            $esEvaluador = $user->hasRole(['evaluador_practica']);
-            $esComite = $user->hasRole(['super_admin', 'admin', 'coordinador']);
-            
-            // Obtener valores desde la práctica
-            $submited_fase3_valor = $practica->valoresCampos->where('campo.name', 'submited_fase3')->first();
-            $estado_director_valor = $practica->valoresCampos->where('campo.name', 'estado_director_fase3')->first();
-            
-            $estudianteYaEnvio = $submited_fase3_valor && $submited_fase3_valor->valor == 'true';
-            $directorYaRespondio = $estado_director_valor && ($estado_director_valor->valor == 'Aprobada' || $estado_director_valor->valor == 'Rechazada');
-            $directorAprobo = $estado_director_valor && $estado_director_valor->valor == 'Aprobada';
-        @endphp
+                                <button type="button"
+                                    onclick="openFase3DirModal(this)"
+                                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white rounded-lg relative inline-flex items-center justify-center w-10 h-10">
+                                    <i class="fa-solid fa-reply"></i>
+                                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
+                                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
+                                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
+                                    </svg>
+                                </button>
+                            </div>
 
-        {{-- ESTUDIANTE --}}
-        @if ($esEstudiante && !$estudianteYaEnvio)
-            {{-- Estudiante: btn lápiz (puede enviar) --}}
-            <div class="flex justify-center items-center mt-3 gap-2">
-                <button type="button"
-                    onclick="openFase3DetailsModal(this)"
-                    class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
-                    <i class="fa-solid fa-eye"></i>
-                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
-                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
-                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
-                    </svg>
-                </button>
-                
-                <button type="button"
-                    onclick="openFase3EstudianteModal(this)"
-                    class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
-                    <i class="fa-solid fa-user-pen"></i>
-                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                    </svg>
-                </button>
-            </div>
-            
-        @elseif ($esEstudiante && $estudianteYaEnvio)
-            {{-- Estudiante: solo ojo (ya envió, esperando respuesta) --}}
-            <div class="flex justify-center items-center mt-3">
-                <button type="button"
-                    onclick="openFase3DetailsModal(this)"
-                    class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
-                    <i class="fa-solid fa-eye"></i>
-                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
-                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
-                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
-                    </svg>
-                </button>
-            </div>
+                        @elseif ($esDirector && $directorYaRespondio && !$directorAprobo)
+                            {{-- Director después de RECHAZAR: solo ojo --}}
+                            <div class="flex justify-center items-center mt-3">
+                                <button type="button"
+                                    onclick="openFase3DetailsModal(this)"
+                                    class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+                                    <i class="fa-solid fa-eye"></i>
+                                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
+                                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
+                                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
+                                    </svg>
+                                </button>
+                            </div>
 
-        {{-- DIRECTOR --}}
-        @elseif ($esDirector && $estudianteYaEnvio && !$directorYaRespondio)
-            {{-- Director: ojo + responder --}}
-            <div class="flex justify-center items-center mt-3 gap-2">
-                <button type="button"
-                    onclick="openFase3DetailsModal(this)"
-                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white rounded-lg relative inline-flex items-center justify-center w-10 h-10">
-                    <i class="fa-solid fa-eye"></i>
-                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
-                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
-                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
-                    </svg>
-                </button>
+                        @elseif ($esDirector && $directorAprobo)
+                            {{-- Director después de APROBAR: solo ojo --}}
+                            <div class="flex justify-center items-center mt-3">
+                                <button type="button"
+                                    onclick="openFase3DetailsModal(this)"
+                                    class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+                                    <i class="fa-solid fa-eye"></i>
+                                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
+                                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
+                                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
+                                    </svg>
+                                </button>
+                            </div>
 
-                <button type="button"
-                    onclick="openFase3DirModal(this)"
-                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white rounded-lg relative inline-flex items-center justify-center w-10 h-10">
-                    <i class="fa-solid fa-reply"></i>
-                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
-                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
-                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
-                    </svg>
-                </button>
-            </div>
+                            {{-- EVALUADOR Y COMITÉ --}}
+                        @elseif (($esEvaluador || $esComite) && $estudianteYaEnvio)
+                            <div class="flex justify-center items-center mt-3">
+                                <button type="button"
+                                    onclick="openFase3DetailsModal(this)"
+                                    class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+                                    <i class="fa-solid fa-eye"></i>
+                                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
+                                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
+                                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        @endif
 
-        @elseif ($esDirector && $directorYaRespondio && !$directorAprobo)
-            {{-- Director después de RECHAZAR: solo ojo --}}
-            <div class="flex justify-center items-center mt-3">
-                <button type="button"
-                    onclick="openFase3DetailsModal(this)"
-                    class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
-                    <i class="fa-solid fa-eye"></i>
-                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
-                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
-                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
-                    </svg>
-                </button>
-            </div>
-
-        @elseif ($esDirector && $directorAprobo)
-            {{-- Director después de APROBAR: solo ojo --}}
-            <div class="flex justify-center items-center mt-3">
-                <button type="button"
-                    onclick="openFase3DetailsModal(this)"
-                    class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
-                    <i class="fa-solid fa-eye"></i>
-                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
-                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
-                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
-                    </svg>
-                </button>
-            </div>
-
-        {{-- EVALUADOR Y COMITÉ --}}
-        @elseif (($esEvaluador || $esComite) && $estudianteYaEnvio)
-            <div class="flex justify-center items-center mt-3">
-                <button type="button"
-                    onclick="openFase3DetailsModal(this)"
-                    class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
-                    <i class="fa-solid fa-eye"></i>
-                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
-                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
-                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
-                    </svg>
-                </button>
-            </div>
-        @endif
-
-    @elseif ($fase_actual > 3)
-        <div class="flex justify-center items-center mt-3">
-            <button type="button"
-                onclick="openFase3DetailsModal(this)"
-                class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
-                <i class="fa-solid fa-eye"></i>
-                <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
-                    <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
-                    <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
-                </svg>
-            </button>
-        </div>
-    @endif
-</div>
+                    @elseif ($fase_actual > 3)
+                        <div class="flex justify-center items-center mt-3">
+                            <button type="button"
+                                onclick="openFase3DetailsModal(this)"
+                                class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+                                <i class="fa-solid fa-eye"></i>
+                                <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
+                                    <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
+                                    <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    @endif
+                </div>
 
                 <!-- FASE 4: PROPUESTA II -->
-<div id="fase-4" class="relative mx-auto flex flex-col items-center justify-center bg-white text-gray-600 rounded-lg shadow-lg h-60 w-full sm:w-50 border card-fase {{ $fase_actual >= 4 ? 'card-activated' : '' }} {{ $fase_actual == 4 ? 'card-activated-animated' : '' }}">
-    <i class="fa-solid fa-paper-plane" style="font-size: 32px; margin-bottom: 10px;"></i>
-    <span class="text-center font-bold text-lg">Fase 4: Propuesta II</span>
-    <p class="text-center mt-2 text-xs mx-4">El evaluador revisa la propuesta del director.</p>
-            
-    @if ($fase_actual == 4)
-        @php
-            $user = auth()->user();
-            
-            $esDirector = $user->hasRole(['super_admin', 'admin', 'coordinador', 'director_practica']);
-            $esEvaluador = $user->hasRole(['evaluador_practica']);
-            $esComite = $user->hasRole(['super_admin', 'admin', 'coordinador']);
-            $esEstudiante = $user->hasRole('estudiante');
-            
-            // Obtener el estado del director en Fase 3
-            $estado_director_fase3_valor = $practica->valoresCampos->where('campo.name', 'estado_director_fase3')->first();
-            $estado_evaluador_fase4_valor = $practica->valoresCampos->where('campo.name', 'estado_evaluador_fase4')->first();
-            
-            // El director aprobó en Fase 3 (eso permite que el evaluador vea y responda en Fase 4)
-            $directorAproboFase3 = $estado_director_fase3_valor && $estado_director_fase3_valor->valor == 'Aprobada';
-            
-            $evaluadorYaRespondio = $estado_evaluador_fase4_valor && ($estado_evaluador_fase4_valor->valor == 'Aprobada' || $estado_evaluador_fase4_valor->valor == 'Rechazada');
-            $evaluadorAprobo = $estado_evaluador_fase4_valor && $estado_evaluador_fase4_valor->valor == 'Aprobada';
-        @endphp
+                <div id="fase-4" class="relative mx-auto flex flex-col items-center justify-center bg-white text-gray-600 rounded-lg shadow-lg h-60 w-full sm:w-50 border card-fase {{ $fase_actual >= 4 ? 'card-activated' : '' }} {{ $fase_actual == 4 ? 'card-activated-animated' : '' }}">
+                    <i class="fa-solid fa-paper-plane" style="font-size: 32px; margin-bottom: 10px;"></i>
+                    <span class="text-center font-bold text-lg">Fase 4: Propuesta II</span>
+                    <p class="text-center mt-2 text-xs mx-4">El evaluador revisa la propuesta del director.</p>
+                            
+                    @if ($fase_actual == 4)
+                        @php
+                            $user = auth()->user();
+                            
+                            $esDirector = $user->hasRole(['super_admin', 'admin', 'coordinador', 'director_practica']);
+                            $esEvaluador = $user->hasRole(['evaluador_practica']);
+                            $esComite = $user->hasRole(['super_admin', 'admin', 'coordinador']);
+                            $esEstudiante = $user->hasRole('estudiante');
+                            
+                            // Obtener el estado del director en Fase 3
+                            $estado_director_fase3_valor = $practica->valoresCampos->where('campo.name', 'estado_director_fase3')->first();
+                            $estado_evaluador_fase4_valor = $practica->valoresCampos->where('campo.name', 'estado_evaluador_fase4')->first();
+                            
+                            // El director aprobó en Fase 3 (eso permite que el evaluador vea y responda en Fase 4)
+                            $directorAproboFase3 = $estado_director_fase3_valor && $estado_director_fase3_valor->valor == 'Aprobada';
+                            
+                            $evaluadorYaRespondio = $estado_evaluador_fase4_valor && ($estado_evaluador_fase4_valor->valor == 'Aprobada' || $estado_evaluador_fase4_valor->valor == 'Rechazada');
+                            $evaluadorAprobo = $estado_evaluador_fase4_valor && $estado_evaluador_fase4_valor->valor == 'Aprobada';
+                        @endphp
 
-        
-        {{-- ================= EVALUADOR (puede ver y responder) ================= --}}
-        @if ($esEvaluador && $directorAproboFase3 && !$evaluadorYaRespondio)
-        <div class="flex justify-center items-center mt-3 gap-2">
-            <button type="button"
-            onclick="openFase3DetailsModal(this)"
-            class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white rounded-lg relative inline-flex items-center justify-center w-10 h-10">
-            <i class="fa-solid fa-eye"></i>
-            <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
-                <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
-                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
-                    </svg>
-                </button>
-                
-                <button type="button"
-                onclick="openFase4EvaluadorModal(this)"
-                class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white rounded-lg relative inline-flex items-center justify-center w-10 h-10">
-                <i class="fa-solid fa-reply"></i>
-                <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
-                    <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
-                    <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
-                </svg>
-            </button>
-        </div>
+                        
+                        {{-- ================= EVALUADOR (puede ver y responder) ================= --}}
+                        @if ($esEvaluador && $directorAproboFase3 && !$evaluadorYaRespondio)
+                        <div class="flex justify-center items-center mt-3 gap-2">
+                            <button type="button"
+                            onclick="openFase3DetailsModal(this)"
+                            class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white rounded-lg relative inline-flex items-center justify-center w-10 h-10">
+                            <i class="fa-solid fa-eye"></i>
+                            <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
+                                <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
+                                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
+                                    </svg>
+                                </button>
+                                
+                                <button type="button"
+                                onclick="openFase4EvaluadorModal(this)"
+                                class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white rounded-lg relative inline-flex items-center justify-center w-10 h-10">
+                                <i class="fa-solid fa-reply"></i>
+                                <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
+                                    <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
+                                    <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
+                                </svg>
+                            </button>
+                        </div>
 
 
-        {{-- ================= EVALUADOR (ya respondió, solo ver) ================= --}}
-        @elseif ($esEvaluador && $evaluadorYaRespondio)
-        <div class="flex justify-center items-center mt-3">
-            <button type="button"
-            onclick="openFase3DetailsModal(this)"
-            class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
-            <i class="fa-solid fa-eye"></i>
-            <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
-                <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
-                <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
-            </svg>
-                    </button>
-                </div>
-                
-                {{-- ================= DIRECTOR ================= --}}
-                @elseif ($esDirector && !$esComite)
-                    <div class="flex justify-center items-center mt-3">
-                        <button type="button"
+                        {{-- ================= EVALUADOR (ya respondió, solo ver) ================= --}}
+                        @elseif ($esEvaluador && $evaluadorYaRespondio)
+                        <div class="flex justify-center items-center mt-3">
+                            <button type="button"
                             onclick="openFase3DetailsModal(this)"
                             class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
                             <i class="fa-solid fa-eye"></i>
@@ -655,79 +628,93 @@
                                 <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
                                 <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
                             </svg>
-                        </button>
-                    </div>
-                
-        {{-- ================= COMITÉ FASE 4 ================= --}}
-        @elseif ($esComite && $evaluadorAprobo)
-            <div class="flex justify-center items-center mt-3 gap-2">
+                                    </button>
+                                </div>
+                                
+                                {{-- ================= DIRECTOR ================= --}}
+                                @elseif ($esDirector && !$esComite)
+                                    <div class="flex justify-center items-center mt-3">
+                                        <button type="button"
+                                            onclick="openFase3DetailsModal(this)"
+                                            class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+                                            <i class="fa-solid fa-eye"></i>
+                                            <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
+                                                <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
+                                                <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                
+                        {{-- ================= COMITÉ FASE 4 ================= --}}
+                        @elseif ($esComite && $evaluadorAprobo)
+                            <div class="flex justify-center items-center mt-3 gap-2">
 
-                {{-- VER --}}
-                 <div class="flex justify-center items-center">
-            <button type="button"
-            onclick="openFase3DetailsModal(this)"
-            class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
-            <i class="fa-solid fa-eye"></i>
-            <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
-                <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
-                <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
-            </svg>
-                    </button>
+                                {{-- VER --}}
+                                <div class="flex justify-center items-center">
+                            <button type="button"
+                            onclick="openFase3DetailsModal(this)"
+                            class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg  w-10 h-10 relative inline-flex items-center justify-center">
+                            <i class="fa-solid fa-eye"></i>
+                            <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
+                                <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
+                                <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
+                            </svg>
+                                    </button>
+                                </div>
+
+                                {{-- EDITAR / RESPONDER --}}
+                            
+                                <button type="button"
+                                    onclick="openFase4ComiteModal(this)"
+                                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white rounded-lg w-10 h-10  relative inline-flex items-center justify-center">
+                                    <i class="fa-solid fa-reply"></i>
+                                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
+                                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
+                                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
+                                    </svg>
+                                </button>
+
+                                
+                                
+
+                            </div>
+
+                        {{-- ================= ESTUDIANTE ================= --}}
+                        @elseif ($esEstudiante && $evaluadorAprobo)
+                            <div class="flex justify-center items-center mt-3">
+                                <button type="button"
+                                    onclick="openFase3DetailsModal(this)"
+                                    class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                            </div>
+                        @endif
+                        
+                
+                    @elseif ($fase_actual > 4)
+                        <div class="flex justify-center items-center mt-3">
+                            <button type="button"
+                                onclick="openFase3DetailsModal(this)"
+                                class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
+                                <i class="fa-solid fa-eye"></i>
+                                <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
+                                    <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
+                                    <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    @endif
+                    
+                    
                 </div>
 
-                {{-- EDITAR / RESPONDER --}}
-                <button type="button"
-                    onclick="openFase4ComiteModal(this)"
-                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white rounded-lg relative inline-flex items-center justify-center">
-                    <i class="fa-solid fa-reply"></i>
-                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
-                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
-                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
-                    </svg>
-                </button>
-
-            </div>
-
-        {{-- ================= ESTUDIANTE ================= --}}
-        @elseif ($esEstudiante && $evaluadorAprobo)
-            <div class="flex justify-center items-center mt-3">
-                <button type="button"
-                    onclick="openFase3DetailsModal(this)"
-                    class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
-                    <i class="fa-solid fa-eye"></i>
-                </button>
-            </div>
-        @endif
-        
-   
-    @elseif ($fase_actual > 4)
-        <div class="flex justify-center items-center mt-3">
-            <button type="button"
-                onclick="openFase3DetailsModal(this)"
-                class="btn-action shadow bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
-                <i class="fa-solid fa-eye"></i>
-                <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
-                    <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
-                    <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
-                </svg>
-            </button>
-        </div>
-    @endif
-    
-    
-</div>
-
-
-
                 <!-- FASE 5. INFORME I -->
-                <div
-                    class="relative mx-auto flex flex-col items-center justify-center bg-white text-gray-600 rounded-lg shadow-lg h-60 w-full sm:w-50 border card-fase {{ $fase_actual >= 5 ? 'card-activated' : '' }} {{ $fase_actual == 5 ? 'card-activated-animated' : '' }}">
+                <div class="relative mx-auto flex flex-col items-center justify-center bg-white text-gray-600 rounded-lg shadow-lg h-60 w-full sm:w-50 border card-fase {{ $fase_actual >= 5 ? 'card-activated' : '' }} {{ $fase_actual == 5 ? 'card-activated-animated' : '' }}">
                     <i class="fa-solid fa-hourglass-half" style="font-size: 32px; margin-bottom: 10px;"></i>
                     <span class="text-center font-bold text-lg">Fase 5: Informe I</span>
                     <p class="text-center mt-2 text-xs mx-4">El estudiante envía el informe al director.</p>
 
                         @if ($fase_actual == 5)
-
                         @php
                             $user = auth()->user();
                             $esEstudiante = $user->hasRole('estudiante');
@@ -805,9 +792,9 @@
                     @endif
                 </div>
 
+        
                 <!-- FASE 6: INFORME II -->
-                <div id="fase-6"
-                    class="relative mx-auto flex flex-col items-center justify-center bg-white text-gray-600 rounded-lg shadow-lg h-60 w-full sm:w-50 border card-fase
+                <div id="fase-6" class="relative mx-auto flex flex-col items-center justify-center bg-white text-gray-600 rounded-lg shadow-lg h-60 w-full sm:w-50 border card-fase
                     {{ $fase_actual >= 6 ? 'card-activated' : '' }}
                     {{ $fase_actual == 6 ? 'card-activated-animated' : '' }}">
 
@@ -847,25 +834,11 @@
                                 $estado_evaluador_fase6_valor->valor == 'Aprobada';
                         @endphp
 
-                        {{-- ================= DIRECTOR ================= --}}
-                        @if ($esDirector)
 
-                            <div class="flex justify-center items-center mt-3 gap-2">
+                        <div class="flex justify-center items-center mt-3 gap-2">
 
-                                <button type="button"
-                                    onclick="openFase5DetailsModal(this)"
-                                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white rounded-lg w-10 h-10 flex items-center justify-center">
-                                    <i class="fa-solid fa-eye"></i>
-                                </button>
-
-                            </div>
-
-
-                        {{-- ================= EVALUADOR ================= --}}
-               
-                        @elseif ($esEvaluador && $directorAproboFase6)
-
-                            <div class="flex justify-center items-center mt-3 gap-2">
+                            {{-- ================= EVALUADOR (PRIORIDAD ALTA) ================= --}}
+                            @if ($esEvaluador && $directorAproboFase6)
 
                                 <button type="button"
                                     onclick="openFase6DetailsModal(this)"
@@ -881,13 +854,19 @@
                                     </button>
                                 @endif
 
-                            </div>
+
+                            {{-- ================= DIRECTOR ================= --}}
+                            @elseif ($esDirector && !$esComite)
+
+                                <button type="button"
+                                    onclick="openFase5DetailsModal(this)"
+                                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white rounded-lg w-10 h-10 flex items-center justify-center">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
 
 
-                        {{-- ================= COMITÉ ================= --}}
-                        @elseif ($esComite && $evaluadorAprobo)
-
-                            <div class="flex justify-center items-center mt-3 gap-2">
+                            {{-- ================= COMITÉ ================= --}}
+                            @elseif ($esComite && $evaluadorAprobo)
 
                                 <button type="button"
                                     onclick="openFase6DetailsModal(this)"
@@ -898,16 +877,12 @@
                                 <button type="button"
                                     onclick="openFase6ComiteModal(this)"
                                     class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white rounded-lg w-10 h-10 flex items-center justify-center">
-                                    <i class="fa-solid fa-reply"></i>
+                                    <i class="fa-solid fa-share"></i>
                                 </button>
 
-                            </div>
 
-
-                        {{-- ================= ESTUDIANTE ================= --}}
-                        @elseif ($esEstudiante)
-
-                            <div class="flex justify-center items-center mt-3">
+                            {{-- ================= ESTUDIANTE ================= --}}
+                            @elseif ($esEstudiante)
 
                                 <button type="button"
                                     onclick="openFase6DetailsModal(this)"
@@ -915,10 +890,9 @@
                                     <i class="fa-solid fa-eye"></i>
                                 </button>
 
-                            </div>
+                            @endif
 
-                        @endif
-
+                        </div>
 
                     @elseif ($fase_actual > 6)
 
@@ -936,22 +910,34 @@
 
                 </div>
 
-                <!-- FASE 7 -->
-                <div
-                    class="relative mx-auto flex flex-col items-center justify-center bg-white text-gray-600 rounded-lg shadow-lg h-60 w-full sm:w-50 border card-fase {{ $fase_actual >= 7 ? 'card-activated' : '' }} {{ $fase_actual == 7 ? 'card-activated-animated' : '' }}">
+                <!-- FASE FINAL -->
+                <div class="relative mx-auto flex flex-col items-center justify-center bg-white text-gray-600 rounded-lg shadow-lg h-60 w-full sm:w-50 border card-fase {{ $fase_actual >= 7 ? 'card-activated' : '' }} {{ $fase_actual == 7 ? 'card-activated-animated' : '' }}">
+
                     <i class="fa-solid fa-user-graduate" style="font-size: 32px; margin-bottom: 10px;"></i>
                     <span class="text-center font-bold text-lg">Fase Final</span>
-                    <p class="text-center mt-2 text-xs mx-4">Estudiantes, director y evaluador programan sustentación.
-                    </p>
+                    <p class="text-center mt-2 text-xs mx-4">Estudiantes, director y evaluador programan sustentación.</p>
+
+                    @if($fase_actual >= 7)
+
+                        <div class="flex justify-center items-center mt-3 gap-2">
+                            <button type="button"
+                                onclick="openFase7DetailsModal(this)"
+                                class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white rounded-lg w-10 h-10 flex items-center justify-center">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+
+                    @endif
+
                 </div>
             </div>
         </div>
 
     </div>
 
-    <!-- ==================== Modal FASE 1 ==================== -->
+    <!-- ==================== MODALES DE LAS FASES ==================== -->
 
-    <!-- Modal FASE 1 - Estudiante (Enviar documentos) -->
+    <!-- MODAL FASE 1 - Estudiante (Enviar documentos) -->
     <div id="fase1EstudianteModal" class="fixed z-50 inset-0 overflow-y-auto">
         <div class="modal-overlay absolute inset-0"
             style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;"
@@ -1053,6 +1039,7 @@
                                 </div>
                                 <span id="doc_fdc126Error" class="text-red-500 text-sm"></span>
                                 <ul id="file-list-fase1" class="mt-4 text-gray-600 text-sm list-disc pl-5"></ul>
+                                <ul id="files-size-fase1" class="mt-4 text-gray-600 text-sm list-disc pl-5"></ul>
                                 <br>
 
                                 <p class="text-red-600 text-sm mb-2">
@@ -1094,39 +1081,39 @@
     </div>
     
 
-    <!-- Moda FASE 1 - Detalles (Ver información enviada) -->
-<div id="fase1DetailsModal" class="fixed z-50 inset-0 overflow-y-auto">
-    <div class="modal-overlay absolute inset-0" onclick="closeFase1DetailsModal()">
-        <div class="flex items-center justify-center min-h-screen p-4 text-center relative">
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
-                onclick="event.stopPropagation()">
-                <button
-                    class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
-                    onclick="closeFase1DetailsModal()">&times;</button>
-                <div class="p-6 mt-2">
-                    <p class="text-2xl font-bold mb-4">Detalles de la <span
-                            class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Práctica</span></p>
-                    <div id="fase1DetailsContent" class="space-y-3">
-                        <div class="text-center py-4">
-                            <svg class="inline w-8 h-8 text-gray-400 animate-spin" viewBox="0 0 64 64"
-                                fill="none">
-                                <path
-                                    d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
-                                    stroke="currentColor" stroke-width="5"></path>
-                            </svg>
+    <!-- MODAL FASE 1 - Detalles (Ver información enviada) -->
+    <div id="fase1DetailsModal" class="fixed z-50 inset-0 overflow-y-auto">
+        <div class="modal-overlay absolute inset-0" onclick="closeFase1DetailsModal()">
+            <div class="flex items-center justify-center min-h-screen p-4 text-center relative">
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
+                    onclick="event.stopPropagation()">
+                    <button
+                        class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
+                        onclick="closeFase1DetailsModal()">&times;</button>
+                    <div class="p-6 mt-2">
+                        <p class="text-2xl font-bold mb-4">Detalles de la <span
+                                class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Práctica</span></p>
+                        <div id="fase1DetailsContent" class="space-y-3">
+                            <div class="text-center py-4">
+                                <svg class="inline w-8 h-8 text-gray-400 animate-spin" viewBox="0 0 64 64"
+                                    fill="none">
+                                    <path
+                                        d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
+                                        stroke="currentColor" stroke-width="5"></path>
+                                </svg>
+                            </div>
                         </div>
-                    </div>
-                    <div class="flex justify-end mt-4">
-                        <button type="button" onclick="closeFase1DetailsModal()"
-                            class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cerrar</button>
+                        <div class="flex justify-end mt-4">
+                            <button type="button" onclick="closeFase1DetailsModal()"
+                                class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cerrar</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-    <!-- Moda FASE 1 - Administrador (Responder solicitud) -->
+    <!-- MODAL FASE 1 - Administrador (Responder solicitud) -->
     <div id="fase1AdminModal" class="fixed z-50 inset-0 overflow-y-auto">
         <div class="modal-overlay absolute inset-0"  style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeFase1AdminModal()">
             <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
@@ -1212,1281 +1199,1962 @@
         </div>
     </div>
 
-    <!-- Moda FASE 2 - Estudiante (Enviar documentos de pago) -->
-<div id="fase2EstudianteModal" class="fixed z-50 inset-0 overflow-y-auto">
-    <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeFase2EstudianteModal()">
-        <div class="flex items-center justify-center min-h-screen p-4 text-center relative">
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full modal-content relative"
-                onclick="event.stopPropagation()" style="max-width: 900px !important; width: 100%;">
-                
-                <button class="modal-close-btn-custom absolute top-3 right-4 text-gray-400 hover:text-red-500 text-2xl z-10"
-                    onclick="closeFase2EstudianteModal()">&times;</button>
-
-                <form class="p-8" id="fase2EstudianteForm" enctype="multipart/form-data">
-                    @csrf
-                    <input type="hidden" name="practica_id" value="{{ $practica->id }}">
-
-                    <!-- Título -->
-                    <div class="mb-4 pr-4">
-                        <p class="text-2xl font-bold" id="fase2EstudianteTitle"> 
-                        <p class="text-gray-950 mt-6 text-sm">En este formulario el estudiante deberá subir la
-                            liquidación de pago y el soporte correspondiente.</p>
-                    </div>
-
-                    <p class="text-sm text-gray-950"><strong>NOTA: </strong>Por cada integrante del proyecto se
-                        debe cargar la liquidación y los respectivos soportes de pago.</p>
-
-                    <!-- Documentos y enlaces informativos -->
-                    <div class="flex items-center my-5">
-                        <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
-                        <p class="font-semibold text-gray-700 flex items-center gap-2">
-                            Documentos (Liquidaciones y soportes)
-                        </p>
-                    </div>
-                    <ul class="space-y-2 text-sm mb-4">
-                        <li class="flex items-center gap-2 flex-wrap">
-                            <span class="text-gray-600">Instructivo para pagar la liquidación:</span>
-                            <a href="{{ asset('ejemplos/fase_1-1.pdf') }}" target="_blank"
-                                class="text-blue-600 hover:text-blue-800 underline flex items-center gap-1">ABRIR ARCHIVO</a>
-                        </li>
-                        <li class="flex items-center gap-2 flex-wrap">
-                            <span class="text-gray-600">Liquidación con marca de agua (Ejemplo):</span>
-                            <a href="{{ asset('ejemplos/fase_1-2.pdf') }}" target="_blank"
-                                class="text-blue-600 hover:text-blue-800 underline flex items-center gap-1">ABRIR ARCHIVO</a>
-                        </li>
-                    </ul>
-
-                    <!-- Campos en GRID para desktop (2 columnas) -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-
-                        <!-- Campo Liquidación de pago -->
-                        <div>
-                            <div class="flex items-center gap-2 mb-2">
-                                <label class="block font-medium text-sm text-gray-700">
-                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i><span
-                                        class="text-red-500">*</span> Liquidación de pago
-                                </label>
-                                <div class="relative inline-block">
-                                    <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
-                                        data-tooltip="tooltip-liquidacion-fase2"></i>
-
-                                    <div id="tooltip-liquidacion-fase2"
-                                        class="tooltip-content hidden absolute left-6 top-0 z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                                        Suba la liquidación generada del pago de modalidad. El documento debe incluir la
-                                        marca de agua correspondiente.
-                                    </div>
-                                </div>
-                            </div>
-                            <div
-                                class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
-                                <div class="grid gap-1 text-center">
-                                    <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                    <h2 class="text-center text-gray-400 text-xs">Solo archivos PDF de máximo 5MB</h2>
-                                </div>
-                                <div class="text-center">
-                                    <input type="file" name="liquidacion_pago" id="liquidacion_pago"
-                                        class="absolute inset-0 opacity-0 cursor-pointer w-full" accept=".pdf" />
-                                    <div
-                                        class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
-                                        Cargar</div>
-                                </div>
-                            </div>
-                            <span id="liquidacion_pagoError" class="text-red-500 text-xs"></span>
-                            <ul id="file-list-liquidacion" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
-                            
-                        </div>
-
-                        <!-- Campo Soporte de pago -->
-                        <div>
-                            <div class="flex items-center gap-2 mb-2">
-                                <label class="block font-medium text-sm text-gray-700">
-                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i><span
-                                        class="text-red-500">*</span> Soporte de pago
-                                </label>
-                                <div class="relative inline-block">
-                                    <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
-                                        data-tooltip="tooltip-soporte-fase2"></i>
-
-                                    <div id="tooltip-soporte-fase2"
-                                        class="tooltip-content hidden absolute left-6 top-0 z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                                        Suba el soporte de pago correspondiente a la liquidación.
-                                    </div>
-                                </div>
-                            </div>
-                            <div
-                                class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
-                                <div class="grid gap-1 text-center">
-                                    <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                    <h2 class="text-center text-gray-400 text-xs">Solo archivos PDF de máximo 5MB</h2>
-                                </div>
-                                <div class="text-center">
-                                    <input type="file" name="soporte_pago" id="soporte_pago"
-                                        class="absolute inset-0 opacity-0 cursor-pointer w-full" accept=".pdf" />
-                                    <div
-                                        class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
-                                        Cargar</div>
-                                </div>
-                            </div>
-                            <span id="soporte_pagoError" class="text-red-500 text-xs"></span>
-                            <ul id="file-list-soporte" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
-                            
-                        </div>
-
-                    </div>
-
-                    <div class="mt-4">
-                        <p class="text-xs">
-                            <i class="fa-solid fa-circle-question text-sm text-uts-500"></i>
-                            <strong>NOTA:</strong> En caso de que el estudiante desee sugerir un director de trabajo de
-                            grado, deberá adjuntar una página adicional en el archivo PDF correspondiente a los pagos de
-                            la modalidad, indicando de manera formal el nombre del docente que desea sugerir como
-                            director de trabajo de grado. El comité evaluará la sugerencia y responderá al estudiante.
-                        </p>
-                    </div>
-
-                    <!-- Botones -->
-                    <div class="flex justify-end space-x-3 mt-6 pt-4 border-t">
-                        <button type="button" onclick="closeFase2EstudianteModal()"
-                            class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-5 py-2 rounded-lg transition">Cancelar</button>
-                        <button type="submit"
-                            class="flex bg-uts-500 hover:bg-uts-800 text-white px-5 py-2 rounded-lg transition items-center gap-2">
-                            <svg id="loadingSpinner-fase2" class="hidden w-4 h-4 text-white animate-spin"
-                                viewBox="0 0 64 64" fill="none">
-                                <path
-                                    d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
-                                    stroke="currentColor" stroke-width="5"></path>
-                                <path
-                                    d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
-                                    stroke="currentColor" stroke-width="5" class="text-white"></path>
-                            </svg>
-                            Enviar
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-    <!-- Moda FASE 2 - Detalles (Ver información enviada) -->
-<div id="fase2DetailsModal" class="fixed z-50 inset-0 overflow-y-auto">
-    <div class="modal-overlay absolute inset-0" onclick="closeFase2DetailsModal()">
-        <div class="flex items-center justify-center min-h-screen p-4 text-center relative">
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
-                onclick="event.stopPropagation()">
-                <button
-                    class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
-                    onclick="closeFase2DetailsModal()">&times;</button>
-                <div class="p-6 mt-2">
-                    <p class="text-2xl font-bold mb-4">Detalles de la <span
-                            class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Práctica</span></p>
-                    <div id="fase2DetailsContent" class="space-y-3">
-                        <div class="text-center py-4">
-                            <svg class="inline w-8 h-8 text-gray-400 animate-spin" viewBox="0 0 64 64"
-                                fill="none">
-                                <path
-                                    d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
-                                    stroke="currentColor" stroke-width="5"></path>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="flex justify-end mt-4">
-                        <button type="button" onclick="closeFase2DetailsModal()"
-                            class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cerrar</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-    <!-- Moda FASE 2 - Administrador (Responder solicitud + Asignar docentes) -->
-<div id="fase2AdminModal" class="fixed z-50 inset-0 overflow-y-auto">
-    <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;"  onclick="closeFase2AdminModal()">
-        <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
-                onclick="event.stopPropagation()">
-                <button
-                    class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
-                    onclick="closeFase2AdminModal()">&times;</button>
-                <form class="p-6 mt-2" id="fase2AdminForm">
-                    @csrf
-                    <input type="hidden" name="practica_id" value="{{ $practica->id }}">
-                    <p class="text-2xl font-bold mb-4">Responder <span
-                            class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Fase 2</span></p>
-                    <p class="text-sm text-gray-600 mb-4">Apruebe o rechace el pago de modalidad. Si aprueba,
-                        deberá asignar director y evaluador.</p>
-
-                    <div class="mb-4">
-                        <label class="block font-medium text-sm text-gray-700"> 
-                            <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
-                            Estado de la práctica:
-                        </label>
-                        <select name="estado" id="estado_fase2"
-                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
-                            <option value="">Seleccione un estado</option>
-                            <option value="Aprobada">Aprobar</option>
-                            <option value="Rechazada">Rechazar</option>
-                        </select>
-                        <span id="estado_fase2Error" class="text-red-500 text-sm"></span>
-                    </div>
+    <!-- MODAL FASE 2 - Estudiante (Enviar documentos de pago) -->
+    <div id="fase2EstudianteModal" class="fixed z-50 inset-0 overflow-y-auto">
+        <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeFase2EstudianteModal()">
+            <div class="flex items-center justify-center min-h-screen p-4 text-center relative">
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full modal-content relative"
+                    onclick="event.stopPropagation()" style="max-width: 900px !important; width: 100%;">
                     
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                        <div>
-                            <label class="block font-medium text-sm text-gray-700">
-                                <i class="fa-regular fa-file-lines mr-1 text-gray-500"></i>    
-                                Número de acta:
-                            </label>
-                            <input type="text" name="nro_acta" id="nro_acta_fase2"
-                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500" placeholder="Ingrese el número de acta">
-                            <span id="nro_acta_fase2Error" class="text-red-500 text-sm"></span>
-                        </div>
-                        <div>
-                            <label class="block font-medium text-sm text-gray-700">
-                                <i class="fa-regular fa-calendar-days mr-1 text-gray-500"></i>
-                                Fecha del acta:
-                            </label>
-                            <input type="date" name="fecha_acta" id="fecha_acta_fase2"
-                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
-                            <span id="fecha_acta_fase2Error" class="text-red-500 text-sm"></span>
-                        </div>
-                    </div>
+                    <button class="modal-close-btn-custom absolute top-3 right-4 text-gray-400 hover:text-red-500 text-2xl z-10"
+                        onclick="closeFase2EstudianteModal()">&times;</button>
 
-<!-- Código de modalidad (se muestra solo si aprueba) -->
-<div class="mb-4 hidden" id="container_codigo_modalidad_fase2">
-    <label class="block font-medium text-sm text-gray-700">
-        <i class="fa-solid fa-hashtag mr-1 text-gray-500"></i>
-        Código de modalidad:
-    </label>
-    <input type="text" name="codigo_modalidad" id="codigo_modalidad_fase2"
-        class="bg-gray-100 border-gray-300 rounded-md shadow-sm mt-1 block w-full focus:ring-uts-500 focus:border-uts-500 cursor-default"
-        readonly
-        value="{{ $codigo_modalidad_generado ?? '' }}"
-        placeholder="Se generará automáticamente">
-    <span id="codigo_modalidad_fase2Error" class="text-red-500 text-sm"></span>
-</div>
-                    
-                    <!-- Contenedor para asignación de docentes (se muestra solo si selecciona Aprobada) -->
-                    <div id="container_docentes_fase2" class="hidden mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                        <p class="font-bold text-sm text-gray-700 mb-3">
-                            <i class="fa-solid fa-chalkboard-user mr-2 text-gray-500"></i>
-                            Asignación de docentes:
-                        </p>
+                    <form class="p-8" id="fase2EstudianteForm" enctype="multipart/form-data">
+                        @csrf
+                        <input type="hidden" name="practica_id" value="{{ $practica->id }}">
 
-                        <div class="mb-3">
-                            <label class="block font-medium text-sm text-gray-700">Director <span class="text-red-500">*</span></label>
-                            <select name="director_id" id="director_id_fase2"
-                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
-                                <option value="">Seleccione un director</option>
-                                @foreach ($docentes as $docente)
-                                    <option value="{{ $docente->id }}">{{ $docente->name }}</option>
-                                @endforeach
-                            </select>
-                            <span id="director_id_fase2Error" class="text-red-500 text-sm"></span>
+                        <!-- Título -->
+                        <div class="mb-4 pr-4">
+                            <p class="text-2xl font-bold" id="fase2EstudianteTitle"> 
+                            <p class="text-gray-950 mt-6 text-sm">En este formulario el estudiante deberá subir la
+                                liquidación de pago y el soporte correspondiente.</p>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="block font-medium text-sm text-gray-700">Evaluador <span class="text-red-500">*</span></label>
-                            <select name="evaluador_id" id="evaluador_id_fase2"
-                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
-                                <option value="">Seleccione un evaluador</option>
-                                @foreach ($docentes as $docente)
-                                    <option value="{{ $docente->id }}">{{ $docente->name }}</option>
-                                @endforeach
-                            </select>
-                            <span id="evaluador_id_fase2Error" class="text-red-500 text-sm"></span>
+                        <p class="text-sm text-gray-950"><strong>NOTA: </strong>Por cada integrante del proyecto se
+                            debe cargar la liquidación y los respectivos soportes de pago.</p>
+
+                        <!-- Documentos y enlaces informativos -->
+                        <div class="flex items-center my-5">
+                            <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                            <p class="font-semibold text-gray-700 flex items-center gap-2">
+                                Documentos (Liquidaciones y soportes)
+                            </p>
                         </div>
-
-                        <div>
-                            <label class="block font-medium text-sm text-gray-700">Codirector (opcional)</label>
-                            <select name="codirector_id" id="codirector_id_fase2"
-                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
-                                <option value="">Seleccione un codirector (opcional)</option>
-                                @foreach ($docentes as $docente)
-                                    <option value="{{ $docente->id }}">{{ $docente->name }}</option>
-                                @endforeach
-                            </select>
-                            <span id="codirector_id_fase2Error" class="text-red-500 text-sm"></span>
-                        </div>
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="block font-medium text-sm text-gray-700">
-                            <i class="fa-solid fa-message mr-2 text-gray-500"></i>
-                            Comentarios de la respuesta:
-                        </label>
-                        <div id="txt-editor-fase2" class="shadow txt-editor-quill" style="height: 200px; background: white;"></div>
-                        <textarea name="respuesta" id="respuesta_fase2" class="hidden"></textarea>
-                        <span id="respuesta_fase2Error" class="text-red-500 text-sm"></span>
-                    </div>
-
-                    <div class="flex justify-end space-x-2 mt-4">
-                        <button type="button" onclick="closeFase2AdminModal()"
-                            class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cancelar</button>
-                        <button type="submit"
-                            class="flex bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg">
-                            <svg id="loadingSpinner-fase2-admin" style="margin: 4px 10px 4px 0"
-                                class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64"
-                                fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
-                                <path
-                                    d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
-                                    stroke="currentColor" stroke-width="5"></path>
-                                <path
-                                    d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
-                                    stroke="currentColor" stroke-width="5" class="text-white"></path>
-                            </svg>
-                            Responder
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-  <!-- Modal FASE 3 - Estudiante (Enviar documentos de trabajo de grado) -->
-<div id="fase3EstudianteModal" class="fixed z-50 inset-0 overflow-y-auto">
-    <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto; background-color: rgba(0, 0, 0, 0.5);" onclick="closeFase3EstudianteModal()">
-        <div class="flex items-center justify-center min-h-screen p-4 text-center relative">
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full modal-content relative"
-                onclick="event.stopPropagation()" style="max-width: 900px !important; width: 100%;">
-                
-                <button class="modal-close-btn-custom absolute top-3 right-4 text-gray-400 hover:text-red-500 text-2xl z-10"
-                    onclick="closeFase3EstudianteModal()">&times;</button>
-
-                <form class="p-8" id="fase3EstudianteForm" enctype="multipart/form-data">
-                    @csrf
-                    <input type="hidden" name="practica_id" value="{{ $practica->id }}">
-
-                    <!-- Título -->
-                    <div class="mb-4 pr-4">
-                        <p class="text-2xl font-bold" id="fase3EstudianteTitle">Prácticas <span
-                                class="bg-uts-500 text-white px-3 py-1 rounded uppercase shadow-md text-xl">Fase 3</span></p>
-                        <p class="text-gray-950 mt-6 text-sm">En este formulario el estudiante podrá cargar los documentos requeridos para formalizar su propuesta de prácticas empresariales. Los siguientes archivos: </p>
-                        <ul class="text-gray-950 mt-6 text-sm list-disc pl-5">
-                            <li>ARL (.PDF)</li>
-                            <li>Formato propuesta de prácticas (F-DC-127)</li>
-                            <li>Acta de inicio de prácticas (F-DC-195)</li>
+                        <ul class="space-y-2 text-sm mb-4">
+                            <li class="flex items-center gap-2 flex-wrap">
+                                <span class="text-gray-600">Instructivo para pagar la liquidación:</span>
+                                <a href="{{ asset('ejemplos/fase_1-1.pdf') }}" target="_blank"
+                                    class="text-blue-600 hover:text-blue-800 underline flex items-center gap-1">ABRIR ARCHIVO</a>
+                            </li>
+                            <li class="flex items-center gap-2 flex-wrap">
+                                <span class="text-gray-600">Liquidación con marca de agua (Ejemplo):</span>
+                                <a href="{{ asset('ejemplos/fase_1-2.pdf') }}" target="_blank"
+                                    class="text-blue-600 hover:text-blue-800 underline flex items-center gap-1">ABRIR ARCHIVO</a>
+                            </li>
                         </ul>
-                    </div>
 
-                    <p class="text-sm text-gray-950"><strong>NOTA: </strong>El formato F-DC-127 y F-DC-195 debe estar debidamente diligenciado, firmado y no debe superar los 5MB en formato Word.</p>
+                        <!-- Campos en GRID para desktop (2 columnas) -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
 
-                    <!-- Campo ARL -->
-                    <div class="mb-6">
-                        <div class="flex items-center gap-2 mb-2">
-                            <label class="block font-medium text-sm text-gray-700">
-                                <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i><span class="text-red-500">*</span> ARL
-                            </label>
-                            <div class="relative inline-block">
-                                <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
-                                    data-tooltip="tooltip-arl-fase3"></i>
-                            </div>
-                        </div>
-                        <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
-                            <div class="grid gap-1 text-center">
-                                <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                <h2 class="text-center text-gray-400 text-xs">Arrastra o selecciona el archivo ARL (PDF, máx. 5MB)</h2>
-                            </div>
-                            <div class="text-center">
-                                <input type="file" name="arl" id="arl"
-                                    class="absolute inset-0 opacity-0 cursor-pointer w-full" accept=".pdf" />
-                                <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
-                                    Cargar
+                            <!-- Campo Liquidación de pago -->
+                            <div>
+                                <div class="flex items-center gap-2 mb-2">
+                                    <label class="block font-medium text-sm text-gray-700">
+                                        <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i><span
+                                            class="text-red-500">*</span> Liquidación de pago
+                                    </label>
+                                    <div class="relative inline-block">
+                                        <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                            data-tooltip="tooltip-liquidacion-fase2"></i>
+
+                                        <div id="tooltip-liquidacion-fase2"
+                                            class="tooltip-content hidden absolute left-6 top-0 z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
+                                            Suba la liquidación generada del pago de modalidad. El documento debe incluir la
+                                            marca de agua correspondiente.
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                        <span id="arlError" class="text-red-500 text-xs"></span>
-                        <ul id="file-list-arl" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
-                        <div id="tooltip-arl-fase3"
-                            class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                            Suba el certificado de afiliación de la Administradora de Riesgos Laborales (ARL). El documento debe incluir la información completa y legible.
-                        </div>
-                    </div>
-
-                    <!-- Campo F-DC-127 -->
-                    <div class="mb-6">
-                        <div class="flex items-center gap-2 mb-2">
-                            <label class="block font-medium text-sm text-gray-700">
-                                <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i><span class="text-red-500">*</span> F-DC-127
-                            </label>
-                            <div class="relative inline-block">
-                                <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
-                                    data-tooltip="tooltip-fdc127-fase3"></i>
-                            </div>
-                        </div>
-                        <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
-                            <div class="grid gap-1 text-center">
-                                <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                <h2 class="text-center text-gray-400 text-xs">Arrastra o selecciona el archivo F-DC-127 (.doc, .docx, máx. 5MB)</h2>
-                            </div>
-                            <div class="text-center">
-                                <input type="file" name="doc_fdc127" id="doc_fdc127"
-                                    class="absolute inset-0 opacity-0 cursor-pointer w-full" accept=".doc,.docx" />
-                                <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
-                                    Cargar
+                                <div
+                                    class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+                                    <div class="grid gap-1 text-center">
+                                        <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                        <h2 class="text-center text-gray-400 text-xs">Solo archivos PDF de máximo 5MB</h2>
+                                    </div>
+                                    <div class="text-center">
+                                        <input type="file" name="liquidacion_pago" id="liquidacion_pago"
+                                            class="absolute inset-0 opacity-0 cursor-pointer w-full" accept=".pdf" />
+                                        <div
+                                            class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                            Cargar</div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                        <span id="doc_fdc127Error" class="text-red-500 text-xs"></span>
-                        <ul id="file-list-fdc127" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
-                        <div id="tooltip-fdc127-fase3"
-                            class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                            Suba el documento F-DC-127 en word
-                        </div>
-                    </div>
+                                <span id="liquidacion_pagoError" class="text-red-500 text-xs"></span>
+                                <ul id="file-list-liquidacion" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                                <ul id="files-size-liquidacion" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
 
-                    <!-- Campo F-DC-195 -->
-                    <div class="mb-6">
-                        <div class="flex items-center gap-2 mb-2">
-                            <label class="block font-medium text-sm text-gray-700">
-                                <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i><span class="text-red-500">*</span> F-DC-195
-                            </label>
-                            <div class="relative inline-block">
-                                <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
-                                    data-tooltip="tooltip-fdc195-fase3"></i>
                             </div>
-                        </div>
-                        <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
-                            <div class="grid gap-1 text-center">
-                                <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                <h2 class="text-center text-gray-400 text-xs">Arrastra o selecciona el archivo F-DC-195 (.doc, .docx, máx. 5MB)</h2>
-                            </div>
-                            <div class="text-center">
-                                <input type="file" name="doc_fdc195" id="doc_fdc195"
-                                    class="absolute inset-0 opacity-0 cursor-pointer w-full" accept=".doc,.docx" />
-                                <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
-                                    Cargar
+
+                            <!-- Campo Soporte de pago -->
+                            <div>
+                                <div class="flex items-center gap-2 mb-2">
+                                    <label class="block font-medium text-sm text-gray-700">
+                                        <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i><span
+                                            class="text-red-500">*</span> Soporte de pago
+                                    </label>
+                                    <div class="relative inline-block">
+                                        <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                            data-tooltip="tooltip-soporte-fase2"></i>
+
+                                        <div id="tooltip-soporte-fase2"
+                                            class="tooltip-content hidden absolute left-6 top-0 z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
+                                            Suba el soporte de pago correspondiente a la liquidación.
+                                        </div>
+                                    </div>
                                 </div>
+                                <div
+                                    class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+                                    <div class="grid gap-1 text-center">
+                                        <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                        <h2 class="text-center text-gray-400 text-xs">Solo archivos PDF de máximo 5MB</h2>
+                                    </div>
+                                    <div class="text-center">
+                                        <input type="file" name="soporte_pago" id="soporte_pago"
+                                            class="absolute inset-0 opacity-0 cursor-pointer w-full" accept=".pdf" />
+                                        <div
+                                            class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                            Cargar</div>
+                                    </div>
+                                </div>
+                                <span id="soporte_pagoError" class="text-red-500 text-xs"></span>
+                                <ul id="file-list-soporte" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                                <ul id="files-size-soporte" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                                
                             </div>
-                        </div>
-                        <span id="doc_fdc195Error" class="text-red-500 text-xs"></span>
-                        <ul id="file-list-fdc195" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
-                        <div id="tooltip-fdc195-fase3"
-                            class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                            Suba el documento F-DC-195 en PDF
-                        </div>
-                    </div>
 
-                    <!-- Botones -->
-                    <div class="flex justify-end space-x-3 mt-6 pt-4 border-t">
-                        <button type="button" onclick="closeFase3EstudianteModal()"
-                            class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-5 py-2 rounded-lg transition">Cancelar</button>
-                        <button type="submit"
-                            class="flex bg-uts-500 hover:bg-uts-800 text-white px-5 py-2 rounded-lg transition items-center gap-2">
-                            <svg id="loadingSpinner-fase3" class="hidden w-4 h-4 text-white animate-spin" viewBox="0 0 64 64" fill="none">
-                                <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
-                                <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
-                            </svg>
-                            Enviar
-                        </button>
-                    </div>
-                </form>
+                        </div>
+
+                        <div class="mt-4">
+                            <p class="text-xs">
+                                <i class="fa-solid fa-circle-question text-sm text-uts-500"></i>
+                                <strong>NOTA:</strong> En caso de que el estudiante desee sugerir un director de trabajo de
+                                grado, deberá adjuntar una página adicional en el archivo PDF correspondiente a los pagos de
+                                la modalidad, indicando de manera formal el nombre del docente que desea sugerir como
+                                director de trabajo de grado. El comité evaluará la sugerencia y responderá al estudiante.
+                            </p>
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="flex justify-end space-x-3 mt-6 pt-4 border-t">
+                            <button type="button" onclick="closeFase2EstudianteModal()"
+                                class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-5 py-2 rounded-lg transition">Cancelar</button>
+                            <button type="submit"
+                                class="flex bg-uts-500 hover:bg-uts-800 text-white px-5 py-2 rounded-lg transition items-center gap-2">
+                                <svg id="loadingSpinner-fase2" class="hidden w-4 h-4 text-white animate-spin"
+                                    viewBox="0 0 64 64" fill="none">
+                                    <path
+                                        d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
+                                        stroke="currentColor" stroke-width="5"></path>
+                                    <path
+                                        d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
+                                        stroke="currentColor" stroke-width="5" class="text-white"></path>
+                                </svg>
+                                Enviar
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-
-    <!-- Moda FASE 3 - Detalles (Ver información enviada) -->
-<div id="fase3DetailsModal" class="fixed z-50 inset-0 overflow-y-auto">
-    <div class="modal-overlay absolute inset-0" onclick="closeFase3DetailsModal()">
-        <div class="flex items-center justify-center min-h-screen p-4 text-center relative">
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
-                onclick="event.stopPropagation()">
-                <button
-                    class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
-                    onclick="closeFase3DetailsModal()">&times;</button>
-                <div class="p-6 mt-2">
-                    <p class="text-2xl font-bold mb-4">Detalles de la <span
-                            class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Práctica</span></p>
-                    <div id="fase3DetailsContent" class="space-y-3">
-                        <div class="text-center py-4">
-                            <svg class="inline w-8 h-8 text-gray-400 animate-spin" viewBox="0 0 64 64"
-                                fill="none">
-                                <path
-                                    d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
-                                    stroke="currentColor" stroke-width="5"></path>
-                            </svg>
+    <!-- MODAL FASE 2 - Detalles (Ver información enviada) -->
+    <div id="fase2DetailsModal" class="fixed z-50 inset-0 overflow-y-auto">
+        <div class="modal-overlay absolute inset-0" onclick="closeFase2DetailsModal()">
+            <div class="flex items-center justify-center min-h-screen p-4 text-center relative">
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
+                    onclick="event.stopPropagation()">
+                    <button
+                        class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
+                        onclick="closeFase2DetailsModal()">&times;</button>
+                    <div class="p-6 mt-2">
+                        <p class="text-2xl font-bold mb-4">Detalles de la <span
+                                class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Práctica</span></p>
+                        <div id="fase2DetailsContent" class="space-y-3">
+                            <div class="text-center py-4">
+                                <svg class="inline w-8 h-8 text-gray-400 animate-spin" viewBox="0 0 64 64"
+                                    fill="none">
+                                    <path
+                                        d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
+                                        stroke="currentColor" stroke-width="5"></path>
+                                </svg>
+                            </div>
                         </div>
-                    </div>
-                    <div class="flex justify-end mt-4">
-                        <button type="button" onclick="closeFase3DetailsModal()"
-                            class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cerrar</button>
+                        <div class="flex justify-end mt-4">
+                            <button type="button" onclick="closeFase2DetailsModal()"
+                                class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cerrar</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Modal Fase 3 Responder Director -->
-<div id="fase3DirModal" class="fixed z-50 inset-0 overflow-y-auto">
-    <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeFase3DirModal()">
-        <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
-                onclick="event.stopPropagation()">
-                <button class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
-                    onclick="closeFase3DirModal()">&times;</button>
-                <form class="p-6 mt-2" id="fase3DirForm" enctype="multipart/form-data">
-                    @csrf
-                    <input type="hidden" name="practica_id" value="{{ $practica->id }}">
+    <!-- MODAL FASE 2 - Administrador (Responder solicitud + Asignar docentes) -->
+    <div id="fase2AdminModal" class="fixed z-50 inset-0 overflow-y-auto">
+        <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;"  onclick="closeFase2AdminModal()">
+            <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
+                    onclick="event.stopPropagation()">
+                    <button
+                        class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
+                        onclick="closeFase2AdminModal()">&times;</button>
+                    <form class="p-6 mt-2" id="fase2AdminForm">
+                        @csrf
+                        <input type="hidden" name="practica_id" value="{{ $practica->id }}">
+                        <p class="text-2xl font-bold mb-4">Responder <span
+                                class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Fase 2</span></p>
+                        <p class="text-sm text-gray-600 mb-4">Apruebe o rechace el pago de modalidad. Si aprueba,
+                            deberá asignar director y evaluador.</p>
 
-                    <p class="text-2xl font-bold mb-4">
-                        Responder
-                        <span class="bg-uts-500 text-white px-2 py-0.5 rounded uppercase shadow">Fase 3</span>
-                    </p>
-
-                    <p class="text-sm text-gray-600 mb-4">Apruebe o rechace la propuesta de prácticas empresariales.</p>
-
-                    <!-- ESTADO -->
-                    <div class="mb-4">
-                        <label class="block font-medium text-sm text-gray-700">
-                            <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
-                            Estado de la práctica:
-                        </label>
-                        <select name="estado" id="estado_fase3_dir"
-                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
-                            <option value="">Seleccione un estado</option>
-                            <option value="Aprobada">Aprobar</option>
-                            <option value="Rechazada">Rechazar</option>
-                        </select>
-                        <span id="estado_fase3_dirError" class="text-red-500 text-sm"></span>
-                    </div>
-
-                    <!-- F-DC-127 -->
-                    <div class="mb-4">
-                        <div class="flex items-center gap-2 mb-2">
-                            <label class="block font-medium text-sm text-gray-700">
-                                <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
-                                <span class="text-red-500">*</span></label>
-                                Propuesta (F-DC-127)
+                        <div class="mb-4">
+                            <label class="block font-medium text-sm text-gray-700"> 
+                                <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                                Estado de la práctica:
                             </label>
-                            <div class="relative inline-block">
-                                <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
-                                    data-tooltip="tooltip-fdc127-dir-fase3"></i>
-                            </div>
-                        </div>
-                        <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
-                            <div class="grid gap-1 text-center">
-                                <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                <h2 class="text-center text-gray-400 text-xs">
-                                    Arrastra o selecciona el archivo F-DC-127 con comentarios o firmado
-                                    (.doc, .docx, máx. 5MB)
-                                </h2>
-                            </div>
-                            <div class="text-center">
-                                <input type="file" name="fdc127" id="fdc127_fase3"
-                                    class="absolute inset-0 opacity-0 cursor-pointer w-full"
-                                    accept=".doc,.docx" />
-                                <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
-                                    Cargar
-                                </div>
-                            </div>
-                        </div>
-                        <span id="fdc127_fase3Error" class="text-red-500 text-xs"></span>
-                        <ul id="file-list-fdc127-fase3" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
-                        <div id="tooltip-fdc127-dir-fase3"
-                            class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                            Suba el documento F-DC-127 firmado o con comentarios del director.
-                        </div>
-                    </div>
-
-                    <!-- F-DC-195 -->
-                    <div class="mb-4">
-                        <div class="flex items-center gap-2 mb-2">
-                            <label class="block font-medium text-sm text-gray-700">
-                                <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
-                                <span class="text-red-500">*</span></label>
-                                Acta de Inicio (F-DC-195)
-                            </label>
-                            <div class="relative inline-block">
-                                <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
-                                    data-tooltip="tooltip-fdc195-dir-fase3"></i>
-                            </div>
-                        </div>
-                        <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
-                            <div class="grid gap-1 text-center">
-                                <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                <h2 class="text-center text-gray-400 text-xs">
-                                    Arrastra o selecciona el archivo F-DC-195 con comentarios o firmado
-                                    (.doc, .docx, máx. 5MB)
-                                </h2>
-                            </div>
-                            <div class="text-center">
-                                <input type="file" name="fdc195" id="fdc195_fase3"
-                                    class="absolute inset-0 opacity-0 cursor-pointer w-full"
-                                    accept=".doc,.docx" />
-                                <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
-                                    Cargar
-                                </div>
-                            </div>
-                        </div>
-                        <span id="fdc195_fase3Error" class="text-red-500 text-xs"></span>
-                        <ul id="file-list-fdc195-fase3" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
-                        <div id="tooltip-fdc195-dir-fase3"
-                            class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                            Suba el acta de inicio F-DC-195 firmada o con comentarios.
-                        </div>
-                    </div>
-
-                    <!-- TURNITIN -->
-                    <div class="mb-4">
-                        <div class="flex items-center gap-2 mb-2">
-                            <label class="block font-medium text-sm text-gray-700">
-                                <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
-                                <span class="text-red-500">*</span></label>
-                                Informe de plagio (Turnitin)
-                            </label>
-                            <div class="relative inline-block">
-                                <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
-                                    data-tooltip="tooltip-turnitin-dir-fase3"></i>
-                            </div>
-                        </div>
-                        <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
-                            <div class="grid gap-1 text-center">
-                                <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                <h2 class="text-center text-gray-400 text-xs">
-                                    Arrastra o selecciona el informe Turnitin (.pdf, máx. 5MB)
-                                </h2>
-                            </div>
-                            <div class="text-center">
-                                <input type="file" name="turnitin" id="turnitin_fase3"
-                                    class="absolute inset-0 opacity-0 cursor-pointer w-full"
-                                    accept=".pdf" />
-                                <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
-                                    Cargar
-                                </div>
-                            </div>
-                        </div>
-                        <span id="turnitin_fase3Error" class="text-red-500 text-xs"></span>
-                        <ul id="file-list-turnitin-fase3" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
-                        <div id="tooltip-turnitin-dir-fase3"
-                            class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                            Suba el informe de similitud generado por Turnitin en formato PDF.
-                        </div>
-                    </div>
-
-                    <!-- RESPUESTA CON QUILL -->
-                    <div class="mb-4">
-                        <label class="block font-medium text-sm text-gray-700">
-                            <i class="fa-solid fa-message mr-2 text-gray-500"></i>
-                            Comentarios de la respuesta:
-                        </label>
-                        <div id="txt-editor-fase3-dir" class="shadow txt-editor-quill" style="height: 200px; background: white;"></div>
-                        <textarea name="respuesta" id="respuesta_fase3_dir" class="hidden"></textarea>
-                        <span id="respuesta_fase3_dirError" class="text-red-500 text-sm"></span>
-                    </div>
-
-                    <!-- BOTONES -->
-                    <div class="flex justify-end space-x-2 mt-4">
-                        <button type="button" onclick="closeFase3DirModal()"
-                            class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cancelar</button>
-                        <button type="submit"
-                            class="flex bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg">
-                            <svg id="loadingSpinner-fase3-admin" style="margin: 4px 10px 4px 0"
-                                class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64" fill="none">
-                                <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
-                                <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
-                            </svg>
-                            Responder
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-
-<!-- Modal Responder Evaluador Fase 4 -->
-<div id="fase4EvaluadorModal" class="fixed z-50 inset-0 overflow-y-auto">
-    <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeFase4EvaluadorModal()">
-        <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
-                onclick="event.stopPropagation()">
-
-                <button class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
-                    onclick="closeFase4EvaluadorModal()">&times;</button>
-
-                <form class="p-6 mt-2" id="fase4EvaluadorForm" enctype="multipart/form-data">
-                    @csrf
-                    <input type="hidden" name="practica_id" id="practica_id_fase4" value="{{ $practica->id }}">
-
-                    <p class="text-2xl font-bold mb-4">
-                        Responder
-                        <span class="bg-uts-500 text-white px-2 py-0.5 rounded uppercase shadow">Fase 4</span>
-                    </p>
-
-                    <p class="text-sm text-gray-600 mb-4">Apruebe o rechace la propuesta de prácticas empresariales.</p>
-
-                    <!-- ESTADO -->
-                    <div class="mb-4">
-                        <label class="block font-medium text-sm text-gray-700">
-                            <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
-                            Estado de la práctica:
-                        </label>
-                        <select name="estado" id="estado_fase4"
-                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
-                            <option value="">Seleccione un estado</option>
-                            <option value="Aprobada">Aprobar</option>
-                            <option value="Rechazada">Rechazar</option>
-                        </select>
-                        <span id="estado_fase4Error" class="text-red-500 text-sm"></span>
-                    </div>
-
-                    <!-- F-DC-127 -->
-                    <div class="mb-4">
-                        <div class="flex items-center gap-2 mb-2">
-                            <label class="block font-medium text-sm text-gray-700">
-                                <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
-                                <span class="text-red-500">*</span></label>
-                                Propuesta (F-DC-127)
-                            </label>
-                            <div class="relative inline-block">
-                                <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
-                                    data-tooltip="tooltip-fdc127-evaluador-fase4"></i>
-                            </div>
-                        </div>
-                        <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
-                            <div class="grid gap-1 text-center">
-                                <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                <h2 class="text-center text-gray-400 text-xs">
-                                    Arrastra o selecciona el archivo F-DC-127 con comentarios o firmado
-                                    (.doc, .docx, máx. 5MB)
-                                </h2>
-                            </div>
-                            <div class="text-center">
-                                <input type="file" name="fdc127" id="fdc127_fase4"
-                                    class="absolute inset-0 opacity-0 cursor-pointer w-full"
-                                    accept=".doc,.docx" />
-                                <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
-                                    Cargar
-                                </div>
-                            </div>
-                        </div>
-                        <span id="fdc127_fase4Error" class="text-red-500 text-xs"></span>
-                        <ul id="file-list-fdc127-fase4" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
-                        <div id="tooltip-fdc127-evaluador-fase4"
-                            class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                            Suba el documento F-DC-127 firmado o con comentarios del evaluador.
-                        </div>
-                    </div>
-
-                    <!-- F-DC-195 -->
-                    <div class="mb-4">
-                        <div class="flex items-center gap-2 mb-2">
-                            <label class="block font-medium text-sm text-gray-700">
-                                <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
-                                <span class="text-red-500">*</span></label>
-                                Acta de Inicio (F-DC-195)
-                            </label>
-                            <div class="relative inline-block">
-                                <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
-                                    data-tooltip="tooltip-fdc195-evaluador-fase4"></i>
-                            </div>
-                        </div>
-                        <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
-                            <div class="grid gap-1 text-center">
-                                <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                <h2 class="text-center text-gray-400 text-xs">
-                                    Arrastra o selecciona el archivo F-DC-195 con comentarios o firmado
-                                    (.doc, .docx, máx. 5MB)
-                                </h2>
-                            </div>
-                            <div class="text-center">
-                                <input type="file" name="fdc195" id="fdc195_fase4"
-                                    class="absolute inset-0 opacity-0 cursor-pointer w-full"
-                                    accept=".doc,.docx" />
-                                <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
-                                    Cargar
-                                </div>
-                            </div>
-                        </div>
-                        <span id="fdc195_fase4Error" class="text-red-500 text-xs"></span>
-                        <ul id="file-list-fdc195-fase4" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
-                        <div id="tooltip-fdc195-evaluador-fase4"
-                            class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                            Suba el acta de inicio F-DC-195 firmada o con comentarios del evaluador.
-                        </div>
-                    </div>
-
-                    <!-- RESPUESTA CON QUILL -->
-                    <div class="mb-4">
-                        <label class="block font-medium text-sm text-gray-700">
-                            <i class="fa-solid fa-message mr-2 text-gray-500"></i>
-                            Comentarios de la respuesta:
-                        </label>
-                        <div id="txt-editor-fase4-evaluador" class="shadow txt-editor-quill" style="height: 200px; background: white;"></div>
-                        <textarea name="respuesta" id="respuesta_fase4" class="hidden"></textarea>
-                        <span id="respuesta_fase4Error" class="text-red-500 text-sm"></span>
-                    </div>
-
-                    <!-- BOTONES -->
-                    <div class="flex justify-end space-x-2 mt-4">
-                        <button type="button" onclick="closeFase4EvaluadorModal()"
-                            class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cancelar</button>
-                        <button type="submit"
-                            class="flex bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg">
-                            <svg id="loadingSpinner-fase4-admin" style="margin: 4px 10px 4px 0"
-                                class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64" fill="none">
-                                <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
-                                <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
-                            </svg>
-                            Responder
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-    <!-- Modal Responder Comité Fase 4 -->
-<div id="fase4ComiteModal" class="fixed z-50 inset-0 overflow-y-auto">
-    <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeFase4ComiteModal()">
-        <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
-                onclick="event.stopPropagation()">
-
-                <button class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
-                    onclick="closeFase4ComiteModal()">&times;</button>
-
-                <form class="p-6 mt-2" id="fase4ComiteForm" enctype="multipart/form-data">
-                    @csrf
-                    <input type="hidden" name="practica_id" id="practica_id_fase4_comite" value="{{ $practica->id }}">
-
-                    <p class="text-2xl font-bold mb-4">
-                        Responder
-                        <span class="bg-uts-500 text-white px-2 py-0.5 rounded uppercase shadow">Fase 4 - Comité</span>
-                    </p>
-
-                    <p class="text-sm text-gray-600 mb-4">El comité revisa la propuesta y asigna el título oficial.</p>
-
-              
-                    <div class="mb-4">
-                        <label class="block font-medium text-sm text-gray-700">
-                            <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
-                            Estado de la práctica:
-                        </label>
-                        <select name="estado" id="estado_fase4_comite"
-                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
-                            <option value="">Seleccione un estado</option>
-                            <option value="Aprobada">Aprobar</option>
-                            <option value="Rechazada">Rechazar</option>
-                        </select>
-                        <span id="estado_fase4_comiteError" class="text-red-500 text-sm"></span>
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="block font-medium text-sm text-gray-700">
-                            <i class="fa-solid fa-heading mr-2 text-gray-500"></i>
-                            Título de la propuesta:
-                        </label>
-                        <input type="text" name="titulo_propuesta" id="titulo_propuesta_fase4_comite"
-                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500"
-                            placeholder="Ingrese el título oficial de la propuesta">
-                        <span id="titulo_propuesta_fase4_comiteError" class="text-red-500 text-sm"></span>
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                        <div>
-                            <label class="block font-medium text-sm text-gray-700">
-                                <i class="fa-regular fa-file-lines mr-1 text-gray-500"></i>
-                                Número de acta:
-                            </label>
-                            <input type="text" name="nro_acta" id="nro_acta_fase4_comite"
-                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500"
-                                placeholder="Ingrese el número de acta">
-                            <span id="nro_acta_fase4_comiteError" class="text-red-500 text-sm"></span>
-                        </div>
-                        <div>
-                            <label class="block font-medium text-sm text-gray-700">
-                                <i class="fa-regular fa-calendar-days mr-1 text-gray-500"></i>
-                                Fecha del acta:
-                            </label>
-                            <input type="date" name="fecha_acta" id="fecha_acta_fase4_comite"
+                            <select name="estado" id="estado_fase2"
                                 class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
-                            <span id="fecha_acta_fase4_comiteError" class="text-red-500 text-sm"></span>
+                                <option value="">Seleccione un estado</option>
+                                <option value="Aprobada">Aprobar</option>
+                                <option value="Rechazada">Rechazar</option>
+                            </select>
+                            <span id="estado_fase2Error" class="text-red-500 text-sm"></span>
                         </div>
-                    </div>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block font-medium text-sm text-gray-700">
+                                    <i class="fa-regular fa-file-lines mr-1 text-gray-500"></i>    
+                                    Número de acta:
+                                </label>
+                                <input type="text" name="nro_acta" id="nro_acta_fase2"
+                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500" placeholder="Ingrese el número de acta">
+                                <span id="nro_acta_fase2Error" class="text-red-500 text-sm"></span>
+                            </div>
+                            <div>
+                                <label class="block font-medium text-sm text-gray-700">
+                                    <i class="fa-regular fa-calendar-days mr-1 text-gray-500"></i>
+                                    Fecha del acta:
+                                </label>
+                                <input type="date" name="fecha_acta" id="fecha_acta_fase2"
+                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
+                                <span id="fecha_acta_fase2Error" class="text-red-500 text-sm"></span>
+                            </div>
+                        </div>
 
-                    <div class="mb-4">
-                        <div class="flex items-center gap-2 mb-2">
+                        <!-- Código de modalidad (se muestra solo si aprueba) -->
+                        <div class="mb-4 hidden" id="container_codigo_modalidad_fase2">
                             <label class="block font-medium text-sm text-gray-700">
-                                <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
-                                Propuesta (F-DC-127)
+                                <i class="fa-solid fa-hashtag mr-1 text-gray-500"></i>
+                                Código de modalidad:
                             </label>
-                            <div class="relative inline-block">
-                                <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
-                                    data-tooltip="tooltip-fdc127-comite-fase4"></i>
+                            <input type="text" name="codigo_modalidad" id="codigo_modalidad_fase2"
+                                class="bg-gray-100 border-gray-300 rounded-md shadow-sm mt-1 block w-full focus:ring-uts-500 focus:border-uts-500 cursor-default"
+                                readonly
+                                value="{{ $codigo_modalidad_generado ?? '' }}"
+                                placeholder="Se generará automáticamente">
+                            <span id="codigo_modalidad_fase2Error" class="text-red-500 text-sm"></span>
+                        </div>
+                        
+                        <!-- Contenedor para asignación de docentes (se muestra solo si selecciona Aprobada) -->
+                        <div id="container_docentes_fase2" class="hidden mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <p class="font-bold text-sm text-gray-700 mb-3">
+                                <i class="fa-solid fa-chalkboard-user mr-2 text-gray-500"></i>
+                                Asignación de docentes:
+                            </p>
+
+                            <div class="mb-3">
+                                <label class="block font-medium text-sm text-gray-700">Director <span class="text-red-500">*</span></label>
+                                <select name="director_id" id="director_id_fase2"
+                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
+                                    <option value="">Seleccione un director</option>
+                                    @foreach ($docentes as $docente)
+                                        <option value="{{ $docente->id }}">{{ $docente->name }}</option>
+                                    @endforeach
+                                </select>
+                                <span id="director_id_fase2Error" class="text-red-500 text-sm"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="block font-medium text-sm text-gray-700">Evaluador <span class="text-red-500">*</span></label>
+                                <select name="evaluador_id" id="evaluador_id_fase2"
+                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
+                                    <option value="">Seleccione un evaluador</option>
+                                    @foreach ($docentes as $docente)
+                                        <option value="{{ $docente->id }}">{{ $docente->name }}</option>
+                                    @endforeach
+                                </select>
+                                <span id="evaluador_id_fase2Error" class="text-red-500 text-sm"></span>
+                            </div>
+
+                            <div>
+                                <label class="block font-medium text-sm text-gray-700">Codirector (opcional)</label>
+                                <select name="codirector_id" id="codirector_id_fase2"
+                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
+                                    <option value="">Seleccione un codirector (opcional)</option>
+                                    @foreach ($docentes as $docente)
+                                        <option value="{{ $docente->id }}">{{ $docente->name }}</option>
+                                    @endforeach
+                                </select>
+                                <span id="codirector_id_fase2Error" class="text-red-500 text-sm"></span>
                             </div>
                         </div>
-                        <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
-                            <div class="grid gap-1 text-center">
-                                <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                <h2 class="text-center text-gray-400 text-xs">
-                                    Arrastra o selecciona el archivo F-DC-127 con comentarios o firmado
-                                    (.doc, .docx, máx. 5MB)
-                                </h2>
-                            </div>
-                            <div class="text-center">
-                                <input type="file" name="fdc127" id="fdc127_fase4_comite"
-                                    class="absolute inset-0 opacity-0 cursor-pointer w-full"
-                                    accept=".doc,.docx" />
-                                <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
-                                    Cargar
-                                </div>
-                            </div>
-                        </div>
-                        <span id="fdc127_fase4_comiteError" class="text-red-500 text-xs"></span>
-                        <ul id="file-list-fdc127-fase4-comite" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
-                        <div id="tooltip-fdc127-comite-fase4"
-                            class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                            Suba el documento F-DC-127 firmado o con comentarios del comité.
-                        </div>
-                    </div>
-                    <div class="mb-4">
-                        <div class="flex items-center gap-2 mb-2">
+
+                        <div class="mb-4">
                             <label class="block font-medium text-sm text-gray-700">
-                                <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
-                                Acta de Inicio (F-DC-195)
+                                <i class="fa-solid fa-message mr-2 text-gray-500"></i>
+                                Comentarios de la respuesta:
                             </label>
-                            <div class="relative inline-block">
-                                <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
-                                    data-tooltip="tooltip-fdc195-comite-fase4"></i>
-                            </div>
+                            <div id="txt-editor-fase2" class="shadow txt-editor-quill" style="height: 200px; background: white;"></div>
+                            <textarea name="respuesta" id="respuesta_fase2" class="hidden"></textarea>
+                            <span id="respuesta_fase2Error" class="text-red-500 text-sm"></span>
                         </div>
-                        <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
-                            <div class="grid gap-1 text-center">
-                                <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                <h2 class="text-center text-gray-400 text-xs">
-                                    Arrastra o selecciona el archivo F-DC-195 con comentarios o firmado
-                                    (.doc, .docx, máx. 5MB)
-                                </h2>
-                            </div>
-                            <div class="text-center">
-                                <input type="file" name="fdc195" id="fdc195_fase4_comite"
-                                    class="absolute inset-0 opacity-0 cursor-pointer w-full"
-                                    accept=".doc,.docx" />
-                                <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
-                                    Cargar
-                                </div>
-                            </div>
-                        </div>
-                        <span id="fdc195_fase4_comiteError" class="text-red-500 text-xs"></span>
-                        <ul id="file-list-fdc195-fase4-comite" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
-                        <div id="tooltip-fdc195-comite-fase4"
-                            class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                            Suba el acta de inicio F-DC-195 firmada o con comentarios del comité.
-                        </div>
-                    </div>
 
-                    <div class="mb-4">
-                        <label class="block font-medium text-sm text-gray-700">
-                            <i class="fa-solid fa-message mr-2 text-gray-500"></i>
-                            Comentarios de la respuesta:
-                        </label>
-                        <div id="txt-editor-fase4-comite" class="shadow txt-editor-quill" style="height: 200px; background: white;"></div>
-                        <textarea name="respuesta" id="respuesta_fase4_comite" class="hidden"></textarea>
-                        <span id="respuesta_fase4_comiteError" class="text-red-500 text-sm"></span>
-                    </div>
-
-                    <div class="flex justify-end space-x-2 mt-4">
-                        <button type="button" onclick="closeFase4ComiteModal()"
-                            class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cancelar</button>
-                        <button type="submit"
-                            class="flex bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg">
-                            <svg id="loadingSpinner-fase4-comite" style="margin: 4px 10px 4px 0"
-                                class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64" fill="none">
-                                <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
-                                <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
-                            </svg>
-                            Responder
-                        </button>
-                    </div>
-                </form>
+                        <div class="flex justify-end space-x-2 mt-4">
+                            <button type="button" onclick="closeFase2AdminModal()"
+                                class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cancelar</button>
+                            <button type="submit"
+                                class="flex bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg">
+                                <svg id="loadingSpinner-fase2-admin" style="margin: 4px 10px 4px 0"
+                                    class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64"
+                                    fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                                    <path
+                                        d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
+                                        stroke="currentColor" stroke-width="5"></path>
+                                    <path
+                                        d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
+                                        stroke="currentColor" stroke-width="5" class="text-white"></path>
+                                </svg>
+                                Responder
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Modal FASE 5 - Estudiante (Enviar documentos F-DC-128, 129, 196) -->
-<div id="fase5EstudianteModal" class="fixed z-50 inset-0 overflow-y-auto">
-    <div class="modal-overlay absolute inset-0"
-        style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto; background-color: rgba(0, 0, 0, 0.5);"
-        onclick="closeFase5EstudianteModal()">
 
-        <div class="flex items-center justify-center min-h-screen p-4 text-center relative">
+    <!-- MODAL FASE 3 - Estudiante (Enviar documentos de trabajo de grado) -->
+    <div id="fase3EstudianteModal" class="fixed z-50 inset-0 overflow-y-auto">
+        <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto; background-color: rgba(0, 0, 0, 0.5);" onclick="closeFase3EstudianteModal()">
+            <div class="flex items-center justify-center min-h-screen p-4 text-center relative">
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full modal-content relative"
+                    onclick="event.stopPropagation()" style="max-width: 900px !important; width: 100%;">
+                    
+                    <button class="modal-close-btn-custom absolute top-3 right-4 text-gray-400 hover:text-red-500 text-2xl z-10"
+                        onclick="closeFase3EstudianteModal()">&times;</button>
 
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full modal-content relative"
-                onclick="event.stopPropagation()" style="max-width: 900px !important; width: 100%;">
+                    <form class="p-8" id="fase3EstudianteForm" enctype="multipart/form-data">
+                        @csrf
+                        <input type="hidden" name="practica_id" value="{{ $practica->id }}">
 
-                <button
-                    class="modal-close-btn-custom absolute top-3 right-4 text-gray-400 hover:text-red-500 text-2xl z-10"
-                    onclick="closeFase5EstudianteModal()">&times;</button>
+                        <!-- Título -->
+                        <div class="mb-4 pr-4">
+                            <p class="text-2xl font-bold" id="fase3EstudianteTitle">Prácticas <span
+                                    class="bg-uts-500 text-white px-3 py-1 rounded uppercase shadow-md text-xl">Fase 3</span></p>
+                            <p class="text-gray-950 mt-6 text-sm">En este formulario el estudiante podrá cargar los documentos requeridos para formalizar su propuesta de prácticas empresariales. Los siguientes archivos: </p>
+                            <ul class="text-gray-950 mt-6 text-sm list-disc pl-5">
+                                <li>ARL (.PDF)</li>
+                                <li>Formato propuesta de prácticas (F-DC-127)</li>
+                                <li>Acta de inicio de prácticas (F-DC-195)</li>
+                            </ul>
+                        </div>
 
-                <form class="p-8" id="fase5EstudianteForm" enctype="multipart/form-data">
-                    @csrf
-                    <input type="hidden" name="practica_id" value="{{ $practica->id }}">
+                        <p class="text-sm text-gray-950"><strong>NOTA: </strong>El formato F-DC-127 y F-DC-195 debe estar debidamente diligenciado, firmado y no debe superar los 5MB en formato Word.</p>
 
-                    <!-- Título -->
-                    <div class="mb-4 pr-4">
-                        <p class="text-2xl font-bold">
-                            Prácticas
-                            <span class="bg-uts-500 text-white px-3 py-1 rounded uppercase shadow-md text-xl">
+                        <!-- Campo ARL -->
+                        <div class="mb-6">
+                            <div class="flex items-center gap-2 mb-2">
+                                <label class="block font-medium text-sm text-gray-700">
+                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i><span class="text-red-500">*</span> ARL
+                                </label>
+                                <div class="relative inline-block">
+                                    <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                        data-tooltip="tooltip-arl-fase3"></i>
+                                </div>
+                            </div>
+                            <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+                                <div class="grid gap-1 text-center">
+                                    <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                    <h2 class="text-center text-gray-400 text-xs">Arrastra o selecciona el archivo ARL (PDF, máx. 5MB)</h2>
+                                </div>
+                                <div class="text-center">
+                                    <input type="file" name="arl" id="arl"
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full" accept=".pdf" />
+                                    <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                        Cargar
+                                    </div>
+                                </div>
+                            </div>
+                            <span id="arlError" class="text-red-500 text-xs"></span>
+                            <ul id="file-list-arl" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                            <ul id="files-size-arl" class="mt-4 text-gray-600 text-sm list-disc pl-5"></ul>
+
+                            <div id="tooltip-arl-fase3"
+                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
+                                Suba el certificado de afiliación de la Administradora de Riesgos Laborales (ARL). El documento debe incluir la información completa y legible.
+                            </div>
+                        </div>
+
+                        <!-- Campo F-DC-127 -->
+                        <div class="mb-6">
+                            <div class="flex items-center gap-2 mb-2">
+                                <label class="block font-medium text-sm text-gray-700">
+                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i><span class="text-red-500">*</span> F-DC-127
+                                </label>
+                                <div class="relative inline-block">
+                                    <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                        data-tooltip="tooltip-fdc127-fase3"></i>
+                                </div>
+                            </div>
+                            <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+                                <div class="grid gap-1 text-center">
+                                    <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                    <h2 class="text-center text-gray-400 text-xs">Arrastra o selecciona el archivo F-DC-127 (.doc, .docx, máx. 5MB)</h2>
+                                </div>
+                                <div class="text-center">
+                                    <input type="file" name="doc_fdc127" id="doc_fdc127"
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full" accept=".doc,.docx" />
+                                    <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                        Cargar
+                                    </div>
+                                </div>
+                            </div>
+                            <span id="doc_fdc127Error" class="text-red-500 text-xs"></span>
+                            <ul id="file-list-fdc127" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                            <ul id="files-size-fdc127" class="mt-4 text-gray-600 text-sm list-disc pl-5"></ul>
+
+                            <div id="tooltip-fdc127-fase3"
+                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
+                                Suba el documento F-DC-127 en word
+                            </div>
+                        </div>
+
+                        <!-- Campo F-DC-195 -->
+                        <div class="mb-6">
+                            <div class="flex items-center gap-2 mb-2">
+                                <label class="block font-medium text-sm text-gray-700">
+                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i><span class="text-red-500">*</span> F-DC-195
+                                </label>
+                                <div class="relative inline-block">
+                                    <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                        data-tooltip="tooltip-fdc195-fase3"></i>
+                                </div>
+                            </div>
+                            <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+                                <div class="grid gap-1 text-center">
+                                    <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                    <h2 class="text-center text-gray-400 text-xs">Arrastra o selecciona el archivo F-DC-195 (.doc, .docx, máx. 5MB)</h2>
+                                </div>
+                                <div class="text-center">
+                                    <input type="file" name="doc_fdc195" id="doc_fdc195"
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full" accept=".doc,.docx" />
+                                    <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                        Cargar
+                                    </div>
+                                </div>
+                            </div>
+                            <span id="doc_fdc195Error" class="text-red-500 text-xs"></span>
+                            <ul id="file-list-fdc195" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                            <div id="tooltip-fdc195-fase3"
+                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
+                                Suba el documento F-DC-195 en PDF
+                            </div>
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="flex justify-end space-x-3 mt-6 pt-4 border-t">
+                            <button type="button" onclick="closeFase3EstudianteModal()"
+                                class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-5 py-2 rounded-lg transition">Cancelar</button>
+                            <button type="submit"
+                                class="flex bg-uts-500 hover:bg-uts-800 text-white px-5 py-2 rounded-lg transition items-center gap-2">
+                                <svg id="loadingSpinner-fase3" class="hidden w-4 h-4 text-white animate-spin" viewBox="0 0 64 64" fill="none">
+                                    <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
+                                    <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
+                                </svg>
+                                Enviar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- MODAL FASE 3 - Detalles (Ver información enviada) -->
+    <div id="fase3DetailsModal" class="fixed z-50 inset-0 overflow-y-auto">
+        <div class="modal-overlay absolute inset-0" onclick="closeFase3DetailsModal()">
+            <div class="flex items-center justify-center min-h-screen p-4 text-center relative">
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
+                    onclick="event.stopPropagation()">
+                    <button
+                        class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
+                        onclick="closeFase3DetailsModal()">&times;</button>
+                    <div class="p-6 mt-2">
+                        <p class="text-2xl font-bold mb-4">Detalles de la <span
+                                class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Práctica</span></p>
+                        <div id="fase3DetailsContent" class="space-y-3">
+                            <div class="text-center py-4">
+                                <svg class="inline w-8 h-8 text-gray-400 animate-spin" viewBox="0 0 64 64"
+                                    fill="none">
+                                    <path
+                                        d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
+                                        stroke="currentColor" stroke-width="5"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="flex justify-end mt-4">
+                            <button type="button" onclick="closeFase3DetailsModal()"
+                                class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cerrar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL FASE 3 Responder Director -->
+    <div id="fase3DirModal" class="fixed z-50 inset-0 overflow-y-auto">
+        <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeFase3DirModal()">
+            <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
+                    onclick="event.stopPropagation()">
+                    <button class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
+                        onclick="closeFase3DirModal()">&times;</button>
+                    <form class="p-6 mt-2" id="fase3DirForm" enctype="multipart/form-data">
+                        @csrf
+                        <input type="hidden" name="practica_id" value="{{ $practica->id }}">
+
+                        <p class="text-2xl font-bold mb-4">
+                            Responder
+                            <span class="bg-uts-500 text-white px-2 py-0.5 rounded uppercase shadow">Fase 3</span>
+                        </p>
+
+                        <p class="text-sm text-gray-600 mb-4">Apruebe o rechace la propuesta de prácticas empresariales.</p>
+
+                        <!-- ESTADO -->
+                        <div class="mb-4">
+                            <label class="block font-medium text-sm text-gray-700">
+                                <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                                Estado de la práctica:
+                            </label>
+                            <select name="estado" id="estado_fase3_dir"
+                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
+                                <option value="">Seleccione un estado</option>
+                                <option value="Aprobada">Aprobar</option>
+                                <option value="Rechazada">Rechazar</option>
+                            </select>
+                            <span id="estado_fase3_dirError" class="text-red-500 text-sm"></span>
+                        </div>
+
+                        <!-- F-DC-127 -->
+                        <div class="mb-4">
+                            <div class="flex items-center gap-2 mb-2">
+                                <label class="block font-medium text-sm text-gray-700">
+                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                    <span class="text-red-500">*</span></label>
+                                    Propuesta (F-DC-127)
+                                </label>
+                                <div class="relative inline-block">
+                                    <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                        data-tooltip="tooltip-fdc127-dir-fase3"></i>
+                                </div>
+                            </div>
+                            <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+                                <div class="grid gap-1 text-center">
+                                    <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                    <h2 class="text-center text-gray-400 text-xs">
+                                        Arrastra o selecciona el archivo F-DC-127 con comentarios o firmado
+                                        (.doc, .docx, máx. 5MB)
+                                    </h2>
+                                </div>
+                                <div class="text-center">
+                                    <input type="file" name="fdc127" id="fdc127_fase3"
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full"
+                                        accept=".doc,.docx" />
+                                    <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                        Cargar
+                                    </div>
+                                </div>
+                            </div>
+                            <span id="fdc127_fase3Error" class="text-red-500 text-xs"></span>
+                            <ul id="file-list-fdc127-fase3" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                            <div id="tooltip-fdc127-dir-fase3"
+                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
+                                Suba el documento F-DC-127 firmado o con comentarios del director.
+                            </div>
+                        </div>
+
+                        <!-- F-DC-195 -->
+                        <div class="mb-4">
+                            <div class="flex items-center gap-2 mb-2">
+                                <label class="block font-medium text-sm text-gray-700">
+                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                    <span class="text-red-500">*</span></label>
+                                    Acta de Inicio (F-DC-195)
+                                </label>
+                                <div class="relative inline-block">
+                                    <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                        data-tooltip="tooltip-fdc195-dir-fase3"></i>
+                                </div>
+                            </div>
+                            <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+                                <div class="grid gap-1 text-center">
+                                    <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                    <h2 class="text-center text-gray-400 text-xs">
+                                        Arrastra o selecciona el archivo F-DC-195 con comentarios o firmado
+                                        (.doc, .docx, máx. 5MB)
+                                    </h2>
+                                </div>
+                                <div class="text-center">
+                                    <input type="file" name="fdc195" id="fdc195_fase3"
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full"
+                                        accept=".doc,.docx" />
+                                    <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                        Cargar
+                                    </div>
+                                </div>
+                            </div>
+                            <span id="fdc195_fase3Error" class="text-red-500 text-xs"></span>
+                            <ul id="file-list-fdc195-fase3" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                            <div id="tooltip-fdc195-dir-fase3"
+                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
+                                Suba el acta de inicio F-DC-195 firmada o con comentarios.
+                            </div>
+                        </div>
+
+                        <!-- TURNITIN -->
+                        <div class="mb-4">
+                            <div class="flex items-center gap-2 mb-2">
+                                <label class="block font-medium text-sm text-gray-700">
+                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                    <span class="text-red-500">*</span></label>
+                                    Informe de plagio (Turnitin)
+                                </label>
+                                <div class="relative inline-block">
+                                    <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                        data-tooltip="tooltip-turnitin-dir-fase3"></i>
+                                </div>
+                            </div>
+                            <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+                                <div class="grid gap-1 text-center">
+                                    <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                    <h2 class="text-center text-gray-400 text-xs">
+                                        Arrastra o selecciona el informe Turnitin (.pdf, máx. 5MB)
+                                    </h2>
+                                </div>
+                                <div class="text-center">
+                                    <input type="file" name="turnitin" id="turnitin_fase3"
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full"
+                                        accept=".pdf" />
+                                    <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                        Cargar
+                                    </div>
+                                </div>
+                            </div>
+                            <span id="turnitin_fase3Error" class="text-red-500 text-xs"></span>
+                            <ul id="file-list-turnitin-fase3" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                            <div id="tooltip-turnitin-dir-fase3"
+                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
+                                Suba el informe de similitud generado por Turnitin en formato PDF.
+                            </div>
+                        </div>
+
+                        <!-- RESPUESTA CON QUILL -->
+                        <div class="mb-4">
+                            <label class="block font-medium text-sm text-gray-700">
+                                <i class="fa-solid fa-message mr-2 text-gray-500"></i>
+                                Comentarios de la respuesta:
+                            </label>
+                            <div id="txt-editor-fase3-dir" class="shadow txt-editor-quill" style="height: 200px; background: white;"></div>
+                            <textarea name="respuesta" id="respuesta_fase3_dir" class="hidden"></textarea>
+                            <span id="respuesta_fase3_dirError" class="text-red-500 text-sm"></span>
+                        </div>
+
+                        <!-- BOTONES -->
+                        <div class="flex justify-end space-x-2 mt-4">
+                            <button type="button" onclick="closeFase3DirModal()"
+                                class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cancelar</button>
+                            <button type="submit"
+                                class="flex bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg">
+                                <svg id="loadingSpinner-fase3-admin" style="margin: 4px 10px 4px 0"
+                                    class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64" fill="none">
+                                    <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
+                                    <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
+                                </svg>
+                                Responder
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL FASE 4 Responder Evaluador  -->
+    <div id="fase4EvaluadorModal" class="fixed z-50 inset-0 overflow-y-auto">
+        <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeFase4EvaluadorModal()">
+            <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
+                    onclick="event.stopPropagation()">
+
+                    <button class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
+                        onclick="closeFase4EvaluadorModal()">&times;</button>
+
+                    <form class="p-6 mt-2" id="fase4EvaluadorForm" enctype="multipart/form-data">
+                        @csrf
+                        <input type="hidden" name="practica_id" id="practica_id_fase4" value="{{ $practica->id }}">
+
+                        <p class="text-2xl font-bold mb-4">
+                            Responder
+                            <span class="bg-uts-500 text-white px-2 py-0.5 rounded uppercase shadow">Fase 4</span>
+                        </p>
+
+                        <p class="text-sm text-gray-600 mb-4">Apruebe o rechace la propuesta de prácticas empresariales.</p>
+
+                        <!-- ESTADO -->
+                        <div class="mb-4">
+                            <label class="block font-medium text-sm text-gray-700">
+                                <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                                Estado de la práctica:
+                            </label>
+                            <select name="estado" id="estado_fase4"
+                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
+                                <option value="">Seleccione un estado</option>
+                                <option value="Aprobada">Aprobar</option>
+                                <option value="Rechazada">Rechazar</option>
+                            </select>
+                            <span id="estado_fase4Error" class="text-red-500 text-sm"></span>
+                        </div>
+
+                        <!-- F-DC-127 -->
+                        <div class="mb-4">
+                            <div class="flex items-center gap-2 mb-2">
+                                <label class="block font-medium text-sm text-gray-700">
+                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                    <span class="text-red-500">*</span></label>
+                                    Propuesta (F-DC-127)
+                                </label>
+                                <div class="relative inline-block">
+                                    <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                        data-tooltip="tooltip-fdc127-evaluador-fase4"></i>
+                                </div>
+                            </div>
+                            <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+                                <div class="grid gap-1 text-center">
+                                    <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                    <h2 class="text-center text-gray-400 text-xs">
+                                        Arrastra o selecciona el archivo F-DC-127 con comentarios o firmado
+                                        (.doc, .docx, máx. 5MB)
+                                    </h2>
+                                </div>
+                                <div class="text-center">
+                                    <input type="file" name="fdc127" id="fdc127_fase4"
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full"
+                                        accept=".doc,.docx" />
+                                    <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                        Cargar
+                                    </div>
+                                </div>
+                            </div>
+                            <span id="fdc127_fase4Error" class="text-red-500 text-xs"></span>
+                            <ul id="file-list-fdc127-fase4" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                            <ul id="files-size-fdc127-fase4" class="mt-4 text-gray-600 text-xs list-disc pl-5"></ul>
+
+                            <div id="tooltip-fdc127-evaluador-fase4"
+                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
+                                Suba el documento F-DC-127 firmado o con comentarios del evaluador.
+                            </div>
+                        </div>
+
+                        <!-- F-DC-195 -->
+                        <div class="mb-4">
+                            <div class="flex items-center gap-2 mb-2">
+                                <label class="block font-medium text-sm text-gray-700">
+                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                    <span class="text-red-500">*</span></label>
+                                    Acta de Inicio (F-DC-195)
+                                </label>
+                                <div class="relative inline-block">
+                                    <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                        data-tooltip="tooltip-fdc195-evaluador-fase4"></i>
+                                </div>
+                            </div>
+                            <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+                                <div class="grid gap-1 text-center">
+                                    <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                    <h2 class="text-center text-gray-400 text-xs">
+                                        Arrastra o selecciona el archivo F-DC-195 con comentarios o firmado
+                                        (.doc, .docx, máx. 5MB)
+                                    </h2>
+                                </div>
+                                <div class="text-center">
+                                    <input type="file" name="fdc195" id="fdc195_fase4"
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full"
+                                        accept=".doc,.docx" />
+                                    <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                        Cargar
+                                    </div>
+                                </div>
+                            </div>
+                            <span id="fdc195_fase4Error" class="text-red-500 text-xs"></span>
+                            <ul id="file-list-fdc195-fase4" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                            <ul id="files-size-fdc195-fase4" class="mt-4 text-gray-600 text-xs list-disc pl-5"></ul>
+                            <div id="tooltip-fdc195-evaluador-fase4"
+                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
+                                Suba el acta de inicio F-DC-195 firmada o con comentarios del evaluador.
+                            </div>
+                        </div>
+
+                        <!-- RESPUESTA CON QUILL -->
+                        <div class="mb-4">
+                            <label class="block font-medium text-sm text-gray-700">
+                                <i class="fa-solid fa-message mr-2 text-gray-500"></i>
+                                Comentarios de la respuesta:
+                            </label>
+                            <div id="txt-editor-fase4-evaluador" class="shadow txt-editor-quill" style="height: 200px; background: white;"></div>
+                            <textarea name="respuesta" id="respuesta_fase4" class="hidden"></textarea>
+                            <span id="respuesta_fase4Error" class="text-red-500 text-sm"></span>
+                        </div>
+
+                        <!-- BOTONES -->
+                        <div class="flex justify-end space-x-2 mt-4">
+                            <button type="button" onclick="closeFase4EvaluadorModal()"
+                                class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cancelar</button>
+                            <button type="submit"
+                                class="flex bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg">
+                                <svg id="loadingSpinner-fase4-admin" style="margin: 4px 10px 4px 0"
+                                    class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64" fill="none">
+                                    <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
+                                    <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
+                                </svg>
+                                Responder
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL FASE 4 Responder Comité -->
+    <div id="fase4ComiteModal" class="fixed z-50 inset-0 overflow-y-auto">
+        <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeFase4ComiteModal()">
+            <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
+                    onclick="event.stopPropagation()">
+
+                    <button class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
+                        onclick="closeFase4ComiteModal()">&times;</button>
+
+                    <form class="p-6 mt-2" id="fase4ComiteForm" enctype="multipart/form-data">
+                        @csrf
+                        <input type="hidden" name="practica_id" id="practica_id_fase4_comite" value="{{ $practica->id }}">
+
+                        <p class="text-2xl font-bold mb-4">
+                            Responder
+                            <span class="bg-uts-500 text-white px-2 py-0.5 rounded uppercase shadow">Fase 4 - Comité</span>
+                        </p>
+
+                        <p class="text-sm text-gray-600 mb-4">El comité revisa la propuesta y asigna el título oficial.</p>
+
+                
+                        <div class="mb-4">
+                            <label class="block font-medium text-sm text-gray-700">
+                                <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                                Estado de la práctica:
+                            </label>
+                            <select name="estado" id="estado_fase4_comite"
+                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
+                                <option value="">Seleccione un estado</option>
+                                <option value="Aprobada">Aprobar</option>
+                                <option value="Rechazada">Rechazar</option>
+                            </select>
+                            <span id="estado_fase4_comiteError" class="text-red-500 text-sm"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block font-medium text-sm text-gray-700">
+                                <i class="fa-solid fa-heading mr-2 text-gray-500"></i>
+                                Título de la propuesta:
+                            </label>
+                            <input type="text" name="titulo_propuesta" id="titulo_propuesta_fase4_comite"
+                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500"
+                                placeholder="Ingrese el título oficial de la propuesta">
+                            <span id="titulo_propuesta_fase4_comiteError" class="text-red-500 text-sm"></span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block font-medium text-sm text-gray-700">
+                                    <i class="fa-regular fa-file-lines mr-1 text-gray-500"></i>
+                                    Número de acta:
+                                </label>
+                                <input type="text" name="nro_acta" id="nro_acta_fase4_comite"
+                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500"
+                                    placeholder="Ingrese el número de acta">
+                                <span id="nro_acta_fase4_comiteError" class="text-red-500 text-sm"></span>
+                            </div>
+                            <div>
+                                <label class="block font-medium text-sm text-gray-700">
+                                    <i class="fa-regular fa-calendar-days mr-1 text-gray-500"></i>
+                                    Fecha del acta:
+                                </label>
+                                <input type="date" name="fecha_acta" id="fecha_acta_fase4_comite"
+                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
+                                <span id="fecha_acta_fase4_comiteError" class="text-red-500 text-sm"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="flex items-center gap-2 mb-2">
+                                <label class="block font-medium text-sm text-gray-700">
+                                    <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                                    Propuesta (F-DC-127)
+                                </label>
+                                <div class="relative inline-block">
+                                    <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                        data-tooltip="tooltip-fdc127-comite-fase4"></i>
+                                </div>
+                            </div>
+                            <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+                                <div class="grid gap-1 text-center">
+                                    <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                    <h2 class="text-center text-gray-400 text-xs">
+                                        Arrastra o selecciona el archivo F-DC-127 con comentarios o firmado
+                                        (.doc, .docx, máx. 5MB)
+                                    </h2>
+                                </div>
+                                <div class="text-center">
+                                    <input type="file" name="fdc127" id="fdc127_fase4_comite"
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full"
+                                        accept=".doc,.docx" />
+                                    <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                        Cargar
+                                    </div>
+                                </div>
+                            </div>
+                            <span id="fdc127_fase4_comiteError" class="text-red-500 text-xs"></span>
+                            <ul id="file-list-fdc127-fase4-comite" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                            <ul id="files-size-fdc127-fase4-comite" class="mt-4 text-gray-600 text-xs list-disc pl-5"></ul>
+
+                            <div id="tooltip-fdc127-comite-fase4"
+                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
+                                Suba el documento F-DC-127 firmado o con comentarios del comité.
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <div class="flex items-center gap-2 mb-2">
+                                <label class="block font-medium text-sm text-gray-700">
+                                    <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                                    Acta de Inicio (F-DC-195)
+                                </label>
+                                <div class="relative inline-block">
+                                    <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                        data-tooltip="tooltip-fdc195-comite-fase4"></i>
+                                </div>
+                            </div>
+                            <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+                                <div class="grid gap-1 text-center">
+                                    <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                    <h2 class="text-center text-gray-400 text-xs">
+                                        Arrastra o selecciona el archivo F-DC-195 con comentarios o firmado
+                                        (.doc, .docx, máx. 5MB)
+                                    </h2>
+                                </div>
+                                <div class="text-center">
+                                    <input type="file" name="fdc195" id="fdc195_fase4_comite"
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full"
+                                        accept=".doc,.docx" />
+                                    <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                        Cargar
+                                    </div>
+                                </div>
+                            </div>
+                            <span id="fdc195_fase4_comiteError" class="text-red-500 text-xs"></span>
+                            <ul id="file-list-fdc195-fase4-comite" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                            <ul id="files-size-fdc195-fase4-comite" class="mt-4 text-gray-600 text-xs list-disc pl-5"></ul>
+                            <div id="tooltip-fdc195-comite-fase4"
+                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
+                                Suba el acta de inicio F-DC-195 firmada o con comentarios del comité.
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block font-medium text-sm text-gray-700">
+                                <i class="fa-solid fa-message mr-2 text-gray-500"></i>
+                                Comentarios de la respuesta:
+                            </label>
+                            <div id="txt-editor-fase4-comite" class="shadow txt-editor-quill" style="height: 200px; background: white;"></div>
+                            <textarea name="respuesta" id="respuesta_fase4_comite" class="hidden"></textarea>
+                            <span id="respuesta_fase4_comiteError" class="text-red-500 text-sm"></span>
+                        </div>
+
+                        <div class="flex justify-end space-x-2 mt-4">
+                            <button type="button" onclick="closeFase4ComiteModal()"
+                                class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cancelar</button>
+                            <button type="submit"
+                                class="flex bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg">
+                                <svg id="loadingSpinner-fase4-comite" style="margin: 4px 10px 4px 0"
+                                    class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64" fill="none">
+                                    <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
+                                    <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
+                                </svg>
+                                Responder
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL FASE 5 - Estudiante (Enviar documentos F-DC-128, 129, 196) -->
+    <div id="fase5EstudianteModal" class="fixed z-50 inset-0 overflow-y-auto">
+        <div class="modal-overlay absolute inset-0"
+            style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto; background-color: rgba(0, 0, 0, 0.5);"
+            onclick="closeFase5EstudianteModal()">
+
+            <div class="flex items-center justify-center min-h-screen p-4 text-center relative">
+
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full modal-content relative"
+                    onclick="event.stopPropagation()" style="max-width: 900px !important; width: 100%;">
+
+                    <button
+                        class="modal-close-btn-custom absolute top-3 right-4 text-gray-400 hover:text-red-500 text-2xl z-10"
+                        onclick="closeFase5EstudianteModal()">&times;</button>
+
+                    <form class="p-8" id="fase5EstudianteForm" enctype="multipart/form-data">
+                        @csrf
+                        <input type="hidden" name="practica_id" value="{{ $practica->id }}">
+
+                        <!-- Título -->
+                        <div class="mb-4 pr-4">
+                            <p class="text-2xl font-bold">
+                                Prácticas
+                                <span class="bg-uts-500 text-white px-3 py-1 rounded uppercase shadow-md text-xl">
+                                    Fase 5
+                                </span>
+                            </p>
+
+                            <p class="text-gray-950 mt-6 text-sm">
+                                En este formulario el estudiante deberá cargar el informe final de trabajo de grado (F-DC-128) completo, el Acta de terminacion y recibo de satisfaccion de las practicas y la rejilla de evaluación (F-DC-129) diligenciada en el apartado de "Información general del proyecto" . Todos los documentos deben ir en formato de word.
+                            </p>
+                        </div>
+
+                        <p class="text-sm text-gray-950">
+                            <strong>NOTA:</strong> Se deberá cargar el  
+                            <a href="https://www.dropbox.com/scl/fo/pudgcaq639agy7t06ahjs/AN084HnuyHffgYL5i--v_Ks/DOCUMENTOS%20DE%20GRADO?dl=0&preview=F-DC-128+Informe+final+de+trabajo+de+grado+en+modalidad+de+pr%C3%A1ctica+V2.docx"
+                                target="_blank"
+                                class="text-blue-600 underline">
+                                Informe </a>,{!! '
+                                <a href="https://www.dropbox.com/scl/fo/pudgcaq639agy7t06ahjs/AN084HnuyHffgYL5i--v_Ks/DOCUMENTOS%20DE%20GRADO?dl=0&preview=F-DC-196+Acta+de+Terminaci%C3%B3n+y+Recibo+a+Satisfacci%C3%B3n+de+Pr%C3%A1cticas+V2.doc&rlkey=6s0b9ajweteyx2ang7ywvk6xm&subfolder_nav_tracking=1"
+                                target="_blank"
+                                class="text-blue-600 underline">
+                                Acta de Terminacion
+                                </a>
+
+                                y la
+
+                                <a href="https://www.dropbox.com/scl/fo/pudgcaq639agy7t06ahjs/AN084HnuyHffgYL5i--v_Ks/DOCUMENTOS%20DE%20GRADO?dl=0&preview=F-DC-129+Rejilla+de+evaluaci%C3%B3n+informe+final+de+trabajo+de+grado+V2.docx&rlkey=6s0b9ajweteyx2ang7ywvk6xm&subfolder_nav_tracking=1"
+                                target="_blank"
+                                class="text-blue-600 underline">
+                                Rejilla
+                                </a>
+                                ' !!} en formato de Word. Tenga en cuenta el tamaño máximo del archivo que puede cargar en cada campo, se le recomienda reducir o comprimir el peso del archivo antes de cargarlo (Puede usar herramientas online para ello o en su defecto la opción "Comprimir imágenes" del Word).
+                        </p>
+                            <br>
+
+                        <!-- F-DC-128 -->
+                        <div class="mb-6">
+                            <div class="flex items-center gap-2 mb-2">
+                                <label class="block font-medium text-sm text-gray-700 mb-2">
+                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                    <span class="text-red-500">*</span> Informe Final F-DC-128
+                                </label>
+                                <div class="relative inline-block">
+                                    <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                        data-tooltip="tooltip-fdc128-fase5"></i>
+                                </div>
+                            </div>
+
+                            <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+                                <div class="grid gap-1 text-center">
+                                    <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                    <h2 class="text-gray-400 text-xs">Subir F-DC-128 (.doc, .docx, máx. 5MB)</h2>
+                                </div>
+
+                                <div class="text-center">
+                                    <input type="file" name="doc_fdc128" id="doc_fdc128"
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full"
+                                        accept=".doc,.docx" />
+
+                                    <div
+                                        class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                        Cargar
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <span id="doc_fdc128Error" class="text-red-500 text-xs"></span>
+                            <ul id="file-list-fdc128" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                            <div id="tooltip-fdc128-fase5"
+                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
+                                Suba el Informe Final F-DC-128. El documento debe incluir la información completa y legible.
+                            </div>
+                        
+                        </div>
+
+                        <!-- F-DC-129 -->
+                        <div class="mb-6">
+                            <div class="flex items-center gap-2 mb-2">
+                                <label class="block font-medium text-sm text-gray-700 mb-2">
+                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                    <span class="text-red-500">*</span>Regilla de Evaluacion F-DC-129
+                                </label>
+                                <div class="relative inline-block">
+                                    <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                        data-tooltip="tooltip-fdc129-fase5"></i>
+                                </div>
+                            </div>
+
+                            <div
+                                class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+
+                                <div class="grid gap-1 text-center">
+                                    <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                    <h2 class="text-gray-400 text-xs">Subir F-DC-129 (.doc, .docx, máx. 5MB)</h2>
+                                </div>
+
+                                <div class="text-center">
+                                    <input type="file" name="doc_fdc129" id="doc_fdc129"
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full"
+                                        accept=".doc,.docx" />
+
+                                    <div
+                                        class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                        Cargar
+                                    </div>
+                                </div>
+                            </div>
+
+                            <span id="doc_fdc129Error" class="text-red-500 text-xs"></span>
+                            <ul id="file-list-fdc129" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                                <div id="tooltip-fdc129-fase5"
+                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
+                                Suba el documento F-DC-129 en word
+                            </div>
+                        </div>
+
+                        <!-- F-DC-196 -->
+                        <div class="mb-6">
+                            <div class="flex items-center gap-2 mb-2">
+                                <label class="block font-medium text-sm text-gray-700 mb-2">
+                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                    <span class="text-red-500">*</span> Acta de Terminacion F-DC-196
+                                </label>
+                                <div class="relative inline-block">
+                                    <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                        data-tooltip="tooltip-fdc196-fase5"></i>
+                                </div>
+                            </div>
+
+                            <div
+                                class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+
+                                <div class="grid gap-1 text-center">
+                                    <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                    <h2 class="text-gray-400 text-xs">Subir F-DC-196 (.doc, .docx, máx. 5MB)</h2>
+                                </div>
+
+                                <div class="text-center">
+                                    <input type="file" name="doc_fdc196" id="doc_fdc196"
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full"
+                                        accept=".doc,.docx" />
+
+                                    <div
+                                        class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                        Cargar
+                                    </div>
+                                </div>
+                            </div>
+
+                            <span id="doc_fdc196Error" class="text-red-500 text-xs"></span>
+                            <ul id="file-list-fdc196" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                            <div id="tooltip-fdc196-fase5"
+                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
+                                Suba el documento F-DC-196 en word
+                            </div>
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="flex justify-end space-x-3 mt-6 pt-4 border-t">
+                            <button type="button" onclick="closeFase5EstudianteModal()"
+                                class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-5 py-2 rounded-lg transition">
+                                Cancelar
+                            </button>
+
+                            <button type="submit"
+                                class="flex bg-uts-500 hover:bg-uts-800 text-white px-5 py-2 rounded-lg transition items-center gap-2">
+
+                                <svg id="loadingSpinner-fase5" class="hidden w-4 h-4 text-white animate-spin"
+                                    viewBox="0 0 64 64" fill="none">
+                                    <path
+                                        d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
+                                        stroke="currentColor" stroke-width="5"></path>
+                                    <path
+                                        d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
+                                        stroke="currentColor" stroke-width="5" class="text-white"></path>
+                                </svg>
+
+                                Enviar
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- MODAL FASE 5 - Detalles -->
+    <div id="fase5DetailsModal" class="fixed z-50 inset-0 overflow-y-auto hidden" >
+
+        <div class="modal-overlay absolute inset-0 bg-black bg-opacity-50"
+            onclick="closeFase5DetailsModal()">
+
+            <div class="flex items-center justify-center min-h-screen p-4 text-center relative">
+
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full modal-content relative"
+                    onclick="event.stopPropagation()">
+
+                    <!-- BOTÓN CERRAR -->
+                    <button
+                        class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
+                        onclick="closeFase5DetailsModal()">
+                        &times;
+                    </button>
+
+                    <div class="p-6 mt-2">
+
+                        <!-- TÍTULO -->
+                        <p class="text-2xl font-bold mb-6">
+                            Detalles de la
+                            <span
+                                class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">
+                                PRACTICA
+                            </span>
+                        </p>
+
+                        <!-- CONTENIDO -->
+                        <div id="fase5DetailsContent" class="space-y-4">
+
+                            <!-- LOADING -->
+                            <div class="text-center py-8">
+
+                                <svg class="inline w-8 h-8 text-gray-400 animate-spin"
+                                    viewBox="0 0 64 64"
+                                    fill="none">
+
+                                    <path
+                                        d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
+                                        stroke="currentColor"
+                                        stroke-width="5">
+                                    </path>
+
+                                </svg>
+
+                                <p class="mt-2 text-gray-500">
+                                    Cargando información...
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <!-- FOOTER -->
+                        <div class="flex justify-end mt-6">
+
+                            <button type="button"
+                                onclick="closeFase5DetailsModal()"
+                                class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">
+
+                                Cerrar
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!--MODAL FASE 5 Responder Director -->
+    <div id="fase5DirModal" class="fixed z-50 inset-0 overflow-y-auto hidden">
+        <div class="modal-overlay absolute inset-0"
+            style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;"
+            onclick="closeFase5DirModal()">
+
+            <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
+
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
+                    onclick="event.stopPropagation()">
+
+                    <!-- BOTÓN CERRAR -->
+                    <button
+                        class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
+                        onclick="closeFase5DirModal()">
+                        &times;
+                    </button>
+
+                    <form class="p-6 mt-2" id="fase5DirForm" enctype="multipart/form-data">
+
+                        @csrf
+
+                        <input type="hidden" name="practica_id" value="{{ $practica->id }}">
+
+                        <!-- TÍTULO -->
+                        <p class="text-2xl font-bold mb-4">
+                            Responder
+                            <span
+                                class="bg-uts-500 text-white px-2 py-0.5 rounded uppercase shadow">
                                 Fase 5
                             </span>
                         </p>
 
-                        <p class="text-gray-950 mt-6 text-sm">
-                            En este formulario el estudiante deberá cargar el informe final de trabajo de grado (F-DC-128) completo, el Acta de terminacion y recibo de satisfaccion de las practicas y la rejilla de evaluación (F-DC-129) diligenciada en el apartado de "Información general del proyecto" . Todos los documentos deben ir en formato de word.
+                        <p class="text-sm text-gray-600 mb-4">
+                            Apruebe o rechace la entrega final de prácticas empresariales.
                         </p>
-                    </div>
 
-                    <p class="text-sm text-gray-950">
-                        <strong>NOTA:</strong> Se deberá cargar el  
-                        <a href="https://www.dropbox.com/scl/fo/pudgcaq639agy7t06ahjs/AN084HnuyHffgYL5i--v_Ks/DOCUMENTOS%20DE%20GRADO?dl=0&preview=F-DC-128+Informe+final+de+trabajo+de+grado+en+modalidad+de+pr%C3%A1ctica+V2.docx"
-                            target="_blank"
-                            class="text-blue-600 underline">
-                            Informe </a>,{!! '
-                            <a href="https://www.dropbox.com/scl/fo/pudgcaq639agy7t06ahjs/AN084HnuyHffgYL5i--v_Ks/DOCUMENTOS%20DE%20GRADO?dl=0&preview=F-DC-196+Acta+de+Terminaci%C3%B3n+y+Recibo+a+Satisfacci%C3%B3n+de+Pr%C3%A1cticas+V2.doc&rlkey=6s0b9ajweteyx2ang7ywvk6xm&subfolder_nav_tracking=1"
-                            target="_blank"
-                            class="text-blue-600 underline">
-                            Acta de Terminacion
-                            </a>
-
-                            y la
-
-                            <a href="https://www.dropbox.com/scl/fo/pudgcaq639agy7t06ahjs/AN084HnuyHffgYL5i--v_Ks/DOCUMENTOS%20DE%20GRADO?dl=0&preview=F-DC-129+Rejilla+de+evaluaci%C3%B3n+informe+final+de+trabajo+de+grado+V2.docx&rlkey=6s0b9ajweteyx2ang7ywvk6xm&subfolder_nav_tracking=1"
-                            target="_blank"
-                            class="text-blue-600 underline">
-                            Rejilla
-                            </a>
-                            ' !!} en formato de Word. Tenga en cuenta el tamaño máximo del archivo que puede cargar en cada campo, se le recomienda reducir o comprimir el peso del archivo antes de cargarlo (Puede usar herramientas online para ello o en su defecto la opción "Comprimir imágenes" del Word).
-                    </p>
-                        <br>
-
-                    <!-- F-DC-128 -->
-                    <div class="mb-6">
-                        <div class="flex items-center gap-2 mb-2">
-                            <label class="block font-medium text-sm text-gray-700 mb-2">
-                                <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
-                                <span class="text-red-500">*</span> Informe Final F-DC-128
+                        <!-- ESTADO -->
+                        <div class="mb-4">
+                            <label class="block font-medium text-sm text-gray-700">
+                                <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                                Estado de la práctica:
                             </label>
-                            <div class="relative inline-block">
-                                <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
-                                    data-tooltip="tooltip-fdc128-fase5"></i>
-                            </div>
+
+                            <select
+                                name="estado"
+                                id="estado_fase5_dir"
+                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
+
+                                <option value="">Seleccione un estado</option>
+                                <option value="Aprobada">Aprobar</option>
+                                <option value="Rechazada">Rechazar</option>
+
+                            </select>
+
+                            <span id="estado_fase5_dirError"
+                                class="text-red-500 text-sm"></span>
                         </div>
 
-                        <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
-                            <div class="grid gap-1 text-center">
-                                <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                <h2 class="text-gray-400 text-xs">Subir F-DC-128 (.doc, .docx, máx. 5MB)</h2>
+                        <!-- F-DC-128 -->
+                        <div class="mb-4">
+
+                            <div class="flex items-center gap-2 mb-2">
+
+                                <label class="block font-medium text-sm text-gray-700">
+                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                    <span class="text-red-500">*</span>
+                                    Informe Final (F-DC-128)
+                                </label>
+
+                                <div class="relative inline-block">
+                                    <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                        data-tooltip="tooltip-fdc128-dir-fase5"></i>
+                                </div>
+
                             </div>
 
-                            <div class="text-center">
-                                <input type="file" name="doc_fdc128" id="doc_fdc128"
-                                    class="absolute inset-0 opacity-0 cursor-pointer w-full"
-                                    accept=".doc,.docx" />
+                            <div
+                                class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
 
-                                <div
-                                    class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
-                                    Cargar
+                                <div class="grid gap-1 text-center">
+
+                                    <i
+                                        class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+
+                                    <h2 class="text-center text-gray-400 text-xs">
+                                        Arrastra o selecciona el archivo F-DC-128
+                                        (.doc, .docx, máx. 5MB)
+                                    </h2>
+
+                                </div>
+
+                                <div class="text-center">
+
+                                    <input
+                                        type="file"
+                                        name="fdc128"
+                                        id="fdc128_fase5"
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full"
+                                        accept=".doc,.docx" />
+
+                                    <div
+                                        class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                        Cargar
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <span id="fdc128_fase5Error"
+                                class="text-red-500 text-xs"></span>
+
+                            <ul id="file-list-fdc128-fase5"
+                                class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+
+                            <div id="tooltip-fdc128-dir-fase5"
+                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
+                                Suba el documento F-DC-128 firmado o con comentarios.
+                            </div>
+
+                        </div>
+
+                        <!-- F-DC-129 -->
+                        <div class="mb-4">
+
+                            <div class="flex items-center gap-2 mb-2">
+
+                                <label class="block font-medium text-sm text-gray-700">
+                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                    <span class="text-red-500">*</span>
+                                    Evaluación Final (F-DC-129)
+                                </label>
+
+                                <div class="relative inline-block">
+                                    <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                        data-tooltip="tooltip-fdc129-dir-fase5"></i>
+                                </div>
+
+                            </div>
+
+                            <div
+                                class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+
+                                <div class="grid gap-1 text-center">
+
+                                    <i
+                                        class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+
+                                    <h2 class="text-center text-gray-400 text-xs">
+                                        Arrastra o selecciona el archivo F-DC-129
+                                        (.doc, .docx, máx. 5MB)
+                                    </h2>
+
+                                </div>
+
+                                <div class="text-center">
+
+                                    <input
+                                        type="file"
+                                        name="fdc129"
+                                        id="fdc129_fase5"
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full"
+                                        accept=".doc,.docx" />
+
+                                    <div
+                                        class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                        Cargar
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <span id="fdc129_fase5Error"
+                                class="text-red-500 text-xs"></span>
+
+                            <ul id="file-list-fdc129-fase5"
+                                class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+
+                            <div id="tooltip-fdc129-dir-fase5"
+                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
+                                Suba el documento F-DC-129 firmado o con comentarios.
+                            </div>
+
+                        </div>
+
+                        <!-- F-DC-196 -->
+                        <div class="mb-4">
+
+                            <div class="flex items-center gap-2 mb-2">
+
+                                <label class="block font-medium text-sm text-gray-700">
+                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                    <span class="text-red-500">*</span>
+                                    Acta Final (F-DC-196)
+                                </label>
+
+                                <div class="relative inline-block">
+                                    <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                        data-tooltip="tooltip-fdc196-dir-fase5"></i>
+                                </div>
+
+                            </div>
+
+                            <div
+                                class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+
+                                <div class="grid gap-1 text-center">
+
+                                    <i
+                                        class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+
+                                    <h2 class="text-center text-gray-400 text-xs">
+                                        Arrastra o selecciona el archivo F-DC-196
+                                        (.doc, .docx, máx. 5MB)
+                                    </h2>
+
+                                </div>
+
+                                <div class="text-center">
+
+                                    <input
+                                        type="file"
+                                        name="fdc196"
+                                        id="fdc196_fase5"
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full"
+                                        accept=".doc,.docx" />
+
+                                    <div
+                                        class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                        Cargar
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <span id="fdc196_fase5Error"
+                                class="text-red-500 text-xs"></span>
+
+                            <ul id="file-list-fdc196-fase5"
+                                class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+
+                            <div id="tooltip-fdc196-dir-fase5"
+                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
+                                Suba el documento F-DC-196 firmado o con comentarios.
+                            </div>
+
+                        </div>
+
+                        <!-- TURNITIN -->
+                        <div class="mb-4">
+
+                            <div class="flex items-center gap-2 mb-2">
+
+                                <label class="block font-medium text-sm text-gray-700">
+                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                    <span class="text-red-500">*</span>
+                                    Informe de plagio (Turnitin)
+                                </label>
+
+                                <div class="relative inline-block">
+                                    <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                        data-tooltip="tooltip-turnitin-dir-fase5"></i>
+                                </div>
+
+                            </div>
+
+                            <div
+                                class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+
+                                <div class="grid gap-1 text-center">
+
+                                    <i
+                                        class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+
+                                    <h2 class="text-center text-gray-400 text-xs">
+                                        Arrastra o selecciona el informe Turnitin
+                                        (.pdf, máx. 5MB)
+                                    </h2>
+
+                                </div>
+
+                                <div class="text-center">
+
+                                    <input
+                                        type="file"
+                                        name="turnitin"
+                                        id="turnitin_fase5"
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full"
+                                        accept=".pdf" />
+
+                                    <div
+                                        class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                        Cargar
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <span id="turnitin_fase5Error"
+                                class="text-red-500 text-xs"></span>
+
+                            <ul id="file-list-turnitin-fase5"
+                                class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+
+                            <div id="tooltip-turnitin-dir-fase5"
+                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
+                                Suba el informe de similitud generado por Turnitin en PDF.
+                            </div>
+
+                        </div>
+
+                        <!-- RESPUESTA -->
+                        <div class="mb-4">
+
+                            <label class="block font-medium text-sm text-gray-700">
+                                <i class="fa-solid fa-message mr-2 text-gray-500"></i>
+                                Comentarios de la respuesta:
+                            </label>
+
+                            <div id="txt-editor-fase5-dir"
+                                class="shadow txt-editor-quill"
+                                style="height: 200px; background: white;">
+                            </div>
+
+                            <textarea
+                                name="respuesta"
+                                id="respuesta_fase5_dir"
+                                class="hidden"></textarea>
+
+                            <span id="respuesta_fase5_dirError"
+                                class="text-red-500 text-sm"></span>
+
+                        </div>
+
+                        <!-- BOTONES -->
+                        <div class="flex justify-end space-x-2 mt-4">
+
+                            <button
+                                type="button"
+                                onclick="closeFase5DirModal()"
+                                class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">
+                                Cancelar
+                            </button>
+
+                            <button
+                                type="submit"
+                                class="flex bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg">
+
+                                <svg id="loadingSpinner-fase5-dir"
+                                    style="margin: 4px 10px 4px 0"
+                                    class="hidden w-4 h-4 text-gray-300 animate-spin"
+                                    viewBox="0 0 64 64"
+                                    fill="none">
+
+                                    <path
+                                        d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
+                                        stroke="currentColor"
+                                        stroke-width="5"></path>
+
+                                    <path
+                                        d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
+                                        stroke="currentColor"
+                                        stroke-width="5"
+                                        class="text-white"></path>
+
+                                </svg>
+
+                                Responder
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODAL FASE 6 Responder Evaluador -->
+    <div id="fase6EvaluadorModal" class="fixed z-50 inset-0 overflow-y-auto">
+        <div class="modal-overlay absolute inset-0"
+            style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;"
+            onclick="closeFase6EvaluadorModal()">
+
+            <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
+                    onclick="event.stopPropagation()">
+
+                    <button class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
+                        onclick="closeFase6EvaluadorModal()">&times;</button>
+
+                    <form class="p-6 mt-2" id="fase6EvaluadorForm" enctype="multipart/form-data">
+                        @csrf
+
+                        <input type="hidden" name="practica_id" id="practica_id_fase6"
+                            value="{{ $practica->id }}">
+
+                        <p class="text-2xl font-bold mb-4">
+                            Responder
+                            <span class="bg-uts-500 text-white px-2 py-0.5 rounded uppercase shadow">
+                                Fase 6
+                            </span>
+                        </p>
+
+                        <p class="text-sm text-gray-600 mb-4">
+                            Apruebe o rechace los documentos finales de las prácticas empresariales.
+                        </p>
+
+                        <!-- ESTADO -->
+                        <div class="mb-4">
+                            <label class="block font-medium text-sm text-gray-700">
+                                <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                                Estado de la práctica:
+                            </label>
+
+                            <select name="estado" id="estado_fase6"
+                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
+                                <option value="">Seleccione un estado</option>
+                                <option value="Aprobada">Aprobar</option>
+                                <option value="Rechazada">Rechazar</option>
+                            </select>
+
+                            <span id="estado_fase6Error" class="text-red-500 text-sm"></span>
+                        </div>
+
+                        <!-- F-DC-128 -->
+                        <div class="mb-4">
+                            <div class="flex items-center gap-2 mb-2">
+                                <label class="block font-medium text-sm text-gray-700">
+                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                    <span class="text-red-500">*</span>
+                                    Informe Final (F-DC-128)
+                                </label>
+
+                                <div class="relative inline-block">
+                                    <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                        data-tooltip="tooltip-fdc128-evaluador-fase6"></i>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <span id="doc_fdc128Error" class="text-red-500 text-xs"></span>
-                        <ul id="file-list-fdc128" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
-                        <div id="tooltip-fdc128-fase5"
-                            class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                            Suba el Informe Final F-DC-128. El documento debe incluir la información completa y legible.
-                        </div>
-                    
-                    </div>
 
-                    <!-- F-DC-129 -->
-                    <div class="mb-6">
-                        <div class="flex items-center gap-2 mb-2">
-                            <label class="block font-medium text-sm text-gray-700 mb-2">
-                                <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
-                                <span class="text-red-500">*</span>Regilla de Evaluacion F-DC-129
-                            </label>
-                              <div class="relative inline-block">
-                                <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
-                                    data-tooltip="tooltip-fdc129-fase5"></i>
-                            </div>
-                        </div>
+                            <div
+                                class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+                                <div class="grid gap-1 text-center">
+                                    <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
 
-                        <div
-                            class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+                                    <h2 class="text-center text-gray-400 text-xs">
+                                        Arrastra o selecciona el archivo F-DC-128 con comentarios o firmado
+                                        (.doc, .docx, máx. 5MB)
+                                    </h2>
+                                </div>
 
-                            <div class="grid gap-1 text-center">
-                                <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                <h2 class="text-gray-400 text-xs">Subir F-DC-129 (.doc, .docx, máx. 5MB)</h2>
-                            </div>
+                                <div class="text-center">
+                                    <input type="file" name="fdc128" id="fdc128_fase6"
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full"
+                                        accept=".doc,.docx" />
 
-                            <div class="text-center">
-                                <input type="file" name="doc_fdc129" id="doc_fdc129"
-                                    class="absolute inset-0 opacity-0 cursor-pointer w-full"
-                                    accept=".doc,.docx" />
-
-                                <div
-                                    class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
-                                    Cargar
+                                    <div
+                                        class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                        Cargar
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <span id="doc_fdc129Error" class="text-red-500 text-xs"></span>
-                        <ul id="file-list-fdc129" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
-                            <div id="tooltip-fdc129-fase5"
-                            class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                            Suba el documento F-DC-129 en word
-                        </div>
-                    </div>
+                            <span id="fdc128_fase6Error" class="text-red-500 text-xs"></span>
 
-                    <!-- F-DC-196 -->
-                    <div class="mb-6">
-                        <div class="flex items-center gap-2 mb-2">
-                            <label class="block font-medium text-sm text-gray-700 mb-2">
-                                <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
-                                <span class="text-red-500">*</span> Acta de Terminacion F-DC-196
-                            </label>
-                            <div class="relative inline-block">
-                                <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
-                                    data-tooltip="tooltip-fdc196-fase5"></i>
+                            <ul id="file-list-fdc128-fase6" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                            <ul id="files-size-fdc128-fase6" class="mt-4 text-gray-600 text-xs list-disc pl-5"></ul>
+
+
+                            <div id="tooltip-fdc128-evaluador-fase6"
+                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
+                                Suba el documento F-DC-128 firmado o con comentarios del evaluador.
                             </div>
                         </div>
 
-                        <div
-                            class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+                        <!-- F-DC-129 -->
+                        <div class="mb-4">
+                            <div class="flex items-center gap-2 mb-2">
+                                <label class="block font-medium text-sm text-gray-700">
+                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                    <span class="text-red-500">*</span>
+                                    Evaluación Final (F-DC-129)
+                                </label>
 
-                            <div class="grid gap-1 text-center">
-                                <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                <h2 class="text-gray-400 text-xs">Subir F-DC-196 (.doc, .docx, máx. 5MB)</h2>
-                            </div>
-
-                            <div class="text-center">
-                                <input type="file" name="doc_fdc196" id="doc_fdc196"
-                                    class="absolute inset-0 opacity-0 cursor-pointer w-full"
-                                    accept=".doc,.docx" />
-
-                                <div
-                                    class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
-                                    Cargar
+                                <div class="relative inline-block">
+                                    <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                        data-tooltip="tooltip-fdc129-evaluador-fase6"></i>
                                 </div>
                             </div>
+
+                            <div
+                                class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+                                <div class="grid gap-1 text-center">
+                                    <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+
+                                    <h2 class="text-center text-gray-400 text-xs">
+                                        Arrastra o selecciona el archivo F-DC-129 con comentarios o firmado
+                                        (.doc, .docx, máx. 5MB)
+                                    </h2>
+                                </div>
+
+                                <div class="text-center">
+                                    <input type="file" name="fdc129" id="fdc129_fase6"
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full"
+                                        accept=".doc,.docx" />
+
+                                    <div
+                                        class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                        Cargar
+                                    </div>
+                                </div>
+                            </div>
+
+                            <span id="fdc129_fase6Error" class="text-red-500 text-xs"></span>
+
+                            <ul id="file-list-fdc129-fase6"class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                            <ul id="files-size-fdc129-fase6" class="mt-4 text-gray-600 text-xs list-disc pl-5"></ul>
+
+                            <div id="tooltip-fdc129-evaluador-fase6"
+                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
+                                Suba el documento F-DC-129 firmado o con comentarios del evaluador.
+                            </div>
                         </div>
 
-                        <span id="doc_fdc196Error" class="text-red-500 text-xs"></span>
-                        <ul id="file-list-fdc196" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
-                        <div id="tooltip-fdc196-fase5"
-                            class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                            Suba el documento F-DC-196 en word
+                        <!-- RESPUESTA -->
+                        <div class="mb-4">
+                            <label class="block font-medium text-sm text-gray-700">
+                                <i class="fa-solid fa-message mr-2 text-gray-500"></i>
+                                Comentarios de la respuesta:
+                            </label>
+
+                            <div id="txt-editor-fase6-evaluador"
+                                class="shadow txt-editor-quill"
+                                style="height: 200px; background: white;">
+                            </div>
+
+                            <textarea name="respuesta" id="respuesta_fase6"
+                                class="hidden"></textarea>
+
+                            <span id="respuesta_fase6Error" class="text-red-500 text-sm"></span>
                         </div>
-                    </div>
 
-                    <!-- Botones -->
-                    <div class="flex justify-end space-x-3 mt-6 pt-4 border-t">
-                        <button type="button" onclick="closeFase5EstudianteModal()"
-                            class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-5 py-2 rounded-lg transition">
-                            Cancelar
-                        </button>
+                        <!-- BOTONES -->
+                        <div class="flex justify-end space-x-2 mt-4">
 
-                        <button type="submit"
-                            class="flex bg-uts-500 hover:bg-uts-800 text-white px-5 py-2 rounded-lg transition items-center gap-2">
+                            <button type="button"
+                                onclick="closeFase6EvaluadorModal()"
+                                class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">
+                                Cancelar
+                            </button>
 
-                            <svg id="loadingSpinner-fase5" class="hidden w-4 h-4 text-white animate-spin"
-                                viewBox="0 0 64 64" fill="none">
-                                <path
-                                    d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
-                                    stroke="currentColor" stroke-width="5"></path>
-                                <path
-                                    d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
-                                    stroke="currentColor" stroke-width="5" class="text-white"></path>
-                            </svg>
+                            <button type="submit"
+                                class="flex bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg">
 
-                            Enviar
-                        </button>
-                    </div>
+                                <svg id="loadingSpinner-fase6-admin"
+                                    style="margin: 4px 10px 4px 0"
+                                    class="hidden w-4 h-4 text-gray-300 animate-spin"
+                                    viewBox="0 0 64 64" fill="none">
 
-                </form>
+                                    <path
+                                        d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
+                                        stroke="currentColor" stroke-width="5">
+                                    </path>
 
+                                    <path
+                                        d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
+                                        stroke="currentColor" stroke-width="5"
+                                        class="text-white">
+                                    </path>
+                                </svg>
+
+                                Responder
+                            </button>
+
+                        </div>
+                    </form>
+
+                </div>
             </div>
         </div>
     </div>
-</div>
 
+    <!-- MODAL FASE 6 Detalles --> 
 
-<!-- MODAL FASE 5 - Detalles -->
-<div id="fase5DetailsModal" class="fixed z-50 inset-0 overflow-y-auto hidden" >
+    <div id="fase6DetailsModal" class="fixed z-50 inset-0 overflow-y-auto hidden">
 
-    <div class="modal-overlay absolute inset-0 bg-black bg-opacity-50"
-        onclick="closeFase5DetailsModal()">
+        <div class="modal-overlay absolute inset-0 bg-black bg-opacity-50"
+            onclick="closeFase6DetailsModal()">
 
-        <div class="flex items-center justify-center min-h-screen p-4 text-center relative">
+            <div class="flex items-center justify-center min-h-screen p-4 text-center relative">
 
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full modal-content relative"
-                onclick="event.stopPropagation()">
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full modal-content relative"
+                    onclick="event.stopPropagation()">
 
-                <!-- BOTÓN CERRAR -->
-                <button
-                    class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
-                    onclick="closeFase5DetailsModal()">
-                    &times;
-                </button>
+                    <!-- BOTÓN CERRAR -->
+                    <button
+                        class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
+                        onclick="closeFase6DetailsModal()">
+                        &times;
+                    </button>
 
-                <div class="p-6 mt-2">
+                    <div class="p-6 mt-2">
 
-                    <!-- TÍTULO -->
-                    <p class="text-2xl font-bold mb-6">
-                        Detalles de la
-                        <span
-                            class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">
-                            PRACTICA
-                        </span>
-                    </p>
+                        <!-- TÍTULO -->
+                        <p class="text-2xl font-bold mb-6">
+                            Detalles de la
+                            <span
+                                class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">
+                                PRÁCTICA
+                            </span>
+                        </p>
 
-                    <!-- CONTENIDO -->
-                    <div id="fase5DetailsContent" class="space-y-4">
+                        <!-- CONTENIDO -->
+                        <div id="fase6DetailsContent" class="space-y-4">
 
-                        <!-- LOADING -->
-                        <div class="text-center py-8">
+                            <!-- LOADING -->
+                            <div class="text-center py-8">
 
-                            <svg class="inline w-8 h-8 text-gray-400 animate-spin"
-                                viewBox="0 0 64 64"
-                                fill="none">
+                                <svg class="inline w-8 h-8 text-gray-400 animate-spin"
+                                    viewBox="0 0 64 64"
+                                    fill="none">
 
-                                <path
-                                    d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
-                                    stroke="currentColor"
-                                    stroke-width="5">
-                                </path>
+                                    <path
+                                        d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
+                                        stroke="currentColor"
+                                        stroke-width="5">
+                                    </path>
 
-                            </svg>
+                                </svg>
 
-                            <p class="mt-2 text-gray-500">
-                                Cargando información...
-                            </p>
+                                <p class="mt-2 text-gray-500">
+                                    Cargando información...
+                                </p>
+
+                            </div>
 
                         </div>
 
-                    </div>
+                        <!-- FOOTER -->
+                        <div class="flex justify-end mt-6">
 
-                    <!-- FOOTER -->
-                    <div class="flex justify-end mt-6">
+                            <button type="button"
+                                onclick="closeFase6DetailsModal()"
+                                class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">
 
-                        <button type="button"
-                            onclick="closeFase5DetailsModal()"
-                            class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">
+                                Cerrar
 
-                            Cerrar
+                            </button>
 
-                        </button>
+                        </div>
 
                     </div>
 
@@ -2498,403 +3166,297 @@
 
     </div>
 
-</div>
+    <!-- MODAL FASE 6 Responder Comite -->
+    <div id="fase6ComiteModal" class="fixed z-50 inset-0 overflow-y-auto">
+        <div class="modal-overlay absolute inset-0"
+            style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;"
+            onclick="closeFase6ComiteModal()">
 
-<!-- Modal Fase 5 Responder Director -->
-<div id="fase5DirModal" class="fixed z-50 inset-0 overflow-y-auto hidden">
-    <div class="modal-overlay absolute inset-0"
-        style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;"
-        onclick="closeFase5DirModal()">
+            <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
+                    onclick="event.stopPropagation()">
 
-        <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
+                    <button class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
+                        onclick="closeFase6ComiteModal()">&times;</button>
 
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
-                onclick="event.stopPropagation()">
+                    <form class="p-6 mt-2" id="fase6ComiteForm" enctype="multipart/form-data">
+                        @csrf
 
-                <!-- BOTÓN CERRAR -->
-                <button
-                    class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
-                    onclick="closeFase5DirModal()">
-                    &times;
-                </button>
+                        <input type="hidden" name="practica_id"
+                            id="practica_id_fase6_comite"
+                            value="{{ $practica->id }}">
 
-                <form class="p-6 mt-2" id="fase5DirForm" enctype="multipart/form-data">
+                        <p class="text-2xl font-bold mb-4">
+                            Responder
+                            <span class="bg-uts-500 text-white px-2 py-0.5 rounded uppercase shadow">
+                                Fase 6 - Comité
+                            </span>
+                        </p>
 
-                    @csrf
+                        <p class="text-sm text-gray-600 mb-4">
+                            El comité revisa la documentación final de las prácticas empresariales.
+                        </p>
 
-                    <input type="hidden" name="practica_id" value="{{ $practica->id }}">
-
-                    <!-- TÍTULO -->
-                    <p class="text-2xl font-bold mb-4">
-                        Responder
-                        <span
-                            class="bg-uts-500 text-white px-2 py-0.5 rounded uppercase shadow">
-                            Fase 5
-                        </span>
-                    </p>
-
-                    <p class="text-sm text-gray-600 mb-4">
-                        Apruebe o rechace la entrega final de prácticas empresariales.
-                    </p>
-
-                    <!-- ESTADO -->
-                    <div class="mb-4">
-                        <label class="block font-medium text-sm text-gray-700">
-                            <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
-                            Estado de la práctica:
-                        </label>
-
-                        <select
-                            name="estado"
-                            id="estado_fase5_dir"
-                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
-
-                            <option value="">Seleccione un estado</option>
-                            <option value="Aprobada">Aprobar</option>
-                            <option value="Rechazada">Rechazar</option>
-
-                        </select>
-
-                        <span id="estado_fase5_dirError"
-                            class="text-red-500 text-sm"></span>
-                    </div>
-
-                    <!-- F-DC-128 -->
-                    <div class="mb-4">
-
-                        <div class="flex items-center gap-2 mb-2">
-
+                        <!-- ESTADO -->
+                        <div class="mb-4">
                             <label class="block font-medium text-sm text-gray-700">
-                                <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
-                                <span class="text-red-500">*</span>
+                                <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                                Estado de la práctica:
+                            </label>
+
+                            <select name="estado" id="estado_fase6_comite"
+                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
+                                <option value="">Seleccione un estado</option>
+                                <option value="Aprobada">Aprobar</option>
+                                <option value="Rechazada">Rechazar</option>
+                            </select>
+
+                            <span id="estado_fase6_comiteError" class="text-red-500 text-sm"></span>
+                        </div>
+
+                        <!-- ACTA -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+
+                            <div>
+                                <label class="block font-medium text-sm text-gray-700">
+                                    <i class="fa-regular fa-file-lines mr-1 text-gray-500"></i>
+                                    Número de acta:
+                                </label>
+
+                                <input type="text"
+                                    name="nro_acta"
+                                    id="nro_acta_fase6_comite"
+                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500"
+                                    placeholder="Ingrese el número de acta">
+
+                                <span id="nro_acta_fase6_comiteError"
+                                    class="text-red-500 text-sm"></span>
+                            </div>
+
+                            <div>
+                                <label class="block font-medium text-sm text-gray-700">
+                                    <i class="fa-regular fa-calendar-days mr-1 text-gray-500"></i>
+                                    Fecha del acta:
+                                </label>
+
+                                <input type="date"
+                                    name="fecha_acta"
+                                    id="fecha_acta_fase6_comite"
+                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
+
+                                <span id="fecha_acta_fase6_comiteError"
+                                    class="text-red-500 text-sm"></span>
+                            </div>
+
+                        </div>
+
+                        <!-- F-DC-128 -->
+                        <div class="mb-4">
+                            <label class="block font-medium text-sm text-gray-700 mb-2">
                                 Informe Final (F-DC-128)
                             </label>
 
-                            <div class="relative inline-block">
-                                <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
-                                    data-tooltip="tooltip-fdc128-dir-fase5"></i>
-                            </div>
+                            <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
 
-                        </div>
+                                <div class="grid gap-1 text-center">
+                                    <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
 
-                        <div
-                            class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+                                    <h2 class="text-center text-gray-400 text-xs">
+                                        Arrastra o selecciona el archivo F-DC-128
+                                        (.doc, .docx, máx. 5MB)
+                                    </h2>
+                                </div>
 
-                            <div class="grid gap-1 text-center">
+                                <div class="text-center">
+                                    <input type="file"
+                                        name="fdc128"
+                                        id="fdc128_fase6_comite"
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full"
+                                        accept=".doc,.docx">
 
-                                <i
-                                    class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-
-                                <h2 class="text-center text-gray-400 text-xs">
-                                    Arrastra o selecciona el archivo F-DC-128
-                                    (.doc, .docx, máx. 5MB)
-                                </h2>
-
-                            </div>
-
-                            <div class="text-center">
-
-                                <input
-                                    type="file"
-                                    name="fdc128"
-                                    id="fdc128_fase5"
-                                    class="absolute inset-0 opacity-0 cursor-pointer w-full"
-                                    accept=".doc,.docx" />
-
-                                <div
-                                    class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
-                                    Cargar
+                                    <div
+                                        class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                        Cargar
+                                    </div>
                                 </div>
 
                             </div>
 
+                            <span id="fdc128_fase6_comiteError" class="text-red-500 text-xs"></span>
+
+                            <ul id="file-list-fdc128-fase6-comite" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                            <ul id="files-size-fdc128-fase6-comite" class="mt-4 text-gray-600 text-xs list-disc pl-5"></ul>
+
+
                         </div>
 
-                        <span id="fdc128_fase5Error"
-                            class="text-red-500 text-xs"></span>
-
-                        <ul id="file-list-fdc128-fase5"
-                            class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
-
-                        <div id="tooltip-fdc128-dir-fase5"
-                            class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                            Suba el documento F-DC-128 firmado o con comentarios.
-                        </div>
-
-                    </div>
-
-                    <!-- F-DC-129 -->
-                    <div class="mb-4">
-
-                        <div class="flex items-center gap-2 mb-2">
-
-                            <label class="block font-medium text-sm text-gray-700">
-                                <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
-                                <span class="text-red-500">*</span>
+                        <!-- F-DC-129 -->
+                        <div class="mb-4">
+                            <label class="block font-medium text-sm text-gray-700 mb-2">
                                 Evaluación Final (F-DC-129)
                             </label>
 
-                            <div class="relative inline-block">
-                                <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
-                                    data-tooltip="tooltip-fdc129-dir-fase5"></i>
-                            </div>
+                            <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
 
-                        </div>
+                                <div class="grid gap-1 text-center">
+                                    <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
 
-                        <div
-                            class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+                                    <h2 class="text-center text-gray-400 text-xs">
+                                        Arrastra o selecciona el archivo F-DC-129
+                                        (.doc, .docx, máx. 5MB)
+                                    </h2>
+                                </div>
 
-                            <div class="grid gap-1 text-center">
+                                <div class="text-center">
+                                    <input type="file"
+                                        name="fdc129"
+                                        id="fdc129_fase6_comite"
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full"
+                                        accept=".doc,.docx">
 
-                                <i
-                                    class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-
-                                <h2 class="text-center text-gray-400 text-xs">
-                                    Arrastra o selecciona el archivo F-DC-129
-                                    (.doc, .docx, máx. 5MB)
-                                </h2>
-
-                            </div>
-
-                            <div class="text-center">
-
-                                <input
-                                    type="file"
-                                    name="fdc129"
-                                    id="fdc129_fase5"
-                                    class="absolute inset-0 opacity-0 cursor-pointer w-full"
-                                    accept=".doc,.docx" />
-
-                                <div
-                                    class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
-                                    Cargar
+                                    <div
+                                        class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                        Cargar
+                                    </div>
                                 </div>
 
                             </div>
 
+                            <span id="fdc129_fase6_comiteError"
+                                class="text-red-500 text-xs"></span>
+
+                            <ul id="file-list-fdc129-fase6-comite" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                            <ul id="files-size-fdc129-fase6-comite" class="mt-4 text-gray-600 text-xs list-disc pl-5"></ul>
                         </div>
 
-                        <span id="fdc129_fase5Error"
-                            class="text-red-500 text-xs"></span>
-
-                        <ul id="file-list-fdc129-fase5"
-                            class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
-
-                        <div id="tooltip-fdc129-dir-fase5"
-                            class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                            Suba el documento F-DC-129 firmado o con comentarios.
-                        </div>
-
-                    </div>
-
-                    <!-- F-DC-196 -->
-                    <div class="mb-4">
-
-                        <div class="flex items-center gap-2 mb-2">
-
+                        <!-- RESPUESTA -->
+                        <div class="mb-4">
                             <label class="block font-medium text-sm text-gray-700">
-                                <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
-                                <span class="text-red-500">*</span>
-                                Acta Final (F-DC-196)
+                                <i class="fa-solid fa-message mr-2 text-gray-500"></i>
+                                Comentarios de la respuesta:
                             </label>
 
-                            <div class="relative inline-block">
-                                <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
-                                    data-tooltip="tooltip-fdc196-dir-fase5"></i>
+                            <div id="txt-editor-fase6-comite"
+                                class="shadow txt-editor-quill"
+                                style="height: 200px; background: white;">
+                            </div>
+
+                            <textarea name="respuesta"
+                                id="respuesta_fase6_comite"
+                                class="hidden"></textarea>
+
+                            <span id="respuesta_fase6_comiteError"
+                                class="text-red-500 text-sm"></span>
+                        </div>
+
+                        <!-- BOTONES -->
+                        <div class="flex justify-end space-x-2 mt-4">
+
+                            <button type="button"
+                                onclick="closeFase6ComiteModal()"
+                                class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">
+                                Cancelar
+                            </button>
+
+                            <button type="submit"
+                                class="flex bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg">
+
+                                <svg id="loadingSpinner-fase6-comite"
+                                    style="margin: 4px 10px 4px 0"
+                                    class="hidden w-4 h-4 text-gray-300 animate-spin"
+                                    viewBox="0 0 64 64" fill="none">
+                                    <!-- mismo SVG que usas en los demás modales -->
+                                </svg>
+
+                                Responder
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--MODAL FASE FINAL - Detalles  Todos los documentos se muestran-->
+    <div id="fase7DetailsModal" class="fixed z-50 inset-0 overflow-y-auto hidden">
+
+        <div class="modal-overlay absolute inset-0 bg-black bg-opacity-50"
+            onclick="closeFase7DetailsModal()">
+
+            <div class="flex items-center justify-center min-h-screen p-4 text-center relative">
+
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full modal-content relative"
+                    onclick="event.stopPropagation()">
+
+                    <!-- BOTÓN CERRAR -->
+                    <button
+                        class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
+                        onclick="closeFase7DetailsModal()">
+                        &times;
+                    </button>
+
+                    <div class="p-6 mt-2">
+
+                        <!-- TÍTULO -->
+                        <p class="text-2xl font-bold mb-6">
+                            Detalles de la
+                            <span
+                                class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">
+                                PRÁCTICA
+                            </span>
+                        </p>
+
+                        <!-- CONTENIDO -->
+                        <div id="fase7DetailsContent" class="space-y-4">
+
+                            <!-- LOADING -->
+                            <div class="text-center py-8">
+
+                                <svg class="inline w-8 h-8 text-gray-400 animate-spin"
+                                    viewBox="0 0 64 64"
+                                    fill="none">
+
+                                    <path
+                                        d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
+                                        stroke="currentColor"
+                                        stroke-width="5">
+                                    </path>
+
+                                </svg>
+
+                                <p class="mt-2 text-gray-500">
+                                    Cargando archivos...
+                                </p>
+
                             </div>
 
                         </div>
 
-                        <div
-                            class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+                        <!-- FOOTER -->
+                        <div class="flex justify-end mt-6">
 
-                            <div class="grid gap-1 text-center">
+                            <button type="button"
+                                onclick="closeFase7DetailsModal()"
+                                class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">
 
-                                <i
-                                    class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                Cerrar
 
-                                <h2 class="text-center text-gray-400 text-xs">
-                                    Arrastra o selecciona el archivo F-DC-196
-                                    (.doc, .docx, máx. 5MB)
-                                </h2>
+                            </button>
 
-                            </div>
-
-                            <div class="text-center">
-
-                                <input
-                                    type="file"
-                                    name="fdc196"
-                                    id="fdc196_fase5"
-                                    class="absolute inset-0 opacity-0 cursor-pointer w-full"
-                                    accept=".doc,.docx" />
-
-                                <div
-                                    class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
-                                    Cargar
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                        <span id="fdc196_fase5Error"
-                            class="text-red-500 text-xs"></span>
-
-                        <ul id="file-list-fdc196-fase5"
-                            class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
-
-                        <div id="tooltip-fdc196-dir-fase5"
-                            class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                            Suba el documento F-DC-196 firmado o con comentarios.
                         </div>
 
                     </div>
 
-                    <!-- TURNITIN -->
-                    <div class="mb-4">
-
-                        <div class="flex items-center gap-2 mb-2">
-
-                            <label class="block font-medium text-sm text-gray-700">
-                                <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
-                                <span class="text-red-500">*</span>
-                                Informe de plagio (Turnitin)
-                            </label>
-
-                            <div class="relative inline-block">
-                                <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
-                                    data-tooltip="tooltip-turnitin-dir-fase5"></i>
-                            </div>
-
-                        </div>
-
-                        <div
-                            class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
-
-                            <div class="grid gap-1 text-center">
-
-                                <i
-                                    class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-
-                                <h2 class="text-center text-gray-400 text-xs">
-                                    Arrastra o selecciona el informe Turnitin
-                                    (.pdf, máx. 5MB)
-                                </h2>
-
-                            </div>
-
-                            <div class="text-center">
-
-                                <input
-                                    type="file"
-                                    name="turnitin"
-                                    id="turnitin_fase5"
-                                    class="absolute inset-0 opacity-0 cursor-pointer w-full"
-                                    accept=".pdf" />
-
-                                <div
-                                    class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
-                                    Cargar
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                        <span id="turnitin_fase5Error"
-                            class="text-red-500 text-xs"></span>
-
-                        <ul id="file-list-turnitin-fase5"
-                            class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
-
-                        <div id="tooltip-turnitin-dir-fase5"
-                            class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                            Suba el informe de similitud generado por Turnitin en PDF.
-                        </div>
-
-                    </div>
-
-                    <!-- RESPUESTA -->
-                    <div class="mb-4">
-
-                        <label class="block font-medium text-sm text-gray-700">
-                            <i class="fa-solid fa-message mr-2 text-gray-500"></i>
-                            Comentarios de la respuesta:
-                        </label>
-
-                        <div id="txt-editor-fase5-dir"
-                            class="shadow txt-editor-quill"
-                            style="height: 200px; background: white;">
-                        </div>
-
-                        <textarea
-                            name="respuesta"
-                            id="respuesta_fase5_dir"
-                            class="hidden"></textarea>
-
-                        <span id="respuesta_fase5_dirError"
-                            class="text-red-500 text-sm"></span>
-
-                    </div>
-
-                    <!-- BOTONES -->
-                    <div class="flex justify-end space-x-2 mt-4">
-
-                        <button
-                            type="button"
-                            onclick="closeFase5DirModal()"
-                            class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">
-                            Cancelar
-                        </button>
-
-                        <button
-                            type="submit"
-                            class="flex bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg">
-
-                            <svg id="loadingSpinner-fase5-dir"
-                                style="margin: 4px 10px 4px 0"
-                                class="hidden w-4 h-4 text-gray-300 animate-spin"
-                                viewBox="0 0 64 64"
-                                fill="none">
-
-                                <path
-                                    d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
-                                    stroke="currentColor"
-                                    stroke-width="5"></path>
-
-                                <path
-                                    d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
-                                    stroke="currentColor"
-                                    stroke-width="5"
-                                    class="text-white"></path>
-
-                            </svg>
-
-                            Responder
-
-                        </button>
-
-                    </div>
-
-                </form>
+                </div>
 
             </div>
 
         </div>
 
     </div>
-</div>
-
-<!-- Modal Fase 6 Responder Evaluador -->
-
-
-<!-- Modal Fase 6 Detalles --> 
-
-<!-- Modal Fase 6 Responder Comite -->
-
-<!-- Modal Fase 7 Detalles  Todos los documentos se muestran-->
-
 
     <!-- Calendario Modal -->
     @if (isset($fechas))
@@ -2953,7 +3515,6 @@
     @endif
 
     <!--Reporte modal prácticas-->
-
     <div id="warningModal" class="fixed z-50 inset-0 overflow-y-auto">
         <div class="modal-overlay absolute inset-0"
             style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;"
@@ -3008,164 +3569,162 @@
     </div>
 
     <!-- ICFES MODAL - Para prácticas (Fases 5 y 6) -->
-@if ($fase_actual >= 5 && $fase_actual <= 6)
-    @if ($submited_icfes_practicas === "false")
-        <!-- Modal Estudiante -->
-        <div id="icfesEstudianteModal" class="fixed z-50 inset-0 overflow-y-auto">
-            <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeIcfesEstudianteModal()">
-                <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
-                    <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative" onclick="event.stopPropagation()">
-                        <button class="modal-close-btn-custom" onclick="closeIcfesEstudianteModal()">&times;</button>
-                        <form id="icfesEstudianteForm" class="p-6 mt-2">
-                            @csrf
-                            <p class="text-2xl font-bold" style="margin: 0.8rem 0 1.5rem 0;" id="icfesEstudianteTitle"></p>
-                            <p class="font-medium text-sm text-gray-700 text-justify">En este formulario el estudiante podrá cargar los resultados de su prueba saber TyT/Pro en dado caso de que pueda hacer parte de los beneficios establecidos en el <a href="https://www.uts.edu.co/sitio/estudiantes/" target="_blank" class="text-blue-500 underline uppercase">reglamento de estímulos</a>. Debe cargar un solo archivo en formato PDF, el comité de trabajos de grado revisará la validez del documento y dará respuesta al estudiante. Tenga en cuenta la siguiente información:</p>
-                            <p class="font-medium text-sm text-gray-700 my-4">Si en su práctica hay más de un integrante debe tener presente lo siguiente:</p>
-                            <ul class="list-disc">
-                                <li class="ml-4 font-medium text-sm text-gray-700 text-justify">Si <strong>UN</strong> solo integrante cumple con el puntaje requerido, únicamente ese integrante deberá cargar desde su cuenta los resultados en formato PDF. El otro u otros integrantes deberán continuar el desarrollo de la práctica de forma normal.</li>
-                                <li class="ml-4 font-medium text-sm text-gray-700 text-justify">Si <strong>TODOS</strong> los integrantes cumplen con el puntaje, cada uno deberá cargar los resultados desde su propia cuenta en formato PDF. El comité se encargará de finalizar toda la práctica.</li>
-                                <li class="ml-4 font-medium text-sm text-gray-700 text-justify">Si <strong>NINGUNO</strong> cumple con el puntaje, el comité no aprobará ningún beneficio a los estudiantes.</li>
-                            </ul>
-                            <input type="hidden" name="practica_id" id="practica_id" value="{{ $practica->id }}">
-                            <input type="hidden" name="submited_icfes_practicas" id="submited_icfes_practicas" value="{{ auth()->user()->id }}_true">
-                            <div class="grid grid-cols-1 gap-6 mt-4">
-                                <div class="flex items-center gap-2">
-                                    <label for="doc_icfes_practicas" class="block font-medium text-sm text-gray-700">
-                                        <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
-                                        <span class="text-red-600 mr-1 text-lg">*</span>Evidencias de resultados pruebas TyT/Pro
-                                    </label>
-                                    <div class="relative inline-block">
-                                        <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon" data-tooltip="tooltip-doc_icfes_practicas"></i>
-                                        <div id="tooltip-doc_icfes_practicas" style="width: 10rem; left: -100px;" class="hidden absolute z-10 max-w-[90vw] px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg left-1/2 -translate-x-1/2 bottom-full mb-2 sm:translate-x-0">
-                                            <p class="uppercase font-bold mb-2">Instrucciones:</p>
-                                            Solo se debe subir un archivo en formato PDF.
+        @if ($fase_actual >= 5 && $fase_actual <= 6)
+            @if ($submited_icfes_practicas === "false")
+                <!-- Modal Estudiante -->
+                <div id="icfesEstudianteModal" class="fixed z-50 inset-0 overflow-y-auto">
+                    <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeIcfesEstudianteModal()">
+                        <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
+                            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative" onclick="event.stopPropagation()">
+                                <button class="modal-close-btn-custom" onclick="closeIcfesEstudianteModal()">&times;</button>
+                                <form id="icfesEstudianteForm" class="p-6 mt-2">
+                                    @csrf
+                                    <p class="text-2xl font-bold" style="margin: 0.8rem 0 1.5rem 0;" id="icfesEstudianteTitle"></p>
+                                    <p class="font-medium text-sm text-gray-700 text-justify">En este formulario el estudiante podrá cargar los resultados de su prueba saber TyT/Pro en dado caso de que pueda hacer parte de los beneficios establecidos en el <a href="https://www.uts.edu.co/sitio/estudiantes/" target="_blank" class="text-blue-500 underline uppercase">reglamento de estímulos</a>. Debe cargar un solo archivo en formato PDF, el comité de trabajos de grado revisará la validez del documento y dará respuesta al estudiante. Tenga en cuenta la siguiente información:</p>
+                                    <p class="font-medium text-sm text-gray-700 my-4">Si en su práctica hay más de un integrante debe tener presente lo siguiente:</p>
+                                    <ul class="list-disc">
+                                        <li class="ml-4 font-medium text-sm text-gray-700 text-justify">Si <strong>UN</strong> solo integrante cumple con el puntaje requerido, únicamente ese integrante deberá cargar desde su cuenta los resultados en formato PDF. El otro u otros integrantes deberán continuar el desarrollo de la práctica de forma normal.</li>
+                                        <li class="ml-4 font-medium text-sm text-gray-700 text-justify">Si <strong>TODOS</strong> los integrantes cumplen con el puntaje, cada uno deberá cargar los resultados desde su propia cuenta en formato PDF. El comité se encargará de finalizar toda la práctica.</li>
+                                        <li class="ml-4 font-medium text-sm text-gray-700 text-justify">Si <strong>NINGUNO</strong> cumple con el puntaje, el comité no aprobará ningún beneficio a los estudiantes.</li>
+                                    </ul>
+                                    <input type="hidden" name="practica_id" id="practica_id" value="{{ $practica->id }}">
+                                    <input type="hidden" name="submited_icfes_practicas" id="submited_icfes_practicas" value="{{ auth()->user()->id }}_true">
+                                    <div class="grid grid-cols-1 gap-6 mt-4">
+                                        <div class="flex items-center gap-2">
+                                            <label for="doc_icfes_practicas" class="block font-medium text-sm text-gray-700">
+                                                <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                                <span class="text-red-600 mr-1 text-lg">*</span>Evidencias de resultados pruebas TyT/Pro
+                                            </label>
+                                            <div class="relative inline-block">
+                                                <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon" data-tooltip="tooltip-doc_icfes_practicas"></i>
+                                                <div id="tooltip-doc_icfes_practicas" style="width: 10rem; left: -100px;" class="hidden absolute z-10 max-w-[90vw] px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg left-1/2 -translate-x-1/2 bottom-full mb-2 sm:translate-x-0">
+                                                    <p class="uppercase font-bold mb-2">Instrucciones:</p>
+                                                    Solo se debe subir un archivo en formato PDF.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="w-full relative py-9 bg-gray-50 rounded-2xl border border-2 border-gray-300 gap-3 grid border-dashed" id="dropzone_doc_icfes_practicas">
+                                            <div class="grid gap-1">
+                                                <i class="mx-auto text-4xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                                <h2 class="text-center text-gray-400 text-xs leading-4">Solo archivos PDF de máximo 4MB</h2>
+                                            </div>
+                                            <div class="grid gap-2">
+                                                <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
+                                                <div class="flex items-center justify-center">
+                                                    <input type="file" name="doc_icfes_practicas[]" id="doc_icfes_practicas" class="absolute inset-0 opacity-0 cursor-pointer" accept=".pdf" />
+                                                    <div class="flex w-28 h-9 px-1 flex-col bg-uts-500 rounded-full shadow text-white text-sm font-semibold leading-4 items-center justify-center cursor-pointer focus:outline-none">Cargar</div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="w-full relative py-9 bg-gray-50 rounded-2xl border border-2 border-gray-300 gap-3 grid border-dashed" id="dropzone_doc_icfes_practicas">
-                                    <div class="grid gap-1">
-                                        <i class="mx-auto text-4xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                        <h2 class="text-center text-gray-400 text-xs leading-4">Solo archivos PDF de máximo 4MB</h2>
+                                    <span id="doc_icfes_practicasError" class="text-red-500 text-sm"></span>
+                                    <ul id="doc_icfes_practicas-file-list" class="mt-4 text-gray-600 text-sm list-disc pl-5"></ul>
+                                    <span id="doc_icfes_practicas-files-size" class="text-gray-800 text-sm"></span>
+                                    <div class="mt-8 flex justify-end space-x-2">
+                                        <button type="button" onclick="closeIcfesEstudianteModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cancelar</button>
+                                        <button id="icfesEstudianteButton" type="submit" class="flex bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg">
+                                            <svg id="loadingSpinner-icfesEstudiante" style="margin: 4px 10px 4px 0" class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                                                <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
+                                            </svg>
+                                            Enviar
+                                        </button>
                                     </div>
-                                    <div class="grid gap-2">
-                                        <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
-                                        <div class="flex items-center justify-center">
-                                            <input type="file" name="doc_icfes_practicas[]" id="doc_icfes_practicas" class="absolute inset-0 opacity-0 cursor-pointer" accept=".pdf" />
-                                            <div class="flex w-28 h-9 px-1 flex-col bg-uts-500 rounded-full shadow text-white text-sm font-semibold leading-4 items-center justify-center cursor-pointer focus:outline-none">Cargar</div>
-                                        </div>
-                                    </div>
-                                </div>
+                                </form>
                             </div>
-                            <span id="doc_icfes_practicasError" class="text-red-500 text-sm"></span>
-                            <ul id="doc_icfes_practicas-file-list" class="mt-4 text-gray-600 text-sm list-disc pl-5"></ul>
-                            <span id="doc_icfes_practicas-files-size" class="text-gray-800 text-sm"></span>
-                            <div class="mt-8 flex justify-end space-x-2">
-                                <button type="button" onclick="closeIcfesEstudianteModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cancelar</button>
-                                <button id="icfesEstudianteButton" type="submit" class="flex bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg">
-                                    <svg id="loadingSpinner-icfesEstudiante" style="margin: 4px 10px 4px 0" class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
-    <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
-    <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
-</svg>
-                                    Enviar
-                                </button>
-                            </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Modal Admin -->
-<div id="icfesAdminModal" class="fixed z-50 inset-0 overflow-y-auto">
-    <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeIcfesAdminModal()">
-        <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative" onclick="event.stopPropagation()">
-                <button class="modal-close-btn-custom" onclick="closeIcfesAdminModal()">&times;</button>
-                <form id="icfesAdminForm" class="p-6 mt-2">
-                    @csrf
-                    <p class="text-2xl font-bold" style="margin: 0.8rem 0 1.5rem 0;" id="icfesAdminTitle"></p>
+                <!-- Modal Admin -->
+                <div id="icfesAdminModal" class="fixed z-50 inset-0 overflow-y-auto">
+                    <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeIcfesAdminModal()">
+                        <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
+                            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative" onclick="event.stopPropagation()">
+                                <button class="modal-close-btn-custom" onclick="closeIcfesAdminModal()">&times;</button>
+                                <form id="icfesAdminForm" class="p-6 mt-2">
+                                    @csrf
+                                    <p class="text-2xl font-bold" style="margin: 0.8rem 0 1.5rem 0;" id="icfesAdminTitle"></p>
 
-                    <input type="hidden" name="practica_id" id="practica_id" value="{{ $practica->id }}">
+                                    <input type="hidden" name="practica_id" id="practica_id" value="{{ $practica->id }}">
 
-                    <div class="mb-4">
-                        <label for="estado_icfes_practicas" class="block font-medium text-sm text-gray-700">
-                            <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
-                            Estado de la solicitud:
-                        </label>
-                        <select name="estado_icfes_practicas" id="estado_icfes_practicas" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full focus:ring-uts-500 focus:border-uts-500">
-                            <option value="" selected disabled>Selecciona una opción</option>
-                            <option value="Aprobado">Aprobado</option>
-                            <option value="Rechazado">Rechazado</option>
-                        </select>
-                        <span id="estado_icfes_practicasError" class="text-red-500 text-sm"></span>
+                                    <div class="mb-4">
+                                        <label for="estado_icfes_practicas" class="block font-medium text-sm text-gray-700">
+                                            <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                                            Estado de la solicitud:
+                                        </label>
+                                        <select name="estado_icfes_practicas" id="estado_icfes_practicas" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full focus:ring-uts-500 focus:border-uts-500">
+                                            <option value="" selected disabled>Selecciona una opción</option>
+                                            <option value="Aprobado">Aprobado</option>
+                                            <option value="Rechazado">Rechazado</option>
+                                        </select>
+                                        <span id="estado_icfes_practicasError" class="text-red-500 text-sm"></span>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label for="estudiante_id_practicas" class="block font-medium text-sm text-gray-700">
+                                            <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                                            Integrante de la práctica:
+                                        </label>
+                                        <select name="estudiante_id" id="estudiante_id_practicas" lang="es" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full focus:ring-uts-500 focus:border-uts-500">
+                                            <option value="" selected disabled>Selecciona una opción</option>
+                                            @foreach ($lista_integrantes as $integrante)
+                                                <option value="{{ $integrante->id }}">{{ $integrante->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <span id="estudiante_id_practicasError" class="text-red-500 text-sm"></span>
+                                    </div>
+
+                                    <!-- ========== CAMPOS DE ACTA (igual que en proyectos de grado) ========== -->
+
+                                    <div class="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                        <div>
+                                            <label for="nro_acta_icfes_practicas" class="block font-medium text-sm text-gray-700">
+                                                <i class="fa-regular fa-file-lines mr-1 text-gray-500"></i>
+                                                Número de acta:
+                                            </label>
+                                            <input type="number" name="nro_acta_icfes_practicas" id="nro_acta_icfes_practicas"
+                                                class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full focus:ring-uts-500 focus:border-uts-500"
+                                                placeholder="Ingrese el número de acta">
+                                            <span id="nro_acta_icfes_practicasError" class="text-red-500 text-sm"></span>
+                                        </div>
+                                    <div>
+                                    <label for="fecha_acta_icfes_practicas" class="block font-medium text-sm text-gray-700">
+                                        <i class="fa-regular fa-calendar-days mr-1 text-gray-500"></i>
+                                        Fecha del acta:
+                                    </label>
+                                    <input type="date" name="fecha_acta_icfes_practicas" id="fecha_acta_icfes_practicas"
+                                        class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full focus:ring-uts-500 focus:border-uts-500">
+                                    <span id="fecha_acta_icfes_practicasError" class="text-red-500 text-sm"></span>
+                                    </div>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="respuesta_icfes_practicas" class="block font-medium text-sm text-gray-700" style="margin-bottom: 5px;">
+                                            <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                                            Comentarios de la respuesta:
+                                        </label>
+                                        <div id="txt-editor-icfes-practicas" class="txt-editor-quill shadow"></div>
+                                        <textarea name="respuesta_icfes_practicas" id="respuesta_icfes_practicas" class="hidden"></textarea>
+                                        <span id="respuesta_icfes_practicasError" class="text-red-500 text-sm"></span>
+                                    </div>
+
+                                    <div class="mt-2 flex justify-end space-x-2">
+                                        <button type="button" onclick="closeIcfesAdminModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cancelar</button>
+                                        <button id="icfesAprobarButton" type="submit" class="flex bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg">
+                                            <svg id="loadingSpinner-icfesAdmin" style="margin: 4px 10px 4px 0" class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                                                <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
+                                            </svg>
+                                            Responder
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
                     </div>
-
-                    <div class="mb-4">
-                        <label for="estudiante_id_practicas" class="block font-medium text-sm text-gray-700">
-                            <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
-                            Integrante de la práctica:
-                        </label>
-                        <select name="estudiante_id" id="estudiante_id_practicas" lang="es" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full focus:ring-uts-500 focus:border-uts-500">
-                            <option value="" selected disabled>Selecciona una opción</option>
-                            @foreach ($lista_integrantes as $integrante)
-                                <option value="{{ $integrante->id }}">{{ $integrante->name }}</option>
-                            @endforeach
-                        </select>
-                        <span id="estudiante_id_practicasError" class="text-red-500 text-sm"></span>
-                    </div>
-
-                    <!-- ========== CAMPOS DE ACTA (igual que en proyectos de grado) ========== -->
-
-                    <div class="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-6">
-    <div>
-        <label for="nro_acta_icfes_practicas" class="block font-medium text-sm text-gray-700">
-            <i class="fa-regular fa-file-lines mr-1 text-gray-500"></i>
-            Número de acta:
-        </label>
-        <input type="number" name="nro_acta_icfes_practicas" id="nro_acta_icfes_practicas"
-            class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full focus:ring-uts-500 focus:border-uts-500"
-            placeholder="Ingrese el número de acta">
-        <span id="nro_acta_icfes_practicasError" class="text-red-500 text-sm"></span>
-    </div>
-    <div>
-        <label for="fecha_acta_icfes_practicas" class="block font-medium text-sm text-gray-700">
-            <i class="fa-regular fa-calendar-days mr-1 text-gray-500"></i>
-            Fecha del acta:
-        </label>
-        <input type="date" name="fecha_acta_icfes_practicas" id="fecha_acta_icfes_practicas"
-            class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full focus:ring-uts-500 focus:border-uts-500">
-        <span id="fecha_acta_icfes_practicasError" class="text-red-500 text-sm"></span>
-    </div>
-</div>
-
-
-                    <div class="mb-4">
-                        <label for="respuesta_icfes_practicas" class="block font-medium text-sm text-gray-700" style="margin-bottom: 5px;">
-                            <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
-                            Comentarios de la respuesta:
-                        </label>
-                        <div id="txt-editor-icfes-practicas" class="txt-editor-quill shadow"></div>
-                        <textarea name="respuesta_icfes_practicas" id="respuesta_icfes_practicas" class="hidden"></textarea>
-                        <span id="respuesta_icfes_practicasError" class="text-red-500 text-sm"></span>
-                    </div>
-
-                    <div class="mt-2 flex justify-end space-x-2">
-                        <button type="button" onclick="closeIcfesAdminModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cancelar</button>
-                        <button id="icfesAprobarButton" type="submit" class="flex bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg">
-                            <svg id="loadingSpinner-icfesAdmin" style="margin: 4px 10px 4px 0" class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
-                                <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
-                                <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
-                            </svg>
-                            Responder
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-    @endif
-@endif
+                </div>
+            @endif
+        @endif
     
     @push('styles')
         <style>
@@ -3209,29 +3768,29 @@
             }
 
             /* Tooltips */
-[id^="tooltip-"] {
-    background-color: #4b5563;
-    color: white;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    line-height: 1.4;
-    max-width: 200px;
-    white-space: normal;
-    word-wrap: break-word;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
+            [id^="tooltip-"] {
+                background-color: #4b5563;
+                color: white;
+                padding: 8px 12px;
+                border-radius: 6px;
+                font-size: 0.75rem;
+                line-height: 1.4;
+                max-width: 200px;
+                white-space: normal;
+                word-wrap: break-word;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            }
 
-[id^="tooltip-"]::before {
-    content: '';
-    position: absolute;
-    bottom: -6px;
-    left: 50%;
-    transform: translateX(-50%);
-    border-width: 6px 6px 0 6px;
-    border-style: solid;
-    border-color: #4b5563 transparent transparent transparent;
-}
+            [id^="tooltip-"]::before {
+                content: '';
+                position: absolute;
+                bottom: -6px;
+                left: 50%;
+                transform: translateX(-50%);
+                border-width: 6px 6px 0 6px;
+                border-style: solid;
+                border-color: #4b5563 transparent transparent transparent;
+            }
 
             .show {
                 display: block !important;
@@ -3268,6 +3827,10 @@
                 fase5_store: '{{ route('practicas.fase5.store') }}',
                 fase5_details: '{{ route('practicas.fase5.details') }}',
                 fase5_reply: '{{ route('practicas.fase5.reply') }}',
+                fase6_reply: '{{ route('practicas.fase6.reply') }}',
+                fase6_comite_reply: "{{ route('practicas.fase6.comite.reply') }}",
+                fase6_details: '{{ route('practicas.fase6.details') }}',
+                fase7_details: '{{ route('practicas.fase7.details') }}'
             };
         </script>
 
@@ -3315,217 +3878,217 @@
         </script>
 
         <script>
-    function openCalendarModal(btn) {
-    // Mostrar spinner y ocultar icono en el botón
-    if (btn) {
-        const icon = btn.querySelector('i');
-        const spinner = btn.querySelector('.loading-spinner');
-        if (icon) icon.classList.add('hidden');
-        if (spinner) spinner.classList.remove('hidden');
-        btn.disabled = true;
-    }
-    
-    // Usar la clase 'show' en lugar de style.display
-    const modal = document.getElementById('calendarModal');
-    if (modal) {
-        modal.classList.add('show');
-        console.log('Modal abierto');
-    } else {
-        console.error('Modal no encontrado');
-    }
-    
-    // Restaurar el botón después de abrir
-    if (btn) {
-        setTimeout(() => {
-            const icon = btn.querySelector('i');
-            const spinner = btn.querySelector('.loading-spinner');
-            if (icon) icon.classList.remove('hidden');
-            if (spinner) spinner.classList.add('hidden');
-            btn.disabled = false;
-        }, 200);
-    }
-}
+            function openCalendarModal(btn) 
+            {
+                // Mostrar spinner y ocultar icono en el botón
+                if (btn) {
+                    const icon = btn.querySelector('i');
+                    const spinner = btn.querySelector('.loading-spinner');
+                    if (icon) icon.classList.add('hidden');
+                    if (spinner) spinner.classList.remove('hidden');
+                    btn.disabled = true;
+                }
+        
+                // Usar la clase 'show' en lugar de style.display
+                const modal = document.getElementById('calendarModal');
+                if (modal) {
+                    modal.classList.add('show');
+                    console.log('Modal abierto');
+                } else {
+                    console.error('Modal no encontrado');
+                }
+        
+                // Restaurar el botón después de abrir
+                if (btn) {
+                    setTimeout(() => {
+                        const icon = btn.querySelector('i');
+                        const spinner = btn.querySelector('.loading-spinner');
+                        if (icon) icon.classList.remove('hidden');
+                        if (spinner) spinner.classList.add('hidden');
+                        btn.disabled = false;
+                    }, 200);
+                }
+            }
 
-function closeCalendarModal() {
-    const modal = document.getElementById('calendarModal');
-    if (modal) {
-        modal.classList.remove('show');
-        console.log('Modal cerrado');
-    }
-}
-</script>
+            function closeCalendarModal() 
+            {
+                const modal = document.getElementById('calendarModal');
+                if (modal) {
+                    modal.classList.remove('show');
+                    console.log('Modal cerrado');
+                }
+            }
+        </script>
 
         <script>
-
             // ESTUDIANTE - Enviar solicitud
-// En lugar de usar .on('submit'), usa .submit() con return false
+            // En lugar de usar .on('submit'), usa .submit() con return false
+            $(document).ready(function() {
+                // ESTUDIANTE
+                $('#icfesEstudianteForm').submit(function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    console.log('Formulario ICFES estudiante - Enviando AJAX');
+                    
+                    const loadingSpinner = document.getElementById('loadingSpinner-icfesEstudiante');
+                    const url = '/practicas/icfes';
+                    const formData = new FormData(this);
 
-$(document).ready(function() {
-    // ESTUDIANTE
-    $('#icfesEstudianteForm').submit(function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        console.log('Formulario ICFES estudiante - Enviando AJAX');
-        
-        const loadingSpinner = document.getElementById('loadingSpinner-icfesEstudiante');
-        const url = '/practicas/icfes';
-        const formData = new FormData(this);
+                    // Validar archivo
+                    const fileInput = document.getElementById('doc_icfes_practicas');
+                    if (!fileInput.files || fileInput.files.length === 0) {
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'Debe seleccionar un archivo PDF',
+                            icon: 'error',
+                            confirmButtonColor: '#C1D631'
+                        });
+                        return false;
+                    }
 
-        // Validar archivo
-        const fileInput = document.getElementById('doc_icfes_practicas');
-        if (!fileInput.files || fileInput.files.length === 0) {
-            Swal.fire({
-                title: 'Error',
-                text: 'Debe seleccionar un archivo PDF',
-                icon: 'error',
-                confirmButtonColor: '#C1D631'
+                    Swal.fire({
+                        heightAuto: false,
+                        title: '¿Está seguro?',
+                        text: "No podrá editar la información una vez se envíe",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#C1D631',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Sí, enviar',
+                        cancelButtonText: 'Cancelar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            if (loadingSpinner) loadingSpinner.classList.remove('hidden');
+                            
+                            $.ajax({
+                                url: url,
+                                type: 'POST',
+                                data: formData,
+                                processData: false,
+                                contentType: false,
+                                headers: {
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                },
+                                success: function(response) {
+                                    Swal.fire({
+                                        title: '¡Enviado!',
+                                        text: response.success || 'Información enviada correctamente',
+                                        icon: 'success',
+                                        confirmButtonColor: '#C1D631'
+                                    });
+                                    closeIcfesEstudianteModal();
+                                    setTimeout(() => location.reload(), 1500);
+                                },
+                                error: function(xhr) {
+                                    if (xhr.responseJSON && xhr.responseJSON.errors) {
+                                        const errors = xhr.responseJSON.errors;
+                                        if (errors.doc_icfes_practicas) {
+                                            $('#doc_icfes_practicasError').text(errors.doc_icfes_practicas[0]);
+                                        }
+                                    } else {
+                                        Swal.fire({
+                                            title: 'Error',
+                                            text: xhr.responseJSON?.error || 'Ocurrió un error',
+                                            icon: 'error',
+                                            confirmButtonColor: '#C1D631'
+                                        });
+                                    }
+                                },
+                                complete: function() {
+                                    if (loadingSpinner) loadingSpinner.classList.add('hidden');
+                                }
+                            });
+                        }
+                    });
+                    
+                    return false; // Importante: evitar doble envío
+                });
+                
+                // ADMIN
+                $('#icfesAdminForm').submit(function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    console.log('Formulario ICFES admin - Enviando AJAX');
+                    
+                    const loadingSpinner = document.getElementById('loadingSpinner-icfesAdmin');
+                    const url = '/practicas/icfes/responder';
+                    const formData = new FormData(this);
+
+                    // Validar campos requeridos
+                    const estado = $('#estado_icfes_practicas').val();
+                    if (!estado) {
+                        $('#estado_icfes_practicasError').text('Debe seleccionar un estado');
+                        return false;
+                    }
+                    
+                    const estudianteId = $('#estudiante_id_practicas').val();
+                    if (!estudianteId) {
+                        $('#estudiante_id_practicasError').text('Debe seleccionar un integrante');
+                        return false;
+                    }
+
+                    Swal.fire({
+                        heightAuto: false,
+                        title: '¿Está seguro?',
+                        text: "Esta acción no se puede deshacer",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#C1D631',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Sí, responder',
+                        cancelButtonText: 'Cancelar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            if (loadingSpinner) loadingSpinner.classList.remove('hidden');
+                            
+                            $.ajax({
+                                url: url,
+                                type: 'POST',
+                                data: formData,
+                                processData: false,
+                                contentType: false,
+                                headers: {
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                },
+                                success: function(response) {
+                                    Swal.fire({
+                                        title: '¡Respondido!',
+                                        text: response.success || 'Respuesta enviada correctamente',
+                                        icon: 'success',
+                                        confirmButtonColor: '#C1D631'
+                                    });
+                                    closeIcfesAdminModal();
+                                    setTimeout(() => location.reload(), 1500);
+                                },
+                                error: function(xhr) {
+                                    if (xhr.status === 422 && xhr.responseJSON.errors) {
+                                        const errors = xhr.responseJSON.errors;
+                                        if (errors.estado_icfes_practicas) $('#estado_icfes_practicasError').text(errors.estado_icfes_practicas[0]);
+                                        if (errors.estudiante_id) $('#estudiante_id_practicasError').text(errors.estudiante_id[0]);
+                                        if (errors.nro_acta_icfes_practicas) $('#nro_acta_icfes_practicasError').text(errors.nro_acta_icfes_practicas[0]);
+                                        if (errors.fecha_acta_icfes_practicas) $('#fecha_acta_icfes_practicasError').text(errors.fecha_acta_icfes_practicas[0]);
+                                        if (errors.respuesta_icfes_practicas) $('#respuesta_icfes_practicasError').text(errors.respuesta_icfes_practicas[0]);
+                                    } else {
+                                        Swal.fire({
+                                            title: 'Error',
+                                            text: xhr.responseJSON?.error || 'Ocurrió un error',
+                                            icon: 'error',
+                                            confirmButtonColor: '#C1D631'
+                                        });
+                                    }
+                                },
+                                complete: function() {
+                                    if (loadingSpinner) loadingSpinner.classList.add('hidden');
+                                }
+                            });
+                        }
+                    });
+                    
+                    return false;
+                });
             });
-            return false;
-        }
-
-        Swal.fire({
-            heightAuto: false,
-            title: '¿Está seguro?',
-            text: "No podrá editar la información una vez se envíe",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#C1D631',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Sí, enviar',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                if (loadingSpinner) loadingSpinner.classList.remove('hidden');
-                
-                $.ajax({
-                    url: url,
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function(response) {
-                        Swal.fire({
-                            title: '¡Enviado!',
-                            text: response.success || 'Información enviada correctamente',
-                            icon: 'success',
-                            confirmButtonColor: '#C1D631'
-                        });
-                        closeIcfesEstudianteModal();
-                        setTimeout(() => location.reload(), 1500);
-                    },
-                    error: function(xhr) {
-                        if (xhr.responseJSON && xhr.responseJSON.errors) {
-                            const errors = xhr.responseJSON.errors;
-                            if (errors.doc_icfes_practicas) {
-                                $('#doc_icfes_practicasError').text(errors.doc_icfes_practicas[0]);
-                            }
-                        } else {
-                            Swal.fire({
-                                title: 'Error',
-                                text: xhr.responseJSON?.error || 'Ocurrió un error',
-                                icon: 'error',
-                                confirmButtonColor: '#C1D631'
-                            });
-                        }
-                    },
-                    complete: function() {
-                        if (loadingSpinner) loadingSpinner.classList.add('hidden');
-                    }
-                });
-            }
-        });
-        
-        return false; // Importante: evitar doble envío
-    });
-    
-    // ADMIN
-    $('#icfesAdminForm').submit(function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        console.log('Formulario ICFES admin - Enviando AJAX');
-        
-        const loadingSpinner = document.getElementById('loadingSpinner-icfesAdmin');
-        const url = '/practicas/icfes/responder';
-        const formData = new FormData(this);
-
-        // Validar campos requeridos
-        const estado = $('#estado_icfes_practicas').val();
-        if (!estado) {
-            $('#estado_icfes_practicasError').text('Debe seleccionar un estado');
-            return false;
-        }
-        
-        const estudianteId = $('#estudiante_id_practicas').val();
-        if (!estudianteId) {
-            $('#estudiante_id_practicasError').text('Debe seleccionar un integrante');
-            return false;
-        }
-
-        Swal.fire({
-            heightAuto: false,
-            title: '¿Está seguro?',
-            text: "Esta acción no se puede deshacer",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#C1D631',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Sí, responder',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                if (loadingSpinner) loadingSpinner.classList.remove('hidden');
-                
-                $.ajax({
-                    url: url,
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function(response) {
-                        Swal.fire({
-                            title: '¡Respondido!',
-                            text: response.success || 'Respuesta enviada correctamente',
-                            icon: 'success',
-                            confirmButtonColor: '#C1D631'
-                        });
-                        closeIcfesAdminModal();
-                        setTimeout(() => location.reload(), 1500);
-                    },
-                    error: function(xhr) {
-                        if (xhr.status === 422 && xhr.responseJSON.errors) {
-                            const errors = xhr.responseJSON.errors;
-                            if (errors.estado_icfes_practicas) $('#estado_icfes_practicasError').text(errors.estado_icfes_practicas[0]);
-                            if (errors.estudiante_id) $('#estudiante_id_practicasError').text(errors.estudiante_id[0]);
-                            if (errors.nro_acta_icfes_practicas) $('#nro_acta_icfes_practicasError').text(errors.nro_acta_icfes_practicas[0]);
-                            if (errors.fecha_acta_icfes_practicas) $('#fecha_acta_icfes_practicasError').text(errors.fecha_acta_icfes_practicas[0]);
-                            if (errors.respuesta_icfes_practicas) $('#respuesta_icfes_practicasError').text(errors.respuesta_icfes_practicas[0]);
-                        } else {
-                            Swal.fire({
-                                title: 'Error',
-                                text: xhr.responseJSON?.error || 'Ocurrió un error',
-                                icon: 'error',
-                                confirmButtonColor: '#C1D631'
-                            });
-                        }
-                    },
-                    complete: function() {
-                        if (loadingSpinner) loadingSpinner.classList.add('hidden');
-                    }
-                });
-            }
-        });
-        
-        return false;
-    });
-});
 
             // ESTUDIANTE
             function openIcfesEstudianteModal() {
@@ -3544,27 +4107,28 @@ $(document).ready(function() {
             }
 
             // ADMIN
-            function openIcfesAdminModal() {
-    initQuillEditor(undefined, "Describa los detalles de la respuesta para el estudiante.", 'txt-editor-icfes-practicas', 'respuesta_icfes_practicas');
+            function openIcfesAdminModal() 
+            {
+                initQuillEditor(undefined, "Describa los detalles de la respuesta para el estudiante.", 'txt-editor-icfes-practicas', 'respuesta_icfes_practicas');
 
-    $('#icfesAdminTitle').html(`Beneficio saber <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">TYT/PRO</span>`);
+                $('#icfesAdminTitle').html(`Beneficio saber <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">TYT/PRO</span>`);
 
-    // Limpiar campos
-    $('#estado_icfes_practicas').val('');
-    $('#estudiante_id_practicas').val('').trigger('change');
-    $('#nro_acta_icfes_practicas').val('');      // ← Nuevo
-    $('#fecha_acta_icfes_practicas').val('');    // ← Nuevo
-    $('#respuesta_icfes_practicas').val('');
+                // Limpiar campos
+                $('#estado_icfes_practicas').val('');
+                $('#estudiante_id_practicas').val('').trigger('change');
+                $('#nro_acta_icfes_practicas').val('');      // ← Nuevo
+                $('#fecha_acta_icfes_practicas').val('');    // ← Nuevo
+                $('#respuesta_icfes_practicas').val('');
 
-    // Limpiar errores
-    $('#estado_icfes_practicasError').text('');
-    $('#estudiante_id_practicasError').text('');
-    $('#nro_acta_icfes_practicasError').text('');   // ← Nuevo
-    $('#fecha_acta_icfes_practicasError').text(''); // ← Nuevo
-    $('#respuesta_icfes_practicasError').text('');
+                // Limpiar errores
+                $('#estado_icfes_practicasError').text('');
+                $('#estudiante_id_practicasError').text('');
+                $('#nro_acta_icfes_practicasError').text('');   // ← Nuevo
+                $('#fecha_acta_icfes_practicasError').text(''); // ← Nuevo
+                $('#respuesta_icfes_practicasError').text('');
 
-    $('#icfesAdminModal').addClass('show');
-}
+                $('#icfesAdminModal').addClass('show');
+            }
 
             function closeIcfesAdminModal() {
                 $('#icfesAdminModal').removeClass('show');
@@ -3572,11 +4136,13 @@ $(document).ready(function() {
         </script>
 
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        
+        <script src="{{ asset('js/fases/practicas/fase_0.js') }}"></script>
         <script src="{{ asset('js/fases/practicas/fase_1.js') }}"></script>
         <script src="{{ asset('js/fases/practicas/fase_2.js') }}"></script>
         <script src="{{ asset('js/fases/practicas/fase_3.js') }}"></script>
         <script src="{{ asset('js/fases/practicas/fase_4.js') }}"></script>
         <script src="{{ asset('js/fases/practicas/fase_5.js') }}"></script>
+        <script src="{{ asset('js/fases/practicas/fase_6.js') }}"></script>
+        <script src="{{ asset('js/fases/practicas/fase_final.js') }}"></script>
     @endpush
 </x-app-layout>

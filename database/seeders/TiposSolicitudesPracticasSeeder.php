@@ -16,7 +16,8 @@ class TiposSolicitudesPracticasSeeder extends Seeder
             ['nombre' => 'practicas_fase_2', 'descripcion' => 'Pago de modalidad'],
             ['nombre' => 'practicas_fase_3', 'descripcion' => 'Propuesta de prácticas'],
             ['nombre' => 'practicas_fase_4', 'descripcion' => 'Documentos de prácticas'],
-            ['nombre' => 'practicas_fase_5', 'descripcion' => 'Finalización de prácticas'],
+            ['nombre' => 'practicas_fase_5', 'descripcion' => 'Aprobación de prácticas'],
+            ['nombre' => 'practicas_fase_6', 'descripcion' => 'Finalización de prácticas'],
         ];
 
         foreach ($tipos as $tipo) {

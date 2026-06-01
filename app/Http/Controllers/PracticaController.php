@@ -194,7 +194,7 @@ class PracticaController extends Controller
         });
     }
 
-    // DATATABLE - AQUI LE SALE LAS PRACTICAS A CADA USUARIO
+   
  // DATATABLE - AQUI LE SALE LAS PRACTICAS A CADA USUARIO
 
         if (auth()->user()->hasRole('estudiante')) {
@@ -324,18 +324,15 @@ class PracticaController extends Controller
             }
 
             elseif ($p->estado === 'Fase 5') {
-
-                
-
                 $submited = $p->valoresCampos
                     ->where('campo.name', 'submited_fase5')
                     ->first();
                 $yaEnvio = $submited && $submited->valor === 'true';
 
-                // Verificar si es beneficiario ICFES
-    $esBeneficiario = $this->esBeneficiarioIcfesListaPractica($p);
-    $badgeBeneficiario = $esBeneficiario ? '<span class="shadow bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded border border-blue-300">Beneficiario ICFES</span>' : '';
-                
+                            // Verificar si es beneficiario ICFES
+                $esBeneficiario = $this->esBeneficiarioIcfesListaPractica($p);
+                $badgeBeneficiario = $esBeneficiario ? '<span class="shadow bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded border border-blue-300">Beneficiario ICFES</span>' : '';
+                            
                 if ($yaEnvio) {
                     $htmlEstado = "
                         <span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 5</span>
@@ -350,15 +347,15 @@ class PracticaController extends Controller
             }
              elseif ($p->estado === 'Fase 6') {
                 $estadoEvaluador = $p->valoresCampos
-                    ->where('campo.name', 'estado_evaluador_fase5')
+                    ->where('campo.name', 'estado_evaluador_fase6')
                     ->first();
 
                 $respondioEvaluador = $estadoEvaluador && !empty($estadoEvaluador->valor);
 
                 // Verificar si es beneficiario ICFES
-    $esBeneficiario = $this->esBeneficiarioIcfesListaPractica($p);
-    $badgeBeneficiario = $esBeneficiario ? '<span class="shadow bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded border border-blue-300">Beneficiario ICFES</span>' : '';
-                
+                $esBeneficiario = $this->esBeneficiarioIcfesListaPractica($p);
+                $badgeBeneficiario = $esBeneficiario ? '<span class="shadow bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded border border-blue-300">Beneficiario ICFES</span>' : '';
+                            
                 if ($respondioEvaluador) {
                     $htmlEstado = "
                         <span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 6</span>
@@ -492,7 +489,7 @@ public function buscarEstudiantes(Request $request)
 
             // Subconsulta para encontrar estudiantes que NO tienen prácticas activas
             // Estados que se consideran "activos" (no se puede agregar a estos estudiantes)
-            $estadosActivos = ['Pendiente', 'Fase 1', 'Fase 2', 'Fase 3', 'Fase 4', 'Fase 5'];
+            $estadosActivos = ['Pendiente', 'Fase 1', 'Fase 2', 'Fase 3', 'Fase 4', 'Fase 5', 'Fase 6'];
 
             $estudiantes = \App\Models\User::where('id', '!=', $userId)
                 ->where('nivel_id', $userNivelId) // Mismo nivel académico
@@ -606,7 +603,8 @@ public function buscarEstudiantes(Request $request)
                 'Fase 2'    => 'Fase 3',
                 'Fase 3'    => 'Fase 4',
                 'Fase 4'    => 'Fase 5',
-                'Fase 5'    => 'Finalizado',
+                'Fase 5'    => 'Fase 6',
+                'Fase 6'    => 'Finalizado',
                 default     => $estadoActual
             };
          // Enviar correo al estudiante - DESCOMENTAR PARA ENVIAR CORREO

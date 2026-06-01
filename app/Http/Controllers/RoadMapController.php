@@ -1981,8 +1981,8 @@ class RoadMapController extends Controller
 
                 if ($request->estado_fase5 === 'Aprobado') {
                     if ($request->remitente == 1) {
-                        // 1. Actualizar estado a Finalizado:
-                        $solicitud->update(['estado' => 'Finalizado']);
+                        // 1. Actualizar estado a Fase 6
+                        $solicitud->update(['estado' => 'Fase 6']);
 
                         // Guardar el doc_firmado
                         $campo_doc_informe = Campo::where('name', '=', 'doc_informe')->firstOrFail();
