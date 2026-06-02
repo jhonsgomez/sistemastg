@@ -92,19 +92,6 @@ class PracticaController extends Controller
         \Log::info('ESTADO PRACTICAS', 
     $practicas->pluck('estado')->toArray()
 );
-    if (auth()->user()->hasRole('estudiante')) {
-        // Mostrar prácticas donde:
-        // 1. El usuario es el creador (user_id)
-        // 2. O el usuario es el segundo integrante (id_integrante_2)
-        $practicas->where(function ($q) {
-            $q->where('user_id', auth()->id())
-                ->orWhereHas('valoresCampos', function ($vc) {
-                    $vc->whereHas('campo', function ($c) {
-                        $c->where('name', 'id_integrante_2');
-                    })->where('valor', auth()->id());
-                });
-        });
-    }
 
     // DIRECTOR
     if (auth()->user()->hasRole('director_practica')) {
@@ -199,12 +186,19 @@ class PracticaController extends Controller
 
         if (auth()->user()->hasRole('estudiante')) {
 
-            $practicas = Practica::with('valoresCampos.campo')
-                ->where('user_id', auth()->id())
-                ->orderBy('id', 'desc')
-                ->get();
+    $practicas = Practica::with('valoresCampos.campo')
+        ->where(function ($q) {
+            $q->where('user_id', auth()->id())
+              ->orWhereHas('valoresCampos', function ($vc) {
+                  $vc->whereHas('campo', function ($c) {
+                      $c->where('name', 'id_integrante_2');
+                  })->where('valor', auth()->id());
+              });
+        })
+        ->orderBy('id', 'desc')
+        ->get();
 
-        } elseif (auth()->user()->hasRole('director_practica')) {
+} elseif (auth()->user()->hasRole('director_practica')) {
 
             $practicas = Practica::with('valoresCampos.campo')
                 ->whereHas('valoresCampos', function ($vc) {
@@ -324,48 +318,52 @@ class PracticaController extends Controller
             }
 
             elseif ($p->estado === 'Fase 5') {
-                $submited = $p->valoresCampos
-                    ->where('campo.name', 'submited_fase5')
-                    ->first();
-                $yaEnvio = $submited && $submited->valor === 'true';
+    $submited = $p->valoresCampos
+        ->where('campo.name', 'submited_fase5')
+        ->first();
+    $yaEnvio = $submited && $submited->valor === 'true';
 
-                            // Verificar si es beneficiario ICFES
-                $esBeneficiario = $this->esBeneficiarioIcfesListaPractica($p);
-                $badgeBeneficiario = $esBeneficiario ? '<span class="shadow bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded border border-blue-300">Beneficiario ICFES</span>' : '';
-                            
-                if ($yaEnvio) {
-                    $htmlEstado = "
-                        <span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 5</span>
-                        <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'> Director</span>
-                    ";
-                } else {
-                    $htmlEstado = "
-                        <span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 5</span>
-                        <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Estudiante</span>
-                    ";
-                }
-            }
-             elseif ($p->estado === 'Fase 6') {
-                $estadoEvaluador = $p->valoresCampos
-                    ->where('campo.name', 'estado_evaluador_fase6')
-                    ->first();
+    $esBeneficiario = $this->esBeneficiarioIcfesListaPractica($p);
+    $badgeBeneficiario = $esBeneficiario ? '<span class="shadow bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded border border-blue-300">Beneficiario ICFES</span>' : '';
 
-                $respondioEvaluador = $estadoEvaluador && !empty($estadoEvaluador->valor);
+    if ($yaEnvio) {
+        $htmlEstado = "
+            <span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 5</span>
+            <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Director</span>
+            $badgeBeneficiario
+        ";
+    } else {
+        $htmlEstado = "
+            <span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 5</span>
+            <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Estudiante</span>
+            $badgeBeneficiario
+        ";
+    }
+}
+elseif ($p->estado === 'Fase 6') {
+    $estadoEvaluador = $p->valoresCampos
+        ->where('campo.name', 'estado_evaluador_fase6')
+        ->first();
 
-                // Verificar si es beneficiario ICFES
-                $esBeneficiario = $this->esBeneficiarioIcfesListaPractica($p);
-                $badgeBeneficiario = $esBeneficiario ? '<span class="shadow bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded border border-blue-300">Beneficiario ICFES</span>' : '';
-                            
-                if ($respondioEvaluador) {
-                    $htmlEstado = "
-                        <span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 6</span>
-                        <span class='shadow bg-purple-100 text-purple-800 text-sm font-medium px-2.5 py-0.5 rounded border border-purple-300'>Comité</span>";
-                } else {
-                    $htmlEstado = "
-                        <span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 6</span>
-                        <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Evaluador</span>";
-                }
-            }
+    $respondioEvaluador = $estadoEvaluador && !empty($estadoEvaluador->valor);
+
+    $esBeneficiario = $this->esBeneficiarioIcfesListaPractica($p);
+    $badgeBeneficiario = $esBeneficiario ? '<span class="shadow bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded border border-blue-300">Beneficiario ICFES</span>' : '';
+
+    if ($respondioEvaluador) {
+        $htmlEstado = "
+            <span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 6</span>
+            <span class='shadow bg-purple-100 text-purple-800 text-sm font-medium px-2.5 py-0.5 rounded border border-purple-300'>Comité</span>
+            $badgeBeneficiario
+        ";
+    } else {
+        $htmlEstado = "
+            <span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 6</span>
+            <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Evaluador</span>
+            $badgeBeneficiario
+        ";
+    }
+}
 
             elseif ($p->estado === 'Finalizado') {
                 $htmlEstado = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-green-100 text-green-800 border border-green-300'>Finalizado</span>";
@@ -470,10 +468,42 @@ private function esBeneficiarioIcfesListaPractica($practica)
         return false;
     }
 
-    $beneficiarios = json_decode($valorBeneficiario->valor, true) ?? [];
-    return in_array(auth()->user()->id, $beneficiarios);
+    $beneficiarios = json_decode($valorBeneficiario->valor, true);
+    
+    if (!is_array($beneficiarios)) {
+        $beneficiarios = [];
+    }
+    
+    $beneficiarios = array_map('intval', $beneficiarios);
+    $userId = (int) auth()->id();
+    
+    return in_array($userId, $beneficiarios);
 }
 
+private function yaEnvioSolicitudIcfes($practica)
+{
+    $userId = (string) auth()->id();
+    
+    $campoSubmited = Campo::where('name', 'submited_icfes_practicas')
+        ->where('tipo_solicitud_id', $practica->tipo_solicitud_id)
+        ->first();
+    
+    if (!$campoSubmited) {
+        return false;
+    }
+    
+    $valor = $practica->valoresCampos
+        ->where('campo_id', $campoSubmited->id)
+        ->first();
+    
+    if (!$valor || !$valor->valor) {
+        return false;
+    }
+    
+    $submitedData = json_decode($valor->valor, true) ?: [];
+    
+    return isset($submitedData[$userId]) && $submitedData[$userId] === true;
+}
 
 public function buscarEstudiantes(Request $request)
     {
@@ -713,8 +743,16 @@ public function buscarEstudiantes(Request $request)
             $docentesHtml .= '</div></div>';
         }
         
-        // Título
-        $titulo = $data['titulo'] ?? 'No disponible';
+        // Título - Buscar en orden jerárquico
+$titulo = 'No disponible';
+
+if (isset($data['titulo_propuesta_fase4']) && !empty($data['titulo_propuesta_fase4'])) {
+    $titulo = $data['titulo_propuesta_fase4'];
+} elseif (isset($data['titulo_propuesta_director_fase3']) && !empty($data['titulo_propuesta_director_fase3'])) {
+    $titulo = $data['titulo_propuesta_director_fase3'];
+} elseif (isset($data['titulo']) && !empty($data['titulo'])) {
+    $titulo = $data['titulo'];
+}
         
         // Nivel académico
         $nivel = $practica->user->nivel->nombre ?? 'N/A';

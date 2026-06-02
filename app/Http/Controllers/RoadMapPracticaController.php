@@ -115,37 +115,57 @@ class RoadMapPracticaController extends Controller
             }
 
                     // ========== INTEGRANTES PARA EL SELECT ICFES (MÁXIMO 2) ==========
-            $integrante_1 = User::find($practica->user_id);  // El creador de la práctica
-            $integrante_2 = null;
+        $integrante_1 = User::find($practica->user_id);
+        $integrante_2 = null;
 
-            // Buscar segundo integrante (campo id_integrante_2)
-            if (isset($valores['id_integrante_2']) && $valores['id_integrante_2']) {
-                $integrante_2 = User::find($valores['id_integrante_2']);
-            }
+        if (isset($valores['id_integrante_2']) && $valores['id_integrante_2']) {
+            $integrante_2 = User::find($valores['id_integrante_2']);
+        }
 
-            $lista_integrantes = [];
-            if ($integrante_1) $lista_integrantes[] = $integrante_1;
-            if ($integrante_2) $lista_integrantes[] = $integrante_2;
+        $lista_integrantes = [];
+        if ($integrante_1) $lista_integrantes[] = $integrante_1;
+        if ($integrante_2) $lista_integrantes[] = $integrante_2;
 
-            // ========== VARIABLES ICFES ==========
-            $submited_icfes_practicas = $valores['submited_icfes_practicas'] ?? 'false';
-            $doc_icfes_practicas = $valores['doc_icfes_practicas'] ?? null;
-            $beneficiarios_icfes_practicas = $valores['beneficiarios_icfes_practicas'] ?? null;
+        // ========== NUEVAS VARIABLES ICFES POR ESTUDIANTE ==========
 
-            // Procesar submited_icfes_practicas (si es JSON con IDs)
-            if ($submited_icfes_practicas !== 'false' && $submited_icfes_practicas) {
-                $solicitantes = json_decode($submited_icfes_practicas, true) ?? [];
-                $submited_icfes_practicas = in_array(auth()->user()->id, $solicitantes) ? 'true' : 'false';
-            } else {
-                $submited_icfes_practicas = 'false';
-            }
+// 1. Obtener datos de submited (quién ha enviado solicitud)
+$submited_icfes_practicas = $valores['submited_icfes_practicas'] ?? '{}';
+$submitedData = json_decode($submited_icfes_practicas, true) ?: [];
 
-            // ========== VERIFICAR SI EL USUARIO ES BENEFICIARIO ==========
-            $es_beneficiario_icfes = false;
-            if ($beneficiarios_icfes_practicas && $beneficiarios_icfes_practicas !== 'false') {
-                $beneficiarios = json_decode($beneficiarios_icfes_practicas, true) ?? [];
-                $es_beneficiario_icfes = in_array(auth()->user()->id, $beneficiarios);
-            }
+// Asegurar que sea un array (por si acaso hay valores booleanos antiguos)
+if (!is_array($submitedData)) {
+    $submitedData = [];
+}
+
+// 2. Obtener beneficiarios (quienes fueron aprobados)
+$beneficiarios_icfes_practicas = $valores['beneficiarios_icfes_practicas'] ?? '[]';
+$beneficiariosData = json_decode($beneficiarios_icfes_practicas, true) ?: [];
+
+// Asegurar que sea un array
+if (!is_array($beneficiariosData)) {
+    $beneficiariosData = [];
+}
+
+// 3. Verificar si el usuario actual ya envió solicitud
+$userId = (string) auth()->id();
+$yaEnvio = isset($submitedData[$userId]) && $submitedData[$userId] === true;
+
+// 4. Verificar si el usuario actual es beneficiario
+$beneficiariosDataInt = array_map('intval', $beneficiariosData);
+$esBeneficiario = in_array((int) auth()->id(), $beneficiariosDataInt);
+
+// 5. Obtener estudiantes que han enviado solicitud (para el select del admin)
+$solicitudesEnviadas = [];
+if (is_array($submitedData) && !empty($submitedData)) {
+    $idsEnviaron = array_keys(array_filter($submitedData));
+    if (!empty($idsEnviaron)) {
+        $solicitudesEnviadas = User::whereIn('id', $idsEnviaron)->get();
+    }
+}
+        
+        // 6. Obtener documentos PDF por estudiante
+        $doc_icfes_practicas = $valores['doc_icfes_practicas'] ?? '{}';
+        $docData = json_decode($doc_icfes_practicas, true) ?: [];
 
             // Variables para Fase 1, 2, 3, 4, 5 y 6
             $submited_fase1 = $valores['submited_fase1'] ?? 'false';
@@ -207,9 +227,12 @@ class RoadMapPracticaController extends Controller
                 'codigo_modalidad_generado',  // ← Pasar a la vista
 
                 'lista_integrantes',
-                'submited_icfes_practicas',
-                'doc_icfes_practicas',
-                'es_beneficiario_icfes'
+            // NUEVAS VARIABLES
+            'yaEnvio',
+            'esBeneficiario',
+            'solicitudesEnviadas',
+            'docData',
+            'submitedData'
 
 
             ));
@@ -2908,180 +2931,166 @@ class RoadMapPracticaController extends Controller
 
 
 
-        // ==================== BENEFICIO ICFES PARA PRÁCTICAS ====================
+        /* FASE 5/6 - Estudiante: Envía solicitud de beneficio ICFES*/
+public function storeIcfesSolicitud(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'practica_id' => 'required|exists:practicas,id',
+        'doc_icfes_practicas' => 'required|array|min:1',
+        'doc_icfes_practicas.*' => 'file|mimes:pdf|max:4096',
+    ]);
 
-    /* FASE 5/6 - Estudiante: Envía solicitud de beneficio ICFES*/
-    public function storeIcfesSolicitud(Request $request)
-    {
-        \Log::info('=== ICFES ESTUDIANTE - INICIO ===');
-        \Log::info('Datos recibidos:', $request->all());
-        \Log::info('Archivos:', $request->hasFile('doc_icfes_practicas') ? 'Sí hay archivo' : 'No hay archivo');
-        
-        $validator = Validator::make($request->all(), [
-            'practica_id' => 'required|exists:practicas,id',
-            'doc_icfes_practicas' => 'required|array|min:1',
-            'doc_icfes_practicas.*' => 'file|mimes:pdf|max:4096',
-            'submited_icfes_practicas' => 'required|string'
-        ]);
-
-        if ($validator->fails()) {
-            \Log::error('Validación fallida:', $validator->errors()->toArray());
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-            $practica = Practica::findOrFail($request->practica_id);
-
-            // Verificar que esté en Fase 5 o 6
-            if (!in_array($practica->estado, ['Fase 5', 'Fase 6'])) {
-                return response()->json(['error' => 'La práctica no está en la fase correspondiente'], 422);
-            }
-
-            // Obtener el campo submited_icfes_practicas
-            $campoIcfes = Campo::where('name', 'submited_icfes_practicas')
-                ->where('tipo_solicitud_id', $practica->tipo_solicitud_id)
-                ->first();
-
-            if (!$campoIcfes) {
-                return response()->json(['error' => 'Configuración incorrecta del campo ICFES'], 500);
-            }
-
-            // Guardar el archivo PDF
-            $path = null;
-            if ($request->hasFile('doc_icfes_practicas')) {
-                $file = $request->file('doc_icfes_practicas')[0];
-                $fileName = 'icfes_practicas_' . $practica->id . '_' . auth()->user()->id . '_' . time() . '.pdf';
-                $path = $file->storeAs('icfes_practicas', $fileName, 'public');
-                
-                // Guardar también en el campo doc_icfes_practicas
-                $campoDoc = Campo::where('name', 'doc_icfes_practicas')
-                    ->where('tipo_solicitud_id', $practica->tipo_solicitud_id)
-                    ->first();
-                
-                if ($campoDoc) {
-                    // Eliminar archivo anterior si existe
-                    $existingDoc = PracticaValorCampo::where('practica_id', $practica->id)
-                        ->where('campo_id', $campoDoc->id)
-                        ->first();
-                    if ($existingDoc && $existingDoc->valor) {
-                        Storage::disk('public')->delete($existingDoc->valor);
-                    }
-                    
-                    PracticaValorCampo::updateOrCreate(
-                        ['practica_id' => $practica->id, 'campo_id' => $campoDoc->id],
-                        ['valor' => $path]
-                    );
-                }
-            }
-
-            // Actualizar el campo submited_icfes_practicas (almacena JSON con IDs)
-            $existingValue = PracticaValorCampo::where('practica_id', $practica->id)
-                ->where('campo_id', $campoIcfes->id)
-                ->first();
-
-            $integrantesSolicitantes = [];
-            if ($existingValue && $existingValue->valor) {
-                $integrantesSolicitantes = json_decode($existingValue->valor, true) ?? [];
-            }
-            
-            if (!in_array(auth()->user()->id, $integrantesSolicitantes)) {
-                $integrantesSolicitantes[] = auth()->user()->id;
-            }
-
-            PracticaValorCampo::updateOrCreate(
-                [
-                    'practica_id' => $practica->id,
-                    'campo_id' => $campoIcfes->id
-                ],
-                ['valor' => json_encode($integrantesSolicitantes)]
-            );
-
-            // Enviar correo a los administradores (comentado por ahora)
-            // $admins = User::role(['super_admin', 'admin'])->get();
-            // foreach ($admins as $admin) {
-            //     Mail::to($admin->email)->send(new IcfesSolicitudPracticaMail($practica, auth()->user()));
-            // }
-
-            Log::info('Beneficio ICFES - Solicitud enviada', [
-                'practica_id' => $practica->id,
-                'estudiante_id' => auth()->user()->id,
-                'fase' => $practica->estado
-            ]);
-
-            \Log::info('=== ICFES ESTUDIANTE - FIN EXITOSO ===');
-        return response()->json(['success' => 'Solicitud enviada correctamente']);
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 422);
     }
 
-    /*FASE 5/6 - Admin/Comité: Responder solicitud de beneficio ICFES*/
-    public function responderIcfesSolicitud(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'practica_id' => 'required|exists:practicas,id',
-            'estado_icfes_practicas' => 'required|in:Aprobado,Rechazado',
-            'estudiante_id' => 'required|exists:users,id',
-            'nro_acta_icfes_practicas' => 'required|integer',    // ← integer porque en BD es int
-            'fecha_acta_icfes_practicas' => 'required|date',     // ← date porque en BD es date
-            'respuesta_icfes_practicas' => 'required|string'
-        ]);
+    $practica = Practica::findOrFail($request->practica_id);
+    $userId = (string) auth()->id(); // string para JSON
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+    if (!in_array($practica->estado, ['Fase 5', 'Fase 6'])) {
+        return response()->json(['error' => 'La práctica no está en la fase correspondiente'], 422);
+    }
+
+    // ========== 1. OBTENER/ACTUALIZAR submited_icfes_practicas ==========
+    $campoSubmited = Campo::where('name', 'submited_icfes_practicas')
+        ->where('tipo_solicitud_id', $practica->tipo_solicitud_id)
+        ->first();
+
+    $submitedData = [];
+    if ($campoSubmited) {
+        $existing = PracticaValorCampo::where('practica_id', $practica->id)
+            ->where('campo_id', $campoSubmited->id)
+            ->first();
+        
+        if ($existing && $existing->valor) {
+            $submitedData = json_decode($existing->valor, true) ?: [];
         }
+    }
 
-        $practica = Practica::findOrFail($request->practica_id);
-        $estudiante = User::findOrFail($request->estudiante_id);
+    // Verificar si ya envió
+    if (isset($submitedData[$userId]) && $submitedData[$userId] === true) {
+        return response()->json(['error' => 'Ya has enviado tu solicitud'], 422);
+    }
 
-        // Verificar que esté en Fase 5 o 6
-        if (!in_array($practica->estado, ['Fase 5', 'Fase 6'])) {
-            return response()->json(['error' => 'La práctica no está en la fase correspondiente'], 422);
+    // ========== 2. GUARDAR PDF (JSON con userId como clave) ==========
+    $campoDoc = Campo::where('name', 'doc_icfes_practicas')
+        ->where('tipo_solicitud_id', $practica->tipo_solicitud_id)
+        ->first();
+
+    $docData = [];
+    if ($campoDoc) {
+        $existingDoc = PracticaValorCampo::where('practica_id', $practica->id)
+            ->where('campo_id', $campoDoc->id)
+            ->first();
+        
+        if ($existingDoc && $existingDoc->valor) {
+            $docData = json_decode($existingDoc->valor, true) ?: [];
         }
+    }
 
-        // ========== GUARDAR EN ACTAS_PRACTICAS ==========
-        ActaPractica::create([
-            'practica_id' => $practica->id,
-            'numero' => $request->nro_acta_icfes_practicas,      // ← int
-            'fecha' => $request->fecha_acta_icfes_practicas,     // ← date
-            'descripcion' => $request->respuesta_icfes_practicas  // ← text
-        ]);
+    if ($request->hasFile('doc_icfes_practicas')) {
+        $file = $request->file('doc_icfes_practicas')[0];
+        $fileName = 'icfes_practicas_' . $practica->id . '_' . $userId . '_' . time() . '.pdf';
+        $path = $file->storeAs('icfes_practicas', $fileName, 'public');
+        $docData[$userId] = $path;
+        
+        PracticaValorCampo::updateOrCreate(
+            ['practica_id' => $practica->id, 'campo_id' => $campoDoc->id],
+            ['valor' => json_encode($docData)]
+        );
+    }
 
-        // Si es aprobado, marcar al estudiante como beneficiario
-        if ($request->estado_icfes_practicas === 'Aprobado') {
-            $campoBeneficiario = Campo::where('name', 'beneficiarios_icfes_practicas')
-                ->where('tipo_solicitud_id', $practica->tipo_solicitud_id)
+    // ========== 3. MARCAR ENVIADO ==========
+    $submitedData[$userId] = true;
+    
+    PracticaValorCampo::updateOrCreate(
+        ['practica_id' => $practica->id, 'campo_id' => $campoSubmited->id],
+        ['valor' => json_encode($submitedData)]
+    );
+
+    return response()->json(['success' => 'Solicitud enviada correctamente']);
+}
+
+    /* FASE 5/6 - Admin/Comité: Responder solicitud de beneficio ICFES */
+public function responderIcfesSolicitud(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'practica_id' => 'required|exists:practicas,id',
+        'estado_icfes_practicas' => 'required|in:Aprobado,Rechazado',
+        'estudiante_id' => 'required|exists:users,id',
+        'nro_acta_icfes_practicas' => 'required|integer',
+        'fecha_acta_icfes_practicas' => 'required|date',
+        'respuesta_icfes_practicas' => 'required|string'
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 422);
+    }
+
+    $practica = Practica::findOrFail($request->practica_id);
+    $estudianteId = (string) $request->estudiante_id;
+
+    if (!in_array($practica->estado, ['Fase 5', 'Fase 6'])) {
+        return response()->json(['error' => 'La práctica no está en la fase correspondiente'], 422);
+    }
+
+    // Guardar acta
+    ActaPractica::create([
+        'practica_id' => $practica->id,
+        'numero' => $request->nro_acta_icfes_practicas,
+        'fecha' => $request->fecha_acta_icfes_practicas,
+        'descripcion' => $request->respuesta_icfes_practicas
+    ]);
+
+    // ========== ACTUALIZAR BENEFICIARIOS (APROBADO) ==========
+    $campoBeneficiario = Campo::where('name', 'beneficiarios_icfes_practicas')
+        ->where('tipo_solicitud_id', $practica->tipo_solicitud_id)
+        ->first();
+
+    $beneficiarios = [];
+    if ($campoBeneficiario) {
+        $existing = PracticaValorCampo::where('practica_id', $practica->id)
+            ->where('campo_id', $campoBeneficiario->id)
+            ->first();
+        
+        if ($existing && $existing->valor) {
+            $beneficiarios = json_decode($existing->valor, true) ?: [];
+        }
+    }
+
+    if ($request->estado_icfes_practicas === 'Aprobado') {
+        if (!in_array($estudianteId, $beneficiarios)) {
+            $beneficiarios[] = (int) $estudianteId;
+        }
+        
+        PracticaValorCampo::updateOrCreate(
+            ['practica_id' => $practica->id, 'campo_id' => $campoBeneficiario->id],
+            ['valor' => json_encode($beneficiarios)]
+        );
+    } else {
+        // RECHAZADO: Borrar del submited para que pueda reintentar
+        $campoSubmited = Campo::where('name', 'submited_icfes_practicas')
+            ->where('tipo_solicitud_id', $practica->tipo_solicitud_id)
+            ->first();
+        
+        if ($campoSubmited) {
+            $existing = PracticaValorCampo::where('practica_id', $practica->id)
+                ->where('campo_id', $campoSubmited->id)
                 ->first();
-
-            if ($campoBeneficiario) {
-                $existingBeneficiarios = PracticaValorCampo::where('practica_id', $practica->id)
-                    ->where('campo_id', $campoBeneficiario->id)
-                    ->first();
-                
-                $beneficiarios = [];
-                if ($existingBeneficiarios && $existingBeneficiarios->valor) {
-                    $beneficiarios = json_decode($existingBeneficiarios->valor, true) ?? [];
-                }
-                
-                if (!in_array($estudiante->id, $beneficiarios)) {
-                    $beneficiarios[] = $estudiante->id;
-                }
+            
+            if ($existing && $existing->valor) {
+                $submitedData = json_decode($existing->valor, true) ?: [];
+                unset($submitedData[$estudianteId]); // Eliminar para que pueda reintentar
                 
                 PracticaValorCampo::updateOrCreate(
-                    [
-                        'practica_id' => $practica->id,
-                        'campo_id' => $campoBeneficiario->id
-                    ],
-                    ['valor' => json_encode($beneficiarios)]
+                    ['practica_id' => $practica->id, 'campo_id' => $campoSubmited->id],
+                    ['valor' => json_encode($submitedData)]
                 );
             }
         }
-
-        Log::info('Beneficio ICFES - Solicitud respondida', [
-            'practica_id' => $practica->id,
-            'estudiante_id' => $estudiante->id,
-            'estado' => $request->estado_icfes_practicas,
-            'acta_numero' => $request->nro_acta_icfes_practicas,
-            'acta_fecha' => $request->fecha_acta_icfes_practicas
-        ]);
-
-        return response()->json(['success' => 'Respuesta enviada correctamente']);
     }
+
+    return response()->json(['success' => 'Respuesta enviada correctamente']);
+}
 
 }
