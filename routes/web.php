@@ -265,7 +265,10 @@ Route::middleware('permission:view_practicas')
         Route::post('/icfes', [RoadMapPracticaController::class, 'storeIcfesSolicitud'])->name('practicas.icfes.store');
         Route::post('/icfes/responder', [RoadMapPracticaController::class, 'responderIcfesSolicitud'])->name('practicas.icfes.responder');
 
-
+        // Configuraciones de prácticas
+Route::post('/configurar/estudiante', [RoadMapPracticaController::class, 'configEstudiante'])->name('practicas.configurar_estudiante');
+Route::post('/configurar/admin', [RoadMapPracticaController::class, 'configAdmin'])->name('practicas.configurar_admin');
+        
         
         // Rutas POST para seguimiento (sin duplicar)
         Route::post('/seguimiento', [RoadMapPracticaController::class, 'index'])->name('practicas.roadmap');

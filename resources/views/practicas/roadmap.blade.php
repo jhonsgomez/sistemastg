@@ -77,7 +77,9 @@
             #fase6DetailsModal,
             #fase6ComiteModal,
             #icfesEstudianteModal,
-            #icfesAdminModal
+            #icfesAdminModal,
+            #configAdminModal,
+            #configModal
             {
                 visibility: hidden !important;
                 opacity: 0 !important;
@@ -113,7 +115,9 @@
             #fase6ComiteModal.show,
             #fase6DetailsModal.show,
             #icfesEstudianteModal.show,
-            #icfesAdminModal.show {
+            #icfesAdminModal.show,
+            #configAdminModal.show,
+            #configModal.show {
                 visibility: visible !important;
                 opacity: 1 !important;
                 transform: translateY(0) scale(1) !important;
@@ -231,11 +235,34 @@
                     </svg>
                 </button>
 
-                <!-- Botón Configuración (Gris) -->
-                <button onclick="openConfiguracionModal()"
-                    class="btn-action bg-gray-500 hover:bg-gray-700 text-white rounded-lg transition flex items-center">
-                    <i class="fa-solid fa-gear"></i>
-                </button>
+                {{-- Botón Configuraciones --}}
+@php
+    $fase_numerica = $fase_actual;
+    $puedeSolicitarRetiro = $fase_numerica >= 1 && $fase_numerica <= 6;
+    $puedeSolicitarCambioDocente = $fase_numerica >= 3 && $fase_numerica <= 6;
+    $puedeSolicitarProrroga = $fase_numerica >= 5 && $fase_numerica <= 6;
+    $tieneSolicitudPendiente = $tiene_solicitud_pendiente ?? false;
+@endphp
+
+@if (($puedeSolicitarRetiro || $puedeSolicitarCambioDocente || $puedeSolicitarProrroga) && !$tieneSolicitudPendiente)
+    @if (auth()->user()->hasRole(['super_admin', 'admin', 'coordinador']))
+        <button type="button" onclick="openConfigAdminModal()"
+            class="btn-action shadow bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded-lg">
+            <i class="fa-solid fa-gear"></i>
+        </button>
+    @elseif (auth()->user()->hasRole('estudiante'))
+        <button type="button" onclick="openConfigModal({{ $fase_numerica }})"
+            class="btn-action shadow bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded-lg">
+            <i class="fa-solid fa-gear"></i>
+        </button>
+    @endif
+@endif
+
+@if ($tieneSolicitudPendiente && auth()->user()->hasRole('estudiante'))
+    <span class="text-yellow-600 bg-yellow-100 px-2 py-1 rounded text-xs ml-2">
+        ⏳ Solicitud pendiente
+    </span>
+@endif
 
                 <!-- Botón Volver (Verde) -->
                 <a href="{{ route('practicas.index') }}"
@@ -3729,6 +3756,269 @@
 </div>
     
 @endif
+
+<!-- CONFIGURACIONES DE LA PRÁCTICA - ESTUDIANTE -->
+<div id="configModal" class="fixed z-50 inset-0 overflow-y-auto">
+    <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeConfigModal()">
+        <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative" onclick="event.stopPropagation()">
+                <button class="modal-close-btn-custom" onclick="closeConfigModal()">&times;</button>
+                <form class="p-6 mt-2" id="configModalForm" enctype="multipart/form-data">
+                    @csrf
+                    <p class="text-2xl font-bold" style="margin: 0.8rem 0 1.5rem 0;" id="configModalTitle"></p>
+                    <p class="font-medium text-sm text-gray-700 mb-6 text-justify">En este formulario el estudiante podrá realizar algunas solicitudes dentro de su práctica, tales como cambio de director, cambio de evaluador, prórroga y retiro de la práctica.</p>
+                    <p class="font-medium text-sm text-gray-700 mb-6 text-justify">- En caso de solicitar <strong>RETIRO</strong>, el estudiante que desee realizar esta solicitud deberá ingresar desde su <strong>PROPIA</strong> cuenta de usuario y adjuntar una carta solicitando el retiro de forma voluntaria.</p>
+
+                    @if ($fase_actual >= 5)
+                        <p class="font-medium text-sm text-gray-700 mb-6 text-justify">- En caso de solicitar <strong>PRÓRROGA</strong>, el estudiante debe tener en cuenta que esta solo se puede solicitar como máximo <strong>DOS</strong> veces en una práctica y deberá adjuntar una carta solicitando la prórroga junto con la liquidación y soporte de pago de la misma.</p>
+                        <div class="flex items-start mb-6">
+                            <p class="font-medium text-sm text-red-700 text-justify">
+                                <i class="fa-solid fa-circle-info text-red-500 text-xl mr-2 mt-1"></i><strong>IMPORTANTE:</strong> El comité de prácticas <strong>únicamente aprobará la prórroga si todos los integrantes activos han realizado el pago correspondiente</strong>. Por lo tanto, <strong>TODOS</strong> los integrantes deberán pagar la <strong>PRÓRROGA</strong>, o en su defecto, solicitar el retiro de forma voluntaria para que los demás integrantes puedan continuar con la práctica. Para solicitar la prórroga <strong>ÚNICAMENTE</strong> deberá hacerlo un solo integrante del proyecto adjuntando todos los soportes de pago en un único archivo pdf junto con la carta solicitando la prórroga.
+                            </p>
+                        </div>
+                    @endif
+
+                    <input type="hidden" name="practica_id" value="{{ $practica->id }}">
+
+                    <div class="mb-4">
+                        <label for="tipo_solicitud" class="block font-medium text-sm text-gray-700">
+                            <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                            Tipo de solicitud:
+                        </label>
+                        <select name="tipo_solicitud" id="tipo_solicitud" lang="es" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full focus:ring-uts-500 focus:border-uts-500">
+                            <option value="" selected disabled>Selecciona una opción</option>
+                            <option value="retiro">Retiro de la práctica</option>
+                            @if ($fase_actual >= 3)
+                                <option value="cambio_director">Cambio de director</option>
+                                <option value="cambio_evaluador">Cambio de evaluador</option>
+                            @endif
+                            @if ($fase_actual >= 5)
+                                <option value="prorroga">Prórroga</option>
+                            @endif
+                        </select>
+                        <span id="tipo_solicitudError" class="text-red-500 text-sm"></span>
+                    </div>
+
+                    <div id="container-doc_prorroga_config" class="mb-5 hidden">
+                        <div class="mb-4">
+                            <label for="carta_prorroga" class="block font-medium text-sm text-gray-700">
+                                <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                                <span class="text-red-600 mr-1 text-lg">*</span>
+                                Carta de solicitud de prórroga:
+                            </label>
+                            <div class="w-full mt-2 relative py-9 bg-gray-50 rounded-2xl border border-2 border-gray-300 gap-3 grid border-dashed" id="dropzone_carta_prorroga">
+                                <div class="grid gap-1">
+                                    <i class="mx-auto text-4xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                    <h2 class="text-center text-gray-400 text-xs leading-4">Solo archivos de PDF de máximo 4MB</h2>
+                                </div>
+                                <div class="grid gap-2">
+                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
+                                    <div class="flex items-center justify-center">
+                                        <input type="file" name="carta_prorroga[]" id="carta_prorroga" class="absolute inset-0 opacity-0 cursor-pointer" accept=".pdf" />
+                                        <div class="flex w-28 h-9 px-1 flex-col bg-uts-500 rounded-full shadow text-white text-sm font-semibold leading-4 items-center justify-center cursor-pointer focus:outline-none">Cargar</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <span id="carta_prorrogaError" class="text-red-500 text-sm"></span>
+                            <ul id="file-list-prorroga-carta" class="mt-4 text-gray-600 text-sm list-disc pl-5"></ul>
+                            <span id="files-size-prorroga-carta" class="text-gray-800 text-sm"></span>
+                        </div>
+                        <div class="mb-4">
+                            <label for="liquidacion_prorroga" class="block font-medium text-sm text-gray-700">
+                                <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                                <span class="text-red-600 mr-1 text-lg">*</span>
+                                Liquidación de prórroga:
+                            </label>
+                            <div class="w-full mt-2 relative py-9 bg-gray-50 rounded-2xl border border-2 border-gray-300 gap-3 grid border-dashed" id="dropzone_liquidacion_prorroga">
+                                <div class="grid gap-1">
+                                    <i class="mx-auto text-4xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                    <h2 class="text-center text-gray-400 text-xs leading-4">Solo archivos de PDF de máximo 4MB</h2>
+                                </div>
+                                <div class="grid gap-2">
+                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
+                                    <div class="flex items-center justify-center">
+                                        <input type="file" name="liquidacion_prorroga[]" id="liquidacion_prorroga" class="absolute inset-0 opacity-0 cursor-pointer" accept=".pdf" />
+                                        <div class="flex w-28 h-9 px-1 flex-col bg-uts-500 rounded-full shadow text-white text-sm font-semibold leading-4 items-center justify-center cursor-pointer focus:outline-none">Cargar</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <span id="liquidacion_prorrogaError" class="text-red-500 text-sm"></span>
+                            <ul id="file-list-liquidacion-prorroga" class="mt-4 text-gray-600 text-sm list-disc pl-5"></ul>
+                            <span id="files-size-liquidacion-prorroga" class="text-gray-800 text-sm"></span>
+                        </div>
+                        <div>
+                            <label for="soporte_prorroga" class="block font-medium text-sm text-gray-700">
+                                <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                                <span class="text-red-600 mr-1 text-lg">*</span>
+                                Soporte de pago de prórroga:
+                            </label>
+                            <div class="w-full mt-2 relative py-9 bg-gray-50 rounded-2xl border border-2 border-gray-300 gap-3 grid border-dashed" id="dropzone_soporte_prorroga">
+                                <div class="grid gap-1">
+                                    <i class="mx-auto text-4xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                    <h2 class="text-center text-gray-400 text-xs leading-4">Solo archivos de PDF de máximo 4MB</h2>
+                                </div>
+                                <div class="grid gap-2">
+                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
+                                    <div class="flex items-center justify-center">
+                                        <input type="file" name="soporte_prorroga[]" id="soporte_prorroga" class="absolute inset-0 opacity-0 cursor-pointer" accept=".pdf" />
+                                        <div class="flex w-28 h-9 px-1 flex-col bg-uts-500 rounded-full shadow text-white text-sm font-semibold leading-4 items-center justify-center cursor-pointer focus:outline-none">Cargar</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <span id="soporte_prorrogaError" class="text-red-500 text-sm"></span>
+                            <ul id="file-list-soporte-prorroga" class="mt-4 text-gray-600 text-sm list-disc pl-5"></ul>
+                            <span id="files-size-soporte-prorroga" class="text-gray-800 text-sm"></span>
+                        </div>
+                    </div>
+
+                    <div id="container-doc_retiro_config" class="mb-5 hidden">
+                        <label for="carta_retiro" class="block font-medium text-sm text-gray-700">
+                            <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                            <span class="text-red-600 mr-1 text-lg">*</span>
+                            Carta de solicitud de retiro:
+                        </label>
+                        <div class="w-full mt-2 relative py-9 bg-gray-50 rounded-2xl border border-2 border-gray-300 gap-3 grid border-dashed" id="dropzone_carta_retiro">
+                            <div class="grid gap-1">
+                                <i class="mx-auto text-4xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                <h2 class="text-center text-gray-400 text-xs leading-4">Solo archivos de PDF de máximo 4MB</h2>
+                            </div>
+                            <div class="grid gap-2">
+                                <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
+                                <div class="flex items-center justify-center">
+                                    <input type="file" name="carta_retiro[]" id="carta_retiro" class="absolute inset-0 opacity-0 cursor-pointer" accept=".pdf" />
+                                    <div class="flex w-28 h-9 px-1 flex-col bg-uts-500 rounded-full shadow text-white text-sm font-semibold leading-4 items-center justify-center cursor-pointer focus:outline-none">Cargar</div>
+                                </div>
+                            </div>
+                        </div>
+                        <span id="carta_retiroError" class="text-red-500 text-sm"></span>
+                        <ul id="file-list-retiro" class="mt-4 text-gray-600 text-sm list-disc pl-5"></ul>
+                        <span id="files-size-retiro" class="text-gray-800 text-sm"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="comentarios_config" class="block font-medium text-sm text-gray-700" style="margin-bottom: 5px;">
+                            <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                            Comentarios de la solicitud:
+                        </label>
+                        <div id="txt-editor-config" class="txt-editor-quill shadow"></div>
+                        <textarea name="comentarios_config" id="comentarios_config" class="hidden"></textarea>
+                        <span id="comentarios_configError" class="text-red-500 text-sm"></span>
+                    </div>
+
+                    <div class="mt-4 flex justify-end space-x-2">
+                        <button type="button" onclick="closeConfigModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cancelar</button>
+                        <button id="configModalButton" type="submit" class="flex bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg">
+    <svg id="loadingSpinner-configModalResponse" style="margin: 4px 10px 4px 0" class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
+    </svg>
+    Enviar
+</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CONFIGURACIONES DE LA PRÁCTICA - ADMIN -->
+<div id="configAdminModal" class="fixed z-50 inset-0 overflow-y-auto">
+    <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeConfigAdminModal()">
+        <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative" onclick="event.stopPropagation()">
+                <button class="modal-close-btn-custom" onclick="closeConfigAdminModal()">&times;</button>
+                <form class="p-6 mt-2" id="configAdminForm" enctype="multipart/form-data">
+                    @csrf
+                    <p class="text-2xl font-bold" style="margin: 0.8rem 0 1.5rem 0;" id="configAdminTitle"></p>
+                    <input type="hidden" name="practica_id" value="{{ $practica->id }}">
+
+                    @if ($fase_actual >= 3 && isset($director_actual) && isset($evaluador_actual))
+                        <div class="mb-4">
+                            <label for="director_id" class="block font-medium text-sm text-gray-700">
+                                <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                                Director actual:
+                            </label>
+                            <select name="director_id" id="director_id-config" lang="es" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full focus:ring-uts-500 focus:border-uts-500">
+                                <option value="" selected disabled>Selecciona una opción</option>
+                                @foreach ($docentes as $docente)
+                                    <option value="{{ $docente->id }}" @if (isset($director_actual) && $docente->id == $director_actual) selected @endif>{{ $docente->name }}</option>
+                                @endforeach
+                            </select>
+                            <span id="director_idError" class="text-red-500 text-sm"></span>
+                        </div>
+                        <div class="mb-4">
+                            <label for="evaluador_id" class="block font-medium text-sm text-gray-700">
+                                <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                                Evaluador actual:
+                            </label>
+                            <select name="evaluador_id" id="evaluador_id-config" lang="es" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full focus:ring-uts-500 focus:border-uts-500">
+                                <option value="" selected disabled>Selecciona una opción</option>
+                                @foreach ($docentes as $docente)
+                                    <option value="{{ $docente->id }}" @if (isset($evaluador_actual) && $docente->id == $evaluador_actual) selected @endif>{{ $docente->name }}</option>
+                                @endforeach
+                            </select>
+                            <span id="evaluador_idError" class="text-red-500 text-sm"></span>
+                        </div>
+                    @endif
+
+                    <div class="mb-4">
+                        <label for="retirar_estudiante" class="block font-medium text-sm text-gray-700">
+                            <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                            Retirar estudiante:
+                        </label>
+                        <select name="retirar_estudiante" id="retirar_estudiante" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full focus:ring-uts-500 focus:border-uts-500">
+                            <option value="">Seleccione un estudiante</option>
+                            @foreach ($lista_integrantes as $integrante)
+                                <option value="{{ $integrante->id }}">{{ $integrante->name }}</option>
+                            @endforeach
+                        </select>
+                        <span id="retirar_estudianteError" class="text-red-500 text-sm"></span>
+                    </div>
+
+                    <div class="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <label for="nro_acta_ajustes" class="block font-medium text-sm text-gray-700">
+                                <i class="fa-regular fa-file-lines mr-1 text-gray-500"></i>
+                                Número de acta:
+                            </label>
+                            <input type="text" name="nro_acta_ajustes" id="nro_acta_ajustes" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full focus:ring-uts-500 focus:border-uts-500" placeholder="Ingrese el número de acta" required>
+                            <span id="nro_acta_ajustesError" class="text-red-500 text-sm"></span>
+                        </div>
+                        <div>
+                            <label for="fecha_acta_ajustes" class="block font-medium text-sm text-gray-700">
+                                <i class="fa-regular fa-calendar-days mr-1 text-gray-500"></i>
+                                Fecha del acta:
+                            </label>
+                            <input type="date" name="fecha_acta_ajustes" id="fecha_acta_ajustes" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full focus:ring-uts-500 focus:border-uts-500">
+                            <span id="fecha_acta_ajustesError" class="text-red-500 text-sm"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="comentarios_config_admin" class="block font-medium text-sm text-gray-700" style="margin-bottom: 5px;">
+                            <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                            Comentarios de la respuesta:
+                        </label>
+                        <div id="txt-editor-config-admin" class="txt-editor-quill shadow"></div>
+                        <textarea name="comentarios_config_admin" id="comentarios_config_admin" class="hidden"></textarea>
+                        <span id="comentarios_config_adminError" class="text-red-500 text-sm"></span>
+                    </div>
+
+                    <div class="mt-2 flex justify-end space-x-2">
+                        <button type="button" onclick="closeConfigAdminModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cancelar</button>
+                        <button id="configAdminButton" type="submit" class="flex bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg">
+    <svg id="loadingSpinner-configAdminResponse" style="margin: 4px 10px 4px 0" class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
+    </svg>
+    Guardar
+</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
     
     @push('styles')
         <style>
@@ -4114,6 +4404,292 @@
         $('#icfesAdminModal').removeClass('show');
     }
 </script>
+
+<script>
+
+    function openConfigModal() {
+    new fileInput('carta_prorroga', 'dropzone_carta_prorroga', 'pdf', 1, 4, 'file-list-prorroga-carta', 'files-size-prorroga-carta');
+    new fileInput('liquidacion_prorroga', 'dropzone_liquidacion_prorroga', 'pdf', 1, 4, 'file-list-liquidacion-prorroga', 'files-size-liquidacion-prorroga');
+    new fileInput('soporte_prorroga', 'dropzone_soporte_prorroga', 'pdf', 1, 4, 'file-list-soporte-prorroga', 'files-size-soporte-prorroga');
+    new fileInput('carta_retiro', 'dropzone_carta_retiro', 'pdf', 1, 4, 'file-list-retiro', 'files-size-retiro');
+
+    initQuillEditor(undefined, "Describa su solicitud detalladamente.", 'txt-editor-config', 'comentarios_config');
+
+    $('#configModalTitle').html(`Ajustes de la <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Práctica</span>`);
+
+    $('#tipo_solicitud').val('').trigger('change');
+    $('#carta_prorroga').val('');
+    $('#liquidacion_prorroga').val('');
+    $('#soporte_prorroga').val('');
+    $('#carta_retiro').val('');
+    $('#comentarios_config').val('');
+
+    $('#tipo_solicitudError').text('');
+    $('#carta_prorrogaError').text('');
+    $('#liquidacion_prorrogaError').text('');
+    $('#soporte_prorrogaError').text('');
+    $('#carta_retiroError').text('');
+    $('#comentarios_configError').text('');
+
+    $('#configModal').addClass('show');
+}
+
+function closeConfigModal() {
+    $('#configModal').removeClass('show');
+}
+
+var directorOriginalGlobal = null;
+var evaluadorOriginalGlobal = null;
+
+function openConfigAdminModal() {
+    initQuillEditor(undefined, "Describa la respuesta para el estudiante.", 'txt-editor-config-admin', 'comentarios_config_admin');
+
+    $('#configAdminTitle').html(`Ajustes de la <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Práctica</span>`);
+
+    // Guardar valores ORIGINALES (los que vienen de BD)
+    directorOriginalGlobal = $('#director_id-config').val();
+    evaluadorOriginalGlobal = $('#evaluador_id-config').val();
+    
+    // Limpiar otros campos
+    $('#retirar_estudiante').val('');
+    $('#nro_acta_ajustes').val('');
+    $('#fecha_acta_ajustes').val('');
+    $('#comentarios_config_admin').val('');
+
+    $('#director_idError').text('');
+    $('#evaluador_idError').text('');
+    $('#retirar_estudianteError').text('');
+    $('#nro_acta_ajustesError').text('');
+    $('#fecha_acta_ajustesError').text('');
+    $('#comentarios_config_adminError').text('');
+
+    $('#configAdminModal').addClass('show');
+}
+
+function closeConfigAdminModal() {
+    $('#configAdminModal').removeClass('show');
+}
+
+$('#configAdminForm').on('submit', function(e) {
+    e.preventDefault();
+    
+    var directorActual = $('#director_id-config').val();
+    var evaluadorActual = $('#evaluador_id-config').val();
+    var estudianteRetiro = $('#retirar_estudiante').val();
+    var nroActa = $('#nro_acta_ajustes').val();
+    var fechaActa = $('#fecha_acta_ajustes').val();
+    
+    // Obtener comentarios del Quill
+    var quill = Quill.find(document.querySelector('#txt-editor-config-admin'));
+    var comentarios = quill ? quill.root.innerHTML : '';
+    $('#comentarios_config_admin').val(comentarios);
+    
+    // Validar campos requeridos
+    if (!nroActa || nroActa.trim() === '') {
+        Swal.fire('Error', 'Debe ingresar el número de acta', 'error');
+        return;
+    }
+    if (!fechaActa) {
+        Swal.fire('Error', 'Debe ingresar la fecha del acta', 'error');
+        return;
+    }
+    
+    // Debug: ver qué se va a enviar
+    console.log('Enviando:', {
+        director_id: directorActual,
+        evaluador_id: evaluadorActual,
+        retirar_estudiante: estudianteRetiro,
+        nro_acta_ajustes: nroActa,
+        fecha_acta_ajustes: fechaActa
+    });
+    
+    // Comparar cambios con valores originales
+    var hayCambioDirector = (directorActual !== directorOriginalGlobal);
+    var hayCambioEvaluador = (evaluadorActual !== evaluadorOriginalGlobal);
+    var hayRetiro = (estudianteRetiro !== null && estudianteRetiro !== '');
+    
+    if (!hayCambioDirector && !hayCambioEvaluador && !hayRetiro) {
+        Swal.fire({
+            icon: 'info',
+            title: 'Sin cambios',
+            text: 'Debe realizar al menos un cambio',
+            heightAuto: false
+        });
+        return;
+    }
+    
+    // Mostrar qué cambios se van a aplicar
+    let mensajeCambios = '';
+    if (hayCambioDirector) mensajeCambios += '- Cambio de director\n';
+    if (hayCambioEvaluador) mensajeCambios += '- Cambio de evaluador\n';
+    if (hayRetiro) mensajeCambios += '- Retiro de estudiante\n';
+    
+    Swal.fire({
+        heightAuto: false,
+        title: '¿Está seguro?',
+        html: `Se aplicarán los siguientes cambios:<br><br>${mensajeCambios.replace(/\n/g, '<br>')}`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#C1D631',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, enviar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const button = $('#configAdminButton');
+            const spinner = $('#loadingSpinner-configAdminResponse');
+            
+            button.prop('disabled', true);
+            spinner.removeClass('hidden');
+            
+            var formData = new FormData(this);
+            formData.set('comentarios_config_admin', comentarios);
+            
+            $.ajax({
+                url: '{{ route("practicas.configurar_admin") }}',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                success: function(response) {
+                    closeConfigAdminModal();
+                    Swal.fire('Éxito', response.success, 'success').then(() => location.reload());
+                },
+                error: function(xhr) {
+                    console.log(xhr.responseJSON);
+                    var errors = xhr.responseJSON.errors;
+                    if (errors) {
+                        $.each(errors, function(key, value) {
+                            $('#' + key + 'Error').text(value[0]);
+                        });
+                        Swal.fire('Error', 'Por favor complete los campos requeridos', 'error');
+                    } else {
+                        Swal.fire('Error', xhr.responseJSON.error || 'Ocurrió un error', 'error');
+                    }
+                },
+                complete: function() {
+                    button.prop('disabled', false);
+                    spinner.addClass('hidden');
+                }
+            });
+        }
+    });
+});
+
+function closeConfigAdminModal() {
+    $('#configAdminModal').removeClass('show');
+}
+
+// Mostrar/ocultar campos según tipo de solicitud
+$(document).ready(function() {
+    $('#tipo_solicitud').on('change', function() {
+        var tipo = $(this).val();
+        $('#container-doc_prorroga_config').addClass('hidden');
+        $('#container-doc_retiro_config').addClass('hidden');
+        if (tipo === 'prorroga') {
+            $('#container-doc_prorroga_config').removeClass('hidden');
+        } else if (tipo === 'retiro') {
+            $('#container-doc_retiro_config').removeClass('hidden');
+        }
+    });
+});
+
+</script>
+
+        <script>
+
+        // Submit del formulario de estudiante
+$('#configModalForm').on('submit', function(e) {
+    e.preventDefault();
+    
+    // Validar que se haya seleccionado un tipo de solicitud
+    const tipoSolicitud = $('#tipo_solicitud').val();
+    if (!tipoSolicitud) {
+        Swal.fire('Error', 'Debe seleccionar un tipo de solicitud', 'error');
+        return;
+    }
+    
+    // Validar archivos según tipo de solicitud
+    if (tipoSolicitud === 'prorroga') {
+        const cartaProrroga = $('#carta_prorroga')[0].files[0];
+        const liquidacion = $('#liquidacion_prorroga')[0].files[0];
+        const soporte = $('#soporte_prorroga')[0].files[0];
+        
+        if (!cartaProrroga) {
+            Swal.fire('Error', 'Debe adjuntar la carta de solicitud de prórroga', 'error');
+            return;
+        }
+        if (!liquidacion) {
+            Swal.fire('Error', 'Debe adjuntar la liquidación de prórroga', 'error');
+            return;
+        }
+        if (!soporte) {
+            Swal.fire('Error', 'Debe adjuntar el soporte de pago de prórroga', 'error');
+            return;
+        }
+    }
+    
+    if (tipoSolicitud === 'retiro') {
+        const cartaRetiro = $('#carta_retiro')[0].files[0];
+        if (!cartaRetiro) {
+            Swal.fire('Error', 'Debe adjuntar la carta de solicitud de retiro', 'error');
+            return;
+        }
+    }
+    
+    Swal.fire({
+        heightAuto: false,
+        title: '¿Está seguro?',
+        text: "No podrá editar la información una vez se envíe",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#C1D631',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, enviar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const button = $('#configModalButton');
+            const spinner = $('#loadingSpinner-configModalResponse');
+            
+            button.prop('disabled', true);
+            spinner.removeClass('hidden');
+            
+            var formData = new FormData(this);
+            
+            $.ajax({
+                url: '{{ route("practicas.configurar_estudiante") }}',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                success: function(response) {
+                    closeConfigModal();
+                    Swal.fire('Éxito', response.success, 'success').then(() => location.reload());
+                },
+                error: function(xhr) {
+                    var errors = xhr.responseJSON.errors;
+                    if (errors) {
+                        $.each(errors, function(key, value) {
+                            $('#' + key + 'Error').text(value[0]);
+                        });
+                        Swal.fire('Error', 'Por favor complete los campos requeridos', 'error');
+                    } else {
+                        Swal.fire('Error', xhr.responseJSON.error || 'Ocurrió un error', 'error');
+                    }
+                },
+                complete: function() {
+                    button.prop('disabled', false);
+                    spinner.addClass('hidden');
+                }
+            });
+        }
+    });
+});
+
+        </script>
 
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script src="{{ asset('js/fases/practicas/fase_0.js') }}"></script>

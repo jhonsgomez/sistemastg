@@ -167,6 +167,36 @@ if (is_array($submitedData) && !empty($submitedData)) {
         $doc_icfes_practicas = $valores['doc_icfes_practicas'] ?? '{}';
         $docData = json_decode($doc_icfes_practicas, true) ?: [];
 
+        // Después de obtener $valores, agregar:
+$carta_prorroga = $valores['carta_prorroga'] ?? null;
+$liquidacion_prorroga = $valores['liquidacion_prorroga'] ?? null;
+$soporte_prorroga = $valores['soporte_prorroga'] ?? null;
+$carta_retiro = $valores['carta_retiro'] ?? null;
+
+    // En el método index, después de obtener $valores:
+
+// ========== VERIFICAR SI EL ESTUDIANTE ESTÁ RETIRADO ==========
+$campoRetirados = Campo::where('name', 'retirados_practica')
+    ->where('tipo_solicitud_id', $practica->tipo_solicitud_id)
+    ->first();
+
+$estudiantesRetirados = [];
+if ($campoRetirados) {
+    $valor = $practica->valoresCampos
+        ->where('campo_id', $campoRetirados->id)
+        ->first();
+    if ($valor && $valor->valor) {
+        $estudiantesRetirados = json_decode($valor->valor, true) ?: [];
+    }
+}
+
+$estaRetirado = in_array(auth()->id(), $estudiantesRetirados);
+
+// Redirigir si está retirado
+if (auth()->user()->hasRole('estudiante') && $estaRetirado) {
+    return redirect()->route('practicas.index')
+        ->with('error', 'Has sido retirado de esta práctica. No puedes acceder al seguimiento.');
+} 
             // Variables para Fase 1, 2, 3, 4, 5 y 6
             $submited_fase1 = $valores['submited_fase1'] ?? 'false';
             $submited_fase2 = $valores['submited_fase2'] ?? 'false';
@@ -232,8 +262,17 @@ if (is_array($submitedData) && !empty($submitedData)) {
             'esBeneficiario',
             'solicitudesEnviadas',
             'docData',
-            'submitedData'
+            'submitedData',
 
+            'carta_prorroga',
+'liquidacion_prorroga',
+'soporte_prorroga',
+'carta_retiro',
+
+    // En el compact, agregar:
+'estudiantesRetirados',
+'estaRetirado',
+            
 
             ));
             
@@ -3091,6 +3130,282 @@ public function responderIcfesSolicitud(Request $request)
     }
 
     return response()->json(['success' => 'Respuesta enviada correctamente']);
+}
+
+/**
+ * Estudiante envía solicitud de configuración
+ */
+public function configEstudiante(Request $request)
+{
+    // Reglas de validación según el tipo de solicitud
+    $rules = [
+        'practica_id' => 'required|exists:practicas,id',
+        'tipo_solicitud' => 'required|in:retiro,cambio_director,cambio_evaluador,prorroga',
+        'comentarios_config' => 'nullable|string',
+    ];
+
+    // Agregar reglas según el tipo de solicitud
+    if ($request->tipo_solicitud === 'prorroga') {
+        $rules['carta_prorroga'] = 'required|array|max:1';
+        $rules['carta_prorroga.*'] = 'file|mimes:pdf|max:4096';
+        $rules['liquidacion_prorroga'] = 'required|array|max:1';
+        $rules['liquidacion_prorroga.*'] = 'file|mimes:pdf|max:4096';
+        $rules['soporte_prorroga'] = 'required|array|max:1';
+        $rules['soporte_prorroga.*'] = 'file|mimes:pdf|max:4096';
+    }
+
+    if ($request->tipo_solicitud === 'retiro') {
+        $rules['carta_retiro'] = 'required|array|max:1';
+        $rules['carta_retiro.*'] = 'file|mimes:pdf|max:4096';
+    }
+
+    // Para cambio de director y cambio de evaluador no se requieren archivos
+
+    $validator = Validator::make($request->all(), $rules);
+
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 422);
+    }
+
+    $practica = Practica::findOrFail($request->practica_id);
+    $userId = auth()->id();
+    $fase_actual = $this->getFaseActual($practica->estado);
+    
+    // Validar fase según tipo de solicitud
+    if ($request->tipo_solicitud === 'prorroga' && !in_array($fase_actual, [5, 6])) {
+        return response()->json(['error' => 'La prórroga solo se puede solicitar en Fase 5 o 6'], 422);
+    }
+    
+    if (in_array($request->tipo_solicitud, ['cambio_director', 'cambio_evaluador']) && $fase_actual < 3) {
+        return response()->json(['error' => 'Los cambios solo se pueden solicitar desde Fase 3'], 422);
+    }
+    
+    if ($request->tipo_solicitud === 'retiro' && $fase_actual < 1) {
+        return response()->json(['error' => 'El retiro solo se puede solicitar desde Fase 1'], 422);
+    }
+
+    // Guardar según tipo de solicitud
+    if ($request->tipo_solicitud === 'prorroga') {
+        if ($request->hasFile('carta_prorroga')) {
+            $file = $request->file('carta_prorroga')[0];
+            $path = $file->storeAs('practicas/solicitudes', 'carta_prorroga_' . $practica->id . '_' . $userId . '_' . time() . '.pdf', 'public');
+            $this->guardarValorCampo($practica->id, 'carta_prorroga', $path);
+        }
+
+        if ($request->hasFile('liquidacion_prorroga')) {
+            $file = $request->file('liquidacion_prorroga')[0];
+            $path = $file->storeAs('practicas/solicitudes', 'liquidacion_prorroga_' . $practica->id . '_' . $userId . '_' . time() . '.pdf', 'public');
+            $this->guardarValorCampo($practica->id, 'liquidacion_prorroga', $path);
+        }
+
+        if ($request->hasFile('soporte_prorroga')) {
+            $file = $request->file('soporte_prorroga')[0];
+            $path = $file->storeAs('practicas/solicitudes', 'soporte_prorroga_' . $practica->id . '_' . $userId . '_' . time() . '.pdf', 'public');
+            $this->guardarValorCampo($practica->id, 'soporte_prorroga', $path);
+        }
+    }
+
+    if ($request->tipo_solicitud === 'retiro') {
+        if ($request->hasFile('carta_retiro')) {
+            $file = $request->file('carta_retiro')[0];
+            $path = $file->storeAs('practicas/solicitudes', 'carta_retiro_' . $practica->id . '_' . $userId . '_' . time() . '.pdf', 'public');
+            $this->guardarValorCampo($practica->id, 'carta_retiro', $path);
+        }
+    }
+
+    // Guardar comentarios
+    if ($request->filled('comentarios_config')) {
+        $this->guardarValorCampo($practica->id, 'comentarios_solicitud', $request->comentarios_config);
+    }
+
+    // Guardar tipo de solicitud y estado pendiente
+    $this->guardarValorCampo($practica->id, 'tipo_solicitud_pendiente', $request->tipo_solicitud);
+    $this->guardarValorCampo($practica->id, 'estado_solicitud', 'pendiente');
+
+    // TODO: Enviar correo al comité
+
+    return response()->json(['success' => 'Solicitud enviada correctamente']);
+}
+
+/**
+ * Admin responde solicitud
+ */
+public function configAdmin(Request $request)
+{
+    \Log::info('Datos recibidos configAdmin:', $request->all());
+    
+    $validator = Validator::make($request->all(), [
+        'practica_id' => 'required|exists:practicas,id',
+        'director_id' => 'nullable|exists:users,id',
+        'evaluador_id' => 'nullable|exists:users,id',
+        'retirar_estudiante' => 'nullable|exists:users,id',
+        'nro_acta_ajustes' => 'required|integer',
+        'fecha_acta_ajustes' => 'required|date',
+        'comentarios_config_admin' => 'nullable|string',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 422);
+    }
+
+    $practica = Practica::findOrFail($request->practica_id);
+    
+    // Guardar acta
+    ActaPractica::create([
+        'practica_id' => $practica->id,
+        'numero' => $request->nro_acta_ajustes,
+        'fecha' => $request->fecha_acta_ajustes,
+        'descripcion' => $request->comentarios_config_admin ?? ''
+    ]);
+
+    $cambiosRealizados = false;
+    
+    // Verificar cambio de director
+    if ($request->has('director_id') && !empty($request->director_id)) {
+        // Buscar el registro existente SIN importar el tipo_solicitud_id
+        $registroDirector = PracticaValorCampo::where('practica_id', $practica->id)
+            ->whereHas('campo', function($q) {
+                $q->where('name', 'director_id');
+            })
+            ->first();
+        
+        if ($registroDirector) {
+            // Actualizar el registro existente
+            if ($registroDirector->valor != $request->director_id) {
+                $registroDirector->valor = $request->director_id;
+                $registroDirector->save();
+                $cambiosRealizados = true;
+                \Log::info('Director actualizado:', ['anterior' => $registroDirector->getOriginal('valor'), 'nuevo' => $request->director_id]);
+            }
+        } else {
+            \Log::warning('No se encontró registro de director para la práctica ' . $practica->id);
+        }
+    }
+    
+    // Verificar cambio de evaluador
+    if ($request->has('evaluador_id') && !empty($request->evaluador_id)) {
+        // Buscar el registro existente SIN importar el tipo_solicitud_id
+        $registroEvaluador = PracticaValorCampo::where('practica_id', $practica->id)
+            ->whereHas('campo', function($q) {
+                $q->where('name', 'evaluador_id');
+            })
+            ->first();
+        
+        if ($registroEvaluador) {
+            // Actualizar el registro existente
+            if ($registroEvaluador->valor != $request->evaluador_id) {
+                $registroEvaluador->valor = $request->evaluador_id;
+                $registroEvaluador->save();
+                $cambiosRealizados = true;
+                \Log::info('Evaluador actualizado:', ['anterior' => $registroEvaluador->getOriginal('valor'), 'nuevo' => $request->evaluador_id]);
+            }
+        } else {
+            \Log::warning('No se encontró registro de evaluador para la práctica ' . $practica->id);
+        }
+    }
+    
+    // Verificar retiro de estudiante
+if ($request->has('retirar_estudiante') && !empty($request->retirar_estudiante)) {
+    $estudianteId = $request->retirar_estudiante;
+    
+    // Obtener o crear el campo retirados_practica
+    $campoRetirados = Campo::where('name', 'retirados_practica')
+        ->where('tipo_solicitud_id', $practica->tipo_solicitud_id)
+        ->first();
+    
+    if ($campoRetirados) {
+        $existentes = PracticaValorCampo::where('practica_id', $practica->id)
+            ->where('campo_id', $campoRetirados->id)
+            ->first();
+        
+        $retirados = [];
+        if ($existentes && $existentes->valor) {
+            $retirados = json_decode($existentes->valor, true) ?: [];
+        }
+        
+        // Agregar el estudiante si no está ya retirado
+        if (!in_array($estudianteId, $retirados)) {
+            $retirados[] = (int) $estudianteId;
+            
+            PracticaValorCampo::updateOrCreate(
+                ['practica_id' => $practica->id, 'campo_id' => $campoRetirados->id],
+                ['valor' => json_encode($retirados)]
+            );
+            
+            $cambiosRealizados = true;
+            \Log::info('Estudiante retirado:', ['estudiante_id' => $estudianteId, 'practica_id' => $practica->id]);
+        }
+    }
+}
+
+    if (!$cambiosRealizados) {
+        return response()->json(['error' => 'No se realizó ningún cambio'], 422);
+    }
+
+    return response()->json(['success' => 'Respuesta enviada correctamente']);
+}
+
+// Agregar esta función auxiliar
+private function obtenerValorCampo($practicaId, $campoName)
+{
+    $campo = Campo::where('name', $campoName)
+        ->whereHas('tipoSolicitud', function($q) {
+            $q->where('nombre', 'practicas_fase_5');
+        })
+        ->first();
+
+    if ($campo) {
+        $valor = PracticaValorCampo::where('practica_id', $practicaId)
+            ->where('campo_id', $campo->id)
+            ->first();
+        return $valor ? $valor->valor : null;
+    }
+    return null;
+}
+
+// Funciones auxiliares privadas
+private function guardarValorCampo($practicaId, $campoName, $valor)
+{
+    $campo = Campo::where('name', $campoName)
+        ->where('tipo_solicitud_id', function($q) use ($practicaId) {
+            $practica = Practica::find($practicaId);
+            $q->select('id')->from('tipos_solicitudes')->where('nombre', 'practicas_fase_5');
+        })
+        ->first();
+
+    if ($campo) {
+        PracticaValorCampo::updateOrCreate(
+            ['practica_id' => $practicaId, 'campo_id' => $campo->id],
+            ['valor' => $valor]
+        );
+    }
+}
+
+private function actualizarCampo($practicaId, $campoName, $valor)
+{
+    $campo = Campo::where('name', $campoName)
+        ->where('tipo_solicitud_id', function($q) use ($practicaId) {
+            $practica = Practica::find($practicaId);
+            $q->select('id')->from('tipos_solicitudes')->where('nombre', 'practicas_fase_5');
+        })
+        ->first();
+
+    if ($campo) {
+        PracticaValorCampo::updateOrCreate(
+            ['practica_id' => $practicaId, 'campo_id' => $campo->id],
+            ['valor' => $valor]
+        );
+    }
+}
+
+private function getFaseActual($estado)
+{
+    if ($estado === 'Finalizado') return 7;
+    if (str_contains($estado, 'Fase')) {
+        $partes = explode(' ', $estado);
+        return (int) $partes[1];
+    }
+    return 0;
 }
 
 }

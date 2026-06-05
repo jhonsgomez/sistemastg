@@ -713,6 +713,78 @@ class CamposPracticasSeeder extends Seeder
             'instructions' => null
         ]
     );
+
+        /* ========== CONFIGURACIONES DE LA PRÁCTICA ========== */
+
+// 1. Carta de retiro (PDF)
+Campo::updateOrCreate(
+    [
+        'tipo_solicitud_id' => $practicas_fase_5->id,
+        'name' => 'carta_retiro'
+    ],
+    [
+        'label' => 'Carta de solicitud de retiro',
+        'type' => 'file',
+        'required' => false,
+        'instructions' => '<p><strong>Instrucciones:</strong> Suba la carta solicitando el retiro voluntario de la práctica en formato PDF. Tamaño máximo 4MB.</p>'
+    ]
+);
+
+// 2. Carta de prórroga (PDF)
+Campo::updateOrCreate(
+    [
+        'tipo_solicitud_id' => $practicas_fase_5->id,
+        'name' => 'carta_prorroga'
+    ],
+    [
+        'label' => 'Carta de solicitud de prórroga',
+        'type' => 'file',
+        'required' => false,
+        'instructions' => '<p><strong>Instrucciones:</strong> Suba la carta solicitando la prórroga de la práctica en formato PDF. Tamaño máximo 4MB.</p>'
+    ]
+);
+
+// 3. Liquidación de prórroga (PDF)
+Campo::updateOrCreate(
+    [
+        'tipo_solicitud_id' => $practicas_fase_5->id,
+        'name' => 'liquidacion_prorroga'
+    ],
+    [
+        'label' => 'Liquidación de prórroga',
+        'type' => 'file',
+        'required' => false,
+        'instructions' => '<p><strong>Instrucciones:</strong> Suba la liquidación de la prórroga en formato PDF. Tamaño máximo 4MB.</p>'
+    ]
+);
+
+// 4. Soporte de pago de prórroga (PDF)
+Campo::updateOrCreate(
+    [
+        'tipo_solicitud_id' => $practicas_fase_5->id,
+        'name' => 'soporte_prorroga'
+    ],
+    [
+        'label' => 'Soporte de pago de prórroga',
+        'type' => 'file',
+        'required' => false,
+        'instructions' => '<p><strong>Instrucciones:</strong> Suba el soporte de pago de la prórroga en formato PDF. Tamaño máximo 4MB.</p>'
+    ]
+);
+
+            // 5. Estudiantes retirados de la práctica (almacena JSON con IDs)
+Campo::updateOrCreate(
+    [
+        'tipo_solicitud_id' => $practicas_fase_5->id,
+        'name' => 'retirados_practica'
+    ],
+    [
+        'label' => 'Estudiantes retirados de la práctica',
+        'type' => 'hidden',
+        'required' => false,
+        'instructions' => null
+    ]
+);
             
         }
 

@@ -245,6 +245,14 @@ class PracticaController extends Controller
         ->addColumn('estado', function ($p) {
             $return_html = '<div class="flex gap-2 flex-wrap items-center justify-center">';
 
+            // Dentro de addColumn('estado'), antes de los demás badges
+if (auth()->user()->hasRole('estudiante')) {
+    $estaRetirado = $this->estudianteRetirado($p);
+    if ($estaRetirado) {
+        $badge = "<span class='shadow bg-red-100 text-red-800 text-sm font-medium px-2.5 py-0.5 rounded border border-red-300'>Retirado</span>";
+        return $return_html . $badge . "</div>";
+    }
+}
             // ========== BADGE BENEFICIARIO ICFES ==========
             $acceso = $this->esBeneficiarioIcfesListaPractica($p);
             
@@ -256,6 +264,7 @@ class PracticaController extends Controller
                 return $return_html . $badge . "</div>";
             }
 
+            
             $htmlEstado = '';
 
             if ($p->estado === 'Pendiente') {
@@ -403,10 +412,26 @@ elseif ($p->estado === 'Fase 6') {
             }
 
             // Botón Roadmap AZUL
-            $esFaseActiva = in_array($p->estado, ['Fase 1', 'Fase 2', 'Fase 3', 'Fase 4', 'Fase 5', 'Fase 6', 'Finalizado']);
-            $puedeVerRoadmap = !$p->deshabilitado && $esFaseActiva;
+$esFaseActiva = in_array($p->estado, ['Fase 1', 'Fase 2', 'Fase 3', 'Fase 4', 'Fase 5', 'Fase 6', 'Finalizado']);
+$puedeVerRoadmap = !$p->deshabilitado && $esFaseActiva;
 
-            if ($puedeVerRoadmap) {
+// Si es estudiante, verificar si está retirado
+if (auth()->user()->hasRole('estudiante')) {
+    $estaRetirado = $this->estudianteRetirado($p);
+    if ($estaRetirado) {
+        $puedeVerRoadmap = false;
+    }
+}
+
+    // AGREGAR: Si es estudiante y es beneficiario ICFES, NO puede ver el roadmap
+if (auth()->user()->hasRole('estudiante')) {
+    $esBeneficiario = $this->esBeneficiarioIcfesListaPractica($p);
+    if ($esBeneficiario) {
+        $puedeVerRoadmap = false;
+    }
+}
+
+if ($puedeVerRoadmap) {
                 $buttons .= '
                     <form action="' . route('practicas.roadmap') . '" method="POST" class="inline-block m-0" onsubmit="return showRoadmapSpinner(this)">
                         ' . csrf_field() . '
@@ -503,6 +528,40 @@ private function yaEnvioSolicitudIcfes($practica)
     $submitedData = json_decode($valor->valor, true) ?: [];
     
     return isset($submitedData[$userId]) && $submitedData[$userId] === true;
+}
+
+    private function estudianteRetirado($practica)
+{
+    if (!auth()->user()->hasRole('estudiante')) {
+        return false;
+    }
+    
+    $campoRetirados = Campo::where('name', 'retirados_practica')
+        ->where('tipo_solicitud_id', $practica->tipo_solicitud_id)
+        ->first();
+    
+    if (!$campoRetirados) {
+        return false;
+    }
+    
+    $valor = $practica->valoresCampos
+        ->where('campo_id', $campoRetirados->id)
+        ->first();
+    
+    if (!$valor || !$valor->valor) {
+        return false;
+    }
+    
+    $retirados = json_decode($valor->valor, true);
+    
+    if (!is_array($retirados)) {
+        return false;
+    }
+    
+    $retirados = array_map('intval', $retirados);
+    $userId = (int) auth()->id();
+    
+    return in_array($userId, $retirados);
 }
 
 public function buscarEstudiantes(Request $request)
