@@ -2,6 +2,11 @@
 
 return [
 
+    'dias_minimo' => env('PRACTICA_DIAS_MINIMO', 90),
+    'dias_maximo' => env('PRACTICA_DIAS_MAXIMO', 180),
+    'dias_prorroga' => env('PRACTICA_PRORROGA_DIAS', 90),
+    'dias_gracia_fase5' => env('PRACTICA_GRACIA_ENVIO_FASE5', 15),
+
     'correos' => [
 
         'practicas_fase_0' => [

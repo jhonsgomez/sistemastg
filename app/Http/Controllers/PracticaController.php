@@ -253,6 +253,13 @@ if (auth()->user()->hasRole('estudiante')) {
         return $return_html . $badge . "</div>";
     }
 }
+
+            // Verificar si está vencida
+if ($p->vencido == 1) {
+    $badgeVencida = "<span class='shadow bg-red-100 text-red-800 text-sm font-medium px-2.5 py-0.5 rounded border border-red-300'>Vencida</span>";
+    return $return_html . $badgeVencida . "</div>";
+}
+
             // ========== BADGE BENEFICIARIO ICFES ==========
             $acceso = $this->esBeneficiarioIcfesListaPractica($p);
             
@@ -263,7 +270,6 @@ if (auth()->user()->hasRole('estudiante')) {
                 $badge = "<span class='shadow bg-red-100 text-red-800 text-sm font-medium px-2.5 py-0.5 rounded border border-red-300'>Rechazada</span>";
                 return $return_html . $badge . "</div>";
             }
-
             
             $htmlEstado = '';
 
@@ -413,7 +419,7 @@ elseif ($p->estado === 'Fase 6') {
 
             // Botón Roadmap AZUL
 $esFaseActiva = in_array($p->estado, ['Fase 1', 'Fase 2', 'Fase 3', 'Fase 4', 'Fase 5', 'Fase 6', 'Finalizado']);
-$puedeVerRoadmap = !$p->deshabilitado && $esFaseActiva;
+$puedeVerRoadmap = !$p->deshabilitado && $esFaseActiva && $p->vencido != 1;
 
 // Si es estudiante, verificar si está retirado
 if (auth()->user()->hasRole('estudiante')) {

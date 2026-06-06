@@ -60,4 +60,21 @@ class Practica extends Model{
             ];
         });
     }
+
+    // app/Models/Practica.php
+
+public function verificarVencimiento(): void
+{
+    if ($this->fecha_limite_practica) {
+        $fechaLimite = Carbon::parse($this->fecha_limite_practica);
+        $vencido = $fechaLimite->isPast() && $this->estado !== 'Finalizado';
+        
+        if ($vencido && !$this->vencido) {
+            $this->update(['vencido' => 1]);
+        } elseif (!$vencido && $this->vencido) {
+            $this->update(['vencido' => 0]);
+        }
+    }
+}
+
 }

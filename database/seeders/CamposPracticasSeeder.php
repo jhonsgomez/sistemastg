@@ -785,6 +785,50 @@ Campo::updateOrCreate(
         'instructions' => null
     ]
 );
+
+    // ========== CAMPOS DE CONTROL DE TIEMPO DE PRÁCTICA ==========
+
+// 1. Fecha de inicio de la práctica (se asigna al aprobar Fase 4)
+Campo::updateOrCreate(
+    [
+        'tipo_solicitud_id' => $practicas_fase_5->id,
+        'name' => 'fecha_inicio_practica'
+    ],
+    [
+        'label' => 'Fecha de inicio de la práctica',
+        'type' => 'hidden',
+        'required' => false,
+        'instructions' => null
+    ]
+);
+
+// 2. Fecha límite de la práctica (inicio + 180 días, se actualiza con cada prórroga)
+Campo::updateOrCreate(
+    [
+        'tipo_solicitud_id' => $practicas_fase_5->id,
+        'name' => 'fecha_limite_practica'
+    ],
+    [
+        'label' => 'Fecha límite de la práctica',
+        'type' => 'hidden',
+        'required' => false,
+        'instructions' => null
+    ]
+);
+
+// 3. Contador de prórrogas (máximo 2)
+Campo::updateOrCreate(
+    [
+        'tipo_solicitud_id' => $practicas_fase_5->id,
+        'name' => 'solicitudes_prorroga'
+    ],
+    [
+        'label' => 'Número de prórrogas solicitadas',
+        'type' => 'hidden',
+        'required' => false,
+        'instructions' => null
+    ]
+);
             
         }
 

@@ -1609,7 +1609,12 @@ if (auth()->user()->hasRole('estudiante') && $estaRetirado) {
                     ['valor' => $request->titulo_propuesta]
                 );
             }
-            
+
+            // Guardar fechas
+$this->guardarValorCampo($practica->id, 'fecha_inicio_practica', Carbon::now()->toDateTimeString());
+$this->guardarValorCampo($practica->id, 'fecha_limite_practica', Carbon::now()->addDays(180)->toDateTimeString());
+$this->guardarValorCampo($practica->id, 'solicitudes_prorroga', '0');
+
             // Crear acta
             ActaPractica::create([
                 'practica_id' => $practica->id,
@@ -3233,7 +3238,12 @@ public function configEstudiante(Request $request)
 public function configAdmin(Request $request)
 {
     \Log::info('Datos recibidos configAdmin:', $request->all());
-    
+
+    \Log::info('configAdmin - aprobar_prorroga recibido:', [
+    'valor' => $request->input('aprobar_prorroga'),
+    'all' => $request->all()
+]);
+
     $validator = Validator::make($request->all(), [
         'practica_id' => 'required|exists:practicas,id',
         'director_id' => 'nullable|exists:users,id',
@@ -3242,6 +3252,9 @@ public function configAdmin(Request $request)
         'nro_acta_ajustes' => 'required|integer',
         'fecha_acta_ajustes' => 'required|date',
         'comentarios_config_admin' => 'nullable|string',
+
+        'aprobar_prorroga' => 'nullable|boolean',
+
     ]);
 
     if ($validator->fails()) {
@@ -3249,7 +3262,31 @@ public function configAdmin(Request $request)
     }
 
     $practica = Practica::findOrFail($request->practica_id);
+
+    $cambiosRealizados = false;
     
+    $descripcionActa = '';
+    
+    // Verificar prórroga
+if ($request->has('aprobar_prorroga') && $request->aprobar_prorroga == true) {
+    
+    // Obtener fecha límite actual
+    $fechaLimiteActual = $this->obtenerValorCampo($practica->id, 'fecha_limite_practica');
+    
+    if ($fechaLimiteActual) {
+        $nuevaFechaLimite = Carbon::parse($fechaLimiteActual)->addDays(90);
+        
+        // Guardar nueva fecha límite
+        $this->guardarValorCampo($practica->id, 'fecha_limite_practica', $nuevaFechaLimite->toDateTimeString());
+        
+        // Incrementar contador de prórrogas
+        $prorrogas = (int) $this->obtenerValorCampo($practica->id, 'solicitudes_prorroga');
+        $this->guardarValorCampo($practica->id, 'solicitudes_prorroga', (string) ($prorrogas + 1));
+        
+        $cambiosRealizados = true;
+    }
+}
+
     // Guardar acta
     ActaPractica::create([
         'practica_id' => $practica->id,
@@ -3257,8 +3294,6 @@ public function configAdmin(Request $request)
         'fecha' => $request->fecha_acta_ajustes,
         'descripcion' => $request->comentarios_config_admin ?? ''
     ]);
-
-    $cambiosRealizados = false;
     
     // Verificar cambio de director
     if ($request->has('director_id') && !empty($request->director_id)) {

@@ -3961,6 +3961,56 @@
                         </div>
                     @endif
 
+                    <!-- FECHAS DE LA PRÁCTICA (SOLO LECTURA) -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+    <div>
+        <label class="block font-medium text-sm text-gray-700">
+            <i class="fa-regular fa-calendar mr-2 text-gray-500"></i>
+            Fecha de inicio de la práctica:
+        </label>
+        @php
+            $fechaInicio = $practica->valoresCampos->where('campo.name', 'fecha_inicio_practica')->first();
+            $fechaLimite = $practica->valoresCampos->where('campo.name', 'fecha_limite_practica')->first();
+        @endphp
+        <input type="text" 
+               value="{{ $fechaInicio ? \Carbon\Carbon::parse($fechaInicio->valor)->format('d/m/Y') : 'No definida' }}"
+               class="bg-gray-100 border-gray-300 rounded-md shadow-sm mt-1 block w-full cursor-default"
+               readonly>
+    </div>
+    <div>
+        <label class="block font-medium text-sm text-gray-700">
+            <i class="fa-regular fa-calendar-check mr-2 text-gray-500"></i>
+            Fecha límite actual:
+        </label>
+        <input type="text" 
+               value="{{ $fechaLimite ? \Carbon\Carbon::parse($fechaLimite->valor)->format('d/m/Y') : 'No definida' }}"
+               class="bg-gray-100 border-gray-300 rounded-md shadow-sm mt-1 block w-full cursor-default"
+               readonly>
+    </div>
+</div>
+
+<!-- PRÓRROGA -->
+@php
+    $prorrogas = (int) ($practica->valoresCampos->where('campo.name', 'solicitudes_prorroga')->first()?->valor ?? 0);
+@endphp
+
+@if($prorrogas < 2)
+    <div class="mb-4">
+        <input type="hidden" name="aprobar_prorroga" value="0">
+        <label class="flex items-center">
+            <input type="checkbox" name="aprobar_prorroga_check" id="aprobar_prorroga" class="mr-2" value="1">
+            <span>Aprobar prórroga</span>
+        </label>
+    </div>
+@else
+    <div class="mb-4 p-3 border rounded-lg bg-gray-100">
+        <p class="text-sm text-gray-500 text-center">
+            <i class="fa-solid fa-ban mr-2"></i>
+            Límite de prórrogas alcanzado (2/2)
+        </p>
+    </div>
+@endif
+                    
                     <div class="mb-4">
                         <label for="retirar_estudiante" class="block font-medium text-sm text-gray-700">
                             <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
@@ -4262,14 +4312,9 @@
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                         },
                         success: function(response) {
-                            Swal.fire({
-                                title: '¡Enviado!',
-                                text: response.success || 'Información enviada correctamente',
-                                icon: 'success',
-                                confirmButtonColor: '#C1D631'
-                            });
                             closeIcfesEstudianteModal();
-                            setTimeout(() => location.reload(), 1500);
+                            showToast(response.success || 'Información enviada correctamente', 'success');
+                            setTimeout(() => location.reload(), 3000);
                         },
                         error: function(xhr) {
                             if (xhr.responseJSON && xhr.responseJSON.errors) {
@@ -4341,9 +4386,8 @@
                         contentType: false,
                         success: function (response) {
                             closeIcfesAdminModal();
-                            sessionStorage.setItem('showToast', 'true');
-                            sessionStorage.setItem('toastMessage', 'Respuesta enviada correctamente');
-                            location.reload();
+                            showToast('Respuesta enviada correctamente', 'success');
+                            setTimeout(() => location.reload(), 1500);
                         },
                         error: function (xhr) {
                             const errors = xhr.responseJSON.errors;
@@ -4441,6 +4485,8 @@ function closeConfigModal() {
 var directorOriginalGlobal = null;
 var evaluadorOriginalGlobal = null;
 
+    var prorrogaOriginalValue = false;
+
 function openConfigAdminModal() {
     initQuillEditor(undefined, "Describa la respuesta para el estudiante.", 'txt-editor-config-admin', 'comentarios_config_admin');
 
@@ -4449,7 +4495,9 @@ function openConfigAdminModal() {
     // Guardar valores ORIGINALES (los que vienen de BD)
     directorOriginalGlobal = $('#director_id-config').val();
     evaluadorOriginalGlobal = $('#evaluador_id-config').val();
-    
+
+        prorrogaOriginalValue = $('#aprobar_prorroga').is(':checked');
+
     // Limpiar otros campos
     $('#retirar_estudiante').val('');
     $('#nro_acta_ajustes').val('');
@@ -4478,7 +4526,8 @@ $('#configAdminForm').on('submit', function(e) {
     var estudianteRetiro = $('#retirar_estudiante').val();
     var nroActa = $('#nro_acta_ajustes').val();
     var fechaActa = $('#fecha_acta_ajustes').val();
-    
+    var prorrogaActual = $('#aprobar_prorroga').is(':checked');
+
     // Obtener comentarios del Quill
     var quill = Quill.find(document.querySelector('#txt-editor-config-admin'));
     var comentarios = quill ? quill.root.innerHTML : '';
@@ -4494,21 +4543,13 @@ $('#configAdminForm').on('submit', function(e) {
         return;
     }
     
-    // Debug: ver qué se va a enviar
-    console.log('Enviando:', {
-        director_id: directorActual,
-        evaluador_id: evaluadorActual,
-        retirar_estudiante: estudianteRetiro,
-        nro_acta_ajustes: nroActa,
-        fecha_acta_ajustes: fechaActa
-    });
-    
     // Comparar cambios con valores originales
     var hayCambioDirector = (directorActual !== directorOriginalGlobal);
     var hayCambioEvaluador = (evaluadorActual !== evaluadorOriginalGlobal);
     var hayRetiro = (estudianteRetiro !== null && estudianteRetiro !== '');
-    
-    if (!hayCambioDirector && !hayCambioEvaluador && !hayRetiro) {
+    var hayProrroga = (prorrogaActual === true);
+
+    if (!hayCambioDirector && !hayCambioEvaluador && !hayRetiro && !hayProrroga) {
         Swal.fire({
             icon: 'info',
             title: 'Sin cambios',
@@ -4523,6 +4564,7 @@ $('#configAdminForm').on('submit', function(e) {
     if (hayCambioDirector) mensajeCambios += '- Cambio de director\n';
     if (hayCambioEvaluador) mensajeCambios += '- Cambio de evaluador\n';
     if (hayRetiro) mensajeCambios += '- Retiro de estudiante\n';
+    if (hayProrroga) mensajeCambios += '- Aprobación de prórroga (+90 días)\n';
     
     Swal.fire({
         heightAuto: false,
@@ -4542,9 +4584,21 @@ $('#configAdminForm').on('submit', function(e) {
             button.prop('disabled', true);
             spinner.removeClass('hidden');
             
+            // ========== CORRECCIÓN: Sincronizar checkbox ANTES de FormData ==========
+            if ($('#aprobar_prorroga').is(':checked')) {
+                $('input[name="aprobar_prorroga"]').val('1');
+            } else {
+                $('input[name="aprobar_prorroga"]').val('0');
+            }
+            // ========================================================================
+            
             var formData = new FormData(this);
             formData.set('comentarios_config_admin', comentarios);
-            
+
+            // Después de sincronizar, ANTES de crear FormData
+console.log('Valor del campo hidden aprobar_prorroga:', $('input[name="aprobar_prorroga"]').val());
+console.log('Checkbox marcado:', $('#aprobar_prorroga').is(':checked'));
+
             $.ajax({
                 url: '{{ route("practicas.configurar_admin") }}',
                 type: 'POST',
@@ -4554,7 +4608,8 @@ $('#configAdminForm').on('submit', function(e) {
                 headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
                 success: function(response) {
                     closeConfigAdminModal();
-                    Swal.fire('Éxito', response.success, 'success').then(() => location.reload());
+                    showToast(response.success, 'success');
+                    setTimeout(() => location.reload(), 3000);
                 },
                 error: function(xhr) {
                     console.log(xhr.responseJSON);
@@ -4629,7 +4684,7 @@ $('#configModalForm').on('submit', function(e) {
             return;
         }
     }
-    
+
     if (tipoSolicitud === 'retiro') {
         const cartaRetiro = $('#carta_retiro')[0].files[0];
         if (!cartaRetiro) {
@@ -4667,7 +4722,8 @@ $('#configModalForm').on('submit', function(e) {
                 headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
                 success: function(response) {
                     closeConfigModal();
-                    Swal.fire('Éxito', response.success, 'success').then(() => location.reload());
+                    showToast(response.success, 'success');
+                    setTimeout(() => location.reload(), 3000);
                 },
                 error: function(xhr) {
                     var errors = xhr.responseJSON.errors;
@@ -4688,6 +4744,20 @@ $('#configModalForm').on('submit', function(e) {
         }
     });
 });
+
+        function showToast(message, type = 'success') {
+    Swal.fire({
+        title: type === 'success' ? '¡Éxito!' : 'Error',
+        text: message,
+        icon: type,
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000
+    });
+
+   
+}
 
         </script>
 
