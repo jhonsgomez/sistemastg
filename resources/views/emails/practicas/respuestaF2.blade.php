@@ -22,94 +22,200 @@
 
 <body>
 
+    @php
+        $cuerpo = $data['cuerpo_correo'];
+        $destinatario = $cuerpo['destinatario'] ?? 'estudiante';
+        $estado = $cuerpo['estado'] ?? '';
+    @endphp
+
     <p>Buen día,</p>
-    <p>Estimado estudiante, en este correo se le informa la respuesta de su solicitud correspondiente a la<strong>FASE 2</strong> de prácticas empresariales 
-        {!! ($data['cuerpo_correo']['estado'] ?? '') === 'Aprobada'
-            ? 'ha sido <strong>APROBADA</strong>'
-            : 'ha sido <strong>RECHAZADA</strong>' !!}
-    </p>
+
+    @if ($destinatario === 'director')
+        <p>
+            Estimado docente, en este correo se le informa que ha sido asignado como
+            <strong class="uppercase">DIRECTOR DE PRÁCTICAS EMPRESARIALES</strong>.
+        </p>
+
+    @elseif ($destinatario === 'evaluador')
+        <p>
+            Estimado docente, en este correo se le informa que ha sido asignado como
+            <strong class="uppercase">EVALUADOR DE PRÁCTICAS EMPRESARIALES</strong>.
+        </p>
+
+    @elseif ($destinatario === 'codirector')
+        <p>
+            Estimado docente, en este correo se le informa que ha sido asignado como
+            <strong class="uppercase">CODIRECTOR DE PRÁCTICAS EMPRESARIALES</strong>.
+        </p>
+
+    @else
+        <p>
+            Estimado estudiante, en este correo se le informa la respuesta de su solicitud
+            correspondiente a la <strong>FASE 2</strong> de prácticas empresariales
+            {!! $estado === 'Aprobada'
+                ? 'ha sido <strong>APROBADA</strong>.'
+                : 'ha sido <strong>RECHAZADA</strong>.' !!}
+        </p>
+    @endif
 
     <ul>
-
-        <li>
-            <strong>Estado actual:</strong>
-            {{ $data['cuerpo_correo']['estado'] ?? '' }}
-        </li>
-
-        <li>
-            <strong>Fecha:</strong>
-            {{ now()->format('d/m/Y H:i:s') }}
-        </li>
-
+        <li><strong>Estado:</strong> {{ $estado }}</li>
+        <li><strong>Fecha:</strong> {{ now()->format('d/m/Y H:i:s') }}</li>
     </ul>
-
-    <br>
 
     <p><strong>Integrantes:</strong></p>
-    <ul>
 
-        <li><strong>Nombre:</strong>{{ $data['cuerpo_correo']['estudiante']->name ?? '' }}</li>
+    <ul>
+        <li><strong>Nombre:</strong> {{ $cuerpo['estudiante']->name ?? '' }}</li>
         <li>
             <strong>Documento:</strong>
-            {{ optional($data['cuerpo_correo']['estudiante']->tipo_documento)->tag }}
-            {{ $data['cuerpo_correo']['estudiante']->nro_documento ?? '' }}
+            {{ optional($cuerpo['estudiante']->tipo_documento)->tag }}
+            {{ $cuerpo['estudiante']->nro_documento ?? '' }}
         </li>
-        <li><strong>Correo:</strong>{{ $data['cuerpo_correo']['correo'] ?? '' }}</li>
+        <li>
+            <strong>Correo:</strong>
+            <a href="mailto:{{ $cuerpo['correo'] ?? '' }}" class="email">
+                {{ $cuerpo['correo'] ?? '' }}
+            </a>
+        </li>
 
-        @if (!empty($data['cuerpo_correo']['integrante_2']))
+        @if (!empty($cuerpo['integrante_2']))
+            <br>
+            <li><strong>Nombre:</strong> {{ $cuerpo['integrante_2']->name ?? '' }}</li>
+            <li><strong>Documento:</strong> {{ $cuerpo['integrante_2_documento'] ?? '' }}</li>
             <li>
-                <strong>Nombre:</strong>
-                {{ is_object($data['cuerpo_correo']['integrante_2'])
-                    ? $data['cuerpo_correo']['integrante_2']->name
-                    : $data['cuerpo_correo']['integrante_2'] }}
+                <strong>Correo:</strong>
+                <a href="mailto:{{ $cuerpo['integrante_2_correo'] ?? '' }}" class="email">
+                    {{ $cuerpo['integrante_2_correo'] ?? '' }}
+                </a>
             </li>
-            <li><strong>Documento:</strong> {{ $data['cuerpo_correo']['integrante_2_documento'] ?? '' }}</li>
-            <li><strong>Correo:</strong> {{ $data['cuerpo_correo']['integrante_2_correo'] ?? '' }}</li>
-            <li><strong>Celular:</strong> {{ $data['cuerpo_correo']['integrante_2_celular'] ?? '' }}</li>
+            <li><strong>Celular:</strong> {{ $cuerpo['integrante_2_celular'] ?? '' }}</li>
         @endif
-
     </ul>
 
-    <br>
+    <p><strong>Respuesta del comité:</strong></p>
+    <p>{{ $cuerpo['respuesta'] ?? '' }}</p>
 
-    <p>
-        <strong>Respuesta del comité:</strong>
-    </p>
+    @if ($estado === 'Aprobada')
 
-    <p>
-        {{ $data['cuerpo_correo']['respuesta'] ?? '' }}
-    </p>
+        @if ($destinatario === 'director')
 
-    <br>
+            @if (!empty($cuerpo['codirector']))
+                <p><strong>Codirector asignado:</strong></p>
+                <ul>
+                    <li><strong>Nombre:</strong> {{ $cuerpo['codirector']->name ?? '' }}</li>
+                    <li>
+                        <strong>Correo:</strong>
+                        <a href="mailto:{{ $cuerpo['codirector']->email ?? '' }}" class="email">
+                            {{ $cuerpo['codirector']->email ?? '' }}
+                        </a>
+                    </li>
+                </ul>
+            @endif
 
-    @if (!empty($data['cuerpo_correo']['director']))
+            @if (!empty($cuerpo['evaluador']))
+                <p><strong>Evaluador asignado:</strong></p>
+                <ul>
+                    <li><strong>Nombre:</strong> {{ $cuerpo['evaluador']->name ?? '' }}</li>
+                    <li>
+                        <strong>Correo:</strong>
+                        <a href="mailto:{{ $cuerpo['evaluador']->email ?? '' }}" class="email">
+                            {{ $cuerpo['evaluador']->email ?? '' }}
+                        </a>
+                    </li>
+                </ul>
+            @endif
+
+        @elseif ($destinatario === 'evaluador')
+
+            @if (!empty($cuerpo['director']))
+                <p><strong>Director asignado:</strong></p>
+                <ul>
+                    <li><strong>Nombre:</strong> {{ $cuerpo['director']->name ?? '' }}</li>
+                    <li>
+                        <strong>Correo:</strong>
+                        <a href="mailto:{{ $cuerpo['director']->email ?? '' }}" class="email">
+                            {{ $cuerpo['director']->email ?? '' }}
+                        </a>
+                    </li>
+                </ul>
+            @endif
+
+            @if (!empty($cuerpo['codirector']))
+                <p><strong>Codirector asignado:</strong></p>
+                <ul>
+                    <li><strong>Nombre:</strong> {{ $cuerpo['codirector']->name ?? '' }}</li>
+                    <li>
+                        <strong>Correo:</strong>
+                        <a href="mailto:{{ $cuerpo['codirector']->email ?? '' }}" class="email">
+                            {{ $cuerpo['codirector']->email ?? '' }}
+                        </a>
+                    </li>
+                </ul>
+            @endif
+
+        @elseif ($destinatario === 'codirector')
+
+            @if (!empty($cuerpo['director']))
+                <p><strong>Director asignado:</strong></p>
+                <ul>
+                    <li><strong>Nombre:</strong> {{ $cuerpo['director']->name ?? '' }}</li>
+                    <li>
+                        <strong>Correo:</strong>
+                        <a href="mailto:{{ $cuerpo['director']->email ?? '' }}" class="email">
+                            {{ $cuerpo['director']->email ?? '' }}
+                        </a>
+                    </li>
+                </ul>
+            @endif
+
+            @if (!empty($cuerpo['evaluador']))
+                <p><strong>Evaluador asignado:</strong></p>
+                <ul>
+                    <li><strong>Nombre:</strong> {{ $cuerpo['evaluador']->name ?? '' }}</li>
+                    <li>
+                        <strong>Correo:</strong>
+                        <a href="mailto:{{ $cuerpo['evaluador']->email ?? '' }}" class="email">
+                            {{ $cuerpo['evaluador']->email ?? '' }}
+                        </a>
+                    </li>
+                </ul>
+            @endif
+
+        @else
+
+            @if (!empty($cuerpo['director']))
+                <p>
+                    <strong>Director asignado:</strong>
+                    {{ $cuerpo['director']->name ?? '' }}
+                    -
+                    <a href="mailto:{{ $cuerpo['director']->email ?? '' }}" class="email">
+                        {{ $cuerpo['director']->email ?? '' }}
+                    </a>
+                </p>
+            @endif
+
+            @if (!empty($cuerpo['codirector']))
+                <p>
+                    <strong>Codirector asignado:</strong>
+                    {{ $cuerpo['codirector']->name ?? '' }}
+                    -
+                    <a href="mailto:{{ $cuerpo['codirector']->email ?? '' }}" class="email">
+                        {{ $cuerpo['codirector']->email ?? '' }}
+                    </a>
+                </p>
+            @endif
+
+        @endif
+
         <p>
-            <strong>Director asignado:</strong>
-            {{ $data['cuerpo_correo']['director'] }}
-        </p>
-    @endif
-
-    @if (!empty($data['cuerpo_correo']['codirector']))
-        <p>
-            <strong>Codirector asignado:</strong>
-            {{ $data['cuerpo_correo']['codirector'] }}
-        </p>
-    @endif
-
-    <br>
-
-    @if (($data['cuerpo_correo']['estado'] ?? '') === 'Aprobada')
-
-        <p>
-            Puede continuar con la siguiente fase del proceso
-            de prácticas empresariales.
+            Puede continuar con la siguiente fase del proceso de prácticas empresariales.
         </p>
 
     @else
 
         <p>
-            Debe revisar las observaciones realizadas por el comité
-            y volver a realizar el proceso correspondiente.
+            Debe revisar las observaciones realizadas por el comité y volver a realizar el proceso correspondiente.
         </p>
 
     @endif
@@ -117,8 +223,7 @@
     <br>
 
     <p>
-        Este es un correo generado automáticamente
-        por el sistema de prácticas,
+        Este es un correo generado automáticamente por el sistema de prácticas,
         por favor no responder.
     </p>
 
@@ -128,9 +233,7 @@
 
     <p>
         Comité de Trabajos de Grado<br>
-
         Programa de Tecnología en Desarrollo de Sistemas Informáticos e Ingeniería de Sistemas<br>
-
         Unidades Tecnológicas de Santander
     </p>
 

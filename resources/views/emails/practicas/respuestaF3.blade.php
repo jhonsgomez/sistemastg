@@ -65,7 +65,9 @@
 
         <li>
             <strong>Correo:</strong>
-            {{ $data['cuerpo_correo']['correo'] ?? '' }}
+            <a href="mailto:{{ $data['cuerpo_correo']['correo'] ?? '' }}" class="email">
+                {{ $data['cuerpo_correo']['correo'] ?? '' }}
+            </a>
         </li>
 
     </ul>

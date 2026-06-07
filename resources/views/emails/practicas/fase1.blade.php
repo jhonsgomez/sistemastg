@@ -14,6 +14,12 @@
             text-decoration: underline;
         }
 
+        
+        .footer {
+            margin-top: 30px;
+        }
+
+
         .uppercase {
             text-transform: uppercase;
         }
@@ -39,7 +45,12 @@
         <li><strong>Nombre:</strong>{{ $data['cuerpo_correo']['estudiante']->name ?? '' }}</li>
         <li> <strong>Documento:</strong>{{ $data['cuerpo_correo']['estudiante']->tipo_documento->tag ?? '' }}
             {{ $data['cuerpo_correo']['estudiante']->nro_documento ?? '' }}</li>
-        <li><strong>Correo:</strong>{{ $data['cuerpo_correo']['correo'] ?? '' }}</li>
+        <li>
+            <strong>Correo:</strong>
+            <a href="mailto:{{ $data['cuerpo_correo']['correo'] ?? '' }}" class="email">
+                {{ $data['cuerpo_correo']['correo'] ?? '' }}
+            </a>
+        </li>
 
         @if (!empty($data['cuerpo_correo']['integrante_2']))
             <li>
@@ -48,9 +59,15 @@
                     ? $data['cuerpo_correo']['integrante_2']->name
                     : $data['cuerpo_correo']['integrante_2'] }}
             </li>
+            <br>
 
             <li><strong>Documento:</strong> {{ $data['cuerpo_correo']['integrante_2_documento'] ?? '' }}</li>
-            <li><strong>Correo:</strong> {{ $data['cuerpo_correo']['integrante_2_correo'] ?? '' }}</li>
+            <li>
+                <strong>Correo:</strong>
+                <a href="mailto:{{ $data['cuerpo_correo']['integrante_2_correo'] ?? '' }}" class="email">
+                    {{ $data['cuerpo_correo']['integrante_2_correo'] ?? '' }}
+                </a>
+            </li>
             <li><strong>Celular:</strong> {{ $data['cuerpo_correo']['integrante_2_celular'] ?? '' }}</li>
         @endif
     </ul>
@@ -58,22 +75,23 @@
 
     <p>El estudiante ha realizado el envío del formato FDC-126.</p>
 
-    <p><strong>Fecha y hora de envío::</strong>{{ now()->format('d/m/Y H:i:s') }}</p>
+    <p><strong>Fecha y hora de envío:</strong>{{ now()->format('d/m/Y H:i:s') }}</p>
 
-    <br>
+            <div class="footer">
 
-    <p>Este es un correo generado automáticamente por el sistema de prácticas,por favor no responder.
-    </p>
-
-    <br>
-
-    <p>Atentamente,</p>
-
-    <p>
-        Comité de Trabajos de Grado<br>
-        Programa de Tecnología en Desarrollo de Sistemas Informáticos e Ingeniería de Sistemas<br>
-        Unidades Tecnológicas de Santander
-    </p>
+                <br><p>Se verificará la información suministrada para dar accesso a las siguientes fases del proyecto.</p><br>
+                <p>
+                    Este es un correo generado automáticamente por el sistema de prácticas,
+                    por favor no responder.
+                </p>
+                <br>
+                <p>Atentamente,</p>
+                <p>
+                    Comité de Trabajos de Grado<br>
+                    Programa de Tecnología en Desarrollo de Sistemas Informáticos e Ingeniería de Sistemas<br>
+                    Unidades Tecnológicas de Santander
+                </p>
+            </div>
 
 </body>
 

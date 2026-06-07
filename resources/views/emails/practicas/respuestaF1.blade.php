@@ -76,8 +76,13 @@
 
         <li><strong>Nombre:</strong>{{ $data['cuerpo_correo']['estudiante']->name ?? '' }}</li>
         <li><strong>Documento:</strong>{{ $data['cuerpo_correo']['estudiante']->tipo_documento->tag ?? '' }}{{ $data['cuerpo_correo']['estudiante']->nro_documento ?? '' }}</li>
-        <li><strong>Correo:</strong>{{ $data['cuerpo_correo']['correo'] ?? '' }}</li>
-
+        <li>
+            <strong>Correo:</strong>
+            <a href="mailto:{{ $data['cuerpo_correo']['correo'] ?? '' }}" class="email">
+                {{ $data['cuerpo_correo']['correo'] ?? '' }}
+            </a>
+        </li>
+        <br>
         @if (!empty($data['cuerpo_correo']['integrante_2']))
             <li>
                 <strong>Nombre:</strong>
@@ -86,7 +91,12 @@
                     : $data['cuerpo_correo']['integrante_2'] }}
             </li>
             <li><strong>Documento:</strong> {{ $data['cuerpo_correo']['integrante_2_documento'] ?? '' }}</li>
-            <li><strong>Correo:</strong> {{ $data['cuerpo_correo']['integrante_2_correo'] ?? '' }}</li>
+            <li>
+                <strong>Correo:</strong>
+                <a href="mailto:{{ $data['cuerpo_correo']['integrante_2_correo'] ?? '' }}" class="email">
+                    {{ $data['cuerpo_correo']['integrante_2_correo'] ?? '' }}
+                </a>
+            </li>
             <li><strong>Celular:</strong> {{ $data['cuerpo_correo']['integrante_2_celular'] ?? '' }}</li>
         @endif
 
@@ -95,12 +105,12 @@
     <br>
 
     <p><strong>Respuesta del comité:</strong></p>
-    <p>{{ $data['cuerpo_correo']['respuesta'] ?? '' }} </p>
+    <p>{{ $data['cuerpo_correo']['respuesta_fase1'] ?? '' }} </p>
 
     <br>
 
     @if (($data['cuerpo_correo']['estado'] ?? '') === 'Aprobada')
-        <p> Su práctica ha avanzado correctamente a la<strong>FASE 2</strong>.</p>
+        <p> Su práctica ha avanzado correctamente a la<strong> FASE 2</strong>.</p>
 
         <p>Se recomienda ingresar al sistema para continuarel proceso correspondiente.</p>
     @else
@@ -111,7 +121,6 @@
         <p>Debe ingresar nuevamente al sistema,corregir la información solicitada y reenviar la FASE 1.</p>
     @endif
 
-    <br>
 
     <p> Este es un correo generado automáticamente por el sistema de prácticas,por favor no responder.</p>
 

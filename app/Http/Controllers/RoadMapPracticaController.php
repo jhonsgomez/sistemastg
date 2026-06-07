@@ -352,7 +352,7 @@ if (auth()->user()->hasRole('estudiante') && $estaRetirado) {
 
         $practica = Practica::findOrFail($request->practica_id);
 
-        // ✅ CORREGIDO: Permitir si está en Fase 1 O si está en Pendiente (recién aprobada)
+        //  Permitir si está en Fase 1 O si está en Pendiente (recién aprobada)
         if (!in_array($practica->estado, ['Fase 1', 'Pendiente'])) {
             return response()->json(['error' => 'La práctica no está en la fase correspondiente'], 422);
         }
@@ -419,8 +419,8 @@ if (auth()->user()->hasRole('estudiante') && $estaRetirado) {
             $practica->save();
         }
 
-        // ENVIAR CORREO  FASE 1 - DESCOMENTAR PARA
-        // $this->practicaMailService->sendFase1($practica);
+        // ENVIAR CORREO  FASE 1 
+         $this->practicaMailService->sendFase1($practica);
 
         return response()->json(['success' => 'Documentos enviados correctamente']);
     }
@@ -499,7 +499,7 @@ if (auth()->user()->hasRole('estudiante') && $estaRetirado) {
 
         // ========== LÓGICA PRINCIPAL ==========
         if ($request->estado === 'Aprobada') {
-            // ✅ APROBADA: Cambiar a Fase 2
+            //  APROBADA: Cambiar a Fase 2
             $practica->estado = 'Fase 2';
             
             // Cambiar el tipo_solicitud_id a Fase 2
@@ -511,7 +511,7 @@ if (auth()->user()->hasRole('estudiante') && $estaRetirado) {
             $practica->save();
             
             // Enviar correo de aprobación al estudiante
-        //   $this->practicaMailService->sendRespuestaFase1($practica, $request);
+            $this->practicaMailService->sendRespuestaFase1($practica, $request);
         } else {
             // RECHAZADA: Volver a Fase 1 (para que el estudiante pueda reenviar)
             $practica->estado = 'Fase 1';
@@ -532,8 +532,7 @@ if (auth()->user()->hasRole('estudiante') && $estaRetirado) {
             }
             
             // Enviar correo de rechazo al estudiante
-        
-        // $this->practicaMailService->sendRespuestaFase1($practica, $request);
+            $this->practicaMailService->sendRespuestaFase1($practica, $request);
         
         }
 
@@ -628,7 +627,7 @@ if (auth()->user()->hasRole('estudiante') && $estaRetirado) {
             'user_id' => auth()->id()
         ]);
         //Envio de correo
-        //$this->practicaMailService->sendFase2($practica);
+         $this->practicaMailService->sendFase2($practica);
 
         return response()->json(['success' => 'Documentos de pago enviados correctamente']);
     }
@@ -837,24 +836,13 @@ if (auth()->user()->hasRole('estudiante') && $estaRetirado) {
             Log::info('Fase 2 - Rechazada');
         }
 
-        /*$this->practicaMailService->sendRespuestaFase2($practica,
-            [
-                'estado' => $request->estado,
-                'respuesta' => $request->respuesta,
-
-                'director' => $request->director_id
-                    ? User::find($request->director_id)?->name
-                    : null,
-
-                'evaluador' => $request->evaluador_id
-                    ? User::find($request->evaluador_id)?->name
-                    : null,
-
-                'codirector' => $request->codirector_id
-                    ? User::find($request->codirector_id)?->name
-                    : null,
-            ]
-        );*/
+       $this->practicaMailService->sendRespuestaFase2($practica, [
+            'estado' => $request->estado,
+            'respuesta' => $request->respuesta,
+            'director_id' => $request->director_id,
+            'evaluador_id' => $request->evaluador_id,
+            'codirector_id' => $request->codirector_id,
+        ]);
 
         return response()->json([
             'success' => 'Respuesta enviada correctamente', 

@@ -27,6 +27,9 @@ class PracticasMail extends Mailable implements ShouldQueue
 
         return new Envelope(
             subject: $configCorreo['subject'],
+            cc: [
+                config('mail.correo_sistemas')
+            ],
         );
     }
 

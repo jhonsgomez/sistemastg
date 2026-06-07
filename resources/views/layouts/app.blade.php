@@ -116,7 +116,7 @@
                         </a>
                     </li>
                     <li>
-                        {{ auth()->user()->roles->pluck('name') }}
+                       
                         <a href="{{ route('profile.show') }}"
                             class="flex items-center gap-3 w-full p-3 {{ request()->routeIs('profile.show') ? 'bg-uts-500 text-white' : 'text-gray-600 hover:bg-uts-500 hover:text-white' }} rounded-lg transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" id="user-square">

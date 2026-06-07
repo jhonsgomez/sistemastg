@@ -43,8 +43,13 @@
                 {{ $data['cuerpo_correo']['estudiante']->tipo_documento->tag ?? '' }}
                 {{ $data['cuerpo_correo']['estudiante']->nro_documento ?? '' }}
             </li>
-            <li><strong>Correo:</strong> {{ $data['cuerpo_correo']['correo'] ?? '' }}</li>
-            <li><strong>Celular:</strong> {{ $data['cuerpo_correo']['nro_celular'] ?? '' }}</li>
+            <li>
+                <strong>Correo:</strong>
+                <a href="mailto:{{ $data['cuerpo_correo']['correo'] ?? '' }}" class="email">
+                    {{ $data['cuerpo_correo']['correo'] ?? '' }}
+                </a>
+            </li>
+            <li><strong>Celular:</strong> {{ $data['cuerpo_correo']['celular'] ?? '' }}</li>
             <br>
 
             @if (!empty($data['cuerpo_correo']['integrante_2']))
@@ -55,7 +60,12 @@
                         : $data['cuerpo_correo']['integrante_2'] }}
                 </li>
                 <li><strong>Documento:</strong> {{ $data['cuerpo_correo']['integrante_2_documento'] ?? '' }}</li>
-                <li><strong>Correo:</strong> {{ $data['cuerpo_correo']['integrante_2_correo'] ?? '' }}</li>
+                <li>
+                    <strong>Correo:</strong>
+                    <a href="mailto:{{ $data['cuerpo_correo']['integrante_2_correo'] ?? '' }}" class="email">
+                        {{ $data['cuerpo_correo']['integrante_2_correo'] ?? '' }}
+                    </a>
+                </li>
                 <li><strong>Celular:</strong> {{ $data['cuerpo_correo']['integrante_2_celular'] ?? '' }}</li>
             @endif
         </ul>

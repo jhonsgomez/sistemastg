@@ -649,8 +649,8 @@ public function buscarEstudiantes(Request $request)
         $practica = $this->practicaService
             ->crearPractica($request);
         
-
-       // $this->practicaMailService ->sendSolicitud($practica);
+        //Envia correo al comite
+        $this->practicaMailService ->sendSolicitud($practica);
 
         return response()->json([
             'message' => 'Práctica enviada correctamente'
@@ -702,22 +702,16 @@ public function buscarEstudiantes(Request $request)
                 'Fase 6'    => 'Finalizado',
                 default     => $estadoActual
             };
-         // Enviar correo al estudiante - DESCOMENTAR PARA ENVIAR CORREO
-        // $this->practicaMailService->sendRespuesta($practica,$nuevoEstado,$request->mensaje,$request->estado);
-            
+             $this->practicaMailService->sendRespuesta($practica,$estadoActual,$nuevoEstado,$request->mensaje,$request->estado);
         } else {
             // Si es rechazada, el nuevo estado es 'Rechazada'
             $nuevoEstado = 'Rechazada';
-             // Enviar correo al estudiante -DESCOMENTAR PARA ENVIAR CORREO
-           // $this->practicaMailService->sendRespuesta($practica,$nuevoEstado,$request->mensaje,$request->estado);
-           
+            $this->practicaMailService->sendRespuesta($practica,$estadoActual,$nuevoEstado,$request->mensaje,$request->estado);
         }
 
         // Asignar el nuevo estado al objeto
         $practica->estado = $nuevoEstado;
         $practica->save();
-
-        
 
         return response()->json(['success' => 'Respuesta enviada exitosamente', 'estado' => $practica->estado]);
     }

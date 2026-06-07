@@ -31,13 +31,10 @@
     </style>
 
 </head>
-
 <body>
-
     <div class="container">
 
         <p>Buen día,</p>
-
 
         <p>Estimado usuario, en este correo se le informa que su solicitud para iniciar practicas
             <span> {!! ($data['cuerpo_correo']['estado'] ?? '') === 'Aprobada'
@@ -61,7 +58,12 @@
                 {{ $data['cuerpo_correo']['estudiante']->tipo_documento->tag ?? '' }}
                 {{ $data['cuerpo_correo']['estudiante']->nro_documento ?? '' }}
             </li>
-            <li><strong>Correo:</strong> {{ $data['cuerpo_correo']['correo'] ?? '' }}</li>
+            <li>
+                <strong>Correo:</strong>
+                <a href="mailto:{{ $data['cuerpo_correo']['correo'] ?? '' }}" class="email">
+                    {{ $data['cuerpo_correo']['correo'] ?? '' }}
+                </a>
+            </li>
             <li><strong>Celular:</strong> {{ $data['cuerpo_correo']['celular'] ?? '' }}</li>
             <br>
 
@@ -74,7 +76,12 @@
                         : $data['cuerpo_correo']['integrante_2'] }}
                 </li>
                 <li><strong>Documento:</strong> {{ $data['cuerpo_correo']['integrante_2_documento'] ?? '' }}</li>
-                <li><strong>Correo:</strong> {{ $data['cuerpo_correo']['integrante_2_correo'] ?? '' }}</li>
+                <li>
+                    <strong>Correo:</strong>
+                    <a href="mailto:{{ $data['cuerpo_correo']['integrante_2_correo'] ?? '' }}" class="email">
+                        {{ $data['cuerpo_correo']['integrante_2_correo'] ?? '' }}
+                    </a>
+                </li>
                 <li><strong>Celular:</strong> {{ $data['cuerpo_correo']['integrante_2_celular'] ?? '' }}</li>
             @endif
         </ul>
@@ -87,31 +94,26 @@
             <p>Se le recomienda ingresar al sistema para volver a realizar su solicitud.</p>
         @endif
 
-         <p>
-            Este es un correo generado automáticamente por el sistema de prácticas,
-            por favor no responder.
-        </p>
 
-
-    {{-- CAMPOS DINÁMICOS --}}
-    @forelse ($data['cuerpo_correo']['campos'] as $campo)
-        @if (!in_array($campo['campo'], ['id_integrante_2', 'tiene_empresa', 'periodo', 'hoja_vida', 'respuesta_comite', 'submited_fase0']))
-            <li>
-                <strong>
-                    {{ ucfirst(str_replace('_', ' ', $campo['campo'] ?? '')) }}:
-                </strong>
-                {{ $campo['valor'] ?? '' }}
-            </li>
-        @endif
-    @empty
+        {{-- CAMPOS DINÁMICOS --}}
+        @forelse ($data['cuerpo_correo']['campos'] as $campo)
+            @if (!in_array($campo['campo'], ['id_integrante_2', 'tiene_empresa', 'periodo', 'hoja_vida', 'respuesta_comite', 'submited_fase0']))
+                <li>
+                    <strong>
+                        {{ ucfirst(str_replace('_', ' ', $campo['campo'] ?? '')) }}:
+                    </strong>
+                    {{ $campo['valor'] ?? '' }}
+                </li>
+            @endif
+            @empty
    
-    @endforelse
+        @endforelse
 
-    @if (!empty($data['comentarios']))
-        <p><strong>Comentarios:</strong>{{ strip_tags($data['comentarios']) }}</p>
-    @endif
+        @if (!empty($data['comentarios']))
+            <p><strong>Comentarios:</strong>{{ strip_tags($data['comentarios']) }}</p>
+        @endif
 
-<div class="footer">
+        <div class="footer">
 
             <br>
 
