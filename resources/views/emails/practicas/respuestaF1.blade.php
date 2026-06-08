@@ -31,9 +31,9 @@
         de prácticas empresariales en <strong>FASE 1</strong> 
         ha sido:
 
-        <strong>
-            {{ $data['cuerpo_correo']['estado'] ?? '' }}
-        </strong>
+    <strong>
+        {{ strtoupper($data['cuerpo_correo']['estado'] ?? '') }}
+    </strong>
     </p>
 
     <br>
@@ -41,28 +41,28 @@
     <ul>
 
         <li>
-            <strong>Estado actual:</strong>
+            <strong>Estado actual: </strong>
             {{ $data['cuerpo_correo']['estado'] ?? '' }}
         </li>
 
         <li>
-            <strong>Empresa:</strong>
+            <strong>Empresa: </strong>
             {{ $data['cuerpo_correo']['empresa'] ?? 'No registra' }}
         </li>
 
         <li>
-            <strong>Práctica institucional:</strong>
+            <strong>Práctica institucional: </strong>
 
             {{ $data['cuerpo_correo']['practica_institucional'] ?? 'No' }}
         </li>
 
         <li>
-            <strong>Número de acta:</strong>
+            <strong>Número de acta: </strong>
             {{ $data['cuerpo_correo']['nro_acta'] ?? '' }}
         </li>
 
         <li>
-            <strong>Fecha de acta:</strong>
+            <strong>Fecha de acta: </strong>
             {{ $data['cuerpo_correo']['fecha_acta'] ?? '' }}
         </li>
 
@@ -70,43 +70,47 @@
 
     <br>
 
-    <p><strong>Integrantes:</strong></p>
+    <p><strong>Integrantes: </strong></p>
 
     <ul>
 
-        <li><strong>Nombre:</strong>{{ $data['cuerpo_correo']['estudiante']->name ?? '' }}</li>
-        <li><strong>Documento:</strong>{{ $data['cuerpo_correo']['estudiante']->tipo_documento->tag ?? '' }}{{ $data['cuerpo_correo']['estudiante']->nro_documento ?? '' }}</li>
+        <li><strong>Nombre: </strong>{{ $data['cuerpo_correo']['estudiante']->name ?? '' }}</li>
+        <li><strong>Documento: </strong>{{ $data['cuerpo_correo']['estudiante']->tipo_documento->tag ?? '' }}{{ $data['cuerpo_correo']['estudiante']->nro_documento ?? '' }}</li>
         <li>
-            <strong>Correo:</strong>
+            <strong>Correo: </strong>
             <a href="mailto:{{ $data['cuerpo_correo']['correo'] ?? '' }}" class="email">
                 {{ $data['cuerpo_correo']['correo'] ?? '' }}
             </a>
         </li>
+        <li><strong>Celular: </strong> {{ $data['cuerpo_correo']['celular'] ?? '' }}</li>
         <br>
         @if (!empty($data['cuerpo_correo']['integrante_2']))
             <li>
-                <strong>Nombre:</strong>
+                <strong>Nombre: </strong>
                 {{ is_object($data['cuerpo_correo']['integrante_2'])
                     ? $data['cuerpo_correo']['integrante_2']->name
                     : $data['cuerpo_correo']['integrante_2'] }}
             </li>
-            <li><strong>Documento:</strong> {{ $data['cuerpo_correo']['integrante_2_documento'] ?? '' }}</li>
+            <li><strong>Documento: </strong> {{ $data['cuerpo_correo']['integrante_2_documento'] ?? '' }}</li>
             <li>
-                <strong>Correo:</strong>
+                <strong>Correo: </strong>
                 <a href="mailto:{{ $data['cuerpo_correo']['integrante_2_correo'] ?? '' }}" class="email">
                     {{ $data['cuerpo_correo']['integrante_2_correo'] ?? '' }}
                 </a>
             </li>
-            <li><strong>Celular:</strong> {{ $data['cuerpo_correo']['integrante_2_celular'] ?? '' }}</li>
+            <li><strong>Celular: </strong> {{ $data['cuerpo_correo']['integrante_2_celular'] ?? '' }}</li>
         @endif
 
     </ul>
 
     <br>
 
-    <p><strong>Respuesta del comité:</strong></p>
-    <p>{{ $data['cuerpo_correo']['respuesta_fase1'] ?? '' }} </p>
 
+    <p><strong>Respuesta del comité: </strong></p>
+    {!! $data['cuerpo_correo']['respuesta_fase1'] ?? '' !!}
+
+    <br>
+    <p><strong>Fecha y hora de envío: </strong>{{ now()->format('d/m/Y H:i:s') }}</p>
     <br>
 
     @if (($data['cuerpo_correo']['estado'] ?? '') === 'Aprobada')

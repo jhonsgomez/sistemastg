@@ -33,49 +33,49 @@
     <p>Estimado usuario, en este correo se le informa el envío de lasolicitud de prácticas empresariales en <strong>FASE1.</strong></p>
 
     <ul>
-        <li><strong>Estado:</strong>{{ $data['cuerpo_correo']['estado'] ?? '' }}</li>
-        <li><strong>¿Es práctica institucional?:</strong>{{ $data['cuerpo_correo']['practica_institucional'] ?? 'No' }}</li>
-        <li><strong>Empresa:</strong>{{ $data['cuerpo_correo']['empresa'] ?? 'No registra' }}</li>
+        <li><strong>Estado: </strong>{{ $data['cuerpo_correo']['estado'] ?? '' }}</li>
+        <li><strong>¿Es práctica institucional?: </strong>{{ $data['cuerpo_correo']['practica_institucional'] ?? 'No' }}</li>
+        <li><strong>Empresa: </strong>{{ $data['cuerpo_correo']['empresa'] ?? 'No registra' }}</li>
     </ul>
 
     <br>
     <p><strong>Integrantes:</strong></p>
 
     <ul>
-        <li><strong>Nombre:</strong>{{ $data['cuerpo_correo']['estudiante']->name ?? '' }}</li>
-        <li> <strong>Documento:</strong>{{ $data['cuerpo_correo']['estudiante']->tipo_documento->tag ?? '' }}
+        <li><strong>Nombre: </strong>{{ $data['cuerpo_correo']['estudiante']->name ?? '' }}</li>
+        <li> <strong>Documento: </strong>{{ $data['cuerpo_correo']['estudiante']->tipo_documento->tag ?? '' }}&nbsp;
             {{ $data['cuerpo_correo']['estudiante']->nro_documento ?? '' }}</li>
         <li>
-            <strong>Correo:</strong>
+            <strong>Correo: </strong>
             <a href="mailto:{{ $data['cuerpo_correo']['correo'] ?? '' }}" class="email">
                 {{ $data['cuerpo_correo']['correo'] ?? '' }}
             </a>
         </li>
+        <li><strong>Celular: </strong> {{ $data['cuerpo_correo']['celular'] ?? '' }}</li>
+        <br>
 
         @if (!empty($data['cuerpo_correo']['integrante_2']))
             <li>
-                <strong>Nombre:</strong>
+                <strong>Nombre: </strong>
                 {{ is_object($data['cuerpo_correo']['integrante_2'])
                     ? $data['cuerpo_correo']['integrante_2']->name
                     : $data['cuerpo_correo']['integrante_2'] }}
             </li>
-            <br>
-
-            <li><strong>Documento:</strong> {{ $data['cuerpo_correo']['integrante_2_documento'] ?? '' }}</li>
+            <li><strong>Documento: </strong> {{ $data['cuerpo_correo']['integrante_2_documento'] ?? '' }}</li>
             <li>
-                <strong>Correo:</strong>
+                <strong>Correo: </strong>
                 <a href="mailto:{{ $data['cuerpo_correo']['integrante_2_correo'] ?? '' }}" class="email">
                     {{ $data['cuerpo_correo']['integrante_2_correo'] ?? '' }}
                 </a>
             </li>
-            <li><strong>Celular:</strong> {{ $data['cuerpo_correo']['integrante_2_celular'] ?? '' }}</li>
+            <li><strong>Celular: </strong> {{ $data['cuerpo_correo']['integrante_2_celular'] ?? '' }}</li>
         @endif
     </ul>
     <br>
 
     <p>El estudiante ha realizado el envío del formato FDC-126.</p>
 
-    <p><strong>Fecha y hora de envío:</strong>{{ now()->format('d/m/Y H:i:s') }}</p>
+    <p><strong>Fecha y hora de envío: </strong>{{ now()->format('d/m/Y H:i:s') }}</p>
 
             <div class="footer">
 

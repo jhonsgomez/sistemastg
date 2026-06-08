@@ -27,46 +27,46 @@
     <p>Estimado usuario, en este correo se le informa que se ha realizado el envío de documentos correspondientes a la <strong>FASE 2</strong> de prácticas empresariales.</p>
 
     <ul>
-        <li><strong>Tipo de solicitud:</strong>PAGO DE LA MODALIDAD</li>
+        <li><strong>Tipo de solicitud: </strong>PAGO DE LA MODALIDAD</li>
 
-        <li><strong>Estado actual:</strong>{{ $data['cuerpo_correo']['estado'] ?? '' }}</li>
+        <li><strong>Estado actual: </strong>{{ $data['cuerpo_correo']['estado'] ?? '' }}</li>
     </ul>
 
     <br>
 
-    <p><strong>Integrantes:</strong></p>
+    <p><strong>Integrantes: </strong></p>
         <ul>
-            <li><strong>Nombre:</strong> {{ $data['cuerpo_correo']['estudiante']->name ?? '' }}</li>
+            <li><strong>Nombre: </strong> {{ $data['cuerpo_correo']['estudiante']->name ?? '' }}</li>
 
             <li>
-                <strong>Documento:</strong>
+                <strong>Documento: </strong>
                 {{ $data['cuerpo_correo']['estudiante']->tipo_documento->tag ?? '' }}
                 {{ $data['cuerpo_correo']['estudiante']->nro_documento ?? '' }}
             </li>
             <li>
-                <strong>Correo:</strong>
+                <strong>Correo: </strong>
                 <a href="mailto:{{ $data['cuerpo_correo']['correo'] ?? '' }}" class="email">
                     {{ $data['cuerpo_correo']['correo'] ?? '' }}
                 </a>
             </li>
-            <li><strong>Celular:</strong> {{ $data['cuerpo_correo']['celular'] ?? '' }}</li>
+            <li><strong>Celular: </strong> {{ $data['cuerpo_correo']['celular'] ?? '' }}</li>
             <br>
 
             @if (!empty($data['cuerpo_correo']['integrante_2']))
                 <li>
-                    <strong>Nombre:</strong>
+                    <strong>Nombre: </strong>
                     {{ is_object($data['cuerpo_correo']['integrante_2'])
                         ? $data['cuerpo_correo']['integrante_2']->name
                         : $data['cuerpo_correo']['integrante_2'] }}
                 </li>
                 <li><strong>Documento:</strong> {{ $data['cuerpo_correo']['integrante_2_documento'] ?? '' }}</li>
                 <li>
-                    <strong>Correo:</strong>
+                    <strong>Correo: </strong>
                     <a href="mailto:{{ $data['cuerpo_correo']['integrante_2_correo'] ?? '' }}" class="email">
                         {{ $data['cuerpo_correo']['integrante_2_correo'] ?? '' }}
                     </a>
                 </li>
-                <li><strong>Celular:</strong> {{ $data['cuerpo_correo']['integrante_2_celular'] ?? '' }}</li>
+                <li><strong>Celular: </strong> {{ $data['cuerpo_correo']['integrante_2_celular'] ?? '' }}</li>
             @endif
         </ul>
 
@@ -80,7 +80,7 @@
     </ul>
 
     <p>
-        Fecha y hora de envío:
+       <strong>Fecha y hora de envío: </strong> 
         {{ now()->format('d/m/Y H:i:s') }}
     </p>
 

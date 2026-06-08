@@ -8,14 +8,7 @@
 
         body {
             font-family: Calibri, sans-serif;
-            color: #333;
-            line-height: 1.6;
         }
-
-        .container {
-            padding: 20px;
-        }
-
         
         .email {
             color: blue;
@@ -44,15 +37,15 @@
             <li><strong>Tipo de solicitud:</strong> SOLICITUD PRACTICAS EMPRESARIALES
                 {{ $data['cuerpo_correo']['periodo'] ?? '' }}</li>
             <li><strong>Nivel académico: </strong>{{ $data['cuerpo_correo']['nivel'] ?? '' }}</li>
-            <li><strong>Estado:</strong> {{ $data['cuerpo_correo']['estado'] ?? '' }}</li>
+            <li><strong>Estado: </strong>{{ $data['cuerpo_correo']['estado'] ?? '' }}</li>
         </ul>
         <br>
         <p>Integrantes del proyecto: </p>
         <ul>
-            <li><strong>Nombre:</strong> {{ $data['cuerpo_correo']['estudiante']->name ?? '' }}</li>
+            <li><strong>Nombre: </strong>{{ $data['cuerpo_correo']['estudiante']->name ?? '' }}</li>
 
             <li>
-                <strong>Documento:</strong>
+                <strong>Documento: </strong>
                 {{ $data['cuerpo_correo']['estudiante']->tipo_documento->tag ?? '' }}
                 {{ $data['cuerpo_correo']['estudiante']->nro_documento ?? '' }}
             </li>
@@ -62,12 +55,12 @@
                     {{ $data['cuerpo_correo']['correo'] ?? '' }}
                 </a>
             </li>
-            <li><strong>Celular:</strong> {{ $data['cuerpo_correo']['celular'] ?? '' }}</li>
+            <li><strong>Celular: </strong> {{ $data['cuerpo_correo']['celular'] ?? '' }}</li>
             <br>
 
             @if (!empty($data['cuerpo_correo']['integrante_2']))
                 <li>
-                    <strong>Nombre:</strong>
+                    <strong>Nombre: </strong>
 
                     {{ is_object($data['cuerpo_correo']['integrante_2'])
                         ? $data['cuerpo_correo']['integrante_2']->name
@@ -77,17 +70,17 @@
                 <li><strong>Documento:</strong> {{ $data['cuerpo_correo']['integrante_2_documento'] ?? '' }}</li>
 
                 <li>
-                    <strong>Correo:</strong>
+                    <strong>Correo: </strong>
                     <a href="mailto:{{ $data['cuerpo_correo']['integrante_2_correo'] ?? '' }}" class="email">
                         {{ $data['cuerpo_correo']['integrante_2_correo'] ?? '' }}
                     </a>
                 </li>
 
-                <li><strong>Celular:</strong> {{ $data['cuerpo_correo']['integrante_2_celular'] ?? '' }}</li>
+                <li><strong>Celular: </strong> {{ $data['cuerpo_correo']['integrante_2_celular'] ?? '' }}</li>
             @endif
         </ul>
 
-            <p><strong>Fecha y hora de envío</strong> {{ now()->format('d/m/Y H:i:s') }}</p>
+            <p><strong>Fecha y hora de envío:</strong> {{ now()->format('d/m/Y H:i:s') }}</p>
 
             {{-- CAMPOS DINÁMICOS --}}
             @forelse ($data['cuerpo_correo']['campos'] as $campo)

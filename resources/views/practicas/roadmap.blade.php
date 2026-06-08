@@ -1069,7 +1069,7 @@
 
                                 <p class="text-red-600 text-sm mb-2">
                                     <i class="fa-solid fa-circle-info mr-1"></i>
-                                    <strong>NOTA:</strong> Si selecciona la opción de práctica institucional tenga en cuenta de que previamente eebe estar aprobado por la coordinación.
+                                    <strong>NOTA:</strong> Si selecciona la opción de práctica institucional tenga en cuenta de que previamente debe estar aprobado por la coordinación.
                                 </p>
 
                                 <p class="text-sm mb-6"><strong>NOTA:</strong> El formato F-DC-126 debe estar
@@ -2272,7 +2272,7 @@
                             <a href="https://www.dropbox.com/scl/fo/pudgcaq639agy7t06ahjs/AN084HnuyHffgYL5i--v_Ks/DOCUMENTOS%20DE%20GRADO?dl=0&preview=F-DC-128+Informe+final+de+trabajo+de+grado+en+modalidad+de+pr%C3%A1ctica+V2.docx"
                                 target="_blank"
                                 class="text-blue-600 underline">
-                                Informe </a>,{!! '
+                                INFORME </a>,{!! '
                                 <a href="https://www.dropbox.com/scl/fo/pudgcaq639agy7t06ahjs/AN084HnuyHffgYL5i--v_Ks/DOCUMENTOS%20DE%20GRADO?dl=0&preview=F-DC-196+Acta+de+Terminaci%C3%B3n+y+Recibo+a+Satisfacci%C3%B3n+de+Pr%C3%A1cticas+V2.doc&rlkey=6s0b9ajweteyx2ang7ywvk6xm&subfolder_nav_tracking=1"
                                 target="_blank"
                                 class="text-blue-600 underline">
@@ -2284,7 +2284,7 @@
                                 <a href="https://www.dropbox.com/scl/fo/pudgcaq639agy7t06ahjs/AN084HnuyHffgYL5i--v_Ks/DOCUMENTOS%20DE%20GRADO?dl=0&preview=F-DC-129+Rejilla+de+evaluaci%C3%B3n+informe+final+de+trabajo+de+grado+V2.docx&rlkey=6s0b9ajweteyx2ang7ywvk6xm&subfolder_nav_tracking=1"
                                 target="_blank"
                                 class="text-blue-600 underline">
-                                Rejilla
+                                REJILLA
                                 </a>
                                 ' !!} en formato de Word. Tenga en cuenta el tamaño máximo del archivo que puede cargar en cada campo, se le recomienda reducir o comprimir el peso del archivo antes de cargarlo (Puede usar herramientas online para ello o en su defecto la opción "Comprimir imágenes" del Word).
                         </p>
@@ -2335,7 +2335,7 @@
                             <div class="flex items-center gap-2 mb-2">
                                 <label class="block font-medium text-sm text-gray-700 mb-2">
                                     <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
-                                    <span class="text-red-500">*</span>Regilla de Evaluacion F-DC-129
+                                    <span class="text-red-500">*</span>Rejilla de Evaluación F-DC-129
                                 </label>
                                 <div class="relative inline-block">
                                     <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
@@ -2376,7 +2376,7 @@
                             <div class="flex items-center gap-2 mb-2">
                                 <label class="block font-medium text-sm text-gray-700 mb-2">
                                     <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
-                                    <span class="text-red-500">*</span> Acta de Terminacion F-DC-196
+                                    <span class="text-red-500">*</span> Acta de Terminación F-DC-196
                                 </label>
                                 <div class="relative inline-block">
                                     <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"

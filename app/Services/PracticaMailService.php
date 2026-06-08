@@ -170,7 +170,7 @@ class PracticaMailService
             }
     }
 
-    public function sendRespuesta($practica,string $nuevoEstado,string $mensaje,string $estadoRespuesta): void 
+    public function sendRespuesta($practica, string $estadoActual, string $nuevoEstado, string $mensaje, string $estadoRespuesta): void 
     {
         $this->send(
             'respuesta_comite',
@@ -178,6 +178,7 @@ class PracticaMailService
             [
                 'comentarios' => $mensaje,
                 'es_respuesta' => true,
+                'estado_actual' => $estadoActual,
                 'estado' => $estadoRespuesta,
                 'nuevo_estado' => $nuevoEstado,
                 'mensaje' => $mensaje,

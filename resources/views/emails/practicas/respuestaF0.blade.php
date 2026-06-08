@@ -8,8 +8,6 @@
 
         body {
             font-family: Calibri, sans-serif;
-            color: #333;
-            line-height: 1.6;
         }
 
         .container {
@@ -36,17 +34,28 @@
 
         <p>Buen día,</p>
 
-        <p>Estimado usuario, en este correo se le informa que su solicitud para iniciar practicas
-            <span> {!! ($data['cuerpo_correo']['estado'] ?? '') === 'Aprobada'
-                ? 'ha pasado a <strong>FASE 1</strong>'
-                : 'ha sido <strong>RECHAZADA</strong>' !!}</span> :
+        @php
+            $estado = $data['cuerpo_correo']['estado'] ?? '';
+            $nuevoEstado = $data['cuerpo_correo']['nuevo_estado'] ?? '';
+        @endphp
+
+        <p>
+            Estimado usuario, en este correo se le informa que su solicitud para iniciar prácticas
+            @if($estado === 'Aprobada')
+                ha pasado a <strong>{{ strtoupper($nuevoEstado) }}</strong>
+            @else
+                ha sido <strong>RECHAZADA</strong>
+            @endif
+            :
         </p>
+
+     
 
         <ul>
             <li><strong>Tipo de solicitud:</strong> SOLICITUD PRACTICAS EMPRESARIALES
                 {{ $data['cuerpo_correo']['periodo'] ?? '' }}</li>
             <li><strong>Nivel académico: </strong>{{ $data['cuerpo_correo']['nivel'] ?? '' }}</li>
-            <li><strong>Estado:</strong> {{ $data['cuerpo_correo']['estado'] ?? '' }}</li>
+            <li><strong>Estado:</strong> <strong>{{ strtoupper($estado) }}</strong></li>
         </ul>
         <br>
         <p>Integrantes:</p>
@@ -86,7 +95,7 @@
             @endif
         </ul>
 
-        <p><strong>Fecha:</strong> {{ now()->format('d/m/Y H:i:s') }}</p>
+        <p><strong>Fecha y hora de envío: </strong>{{ now()->format('d/m/Y H:i:s') }}</p>
 
         @if ($data['cuerpo_correo']['estado'] === 'Aprobada')
             <p>Se le recomienda ingresar al sistema para continuar con las siguientes fases del proyecto en curso.</p>
@@ -110,7 +119,7 @@
         @endforelse
 
         @if (!empty($data['comentarios']))
-            <p><strong>Comentarios:</strong>{{ strip_tags($data['comentarios']) }}</p>
+            <p><strong>Comentarios: </strong>{{ strip_tags($data['comentarios']) }}</p>
         @endif
 
         <div class="footer">
@@ -135,7 +144,5 @@
         </div>
 
     </div>
-
 </body>
-
 </html>

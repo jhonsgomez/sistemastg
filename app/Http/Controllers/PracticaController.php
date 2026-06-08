@@ -247,28 +247,28 @@ class PracticaController extends Controller
                         return 'Solicitud de prácticas empresariales';
 
                     case 'Fase 1':
-                        return 'Envío de formato F-DC-127';
+                        return 'Envío del formato F-DC-126';
 
                     case 'Fase 2':
-                        return 'Pago y liquidación de matrícula';
+                        return 'Pago y liquidación de la modalidad';
 
                     case 'Fase 3':
-                        return 'Propuesta I';
+                        return 'Propuesta de grado I';
 
                     case 'Fase 4':
-                        return 'Propuesta II';
+                        return 'Propuesta de grado II';
 
                     case 'Fase 5':
-                        return 'Informe I';
+                        return 'Informe Final I';
 
                     case 'Fase 6':
-                        return 'Informe II';
+                        return 'Informe Final II';
 
                     case 'Finalizado':
                         return 'Práctica empresarial finalizada';
 
                     case 'Rechazada':
-                        return 'Solicitud rechazada';
+                        return 'Solicitud de prácticas rechazada';
 
                     default:
                         return 'Solicitud de prácticas empresariales';

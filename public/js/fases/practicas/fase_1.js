@@ -65,11 +65,16 @@ function openFase1DetailsModal(btn) {
             practica_id: $('input[name="practica_id"]').first().val()
         },
         success: function(response) {
+
             let html = `
                 <div class="flex flex-col space-y-3">
                     <div class="flex flex-col sm:flex-row items-start justify-between p-3 bg-gray-50 rounded-lg">
                         <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">¿Es práctica institucional?:</p>
-                        <span class="items-details text-gray-800 w-full sm:flex-1 sm:ml-2" >${response.es_institucional ? 'Sí' : 'No'}</span>
+                        <span class="items-details text-gray-800 w-full sm:flex-1 sm:ml-2">
+                                ${response.es_institucional == 1 ? 'Sí' : 'No'}
+                        </span>
+                        
+
                     </div>
                     <div class="flex flex-col sm:flex-row items-start justify-between p-3 bg-gray-50 rounded-lg">
                         <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Empresa:</p>
@@ -79,7 +84,7 @@ function openFase1DetailsModal(btn) {
                         <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Formato F-DC-126:</p>
                         ${response.doc_fdc126 ? 
                             `<div class="items-details text-gray-800 w-full sm:flex-1 sm:ml-2" ><i class="fa-regular fa-file-word text-blue-500 mr-2"></i> <a href="/storage/${response.doc_fdc126}" target="_blank" class="text-blue-500 underline hover:text-blue-800">Documento 1</a></div>` : 
-                            '<span class="text-gray-500">No disponible</span>'}
+                            '<span class="text-gray-800 w-full sm:flex-1 sm:ml-2">No disponible</span>'}
                     </div>
                 </div>
             `;
