@@ -33,13 +33,13 @@
     @if ($destinatario === 'evaluador')
         <p>
             Estimado docente, en este correo se le informa que el director ha aprobado los documentos
-            correspondientes a la <strong>FASE 3</strong> de prácticas empresariales y ha enviado la solicitud
-            para su revisión como <strong class="uppercase">EVALUADOR</strong>.
+            correspondientes a la <strong>FASE 5</strong> de prácticas empresariales y ha enviado la solicitud
+            para su revisión como <strong class="uppercase">EVALUADOR</strong> en la <strong>FASE 6</strong>.
         </p>
     @else
         <p>
             Estimado estudiante, en este correo se le informa la respuesta del director a los documentos
-            correspondientes a la <strong>FASE 3</strong> de prácticas empresariales
+            correspondientes a la <strong>FASE 5</strong> de prácticas empresariales
             {!! $estado === 'Aprobada'
                 ? 'ha sido <strong>APROBADA</strong>.'
                 : 'ha sido <strong>RECHAZADA</strong>.' !!}
@@ -48,7 +48,7 @@
 
     <ul>
         <li><strong>Estado:</strong> {{ $estado }}</li>
-        <li><strong>Fecha:</strong> {{ now()->format('d/m/Y H:i:s') }}</li>
+        <li><strong>Fecha y hora:</strong> {{ now()->format('d/m/Y H:i:s') }}</li>
     </ul>
 
     <p><strong>Integrantes:</strong></p>
@@ -75,7 +75,11 @@
             <br>
 
             <li><strong>Nombre:</strong> {{ $cuerpo['integrante_2']->name ?? '' }}</li>
-            <li><strong>Documento:</strong> {{ $cuerpo['integrante_2_documento'] ?? '' }}</li>
+
+            <li>
+                <strong>Documento:</strong>
+                {{ $cuerpo['integrante_2_documento'] ?? '' }}
+            </li>
 
             <li>
                 <strong>Correo:</strong>
@@ -84,7 +88,10 @@
                 </a>
             </li>
 
-            <li><strong>Celular:</strong> {{ $cuerpo['integrante_2_celular'] ?? '' }}</li>
+            <li>
+                <strong>Celular:</strong>
+                {{ $cuerpo['integrante_2_celular'] ?? '' }}
+            </li>
         @endif
     </ul>
 
@@ -97,7 +104,7 @@
         @if ($destinatario === 'evaluador')
             <p>
                 <strong>NOTA:</strong> El evaluador será el encargado de revisar y validar los documentos
-                enviados por el director para continuar con el proceso de prácticas empresariales.
+                correspondientes al informe final de prácticas empresariales para continuar con el proceso.
             </p>
 
             @if (!empty($cuerpo['director']))
@@ -112,16 +119,21 @@
             @endif
         @else
             <p>
-                Los documentos correspondientes a la Fase 3 han sido aprobados por el director.
-                El evaluador será el encargado de continuar con la revisión en la siguiente fase.
+                Los documentos correspondientes a la <strong>FASE 5</strong> han sido aprobados por el director.
+                El evaluador será el encargado de continuar con la revisión en la <strong>FASE 6</strong>
+                del proceso de prácticas empresariales.
+            </p>
+
+            <p>
+                La práctica ha sido habilitada para continuar con la <strong>FASE 6</strong> del proceso.
             </p>
         @endif
 
     @else
 
         <p>
-            Debe revisar las observaciones realizadas por el director, corregir los documentos solicitados
-            y realizar nuevamente el proceso correspondiente.
+            Debe revisar las observaciones realizadas por el director, realizar las correcciones correspondientes
+            al informe final y efectuar nuevamente el envío de los documentos requeridos.
         </p>
 
     @endif

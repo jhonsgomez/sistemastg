@@ -564,11 +564,11 @@ class PracticaMailService
             'valoresCampos.campo'
         ]);
 
-        // Obtener valores dinámicos
+        $user = $practica->user;
+
         $campos = [];
 
         foreach ($practica->valoresCampos as $valorCampo) {
-
             $campos[] = [
                 'campo' => $valorCampo->campo->name,
                 'valor' => $valorCampo->valor,
@@ -586,51 +586,82 @@ class PracticaMailService
         $fdc195 = collect($campos)
             ->firstWhere('campo', 'doc_fdc195');
 
+        // ================= INTEGRANTE 2 =================
+
+        $integrante2Campo = collect($campos)
+            ->firstWhere('campo', 'id_integrante_2');
+
+        $integrante2 = null;
+
+        if (!empty($integrante2Campo['valor'])) {
+            $integrante2 = User::with('tipo_documento')
+                ->find($integrante2Campo['valor']);
+        }
+
+        // ================= DIRECTOR =================
+
+        $directorCampo = collect($campos)
+            ->firstWhere('campo', 'director_id');
+
+        $director = null;
+
+        if (!empty($directorCampo['valor'])) {
+            $director = User::find($directorCampo['valor']);
+        }
+
         // ================= DATA CORREO =================
 
         $data = [
-
             'tipo_correo' => 'practicas_fase_3',
 
             'cuerpo_correo' => [
-
                 'estado' => $practica->estado,
 
-                'correo' => $practica->user->email,
+                'correo' => $user->email,
+                'estudiante' => $user,
+                'celular' => $user->nro_celular ?? '',
 
-                'estudiante' => $practica->user,
+                'integrante_2' => $integrante2,
+                'integrante_2_correo' => $integrante2->email ?? null,
+                'integrante_2_documento' => $integrante2
+                    ? (($integrante2->tipo_documento->tag ?? '') . ' ' . ($integrante2->nro_documento ?? ''))
+                    : null,
+                'integrante_2_celular' => $integrante2->nro_celular ?? null,
+
+                'director' => $director,
+                'director_correo' => $director->email ?? null,
 
                 'campos' => $campos,
             ],
 
-            // ================= ADJUNTOS =================
-
             'adjuntos' => [
-
                 $arl['valor'] ?? null,
-
                 $fdc127['valor'] ?? null,
-
                 $fdc195['valor'] ?? null,
             ],
         ];
 
-        // Limpiar adjuntos null
-        $data['adjuntos'] = array_filter(
-            $data['adjuntos']
-        );
+        $data['adjuntos'] = array_filter($data['adjuntos']);
 
-        Mail::to(config('mail.from.address'))
+        // ================= DESTINATARIOS =================
+
+        $destinatarios = [
+            $user->email,
+        ];
+
+        if (!empty($integrante2?->email)) {
+            $destinatarios[] = $integrante2->email;
+        }
+
+        if (!empty($director?->email)) {
+            $destinatarios[] = $director->email;
+        }
+
+        $destinatarios = array_unique(array_filter($destinatarios));
+
+        Mail::to($destinatarios)
             ->queue(new PracticasMail($data));
     }
-
-
-
-   
-
-
-
-
     
     public function sendRespuestaFase3($practica, $respuesta)
     {
@@ -639,45 +670,622 @@ class PracticaMailService
             'valoresCampos.campo'
         ]);
 
-        // Obtener valores dinámicos
         $campos = [];
 
         foreach ($practica->valoresCampos as $valorCampo) {
-
             $campos[] = [
                 'campo' => $valorCampo->campo->name,
                 'valor' => $valorCampo->valor,
             ];
         }
 
-        $data = [
+        $integrante2Campo = collect($campos)
+            ->firstWhere('campo', 'id_integrante_2');
 
+        $directorCampo = collect($campos)
+            ->firstWhere('campo', 'director_id');
+
+        $evaluadorCampo = collect($campos)
+            ->firstWhere('campo', 'evaluador_id');
+
+        $integrante2 = !empty($integrante2Campo['valor'])
+            ? User::with('tipo_documento')->find($integrante2Campo['valor'])
+            : null;
+
+        $director = !empty($directorCampo['valor'])
+            ? User::find($directorCampo['valor'])
+            : null;
+
+        $evaluador = !empty($evaluadorCampo['valor'])
+            ? User::find($evaluadorCampo['valor'])
+            : null;
+
+        $dataBase = [
             'tipo_correo' => 'respuesta_fase_3',
 
             'cuerpo_correo' => [
-
-                'estado' => $respuesta['estado'],
-
-                'respuesta' => $respuesta['respuesta'],
+                'estado' => $respuesta->estado,
+                'respuesta' => $respuesta->respuesta,
 
                 'correo' => $practica->user->email,
-
                 'estudiante' => $practica->user,
+                'celular' => $practica->user->nro_celular ?? '',
 
-                'director' => $respuesta['director'] ?? null,
+                'integrante_2' => $integrante2,
+                'integrante_2_correo' => $integrante2->email ?? null,
+                'integrante_2_documento' => $integrante2
+                    ? (($integrante2->tipo_documento->tag ?? '') . ' ' . ($integrante2->nro_documento ?? ''))
+                    : null,
+                'integrante_2_celular' => $integrante2->nro_celular ?? null,
 
-                'evaluador' => $respuesta['evaluador'] ?? null,
-
-                'codirector' => $respuesta['codirector'] ?? null,
+                'director' => $director,
+                'evaluador' => $evaluador,
 
                 'campos' => $campos,
             ],
         ];
 
-        Mail::to($practica->user->email)
+        // 1. Correo para estudiante e integrante 2
+        $destinatariosEstudiantes = [
+            $practica->user->email,
+        ];
+
+        if (!empty($integrante2?->email)) {
+            $destinatariosEstudiantes[] = $integrante2->email;
+        }
+
+        $destinatariosEstudiantes = array_unique(array_filter($destinatariosEstudiantes));
+
+        $dataEstudiantes = $dataBase;
+        $dataEstudiantes['cuerpo_correo']['destinatario'] = 'estudiante';
+
+        Mail::to($destinatariosEstudiantes)
+            ->send(new PracticasMail($dataEstudiantes));
+
+        // 2. Si fue aprobada, enviar también al evaluador
+        if (($respuesta->estado ?? '') === 'Aprobada' && !empty($evaluador?->email)) {
+            $dataEvaluador = $dataBase;
+            $dataEvaluador['cuerpo_correo']['destinatario'] = 'evaluador';
+
+            Mail::to($evaluador->email)
+                ->send(new PracticasMail($dataEvaluador));
+        }
+    }
+                        
+    // ================= RESPUESTA EVALUADOR Y COMITE  FASE 4   =================    
+    public function sendRespuestaFase4Evaluador($practica, $respuesta)
+    {
+        $practica->load([
+            'user.tipo_documento',
+            'valoresCampos.campo'
+        ]);
+
+        $campos = [];
+
+        foreach ($practica->valoresCampos as $valorCampo) {
+            $campos[] = [
+                'campo' => $valorCampo->campo->name,
+                'valor' => $valorCampo->valor,
+            ];
+        }
+
+        $integrante2Campo = collect($campos)->firstWhere('campo', 'id_integrante_2');
+        $directorCampo = collect($campos)->firstWhere('campo', 'director_id');
+        $evaluadorCampo = collect($campos)->firstWhere('campo', 'evaluador_id');
+        $codirectorCampo = collect($campos)->firstWhere('campo', 'codirector_id');
+
+        $integrante2 = !empty($integrante2Campo['valor'])
+            ? User::with('tipo_documento')->find($integrante2Campo['valor'])
+            : null;
+
+        $director = !empty($directorCampo['valor'])
+            ? User::find($directorCampo['valor'])
+            : null;
+
+        $evaluador = !empty($evaluadorCampo['valor'])
+            ? User::find($evaluadorCampo['valor'])
+            : null;
+
+        $codirector = !empty($codirectorCampo['valor'])
+            ? User::find($codirectorCampo['valor'])
+            : null;
+
+        $dataBase = [
+            'tipo_correo' => 'respuesta_fase_4',
+
+            'cuerpo_correo' => [
+                'remitente' => 'evaluador',
+                'destinatario' => 'estudiante',
+
+                'estado' => $respuesta->estado,
+                'respuesta' => $respuesta->respuesta,
+
+                'correo' => $practica->user->email,
+                'estudiante' => $practica->user,
+                'celular' => $practica->user->nro_celular ?? '',
+
+                'integrante_2' => $integrante2,
+                'integrante_2_correo' => $integrante2->email ?? null,
+                'integrante_2_documento' => $integrante2
+                    ? (($integrante2->tipo_documento->tag ?? '') . ' ' . ($integrante2->nro_documento ?? ''))
+                    : null,
+                'integrante_2_celular' => $integrante2->nro_celular ?? null,
+
+                'director' => $director,
+                'evaluador' => $evaluador,
+                'codirector' => $codirector,
+
+                'campos' => $campos,
+            ],
+        ];
+
+        // Correo a estudiantes
+        $destinatariosEstudiantes = [
+            $practica->user->email,
+        ];
+
+        if (!empty($integrante2?->email)) {
+            $destinatariosEstudiantes[] = $integrante2->email;
+        }
+
+        $destinatariosEstudiantes = array_unique(array_filter($destinatariosEstudiantes));
+
+        Mail::to($destinatariosEstudiantes)
+            ->queue(new PracticasMail($dataBase));
+
+        // Si aprueba, también notifica al comité
+        if (($respuesta->estado ?? '') === 'Aprobada') {
+            $dataComite = $dataBase;
+            $dataComite['cuerpo_correo']['destinatario'] = 'comite';
+
+            Mail::to(config('mail.correo_sistemas'))
+                ->queue(new PracticasMail($dataComite));
+        }
+    }
+
+    public function sendRespuestaFase4Comite($practica, $respuesta)
+    {
+        $practica->load([
+            'user.tipo_documento',
+            'valoresCampos.campo'
+        ]);
+
+        $campos = [];
+
+        foreach ($practica->valoresCampos as $valorCampo) {
+            $campos[] = [
+                'campo' => $valorCampo->campo->name,
+                'valor' => $valorCampo->valor,
+            ];
+        }
+
+        $integrante2Campo = collect($campos)->firstWhere('campo', 'id_integrante_2');
+        $directorCampo = collect($campos)->firstWhere('campo', 'director_id');
+        $evaluadorCampo = collect($campos)->firstWhere('campo', 'evaluador_id');
+        $codirectorCampo = collect($campos)->firstWhere('campo', 'codirector_id');
+
+        $integrante2 = !empty($integrante2Campo['valor'])
+            ? User::with('tipo_documento')->find($integrante2Campo['valor'])
+            : null;
+
+        $director = !empty($directorCampo['valor'])
+            ? User::find($directorCampo['valor'])
+            : null;
+
+        $evaluador = !empty($evaluadorCampo['valor'])
+            ? User::find($evaluadorCampo['valor'])
+            : null;
+
+        $codirector = !empty($codirectorCampo['valor'])
+            ? User::find($codirectorCampo['valor'])
+            : null;
+
+        $data = [
+            'tipo_correo' => 'respuesta_fase_4',
+
+            'cuerpo_correo' => [
+                'remitente' => 'comite',
+                'destinatario' => 'todos',
+
+                'estado' => $respuesta->estado,
+                'respuesta' => $respuesta->respuesta,
+                'nro_acta' => $respuesta->nro_acta ?? null,
+                'fecha_acta' => $respuesta->fecha_acta ?? null,
+                'titulo_propuesta' => $respuesta->titulo_propuesta ?? null,
+
+                'correo' => $practica->user->email,
+                'estudiante' => $practica->user,
+                'celular' => $practica->user->nro_celular ?? '',
+
+                'integrante_2' => $integrante2,
+                'integrante_2_correo' => $integrante2->email ?? null,
+                'integrante_2_documento' => $integrante2
+                    ? (($integrante2->tipo_documento->tag ?? '') . ' ' . ($integrante2->nro_documento ?? ''))
+                    : null,
+                'integrante_2_celular' => $integrante2->nro_celular ?? null,
+
+                'director' => $director,
+                'evaluador' => $evaluador,
+                'codirector' => $codirector,
+
+                'campos' => $campos,
+            ],
+        ];
+
+        $destinatarios = [
+            $practica->user->email,
+        ];
+
+        if (!empty($integrante2?->email)) {
+            $destinatarios[] = $integrante2->email;
+        }
+
+        if (!empty($director?->email)) {
+            $destinatarios[] = $director->email;
+        }
+
+        if (!empty($evaluador?->email)) {
+            $destinatarios[] = $evaluador->email;
+        }
+
+        if (($respuesta->estado ?? '') === 'Aprobada' && !empty($codirector?->email)) {
+            $destinatarios[] = $codirector->email;
+        }
+
+        $destinatarios = array_unique(array_filter($destinatarios));
+
+        Mail::to($destinatarios)
             ->queue(new PracticasMail($data));
     }
 
+    // ================= ENVIO Y RESPUESTA FASE 5 =================    
+
+    public function sendFase5($practica)
+    {
+        $practica->load(['user.tipo_documento', 'valoresCampos.campo']);
+
+        $user = $practica->user;
+
+        $campos = [];
+
+        foreach ($practica->valoresCampos as $valorCampo) {
+            $campos[] = [
+                'campo' => $valorCampo->campo->name,
+                'valor' => $valorCampo->valor,
+            ];
+        }
+
+        $fdc128 = collect($campos)->firstWhere('campo', 'doc_fdc128');
+        $fdc129 = collect($campos)->firstWhere('campo', 'doc_fdc129');
+        $fdc196 = collect($campos)->firstWhere('campo', 'doc_fdc196');
+
+        $integrante2Campo = collect($campos)->firstWhere('campo', 'id_integrante_2');
+        $directorCampo = collect($campos)->firstWhere('campo', 'director_id');
+
+        $integrante2 = !empty($integrante2Campo['valor'])
+            ? User::with('tipo_documento')->find($integrante2Campo['valor'])
+            : null;
+
+        $director = !empty($directorCampo['valor'])
+            ? User::find($directorCampo['valor'])
+            : null;
+
+        $data = [
+            'tipo_correo' => 'practicas_fase_5',
+
+            'cuerpo_correo' => [
+                'estado' => $practica->estado,
+
+                'correo' => $user->email,
+                'estudiante' => $user,
+                'celular' => $user->nro_celular ?? '',
+
+                'integrante_2' => $integrante2,
+                'integrante_2_correo' => $integrante2->email ?? null,
+                'integrante_2_documento' => $integrante2
+                    ? (($integrante2->tipo_documento->tag ?? '') . ' ' . ($integrante2->nro_documento ?? ''))
+                    : null,
+                'integrante_2_celular' => $integrante2->nro_celular ?? null,
+
+                'director' => $director,
+                'director_correo' => $director->email ?? null,
+
+                'campos' => $campos,
+            ],
+
+            'adjuntos' => [
+                $fdc128['valor'] ?? null,
+                $fdc129['valor'] ?? null,
+                $fdc196['valor'] ?? null,
+            ],
+        ];
+
+        $data['adjuntos'] = array_filter($data['adjuntos']);
+
+        $destinatarios = [
+            $user->email,
+        ];
+
+        if (!empty($integrante2?->email)) {
+            $destinatarios[] = $integrante2->email;
+        }
+
+        if (!empty($director?->email)) {
+            $destinatarios[] = $director->email;
+        }
+
+        $destinatarios = array_unique(array_filter($destinatarios));
+
+        Mail::to($destinatarios)
+            ->queue(new PracticasMail($data));
+    }
+
+    public function sendRespuestaFase5($practica, $respuesta)
+    {
+        $practica->load(['user.tipo_documento', 'valoresCampos.campo']);
+
+        $campos = [];
+
+        foreach ($practica->valoresCampos as $valorCampo) {
+            $campos[] = [
+                'campo' => $valorCampo->campo->name,
+                'valor' => $valorCampo->valor,
+            ];
+        }
+
+        $integrante2Campo = collect($campos)->firstWhere('campo', 'id_integrante_2');
+        $directorCampo = collect($campos)->firstWhere('campo', 'director_id');
+        $evaluadorCampo = collect($campos)->firstWhere('campo', 'evaluador_id');
+
+        $integrante2 = !empty($integrante2Campo['valor'])
+            ? User::with('tipo_documento')->find($integrante2Campo['valor'])
+            : null;
+
+        $director = !empty($directorCampo['valor'])
+            ? User::find($directorCampo['valor'])
+            : null;
+
+        $evaluador = !empty($evaluadorCampo['valor'])
+            ? User::find($evaluadorCampo['valor'])
+            : null;
+
+        $dataBase = [
+            'tipo_correo' => 'respuesta_fase_5',
+
+            'cuerpo_correo' => [
+                'estado' => $respuesta->estado,
+                'respuesta' => $respuesta->respuesta,
+
+                'correo' => $practica->user->email,
+                'estudiante' => $practica->user,
+                'celular' => $practica->user->nro_celular ?? '',
+
+                'integrante_2' => $integrante2,
+                'integrante_2_correo' => $integrante2->email ?? null,
+                'integrante_2_documento' => $integrante2
+                    ? (($integrante2->tipo_documento->tag ?? '') . ' ' . ($integrante2->nro_documento ?? ''))
+                    : null,
+                'integrante_2_celular' => $integrante2->nro_celular ?? null,
+
+                'director' => $director,
+                'evaluador' => $evaluador,
+
+                'campos' => $campos,
+            ],
+        ];
+
+        $destinatariosEstudiantes = [
+            $practica->user->email,
+        ];
+
+        if (!empty($integrante2?->email)) {
+            $destinatariosEstudiantes[] = $integrante2->email;
+        }
+
+        $destinatariosEstudiantes = array_unique(array_filter($destinatariosEstudiantes));
+
+        $dataEstudiantes = $dataBase;
+        $dataEstudiantes['cuerpo_correo']['destinatario'] = 'estudiante';
+
+        Mail::to($destinatariosEstudiantes)
+            ->queue(new PracticasMail($dataEstudiantes));
+
+        if (($respuesta->estado ?? '') === 'Aprobada' && !empty($evaluador?->email)) {
+            $dataEvaluador = $dataBase;
+            $dataEvaluador['cuerpo_correo']['destinatario'] = 'evaluador';
+
+            Mail::to($evaluador->email)
+                ->queue(new PracticasMail($dataEvaluador));
+        }
+    }
+
+    // ================= RESPUESTA EVALUADOR FASE 6 =================
+    public function sendRespuestaFase6Evaluador($practica, $respuesta)
+    {
+        $practica->load([
+            'user.tipo_documento',
+            'valoresCampos.campo'
+        ]);
+
+        $campos = [];
+
+        foreach ($practica->valoresCampos as $valorCampo) {
+            $campos[] = [
+                'campo' => $valorCampo->campo->name,
+                'valor' => $valorCampo->valor,
+            ];
+        }
+
+        $integrante2Campo = collect($campos)->firstWhere('campo', 'id_integrante_2');
+        $directorCampo = collect($campos)->firstWhere('campo', 'director_id');
+        $evaluadorCampo = collect($campos)->firstWhere('campo', 'evaluador_id');
+        $codirectorCampo = collect($campos)->firstWhere('campo', 'codirector_id');
+
+        $integrante2 = !empty($integrante2Campo['valor'])
+            ? User::with('tipo_documento')->find($integrante2Campo['valor'])
+            : null;
+
+        $director = !empty($directorCampo['valor'])
+            ? User::find($directorCampo['valor'])
+            : null;
+
+        $evaluador = !empty($evaluadorCampo['valor'])
+            ? User::find($evaluadorCampo['valor'])
+            : null;
+
+        $codirector = !empty($codirectorCampo['valor'])
+            ? User::find($codirectorCampo['valor'])
+            : null;
+
+        $dataBase = [
+            'tipo_correo' => 'respuesta_fase_6',
+
+            'cuerpo_correo' => [
+                'remitente' => 'evaluador',
+                'destinatario' => 'estudiante',
+
+                'estado' => $respuesta->estado,
+                'respuesta' => $respuesta->respuesta,
+
+                'correo' => $practica->user->email,
+                'estudiante' => $practica->user,
+                'celular' => $practica->user->nro_celular ?? '',
+
+                'integrante_2' => $integrante2,
+                'integrante_2_correo' => $integrante2->email ?? null,
+                'integrante_2_documento' => $integrante2
+                    ? (($integrante2->tipo_documento->tag ?? '') . ' ' . ($integrante2->nro_documento ?? ''))
+                    : null,
+                'integrante_2_celular' => $integrante2->nro_celular ?? null,
+
+                'director' => $director,
+                'evaluador' => $evaluador,
+                'codirector' => $codirector,
+
+                'campos' => $campos,
+            ],
+        ];
+
+        $destinatariosEstudiantes = [
+            $practica->user->email,
+        ];
+
+        if (!empty($integrante2?->email)) {
+            $destinatariosEstudiantes[] = $integrante2->email;
+        }
+
+        $destinatariosEstudiantes = array_unique(array_filter($destinatariosEstudiantes));
+
+        Mail::to($destinatariosEstudiantes)
+            ->queue(new PracticasMail($dataBase));
+
+        if (($respuesta->estado ?? '') === 'Aprobada') {
+            $dataComite = $dataBase;
+            $dataComite['cuerpo_correo']['destinatario'] = 'comite';
+
+            $correoComite = config('mail.correo_sistemas');
+
+            if (!empty($correoComite)) {
+                Mail::to($correoComite)
+                    ->queue(new PracticasMail($dataComite));
+            }
+        }
+    }
+
+    // ================= RESPUESTA COMITÉ FASE 6 =================
+    public function sendRespuestaFase6Comite($practica, $respuesta)
+    {
+        $practica->load([
+            'user.tipo_documento',
+            'valoresCampos.campo'
+        ]);
+
+        $campos = [];
+
+        foreach ($practica->valoresCampos as $valorCampo) {
+            $campos[] = [
+                'campo' => $valorCampo->campo->name,
+                'valor' => $valorCampo->valor,
+            ];
+        }
+
+        $integrante2Campo = collect($campos)->firstWhere('campo', 'id_integrante_2');
+        $directorCampo = collect($campos)->firstWhere('campo', 'director_id');
+        $evaluadorCampo = collect($campos)->firstWhere('campo', 'evaluador_id');
+        $codirectorCampo = collect($campos)->firstWhere('campo', 'codirector_id');
+
+        $integrante2 = !empty($integrante2Campo['valor'])
+            ? User::with('tipo_documento')->find($integrante2Campo['valor'])
+            : null;
+
+        $director = !empty($directorCampo['valor'])
+            ? User::find($directorCampo['valor'])
+            : null;
+
+        $evaluador = !empty($evaluadorCampo['valor'])
+            ? User::find($evaluadorCampo['valor'])
+            : null;
+
+        $codirector = !empty($codirectorCampo['valor'])
+            ? User::find($codirectorCampo['valor'])
+            : null;
+
+        $data = [
+            'tipo_correo' => 'respuesta_fase_6',
+
+            'cuerpo_correo' => [
+                'remitente' => 'comite',
+                'destinatario' => 'todos',
+
+                'estado' => $respuesta->estado,
+                'respuesta' => $respuesta->respuesta,
+                'nro_acta' => $respuesta->nro_acta ?? null,
+                'fecha_acta' => $respuesta->fecha_acta ?? null,
+
+                'correo' => $practica->user->email,
+                'estudiante' => $practica->user,
+                'celular' => $practica->user->nro_celular ?? '',
+
+                'integrante_2' => $integrante2,
+                'integrante_2_correo' => $integrante2->email ?? null,
+                'integrante_2_documento' => $integrante2
+                    ? (($integrante2->tipo_documento->tag ?? '') . ' ' . ($integrante2->nro_documento ?? ''))
+                    : null,
+                'integrante_2_celular' => $integrante2->nro_celular ?? null,
+
+                'director' => $director,
+                'evaluador' => $evaluador,
+                'codirector' => $codirector,
+
+                'campos' => $campos,
+            ],
+        ];
+
+        $destinatarios = [
+            $practica->user->email,
+        ];
+
+        if (!empty($integrante2?->email)) {
+            $destinatarios[] = $integrante2->email;
+        }
+
+        if (!empty($director?->email)) {
+            $destinatarios[] = $director->email;
+        }
+
+        if (!empty($evaluador?->email)) {
+            $destinatarios[] = $evaluador->email;
+        }
+
+        if (!empty($codirector?->email)) {
+            $destinatarios[] = $codirector->email;
+        }
+
+        $destinatarios = array_unique(array_filter($destinatarios));
+
+        Mail::to($destinatarios)
+            ->queue(new PracticasMail($data));
+    }
 
 
 

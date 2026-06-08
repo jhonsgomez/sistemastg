@@ -26,11 +26,11 @@
 
     <p>
         Estimado usuario, en este correo se le informa que se ha realizado el envío de documentos
-        correspondientes a la <strong>FASE 3</strong> de prácticas empresariales.
+        correspondientes a la <strong>FASE 5</strong> de prácticas empresariales.
     </p>
 
     <ul>
-        <li><strong>Tipo de solicitud:</strong> ENVÍO DE PROPUESTA DE PRÁCTICAS</li>
+        <li><strong>Tipo de solicitud:</strong> ENVÍO DE INFORME FINAL DE PRÁCTICAS</li>
         <li><strong>Estado actual:</strong> {{ $data['cuerpo_correo']['estado'] ?? '' }}</li>
     </ul>
 
@@ -89,9 +89,9 @@
     <p>El estudiante ha adjuntado los siguientes documentos:</p>
 
     <ul>
-        <li>ARL</li>
-        <li>Formato propuesta de prácticas F-DC-127</li>
-        <li>Acta de inicio de prácticas F-DC-195</li>
+        <li>Informe final F-DC-128</li>
+        <li>Rejilla de evaluación F-DC-129</li>
+        <li>Acta de terminación F-DC-196</li>
     </ul>
 
     <p>

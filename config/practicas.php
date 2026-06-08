@@ -81,6 +81,45 @@ return [
                 'emails.practicas.respuestaF3',
         ],
 
+        
+        'respuesta_fase_4' => [
+
+            'subject' =>
+                'RESPUESTA PRÁCTICAS - FASE 4',
+
+            'view' =>
+                'emails.practicas.respuestaF4',
+        ],
+
+        
+        'practicas_fase_5' => [
+
+            'subject' =>
+                'PRÁCTICAS EMPRESARIALES - FASE 5: INFORME I',
+
+            'view' =>
+                'emails.practicas.fase5',
+        ],
+
+         'respuesta_fase_5' => [
+
+            'subject' =>
+                'RESPUESTA PRÁCTICAS - FASE 5 INFORME I',
+
+            'view' =>
+                'emails.practicas.respuestaF5',
+        ],
+
+         'respuesta_fase_6' => [
+
+            'subject' =>
+                'RESPUESTA PRÁCTICAS - FASE 6',
+
+            'view' =>
+                'emails.practicas.respuestaF6',
+        ]
+
+
 
 
 

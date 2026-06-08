@@ -134,42 +134,42 @@
                 transform: translateY(0) !important;
             }
 
-    /* Estilos específicos para calendarModal */
-#calendarModal {
-    visibility: hidden !important;
-    opacity: 0 !important;
-    transform: translateY(-20px) !important;
-    transition: visibility 0.3s ease, opacity 0.3s ease, transform 0.3s ease !important;
-    pointer-events: none !important;
-}
+            /* Estilos específicos para calendarModal */
+            #calendarModal {
+                visibility: hidden !important;
+                opacity: 0 !important;
+                transform: translateY(-20px) !important;
+                transition: visibility 0.3s ease, opacity 0.3s ease, transform 0.3s ease !important;
+                pointer-events: none !important;
+            }
 
-#calendarModal.show {
-    visibility: visible !important;
-    opacity: 1 !important;
-    transform: translateY(0) !important;
-    pointer-events: auto !important;
-}
-            
-            #integrantes_list {
-    position: absolute;
-    z-index: 50;
-    width: 100%;
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.5rem;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    max-height: 240px;
-    overflow-y: auto;
-}
+            #calendarModal.show {
+                visibility: visible !important;
+                opacity: 1 !important;
+                transform: translateY(0) !important;
+                pointer-events: auto !important;
+            }
+                        
+                        #integrantes_list {
+                position: absolute;
+                z-index: 50;
+                width: 100%;
+                background: white;
+                border: 1px solid #e5e7eb;
+                border-radius: 0.5rem;
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+                max-height: 240px;
+                overflow-y: auto;
+            }
 
-#integrantes_list div:hover {
-    background-color: #f3f4f6;
-}
+            #integrantes_list div:hover {
+                background-color: #f3f4f6;
+            }
 
-#selected_integrante_2 {
-    display: none;
-}
-            
+            #selected_integrante_2 {
+                display: none;
+            }
+                    
             .modal-content {
                 max-width: 850px !important;
                 width: 100% !important;
@@ -217,23 +217,23 @@
             }
 
             /* Estilos para el foco del selector de cantidad de registros (length menu) */
-#practicasTable_wrapper .dataTables_length select:focus,
-.dataTables_length select:focus,
-#practicasTable_length select:focus,
-select.dt-input:focus {
-    border-color: #C1D631 !important;
-    outline: none !important;
-    box-shadow: 0 0 0 2px rgba(193, 214, 49, 1) !important;
-}
+            #practicasTable_wrapper .dataTables_length select:focus,
+            .dataTables_length select:focus,
+            #practicasTable_length select:focus,
+            select.dt-input:focus {
+                border-color: #C1D631 !important;
+                outline: none !important;
+                box-shadow: 0 0 0 2px rgba(193, 214, 49, 1) !important;
+            }
 
-/* Estilos para cualquier input o select dentro del wrapper de DataTables */
-.dataTables_wrapper input:focus,
-.dataTables_wrapper select:focus {
-    border-color: #C1D631 !important;
-    outline: none !important;
-    box-shadow: 0 0 0 2px rgba(193, 214, 49, 0.5) !important;
-}
-            /* ESTILOS DE PAGINACIÓN */
+            /* Estilos para cualquier input o select dentro del wrapper de DataTables */
+            .dataTables_wrapper input:focus,
+            .dataTables_wrapper select:focus {
+                border-color: #C1D631 !important;
+                outline: none !important;
+                box-shadow: 0 0 0 2px rgba(193, 214, 49, 0.5) !important;
+            }
+                        /* ESTILOS DE PAGINACIÓN */
             .dataTables_paginate .paginate_button {
                 padding: 0.25rem 0.75rem !important;
                 margin: 0 2px !important;
@@ -270,154 +270,154 @@ select.dt-input:focus {
                 font-size: 1rem !important;
             }
 
-    /* Estilos tipo Select2 */
-    .select2-container--default .select2-selection--single {
-        border-color: #d1d5db;
-        border-radius: 0.375rem;
-    }
-    
-    .select2-container--default.select2-container--open .select2-selection--single {
-        border-color: #C1D631;
-    }
-    
-    .select2-container--default .select2-selection--single:focus {
-        border-color: #C1D631;
-        box-shadow: 0 0 0 2px rgba(193, 214, 49, 0.2);
-    }
-    
-    /* Estilos para la lista de resultados */
-    .integrante-resultado {
-        padding: 8px 12px;
-        cursor: pointer;
-        border-bottom: 1px solid #e5e7eb;
-        font-size: 0.875rem;
-    }
-    
-    .integrante-resultado:last-child {
-        border-bottom: none;
-    }
-    
-    .integrante-resultado:hover {
-        background-color: #f0fdf4;
-        background-color: rgba(193, 214, 49, 0.1);
-    }
-    
-    .integrante-resultado.highlight {
-        background-color: #f0fdf4;
-        background-color: rgba(193, 214, 49, 0.2);
-    }
-    
-    /* Tag seleccionado */
-    .selected-tag {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background-color: #f0fdf4;
-        border: 1px solid #C1D631;
-        color: #4a5b1a;
-        padding: 4px 8px 4px 12px;
-        border-radius: 9999px;
-        font-size: 0.875rem;
-    }
-    
-    .selected-tag .remove-btn {
-        cursor: pointer;
-        font-size: 1.125rem;
-        font-weight: bold;
-        color: #9ca3af;
-        transition: color 0.2s;
-    }
-    
-    .selected-tag .remove-btn:hover {
-        color: #dc2626;
-    }
-    
-    /* Mensaje de búsqueda */
-    .search-message {
-        padding: 8px 12px;
-        text-align: center;
-        color: #6b7280;
-        font-size: 0.875rem;
-    }
-    
-    /* Input con borde verde cuando tiene foco */
-    #search_integrante_2:focus {
-        border-color: #C1D631;
-        outline: none;
-        box-shadow: 0 0 0 2px rgba(193, 214, 49, 0.2);
-    }
+            /* Estilos tipo Select2 */
+            .select2-container--default .select2-selection--single {
+                border-color: #d1d5db;
+                border-radius: 0.375rem;
+            }
+            
+            .select2-container--default.select2-container--open .select2-selection--single {
+                border-color: #C1D631;
+            }
+            
+            .select2-container--default .select2-selection--single:focus {
+                border-color: #C1D631;
+                box-shadow: 0 0 0 2px rgba(193, 214, 49, 0.2);
+            }
+            
+            /* Estilos para la lista de resultados */
+            .integrante-resultado {
+                padding: 8px 12px;
+                cursor: pointer;
+                border-bottom: 1px solid #e5e7eb;
+                font-size: 0.875rem;
+            }
+            
+            .integrante-resultado:last-child {
+                border-bottom: none;
+            }
+            
+            .integrante-resultado:hover {
+                background-color: #f0fdf4;
+                background-color: rgba(193, 214, 49, 0.1);
+            }
+            
+            .integrante-resultado.highlight {
+                background-color: #f0fdf4;
+                background-color: rgba(193, 214, 49, 0.2);
+            }
+            
+            /* Tag seleccionado */
+            .selected-tag {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                background-color: #f0fdf4;
+                border: 1px solid #C1D631;
+                color: #4a5b1a;
+                padding: 4px 8px 4px 12px;
+                border-radius: 9999px;
+                font-size: 0.875rem;
+            }
+            
+            .selected-tag .remove-btn {
+                cursor: pointer;
+                font-size: 1.125rem;
+                font-weight: bold;
+                color: #9ca3af;
+                transition: color 0.2s;
+            }
+            
+            .selected-tag .remove-btn:hover {
+                color: #dc2626;
+            }
+            
+            /* Mensaje de búsqueda */
+            .search-message {
+                padding: 8px 12px;
+                text-align: center;
+                color: #6b7280;
+                font-size: 0.875rem;
+            }
+            
+            /* Input con borde verde cuando tiene foco */
+            #search_integrante_2:focus {
+                border-color: #C1D631;
+                outline: none;
+                box-shadow: 0 0 0 2px rgba(193, 214, 49, 0.2);
+            }
 
-    /* Estilo del input cuando tiene focus - VERDE del programa */
-    #search_integrante_2:focus {
-        border-color: #C1D631 !important;
-        outline: none !important;
-        box-shadow: 0 0 0 2px rgba(193, 214, 49, 0.2) !important;
-        ring-color: #C1D631 !important;
-    }
-    
-    /* Estilos para la lista desplegable */
-    #integrantes_list {
-        background: white;
-        border: 1px solid #e5e7eb;
-        border-radius: 0.5rem;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        max-height: 240px;
-        overflow-y: auto;
-        z-index: 50;
-    }
-    
-    /* Cada resultado */
-    #integrantes_list > div {
-        padding: 10px 12px;
-        cursor: pointer;
-        border-bottom: 1px solid #f3f4f6;
-        transition: all 0.2s;
-    }
-    
-    #integrantes_list > div:last-child {
-        border-bottom: none;
-    }
-    
-    /* Hover con color VERDE del programa */
-    #integrantes_list > div:hover {
-        background-color: rgba(193, 214, 49, 0.1);
-    }
-    
-    /* Estilo del elemento seleccionado (tag) */
-    #selected_integrante_2 {
-        margin-top: 8px;
-    }
-    
-    #selected_integrante_2 > div {
-        background-color: #f0f9f0;
-        border: 1px solid #C1D631;
-        border-radius: 8px;
-        padding: 8px 12px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-    
-    #selected_integrante_2 button {
-        background: none;
-        border: none;
-        cursor: pointer;
-        font-size: 18px;
-        color: #9ca3af;
-        transition: color 0.2s;
-    }
-    
-    #selected_integrante_2 button:hover {
-        color: #dc2626;
-    }
-    
-    /* Mensaje de "No se encontraron estudiantes" */
-    #integrantes_list .text-center {
-        padding: 12px;
-        color: #6b7280;
-        text-align: center;
-    }
-    
+            /* Estilo del input cuando tiene focus - VERDE del programa */
+            #search_integrante_2:focus {
+                border-color: #C1D631 !important;
+                outline: none !important;
+                box-shadow: 0 0 0 2px rgba(193, 214, 49, 0.2) !important;
+                ring-color: #C1D631 !important;
+            }
+            
+            /* Estilos para la lista desplegable */
+            #integrantes_list {
+                background: white;
+                border: 1px solid #e5e7eb;
+                border-radius: 0.5rem;
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+                max-height: 240px;
+                overflow-y: auto;
+                z-index: 50;
+            }
+            
+            /* Cada resultado */
+            #integrantes_list > div {
+                padding: 10px 12px;
+                cursor: pointer;
+                border-bottom: 1px solid #f3f4f6;
+                transition: all 0.2s;
+            }
+            
+            #integrantes_list > div:last-child {
+                border-bottom: none;
+            }
+            
+            /* Hover con color VERDE del programa */
+            #integrantes_list > div:hover {
+                background-color: rgba(193, 214, 49, 0.1);
+            }
+            
+            /* Estilo del elemento seleccionado (tag) */
+            #selected_integrante_2 {
+                margin-top: 8px;
+            }
+            
+            #selected_integrante_2 > div {
+                background-color: #f0f9f0;
+                border: 1px solid #C1D631;
+                border-radius: 8px;
+                padding: 8px 12px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+            
+            #selected_integrante_2 button {
+                background: none;
+                border: none;
+                cursor: pointer;
+                font-size: 18px;
+                color: #9ca3af;
+                transition: color 0.2s;
+            }
+            
+            #selected_integrante_2 button:hover {
+                color: #dc2626;
+            }
+            
+            /* Mensaje de "No se encontraron estudiantes" */
+            #integrantes_list .text-center {
+                padding: 12px;
+                color: #6b7280;
+                text-align: center;
+            }
+            
         </style>
 
     @endpush
@@ -450,21 +450,21 @@ select.dt-input:focus {
             </button>
             <!--- AQUI SOLO VA LA VARIABLE $fechas--->
             <button type="button" id="calendar" onclick="openCalendarModal(this)"
-    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center"
-    style="margin-right: 0.3rem !important">
-    <i class="fa-regular fa-calendar"></i>
-    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none"
-        xmlns="http://www.w3.org/2000/svg" width="24" height="24">
-        <path
-            d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
-            stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
-        <path
-            d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
-            stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"
-            class="text-white">
-        </path>
-    </svg>
-</button>
+                class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center"
+                style="margin-right: 0.3rem !important">
+                <i class="fa-regular fa-calendar"></i>
+                <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none"
+                    xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                    <path
+                        d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
+                        stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                    <path
+                        d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
+                        stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"
+                        class="text-white">
+                    </path>
+                </svg>
+            </button>
             @if (auth()->user()->hasRole(['estudiante']))
                 @can('create_proyecto_grado')
                     <button onclick="openCreateModal()" id="openCreateModalButton"
@@ -2161,67 +2161,67 @@ $(document).ready(function() {
                 });
             }
         });
+        });
     });
-});
 
         </script>
 
     <script>
-    function openCalendarModal(btn) {
-    // Mostrar spinner y ocultar icono en el botón
-    if (btn) {
-        const icon = btn.querySelector('i');
-        const spinner = btn.querySelector('.loading-spinner');
-        if (icon) icon.classList.add('hidden');
-        if (spinner) spinner.classList.remove('hidden');
-        btn.disabled = true;
-    }
-    
-    // Usar la clase 'show' en lugar de style.display
-    const modal = document.getElementById('calendarModal');
-    if (modal) {
-        modal.classList.add('show');
-        console.log('Modal abierto');
-    } else {
-        console.error('Modal no encontrado');
-    }
-    
-    // Restaurar el botón después de abrir
-    if (btn) {
-        setTimeout(() => {
-            const icon = btn.querySelector('i');
-            const spinner = btn.querySelector('.loading-spinner');
-            if (icon) icon.classList.remove('hidden');
-            if (spinner) spinner.classList.add('hidden');
-            btn.disabled = false;
-        }, 200);
-    }
-}
+        function openCalendarModal(btn) {
+                // Mostrar spinner y ocultar icono en el botón
+                if (btn) {
+                    const icon = btn.querySelector('i');
+                    const spinner = btn.querySelector('.loading-spinner');
+                    if (icon) icon.classList.add('hidden');
+                    if (spinner) spinner.classList.remove('hidden');
+                    btn.disabled = true;
+                }
+                
+                // Usar la clase 'show' en lugar de style.display
+                const modal = document.getElementById('calendarModal');
+                if (modal) {
+                    modal.classList.add('show');
+                    console.log('Modal abierto');
+                } else {
+                    console.error('Modal no encontrado');
+                }
+                
+                // Restaurar el botón después de abrir
+                if (btn) {
+                    setTimeout(() => {
+                        const icon = btn.querySelector('i');
+                        const spinner = btn.querySelector('.loading-spinner');
+                        if (icon) icon.classList.remove('hidden');
+                        if (spinner) spinner.classList.add('hidden');
+                        btn.disabled = false;
+                    }, 200);
+                }
+            }
 
-function closeCalendarModal() {
-    const modal = document.getElementById('calendarModal');
-    if (modal) {
-        modal.classList.remove('show');
-        console.log('Modal cerrado');
-    }
-}
-</script>
+            function closeCalendarModal() {
+                const modal = document.getElementById('calendarModal');
+                if (modal) {
+                    modal.classList.remove('show');
+                    console.log('Modal cerrado');
+                }
+            }
+    </script>
 
-<script>
+    <script>
 
-    function showRoadmapSpinner(form) {
-        const button = form.querySelector('button');
-        const icon = button.querySelector('i');
-        const spinner = button.querySelector('.loading-spinner');
-        
-        if (icon) icon.classList.add('hidden');
-        if (spinner) spinner.classList.remove('hidden');
-        button.disabled = true;
-        
-        return true; // Permite que el formulario se envíe
-    }
+        function showRoadmapSpinner(form) {
+            const button = form.querySelector('button');
+            const icon = button.querySelector('i');
+            const spinner = button.querySelector('.loading-spinner');
+            
+            if (icon) icon.classList.add('hidden');
+            if (spinner) spinner.classList.remove('hidden');
+            button.disabled = true;
+            
+            return true; // Permite que el formulario se envíe
+        }
 
-</script>
+    </script>
 
         <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
         <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">

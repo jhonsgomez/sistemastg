@@ -82,495 +82,526 @@ class PracticaController extends Controller
 
     
     public function getData(Request $request)
-{
+    {
 
-  
-    // CORREGIDO: Mostrar TODAS las prácticas, no solo tipo_solicitud_id = 9
-    $practicas = Practica::with('user')
-        ->where('tipo_solicitud_id', '>=', 9);  // Todas las fases de prácticas (9, 10, 11, 12, 13, 14)
+    
+            // CORREGIDO: Mostrar TODAS las prácticas, no solo tipo_solicitud_id = 9
+            $practicas = Practica::with('user')
+                ->where('tipo_solicitud_id', '>=', 9);  // Todas las fases de prácticas (9, 10, 11, 12, 13, 14)
 
-        \Log::info('ESTADO PRACTICAS', 
-    $practicas->pluck('estado')->toArray()
-);
+                \Log::info('ESTADO PRACTICAS', 
+            $practicas->pluck('estado')->toArray()
+        );
 
-    // DIRECTOR
-    if (auth()->user()->hasRole('director_practica')) {
+        // DIRECTOR
+        if (auth()->user()->hasRole('director_practica')) {
 
 
-        $practicas->whereHas('valoresCampos', function ($vc) {
+            $practicas->whereHas('valoresCampos', function ($vc) {
 
-            $vc->whereHas('campo', function ($c) {
-                $c->where('name', 'director_id');
-            })->where('valor', auth()->id());
+                $vc->whereHas('campo', function ($c) {
+                    $c->where('name', 'director_id');
+                })->where('valor', auth()->id());
 
-        });
-
-    }
-
-    // EVALUADOR
-    if (auth()->user()->hasRole('evaluador_practica')) {
-
-        
-
-        $practicas->whereHas('valoresCampos', function ($vc) {
-
-            $vc->whereHas('campo', function ($c) {
-                $c->where('name', 'evaluador_id');
-            })->where('valor', auth()->id());
-
-        });
-
-    }
-
-    // FILTRO PARA CODIRECTOR (si lo necesitas)
-    if (auth()->user()->hasRole('codirector_practica')) {
-        $practicas->whereHas('valoresCampos', function ($vc) {
-            $vc->whereHas('campo', function ($c) {
-                $c->where('name', 'codirector_id');
-            })->where('valor', auth()->id());
-        });
-    }
-
-    if (auth()->user()->hasRole(['super_admin', 'admin', 'coordinador'])) {
-        $filter = $request->input('filter');
-        
-        switch ($filter) {
-            case 'pendientes_comite':
-                $practicas->whereIn('estado', ['Pendiente', 'Fase 1', 'Fase 5']);
-                break;
-            case 'pendientes_director':
-                $practicas->where('estado', 'Fase 3');
-                break;
-            case 'pendientes_evaluador':
-                $practicas->where('estado', 'Fase 4');
-                break;
-            case 'propuestas_pendientes':
-                $practicas->where('estado', 'Fase 1');
-                break;
-            case 'informes_pendientes':
-                $practicas->where('estado', 'Fase 4');
-                break;
-        }
-    }
-
-    // BÚSQUEDA AVANZADA
-    if ($request->has('search') && $search = $request->input('search.value')) {
-        $practicas->where(function ($q) use ($search) {
-            if (preg_match('/GRA-00(\d+)/i', $search, $matches)) {
-                $idNumero = intval($matches[1]);
-                $q->orWhere('id', $idNumero);
-            }
-            if (is_numeric($search)) {
-                $q->orWhere('id', $search);
-            }
-            $q->orWhere('estado', 'LIKE', "%{$search}%");
-            $q->orWhereHas('user', function ($uq) use ($search) {
-                $uq->where('name', 'LIKE', "%{$search}%")
-                    ->orWhere('email', 'LIKE', "%{$search}%")
-                    ->orWhere('nro_documento', 'LIKE', "%{$search}%")
-                    ->orWhere('nro_celular', 'LIKE', "%{$search}%");
             });
-            $q->orWhereHas('user.nivel', function ($nq) use ($search) {
-                $nq->where('nombre', 'LIKE', "%{$search}%");
-            });
-            $q->orWhereHas('valoresCampos', function ($vcq) use ($search) {
-                $vcq->whereHas('campo', function ($cq) use ($search) {
-                    $cq->whereIn('name', ['titulo', 'nombre_empresa']);
-                })->where('valor', 'LIKE', "%{$search}%");
-            });
-        });
-    }
 
-   
- // DATATABLE - AQUI LE SALE LAS PRACTICAS A CADA USUARIO
-
-        if (auth()->user()->hasRole('estudiante')) {
-
-    $practicas = Practica::with('valoresCampos.campo')
-        ->where(function ($q) {
-            $q->where('user_id', auth()->id())
-              ->orWhereHas('valoresCampos', function ($vc) {
-                  $vc->whereHas('campo', function ($c) {
-                      $c->where('name', 'id_integrante_2');
-                  })->where('valor', auth()->id());
-              });
-        })
-        ->orderBy('id', 'desc')
-        ->get();
-
-} elseif (auth()->user()->hasRole('director_practica')) {
-
-            $practicas = Practica::with('valoresCampos.campo')
-                ->whereHas('valoresCampos', function ($vc) {
-
-                    $vc->whereHas('campo', function ($c) {
-                        $c->where('name', 'director_id');
-                    })
-
-                    ->where('valor', auth()->id());
-
-                })
-                ->orderBy('id', 'desc')
-                ->get();
-
-        } elseif (auth()->user()->hasRole('evaluador_practica')) {
-
-            $practicas = Practica::with('valoresCampos.campo')
-                ->whereHas('valoresCampos', function ($vc) {
-
-                    $vc->whereHas('campo', function ($c) {
-                        $c->where('name', 'evaluador_id');
-                    })
-
-                    ->where('valor', auth()->id());
-
-                })
-                ->orderBy('id', 'desc')
-                ->get();
-
-        } else {
-
-            $practicas = Practica::with('valoresCampos.campo')
-                ->orderBy('id', 'desc')
-                ->get();
         }
 
-    return DataTables::of($practicas)
-        ->addColumn('formatted_id', function ($p) {
-            return 'GRA-00' . $p->id;
-        })
-        ->addColumn('descripcion', function ($p) {
-            return 'Solicitud de prácticas empresariales';
-        })
-        ->addColumn('estado', function ($p) {
-            $return_html = '<div class="flex gap-2 flex-wrap items-center justify-center">';
+        // EVALUADOR
+        if (auth()->user()->hasRole('evaluador_practica')) {
 
-            // Dentro de addColumn('estado'), antes de los demás badges
-if (auth()->user()->hasRole('estudiante')) {
-    $estaRetirado = $this->estudianteRetirado($p);
-    if ($estaRetirado) {
-        $badge = "<span class='shadow bg-red-100 text-red-800 text-sm font-medium px-2.5 py-0.5 rounded border border-red-300'>Retirado</span>";
-        return $return_html . $badge . "</div>";
-    }
-}
+            
+
+            $practicas->whereHas('valoresCampos', function ($vc) {
+
+                $vc->whereHas('campo', function ($c) {
+                    $c->where('name', 'evaluador_id');
+                })->where('valor', auth()->id());
+
+            });
+
+        }
+
+        // FILTRO PARA CODIRECTOR (si lo necesitas)
+        if (auth()->user()->hasRole('codirector_practica')) {
+            $practicas->whereHas('valoresCampos', function ($vc) {
+                $vc->whereHas('campo', function ($c) {
+                    $c->where('name', 'codirector_id');
+                })->where('valor', auth()->id());
+            });
+        }
+
+        if (auth()->user()->hasRole(['super_admin', 'admin', 'coordinador'])) {
+            $filter = $request->input('filter');
+            
+            switch ($filter) {
+                case 'pendientes_comite':
+                    $practicas->whereIn('estado', ['Pendiente', 'Fase 1', 'Fase 5']);
+                    break;
+                case 'pendientes_director':
+                    $practicas->where('estado', 'Fase 3');
+                    break;
+                case 'pendientes_evaluador':
+                    $practicas->where('estado', 'Fase 4');
+                    break;
+                case 'propuestas_pendientes':
+                    $practicas->where('estado', 'Fase 1');
+                    break;
+                case 'informes_pendientes':
+                    $practicas->where('estado', 'Fase 4');
+                    break;
+            }
+        }
+
+        // BÚSQUEDA AVANZADA
+        if ($request->has('search') && $search = $request->input('search.value')) {
+            $practicas->where(function ($q) use ($search) {
+                if (preg_match('/GRA-00(\d+)/i', $search, $matches)) {
+                    $idNumero = intval($matches[1]);
+                    $q->orWhere('id', $idNumero);
+                }
+                if (is_numeric($search)) {
+                    $q->orWhere('id', $search);
+                }
+                $q->orWhere('estado', 'LIKE', "%{$search}%");
+                $q->orWhereHas('user', function ($uq) use ($search) {
+                    $uq->where('name', 'LIKE', "%{$search}%")
+                        ->orWhere('email', 'LIKE', "%{$search}%")
+                        ->orWhere('nro_documento', 'LIKE', "%{$search}%")
+                        ->orWhere('nro_celular', 'LIKE', "%{$search}%");
+                });
+                $q->orWhereHas('user.nivel', function ($nq) use ($search) {
+                    $nq->where('nombre', 'LIKE', "%{$search}%");
+                });
+                $q->orWhereHas('valoresCampos', function ($vcq) use ($search) {
+                    $vcq->whereHas('campo', function ($cq) use ($search) {
+                        $cq->whereIn('name', ['titulo', 'nombre_empresa']);
+                    })->where('valor', 'LIKE', "%{$search}%");
+                });
+            });
+        }
+
+    
+        // DATATABLE - AQUI LE SALE LAS PRACTICAS A CADA USUARIO
+
+            if (auth()->user()->hasRole('estudiante')) 
+            {
+
+                $practicas = Practica::with('valoresCampos.campo')
+                    ->where(function ($q) {
+                        $q->where('user_id', auth()->id())
+                        ->orWhereHas('valoresCampos', function ($vc) {
+                            $vc->whereHas('campo', function ($c) {
+                                $c->where('name', 'id_integrante_2');
+                            })->where('valor', auth()->id());
+                        });
+                    })
+                    ->orderBy('id', 'desc')
+                    ->get();
+
+            } elseif (auth()->user()->hasRole('director_practica')) 
+            {
+
+                $practicas = Practica::with('valoresCampos.campo')
+                    ->whereHas('valoresCampos', function ($vc) {
+
+                        $vc->whereHas('campo', function ($c) {
+                            $c->where('name', 'director_id');
+                        })
+
+                        ->where('valor', auth()->id());
+
+                    })
+                    ->orderBy('id', 'desc')
+                    ->get();
+
+            } elseif (auth()->user()->hasRole('evaluador_practica')) {
+
+                $practicas = Practica::with('valoresCampos.campo')
+                    ->whereHas('valoresCampos', function ($vc) {
+
+                        $vc->whereHas('campo', function ($c) {
+                            $c->where('name', 'evaluador_id');
+                        })
+
+                        ->where('valor', auth()->id());
+
+                    })
+                    ->orderBy('id', 'desc')
+                    ->get();
+
+            } else {
+
+                $practicas = Practica::with('valoresCampos.campo')
+                    ->orderBy('id', 'desc')
+                    ->get();
+            }
+
+        return DataTables::of($practicas)
+            ->addColumn('formatted_id', function ($p) {
+                return 'GRA-00' . $p->id;
+            })
+            ->addColumn('descripcion', function ($p) {
+                switch ($p->estado) {
+                    case 'Pendiente':
+                        return 'Solicitud de prácticas empresariales';
+
+                    case 'Fase 1':
+                        return 'Envío de formato F-DC-127';
+
+                    case 'Fase 2':
+                        return 'Pago y liquidación de matrícula';
+
+                    case 'Fase 3':
+                        return 'Propuesta I';
+
+                    case 'Fase 4':
+                        return 'Propuesta II';
+
+                    case 'Fase 5':
+                        return 'Informe I';
+
+                    case 'Fase 6':
+                        return 'Informe II';
+
+                    case 'Finalizado':
+                        return 'Práctica empresarial finalizada';
+
+                    case 'Rechazada':
+                        return 'Solicitud rechazada';
+
+                    default:
+                        return 'Solicitud de prácticas empresariales';
+                }
+            })
+            ->addColumn('estado', function ($p) {
+                $return_html = '<div class="flex gap-2 flex-wrap items-center justify-center">';
+
+                // Dentro de addColumn('estado'), antes de los demás badges
+            if (auth()->user()->hasRole('estudiante')) {
+                $estaRetirado = $this->estudianteRetirado($p);
+                if ($estaRetirado) {
+                    $badge = "<span class='shadow bg-red-100 text-red-800 text-sm font-medium px-2.5 py-0.5 rounded border border-red-300'>Retirado</span>";
+                    return $return_html . $badge . "</div>";
+                }
+            }
 
             // Verificar si está vencida
-if ($p->vencido == 1) {
-    $badgeVencida = "<span class='shadow bg-red-100 text-red-800 text-sm font-medium px-2.5 py-0.5 rounded border border-red-300'>Vencida</span>";
-    return $return_html . $badgeVencida . "</div>";
-}
-
-            // ========== BADGE BENEFICIARIO ICFES ==========
-            $acceso = $this->esBeneficiarioIcfesListaPractica($p);
-            
-            // Badge para beneficiario ICFES (solo estudiantes en Fase 5 o 6)
-            $badge_beneficiario_icfes = '<span class="shadow bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded border border-blue-300">Beneficiario ICFES</span>';
-            
-            if ($p->estado === 'Rechazada') {
-                $badge = "<span class='shadow bg-red-100 text-red-800 text-sm font-medium px-2.5 py-0.5 rounded border border-red-300'>Rechazada</span>";
-                return $return_html . $badge . "</div>";
+            if ($p->vencido == 1) {
+                $badgeVencida = "<span class='shadow bg-red-100 text-red-800 text-sm font-medium px-2.5 py-0.5 rounded border border-red-300'>Vencida</span>";
+                return $return_html . $badgeVencida . "</div>";
             }
-            
-            $htmlEstado = '';
 
-            if ($p->estado === 'Pendiente') {
-                $htmlEstado = "<span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Pendiente</span>
-                               <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Comité</span>";
-            } 
-            elseif ($p->estado === 'Fase 1') {
-                $submited = $p->valoresCampos->where('campo.name', 'submited_fase1')->first();
-                $yaEnvio = $submited && $submited->valor === 'true';
+                // ========== BADGE BENEFICIARIO ICFES ==========
+                $acceso = $this->esBeneficiarioIcfesListaPractica($p);
                 
-                if ($yaEnvio) {
-                    $htmlEstado = "<span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 1</span>
-                                   <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Comité</span>";
-                } else {
-                    $htmlEstado = "<span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 1</span>
-                                   <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Estudiante</span>";
+                // Badge para beneficiario ICFES (solo estudiantes en Fase 5 o 6)
+                $badge_beneficiario_icfes = '<span class="shadow bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded border border-blue-300">Beneficiario ICFES</span>';
+                
+                if ($p->estado === 'Rechazada') {
+                    $badge = "<span class='shadow bg-red-100 text-red-800 text-sm font-medium px-2.5 py-0.5 rounded border border-red-300'>Rechazada</span>";
+                    return $return_html . $badge . "</div>";
                 }
-            } 
-            elseif ($p->estado === 'Fase 2') {
-                $submited = $p->valoresCampos->where('campo.name', 'submited_fase2')->first();
-                $yaEnvio = $submited && $submited->valor === 'true';
                 
-                if ($yaEnvio) {
-                    $htmlEstado = "<span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 2</span>
+                $htmlEstado = '';
+
+                if ($p->estado === 'Pendiente') {
+                    $htmlEstado = "<span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Pendiente</span>
                                 <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Comité</span>";
-                } else {
-                    $htmlEstado = "<span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 2</span>
-                                <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Estudiante</span>";
+                } 
+                elseif ($p->estado === 'Fase 1') {
+                    $submited = $p->valoresCampos->where('campo.name', 'submited_fase1')->first();
+                    $yaEnvio = $submited && $submited->valor === 'true';
+                    
+                    if ($yaEnvio) {
+                        $htmlEstado = "<span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 1</span>
+                                    <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Comité</span>";
+                    } else {
+                        $htmlEstado = "<span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 1</span>
+                                    <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Estudiante</span>";
+                    }
+                } 
+                elseif ($p->estado === 'Fase 2') {
+                    $submited = $p->valoresCampos->where('campo.name', 'submited_fase2')->first();
+                    $yaEnvio = $submited && $submited->valor === 'true';
+                    
+                    if ($yaEnvio) {
+                        $htmlEstado = "<span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 2</span>
+                                    <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Comité</span>";
+                    } else {
+                        $htmlEstado = "<span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 2</span>
+                                    <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Estudiante</span>";
+                    }
                 }
-            }
-            elseif ($p->estado === 'Fase 3') {
-                $submited = $p->valoresCampos->where('campo.name', 'submited_fase3')->first();
-                $yaEnvio = $submited && $submited->valor === 'true';
+                elseif ($p->estado === 'Fase 3') {
+                    $submited = $p->valoresCampos->where('campo.name', 'submited_fase3')->first();
+                    $yaEnvio = $submited && $submited->valor === 'true';
 
-                if ($yaEnvio) {
-                    $htmlEstado = "<span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 3</span>
-                                <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Director</span>";
-                } else {
-                    $htmlEstado = "<span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 3</span>
-                                <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Estudiante</span>";
+                    if ($yaEnvio) {
+                        $htmlEstado = "<span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 3</span>
+                                    <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Director</span>";
+                    } else {
+                        $htmlEstado = "<span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 3</span>
+                                    <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Estudiante</span>";
+                    }
                 }
-            }
-         
-            elseif ($p->estado === 'Fase 4') {
-                $estadoEvaluador = $p->valoresCampos
-                    ->where('campo.name', 'estado_evaluador_fase4')
-                    ->first();
+            
+                elseif ($p->estado === 'Fase 4') {
+                    $estadoEvaluador = $p->valoresCampos
+                        ->where('campo.name', 'estado_evaluador_fase4')
+                        ->first();
 
-                $respondioEvaluador = $estadoEvaluador && !empty($estadoEvaluador->valor);
+                    $respondioEvaluador = $estadoEvaluador && !empty($estadoEvaluador->valor);
 
-                if ($respondioEvaluador) {
-                    $htmlEstado = "
-                        <span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 4</span>
-                        <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Comité</span>";
-                } else {
-                    $htmlEstado = "
-                        <span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 4</span>
-                        <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Evaluador</span>";
+                    if ($respondioEvaluador) {
+                        $htmlEstado = "
+                            <span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 4</span>
+                            <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Comité</span>";
+                    } else {
+                        $htmlEstado = "
+                            <span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 4</span>
+                            <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Evaluador</span>";
+                    }
                 }
-            }
 
-            elseif ($p->estado === 'Fase 5') {
-    $submited = $p->valoresCampos
-        ->where('campo.name', 'submited_fase5')
-        ->first();
-    $yaEnvio = $submited && $submited->valor === 'true';
+                elseif ($p->estado === 'Fase 5') {
+                    $submited = $p->valoresCampos
+                        ->where('campo.name', 'submited_fase5')
+                        ->first();
+                    $yaEnvio = $submited && $submited->valor === 'true';
 
-    $esBeneficiario = $this->esBeneficiarioIcfesListaPractica($p);
-    $badgeBeneficiario = $esBeneficiario ? '<span class="shadow bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded border border-blue-300">Beneficiario ICFES</span>' : '';
+                    $esBeneficiario = $this->esBeneficiarioIcfesListaPractica($p);
+                    $badgeBeneficiario = $esBeneficiario ? '<span class="shadow bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded border border-blue-300">Beneficiario ICFES</span>' : '';
 
-    if ($yaEnvio) {
-        $htmlEstado = "
-            <span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 5</span>
-            <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Director</span>
-            $badgeBeneficiario
-        ";
-    } else {
-        $htmlEstado = "
-            <span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 5</span>
-            <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Estudiante</span>
-            $badgeBeneficiario
-        ";
+                    if ($yaEnvio) {
+                        $htmlEstado = "
+                            <span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 5</span>
+                            <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Director</span>
+                            $badgeBeneficiario
+                        ";
+                    } else {
+                        $htmlEstado = "
+                            <span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 5</span>
+                            <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Estudiante</span>
+                            $badgeBeneficiario
+                        ";
+                    }
+                }
+                elseif ($p->estado === 'Fase 6') {
+                    $estadoEvaluador = $p->valoresCampos
+                        ->where('campo.name', 'estado_evaluador_fase6')
+                        ->first();
+
+                    $respondioEvaluador = $estadoEvaluador && !empty($estadoEvaluador->valor);
+
+                    $esBeneficiario = $this->esBeneficiarioIcfesListaPractica($p);
+                    $badgeBeneficiario = $esBeneficiario ? '<span class="shadow bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded border border-blue-300">Beneficiario ICFES</span>' : '';
+
+                    if ($respondioEvaluador) {
+                        $htmlEstado = "
+                            <span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 6</span>
+                            <span class='shadow bg-purple-100 text-purple-800 text-sm font-medium px-2.5 py-0.5 rounded border border-purple-300'>Comité</span>
+                            $badgeBeneficiario
+                        ";
+                    } else {
+                        $htmlEstado = "
+                            <span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 6</span>
+                            <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Evaluador</span>
+                            $badgeBeneficiario
+                        ";
+                    }
+                }
+
+                elseif ($p->estado === 'Finalizado') {
+                    $htmlEstado = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-green-100 text-green-800 border border-green-300'>Finalizado</span>";
+                }
+
+                if ($p->deshabilitado && $p->estado !== 'Rechazada') {
+                    $deshabilitadoBadge = "<span class='shadow bg-red-100 text-red-800 text-sm font-medium px-2.5 py-0.5 rounded border border-red-300'>Deshabilitado</span>";
+                    return $return_html . $htmlEstado . ' ' . $deshabilitadoBadge . "</div>";
+                }
+
+                return $return_html . $htmlEstado . "</div>";
+            })
+            ->addColumn('acciones', function ($p) {
+                $user = auth()->user();
+                $buttons = '<div class="flex items-center justify-center gap-2">';
+
+                // Botón Ver (siempre visible)
+                $buttons .= '<button onclick="openDetailsModal(this, ' . $p->id . ')" 
+                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white w-10 h-10 rounded-lg relative inline-flex items-center justify-center">
+                    <i class="fa-regular fa-eye"></i>
+                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
+                        <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
+                        <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
+                    </svg>
+                </button>';
+
+                // Botón Responder VERDE (para Comité en Fase 0 Pendiente)
+                $esComite = $user->hasRole(['super_admin', 'admin', 'coordinador']);
+                if ($esComite && $p->estado === 'Pendiente') {
+                    $submited = $p->valoresCampos->where('campo.name', 'submited_fase0')->first();
+                    if ($submited && $submited->valor === 'true') {
+                        $buttons .= '<button onclick="openResponderSolicitudModal(' . $p->id . ')"
+                            class="btn-action shadow bg-uts-500 hover:bg-uts-800 text-white px-3 py-1 rounded-lg">
+                            <i class="fa-solid fa-share"></i>
+                        </button>';
+                    }
+                }
+
+                // Botón Roadmap AZUL
+                $esFaseActiva = in_array($p->estado, ['Fase 1', 'Fase 2', 'Fase 3', 'Fase 4', 'Fase 5', 'Fase 6', 'Finalizado']);
+                $puedeVerRoadmap = !$p->deshabilitado && $esFaseActiva && $p->vencido != 1;
+
+                // Si es estudiante, verificar si está retirado
+                if (auth()->user()->hasRole('estudiante')) {
+                    $estaRetirado = $this->estudianteRetirado($p);
+                    if ($estaRetirado) {
+                        $puedeVerRoadmap = false;
+                    }
+                }
+
+                    // AGREGAR: Si es estudiante y es beneficiario ICFES, NO puede ver el roadmap
+                if (auth()->user()->hasRole('estudiante')) {
+                    $esBeneficiario = $this->esBeneficiarioIcfesListaPractica($p);
+                    if ($esBeneficiario) {
+                        $puedeVerRoadmap = false;
+                    }
+                }
+
+                if ($puedeVerRoadmap) {
+                    $buttons .= '
+                        <form action="' . route('practicas.roadmap') . '" method="POST" class="inline-block m-0" onsubmit="return showRoadmapSpinner(this)">
+                            ' . csrf_field() . '
+                            <input type="hidden" name="practica_id" value="' . $p->id . '">
+                            <button type="submit" class="btn-action shadow bg-indigo-500 hover:bg-indigo-800 text-white rounded-lg inline-flex items-center justify-center">
+                                <i class="fa-solid fa-map-location-dot"></i>
+                                <svg class="loading-spinner hidden text-white animate-spin" viewBox="0 0 64 64" fill="none">
+                                    <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
+                                </svg>
+                            </button>
+                        </form>';
+                }
+
+                // Botón Deshabilitar/Habilitar (SOLO para Comité)
+                if ($esComite && $esFaseActiva && $p->estado !== 'Rechazada') {
+                    if (!$p->deshabilitado) {
+                        $buttons .= '<button onclick="deshabilitarPracticaConActa(' . $p->id . ')"
+                            class="btn-action shadow bg-red-500 hover:bg-red-700 text-white rounded-lg inline-flex items-center justify-center">
+                            <i class="fa-regular fa-circle-xmark"></i>
+                        </button>';
+                    } else {
+                        $buttons .= '<button onclick="habilitarPracticaConActa(' . $p->id . ')"
+                            class="btn-action shadow bg-teal-500 hover:bg-teal-800 text-white px-3 py-1 rounded-lg relative">
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                        </button>';
+                    }
+                }
+
+                $buttons .= '</div>';
+                return $buttons;
+            })
+            ->rawColumns(['estado', 'acciones', 'descripcion'])
+            ->make(true);
     }
-}
-elseif ($p->estado === 'Fase 6') {
-    $estadoEvaluador = $p->valoresCampos
-        ->where('campo.name', 'estado_evaluador_fase6')
-        ->first();
-
-    $respondioEvaluador = $estadoEvaluador && !empty($estadoEvaluador->valor);
-
-    $esBeneficiario = $this->esBeneficiarioIcfesListaPractica($p);
-    $badgeBeneficiario = $esBeneficiario ? '<span class="shadow bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded border border-blue-300">Beneficiario ICFES</span>' : '';
-
-    if ($respondioEvaluador) {
-        $htmlEstado = "
-            <span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 6</span>
-            <span class='shadow bg-purple-100 text-purple-800 text-sm font-medium px-2.5 py-0.5 rounded border border-purple-300'>Comité</span>
-            $badgeBeneficiario
-        ";
-    } else {
-        $htmlEstado = "
-            <span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 6</span>
-            <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Evaluador</span>
-            $badgeBeneficiario
-        ";
-    }
-}
-
-            elseif ($p->estado === 'Finalizado') {
-                $htmlEstado = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-green-100 text-green-800 border border-green-300'>Finalizado</span>";
-            }
-
-            if ($p->deshabilitado && $p->estado !== 'Rechazada') {
-                $deshabilitadoBadge = "<span class='shadow bg-red-100 text-red-800 text-sm font-medium px-2.5 py-0.5 rounded border border-red-300'>Deshabilitado</span>";
-                return $return_html . $htmlEstado . ' ' . $deshabilitadoBadge . "</div>";
-            }
-
-            return $return_html . $htmlEstado . "</div>";
-        })
-        ->addColumn('acciones', function ($p) {
-            $user = auth()->user();
-            $buttons = '<div class="flex items-center justify-center gap-2">';
-
-            // Botón Ver (siempre visible)
-            $buttons .= '<button onclick="openDetailsModal(this, ' . $p->id . ')" 
-                class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white w-10 h-10 rounded-lg relative inline-flex items-center justify-center">
-                <i class="fa-regular fa-eye"></i>
-                <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none">
-                    <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5"></path>
-                    <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" class="text-white"></path>
-                </svg>
-            </button>';
-
-            // Botón Responder VERDE (para Comité en Fase 0 Pendiente)
-            $esComite = $user->hasRole(['super_admin', 'admin', 'coordinador']);
-            if ($esComite && $p->estado === 'Pendiente') {
-                $submited = $p->valoresCampos->where('campo.name', 'submited_fase0')->first();
-                if ($submited && $submited->valor === 'true') {
-                    $buttons .= '<button onclick="openResponderSolicitudModal(' . $p->id . ')"
-                        class="btn-action shadow bg-uts-500 hover:bg-uts-800 text-white px-3 py-1 rounded-lg">
-                        <i class="fa-solid fa-share"></i>
-                    </button>';
-                }
-            }
-
-            // Botón Roadmap AZUL
-$esFaseActiva = in_array($p->estado, ['Fase 1', 'Fase 2', 'Fase 3', 'Fase 4', 'Fase 5', 'Fase 6', 'Finalizado']);
-$puedeVerRoadmap = !$p->deshabilitado && $esFaseActiva && $p->vencido != 1;
-
-// Si es estudiante, verificar si está retirado
-if (auth()->user()->hasRole('estudiante')) {
-    $estaRetirado = $this->estudianteRetirado($p);
-    if ($estaRetirado) {
-        $puedeVerRoadmap = false;
-    }
-}
-
-    // AGREGAR: Si es estudiante y es beneficiario ICFES, NO puede ver el roadmap
-if (auth()->user()->hasRole('estudiante')) {
-    $esBeneficiario = $this->esBeneficiarioIcfesListaPractica($p);
-    if ($esBeneficiario) {
-        $puedeVerRoadmap = false;
-    }
-}
-
-if ($puedeVerRoadmap) {
-                $buttons .= '
-                    <form action="' . route('practicas.roadmap') . '" method="POST" class="inline-block m-0" onsubmit="return showRoadmapSpinner(this)">
-                        ' . csrf_field() . '
-                        <input type="hidden" name="practica_id" value="' . $p->id . '">
-                        <button type="submit" class="btn-action shadow bg-indigo-500 hover:bg-indigo-800 text-white rounded-lg inline-flex items-center justify-center">
-                            <i class="fa-solid fa-map-location-dot"></i>
-                            <svg class="loading-spinner hidden text-white animate-spin" viewBox="0 0 64 64" fill="none">
-                                <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
-                                <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
-                            </svg>
-                        </button>
-                    </form>';
-            }
-
-            // Botón Deshabilitar/Habilitar (SOLO para Comité)
-            if ($esComite && $esFaseActiva && $p->estado !== 'Rechazada') {
-                if (!$p->deshabilitado) {
-                    $buttons .= '<button onclick="deshabilitarPracticaConActa(' . $p->id . ')"
-                        class="btn-action shadow bg-red-500 hover:bg-red-700 text-white rounded-lg inline-flex items-center justify-center">
-                        <i class="fa-regular fa-circle-xmark"></i>
-                    </button>';
-                } else {
-                    $buttons .= '<button onclick="habilitarPracticaConActa(' . $p->id . ')"
-                        class="btn-action shadow bg-teal-500 hover:bg-teal-800 text-white px-3 py-1 rounded-lg relative">
-                        <i class="fa-solid fa-clock-rotate-left"></i>
-                    </button>';
-                }
-            }
-
-            $buttons .= '</div>';
-            return $buttons;
-        })
-        ->rawColumns(['estado', 'acciones', 'descripcion'])
-        ->make(true);
-}
 
     // Dentro del método getData(), después de las funciones existentes
-// Agrega esta función auxiliar
+    // Agrega esta función auxiliar
+    private function esBeneficiarioIcfesListaPractica($practica)
+    {
+        if (!auth()->user()->hasRole('estudiante')) {
+            return false;
+        }
 
-private function esBeneficiarioIcfesListaPractica($practica)
-{
-    if (!auth()->user()->hasRole('estudiante')) {
-        return false;
+        $campoBeneficiario = Campo::where('name', 'beneficiarios_icfes_practicas')
+            ->where('tipo_solicitud_id', $practica->tipo_solicitud_id)
+            ->first();
+
+        if (!$campoBeneficiario) {
+            return false;
+        }
+
+        $valorBeneficiario = $practica->valoresCampos
+            ->where('campo_id', $campoBeneficiario->id)
+            ->first();
+
+        if (!$valorBeneficiario || !$valorBeneficiario->valor) {
+            return false;
+        }
+
+        $beneficiarios = json_decode($valorBeneficiario->valor, true);
+        
+        if (!is_array($beneficiarios)) {
+            $beneficiarios = [];
+        }
+        
+        $beneficiarios = array_map('intval', $beneficiarios);
+        $userId = (int) auth()->id();
+        
+        return in_array($userId, $beneficiarios);
     }
 
-    $campoBeneficiario = Campo::where('name', 'beneficiarios_icfes_practicas')
-        ->where('tipo_solicitud_id', $practica->tipo_solicitud_id)
-        ->first();
-
-    if (!$campoBeneficiario) {
-        return false;
+    private function yaEnvioSolicitudIcfes($practica)
+    {
+        $userId = (string) auth()->id();
+        
+        $campoSubmited = Campo::where('name', 'submited_icfes_practicas')
+            ->where('tipo_solicitud_id', $practica->tipo_solicitud_id)
+            ->first();
+        
+        if (!$campoSubmited) {
+            return false;
+        }
+        
+        $valor = $practica->valoresCampos
+            ->where('campo_id', $campoSubmited->id)
+            ->first();
+        
+        if (!$valor || !$valor->valor) {
+            return false;
+        }
+        
+        $submitedData = json_decode($valor->valor, true) ?: [];
+        
+        return isset($submitedData[$userId]) && $submitedData[$userId] === true;
     }
-
-    $valorBeneficiario = $practica->valoresCampos
-        ->where('campo_id', $campoBeneficiario->id)
-        ->first();
-
-    if (!$valorBeneficiario || !$valorBeneficiario->valor) {
-        return false;
-    }
-
-    $beneficiarios = json_decode($valorBeneficiario->valor, true);
-    
-    if (!is_array($beneficiarios)) {
-        $beneficiarios = [];
-    }
-    
-    $beneficiarios = array_map('intval', $beneficiarios);
-    $userId = (int) auth()->id();
-    
-    return in_array($userId, $beneficiarios);
-}
-
-private function yaEnvioSolicitudIcfes($practica)
-{
-    $userId = (string) auth()->id();
-    
-    $campoSubmited = Campo::where('name', 'submited_icfes_practicas')
-        ->where('tipo_solicitud_id', $practica->tipo_solicitud_id)
-        ->first();
-    
-    if (!$campoSubmited) {
-        return false;
-    }
-    
-    $valor = $practica->valoresCampos
-        ->where('campo_id', $campoSubmited->id)
-        ->first();
-    
-    if (!$valor || !$valor->valor) {
-        return false;
-    }
-    
-    $submitedData = json_decode($valor->valor, true) ?: [];
-    
-    return isset($submitedData[$userId]) && $submitedData[$userId] === true;
-}
 
     private function estudianteRetirado($practica)
-{
-    if (!auth()->user()->hasRole('estudiante')) {
-        return false;
+    {
+        if (!auth()->user()->hasRole('estudiante')) {
+            return false;
+        }
+        
+        $campoRetirados = Campo::where('name', 'retirados_practica')
+            ->where('tipo_solicitud_id', $practica->tipo_solicitud_id)
+            ->first();
+        
+        if (!$campoRetirados) {
+            return false;
+        }
+        
+        $valor = $practica->valoresCampos
+            ->where('campo_id', $campoRetirados->id)
+            ->first();
+        
+        if (!$valor || !$valor->valor) {
+            return false;
+        }
+        
+        $retirados = json_decode($valor->valor, true);
+        
+        if (!is_array($retirados)) {
+            return false;
+        }
+        
+        $retirados = array_map('intval', $retirados);
+        $userId = (int) auth()->id();
+        
+        return in_array($userId, $retirados);
     }
-    
-    $campoRetirados = Campo::where('name', 'retirados_practica')
-        ->where('tipo_solicitud_id', $practica->tipo_solicitud_id)
-        ->first();
-    
-    if (!$campoRetirados) {
-        return false;
-    }
-    
-    $valor = $practica->valoresCampos
-        ->where('campo_id', $campoRetirados->id)
-        ->first();
-    
-    if (!$valor || !$valor->valor) {
-        return false;
-    }
-    
-    $retirados = json_decode($valor->valor, true);
-    
-    if (!is_array($retirados)) {
-        return false;
-    }
-    
-    $retirados = array_map('intval', $retirados);
-    $userId = (int) auth()->id();
-    
-    return in_array($userId, $retirados);
-}
 
-public function buscarEstudiantes(Request $request)
+    public function buscarEstudiantes(Request $request)
     {
         try {
             $search = $request->get('search');
@@ -640,10 +671,7 @@ public function buscarEstudiantes(Request $request)
     }
     
     
-    
-    
-    
-    
+
    public function store(StorePracticaRequest $request)
     {
         $practica = $this->practicaService
@@ -716,140 +744,138 @@ public function buscarEstudiantes(Request $request)
         return response()->json(['success' => 'Respuesta enviada exitosamente', 'estado' => $practica->estado]);
     }
 
-
-    
     public function getDetalle($id)
-{
-    try {
-        $practica = Practica::with('user.nivel', 'valoresCampos.campo')->findOrFail($id);
-        
-        $data = [];
-        foreach ($practica->valoresCampos as $vc) {
-            if ($vc->campo && $vc->campo->name) {
-                $data[$vc->campo->name] = $vc->valor;
+    {
+        try {
+            $practica = Practica::with('user.nivel', 'valoresCampos.campo')->findOrFail($id);
+            
+            $data = [];
+            foreach ($practica->valoresCampos as $vc) {
+                if ($vc->campo && $vc->campo->name) {
+                    $data[$vc->campo->name] = $vc->valor;
+                }
             }
-        }
-        
-        // Determinar si el usuario es estudiante
-        $esEstudiante = auth()->user()->hasRole('estudiante');
+            
+            // Determinar si el usuario es estudiante
+            $esEstudiante = auth()->user()->hasRole('estudiante');
 
-        // Obtener el segundo integrante
-        $integrante2 = null;
-        if (isset($data['id_integrante_2']) && !empty($data['id_integrante_2'])) {
-            $integrante2 = \App\Models\User::find($data['id_integrante_2']);
-        }
+            // Obtener el segundo integrante
+            $integrante2 = null;
+            if (isset($data['id_integrante_2']) && !empty($data['id_integrante_2'])) {
+                $integrante2 = \App\Models\User::find($data['id_integrante_2']);
+            }
 
-        // Construir HTML de integrantes
-        $integrantesHtml = '';
-        
-        // Integrante 1
-        $integrantesHtml .= '<div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">';
-        $integrantesHtml .= '<p class="font-semibold text-gray-700 mb-2 sm:mb-0 w-1/3 min-w-[100px]">Integrante:</p>';
-        $integrantesHtml .= '<div class="text-gray-800 w-full sm:flex-1 sm:ml-2">';
-        $integrantesHtml .= e($practica->user->name) . '<br>';
-        $integrantesHtml .= 'C.C ' . e($practica->user->nro_documento ?? 'N/A') . '<br>';
-        $integrantesHtml .= '<a href="mailto:' . e($practica->user->email) . '" class="text-blue-600 underline">'. e($practica->user->email) .'</a><br>';
-        $integrantesHtml .= e($practica->user->nro_celular ?? 'N/A');
-        $integrantesHtml .= '</div></div>';
-        
-        // Integrante 2 (si existe)
-        if ($integrante2) {
+            // Construir HTML de integrantes
+            $integrantesHtml = '';
+            
+            // Integrante 1
             $integrantesHtml .= '<div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">';
             $integrantesHtml .= '<p class="font-semibold text-gray-700 mb-2 sm:mb-0 w-1/3 min-w-[100px]">Integrante:</p>';
             $integrantesHtml .= '<div class="text-gray-800 w-full sm:flex-1 sm:ml-2">';
-            $integrantesHtml .= e($integrante2->name) . '<br>';
-            $integrantesHtml .= 'C.C ' . e($integrante2->nro_documento ?? 'N/A') . '<br>';
-            $integrantesHtml .= '<a href="mailto:' . e($integrante2->email) . '" class="text-blue-600 underline">'. e($integrante2->email) .'</a><br>';
-            $integrantesHtml .= e($integrante2->nro_celular ?? 'N/A');
+            $integrantesHtml .= e($practica->user->name) . '<br>';
+            $integrantesHtml .= 'C.C ' . e($practica->user->nro_documento ?? 'N/A') . '<br>';
+            $integrantesHtml .= '<a href="mailto:' . e($practica->user->email) . '" class="text-blue-600 underline">'. e($practica->user->email) .'</a><br>';
+            $integrantesHtml .= e($practica->user->nro_celular ?? 'N/A');
             $integrantesHtml .= '</div></div>';
-        }
-        
-        // Obtener nombres de los docentes en lugar de IDs
-        $directorNombre = 'No asignado';
-        $evaluadorNombre = 'No asignado';
-        $codirectorNombre = 'No asignado';
-        
-        if (isset($data['director_id']) && !empty($data['director_id'])) {
-            $director = \App\Models\User::find($data['director_id']);
-            $directorNombre = $director ? $director->name : 'No asignado';
-        }
-        
-        if (isset($data['evaluador_id']) && !empty($data['evaluador_id'])) {
-            $evaluador = \App\Models\User::find($data['evaluador_id']);
-            $evaluadorNombre = $evaluador ? $evaluador->name : 'No asignado';
-        }
-        
-        if (isset($data['codirector_id']) && !empty($data['codirector_id'])) {
-            $codirector = \App\Models\User::find($data['codirector_id']);
-            $codirectorNombre = $codirector ? $codirector->name : 'No asignado';
-        }
-        
-        // Si es estudiante, ocultar evaluador
-        if ($esEstudiante) {
-            $docentesHtml = '<div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">';
-            $docentesHtml .= '<p class="font-semibold text-gray-700 mb-2 sm:mb-0 w-1/3 min-w-[100px]">Docentes:</p>';
-            $docentesHtml .= '<div class="text-gray-800 w-full sm:flex-1 sm:ml-2">';
-            $docentesHtml .= '<span><b>Director:</b> ' . e($directorNombre) . '</span><br>';
-            $docentesHtml .= '<span><b>Codirector:</b> ' . e($codirectorNombre) . '</span>';
-            $docentesHtml .= '</div></div>';
-        } else {
-            $docentesHtml = '<div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">';
-            $docentesHtml .= '<p class="font-semibold text-gray-700 mb-2 sm:mb-0 w-1/3 min-w-[100px]">Docentes:</p>';
-            $docentesHtml .= '<div class="text-gray-800 w-full sm:flex-1 sm:ml-2">';
-            $docentesHtml .= '<span><b>Director:</b> ' . e($directorNombre) . '</span><br>';
-            $docentesHtml .= '<span><b>Evaluador:</b> ' . e($evaluadorNombre) . '</span><br>';
-            $docentesHtml .= '<span><b>Codirector:</b> ' . e($codirectorNombre) . '</span>';
-            $docentesHtml .= '</div></div>';
-        }
-        
-        // Título - Buscar en orden jerárquico
-$titulo = 'No disponible';
+            
+            // Integrante 2 (si existe)
+            if ($integrante2) {
+                $integrantesHtml .= '<div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">';
+                $integrantesHtml .= '<p class="font-semibold text-gray-700 mb-2 sm:mb-0 w-1/3 min-w-[100px]">Integrante:</p>';
+                $integrantesHtml .= '<div class="text-gray-800 w-full sm:flex-1 sm:ml-2">';
+                $integrantesHtml .= e($integrante2->name) . '<br>';
+                $integrantesHtml .= 'C.C ' . e($integrante2->nro_documento ?? 'N/A') . '<br>';
+                $integrantesHtml .= '<a href="mailto:' . e($integrante2->email) . '" class="text-blue-600 underline">'. e($integrante2->email) .'</a><br>';
+                $integrantesHtml .= e($integrante2->nro_celular ?? 'N/A');
+                $integrantesHtml .= '</div></div>';
+            }
+            
+            // Obtener nombres de los docentes en lugar de IDs
+            $directorNombre = 'No asignado';
+            $evaluadorNombre = 'No asignado';
+            $codirectorNombre = 'No asignado';
+            
+            if (isset($data['director_id']) && !empty($data['director_id'])) {
+                $director = \App\Models\User::find($data['director_id']);
+                $directorNombre = $director ? $director->name : 'No asignado';
+            }
+            
+            if (isset($data['evaluador_id']) && !empty($data['evaluador_id'])) {
+                $evaluador = \App\Models\User::find($data['evaluador_id']);
+                $evaluadorNombre = $evaluador ? $evaluador->name : 'No asignado';
+            }
+            
+            if (isset($data['codirector_id']) && !empty($data['codirector_id'])) {
+                $codirector = \App\Models\User::find($data['codirector_id']);
+                $codirectorNombre = $codirector ? $codirector->name : 'No asignado';
+            }
+            
+            // Si es estudiante, ocultar evaluador
+            if ($esEstudiante) {
+                $docentesHtml = '<div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">';
+                $docentesHtml .= '<p class="font-semibold text-gray-700 mb-2 sm:mb-0 w-1/3 min-w-[100px]">Docentes:</p>';
+                $docentesHtml .= '<div class="text-gray-800 w-full sm:flex-1 sm:ml-2">';
+                $docentesHtml .= '<span><b>Director:</b> ' . e($directorNombre) . '</span><br>';
+                $docentesHtml .= '<span><b>Codirector:</b> ' . e($codirectorNombre) . '</span>';
+                $docentesHtml .= '</div></div>';
+            } else {
+                $docentesHtml = '<div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">';
+                $docentesHtml .= '<p class="font-semibold text-gray-700 mb-2 sm:mb-0 w-1/3 min-w-[100px]">Docentes:</p>';
+                $docentesHtml .= '<div class="text-gray-800 w-full sm:flex-1 sm:ml-2">';
+                $docentesHtml .= '<span><b>Director:</b> ' . e($directorNombre) . '</span><br>';
+                $docentesHtml .= '<span><b>Evaluador:</b> ' . e($evaluadorNombre) . '</span><br>';
+                $docentesHtml .= '<span><b>Codirector:</b> ' . e($codirectorNombre) . '</span>';
+                $docentesHtml .= '</div></div>';
+            }
+            
+            // Título - Buscar en orden jerárquico
+        $titulo = 'No disponible';
 
-if (isset($data['titulo_propuesta_fase4']) && !empty($data['titulo_propuesta_fase4'])) {
-    $titulo = $data['titulo_propuesta_fase4'];
-} elseif (isset($data['titulo_propuesta_director_fase3']) && !empty($data['titulo_propuesta_director_fase3'])) {
-    $titulo = $data['titulo_propuesta_director_fase3'];
-} elseif (isset($data['titulo']) && !empty($data['titulo'])) {
-    $titulo = $data['titulo'];
-}
-        
-        // Nivel académico
-        $nivel = $practica->user->nivel->nombre ?? 'N/A';
-        
-        // Periodo académico
-        $periodo = $data['periodo'] ?? (date('Y') . '-' . (date('n') <= 6 ? '1' : '2'));
-        
-        // Modalidad
-        $modalidad = 'Prácticas empresariales';
-        
-        // Empresa
-        $tieneEmpresa = $data['tiene_empresa'] ?? 'false';
-        $hojaVida = $data['hoja_vida'] ?? null;
-        $hojaVida2 = $data['hoja_vida_2'] ?? null;
-        
-        return response()->json([
-            'id' => $practica->id,
-            'estado' => $practica->estado,
-            'vencido' => $practica->vencido,
-            'deshabilitado' => $practica->deshabilitado,
-            'fecha_solicitud' => $practica->created_at->format('d/m/Y H:i'),
-            'integrantes_html' => $integrantesHtml,
-            'docentes_html' => $docentesHtml,
-            'titulo' => $titulo,
-            'nivel' => $nivel,
-            'periodo' => $periodo,
-            'modalidad' => $modalidad,
-            'tiene_empresa' => $tieneEmpresa === 'true',
-            'hoja_vida' => $hojaVida,
-            'hoja_vida_2' => $hojaVida2,
-            'es_estudiante' => $esEstudiante
-        ]);
-        
-    } catch (\Exception $e) {
-        \Log::error('Error en getDetalle: ' . $e->getMessage());
-        return response()->json(['error' => 'Error al cargar los detalles'], 500);
+        if (isset($data['titulo_propuesta_fase4']) && !empty($data['titulo_propuesta_fase4'])) {
+            $titulo = $data['titulo_propuesta_fase4'];
+        } elseif (isset($data['titulo_propuesta_director_fase3']) && !empty($data['titulo_propuesta_director_fase3'])) {
+            $titulo = $data['titulo_propuesta_director_fase3'];
+        } elseif (isset($data['titulo']) && !empty($data['titulo'])) {
+            $titulo = $data['titulo'];
+        }
+            
+            // Nivel académico
+            $nivel = $practica->user->nivel->nombre ?? 'N/A';
+            
+            // Periodo académico
+            $periodo = $data['periodo'] ?? (date('Y') . '-' . (date('n') <= 6 ? '1' : '2'));
+            
+            // Modalidad
+            $modalidad = 'Prácticas empresariales';
+            
+            // Empresa
+            $tieneEmpresa = $data['tiene_empresa'] ?? 'false';
+            $hojaVida = $data['hoja_vida'] ?? null;
+            $hojaVida2 = $data['hoja_vida_2'] ?? null;
+            
+            return response()->json([
+                'id' => $practica->id,
+                'estado' => $practica->estado,
+                'vencido' => $practica->vencido,
+                'deshabilitado' => $practica->deshabilitado,
+                'fecha_solicitud' => $practica->created_at->format('d/m/Y H:i'),
+                'integrantes_html' => $integrantesHtml,
+                'docentes_html' => $docentesHtml,
+                'titulo' => $titulo,
+                'nivel' => $nivel,
+                'periodo' => $periodo,
+                'modalidad' => $modalidad,
+                'tiene_empresa' => $tieneEmpresa === 'true',
+                'hoja_vida' => $hojaVida,
+                'hoja_vida_2' => $hojaVida2,
+                'es_estudiante' => $esEstudiante
+            ]);
+            
+        } catch (\Exception $e) {
+            \Log::error('Error en getDetalle: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al cargar los detalles'], 500);
+        }
     }
-}
 
     public function show($id)
     {
