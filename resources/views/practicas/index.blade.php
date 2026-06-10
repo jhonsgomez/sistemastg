@@ -1,3 +1,14 @@
+
+    @php
+use Carbon\Carbon;
+
+$fechaActual = Carbon::now()->format('Y-m-d');
+
+$anio_inicio = 2025;
+$anio_actual = Carbon::now()->year;
+$mes_actual = Carbon::now()->month;
+@endphp
+
 <!---Este es el que trae el menu -->
 <x-app-layout>
     <x-slot name="header">
@@ -223,7 +234,7 @@
             select.dt-input:focus {
                 border-color: #C1D631 !important;
                 outline: none !important;
-                box-shadow: 0 0 0 2px rgba(193, 214, 49, 1) !important;
+                box-shadow: 0 0 0 1.5px rgba(193, 214, 49, 1) !important;
             }
 
             /* Estilos para cualquier input o select dentro del wrapper de DataTables */
@@ -448,23 +459,31 @@
                     </path>
                 </svg>
             </button>
-            <!--- AQUI SOLO VA LA VARIABLE $fechas--->
-            <button type="button" id="calendar" onclick="openCalendarModal(this)"
-                class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center"
-                style="margin-right: 0.3rem !important">
-                <i class="fa-regular fa-calendar"></i>
-                <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none"
-                    xmlns="http://www.w3.org/2000/svg" width="24" height="24">
-                    <path
-                        d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
-                        stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
-                    <path
-                        d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
-                        stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"
-                        class="text-white">
-                    </path>
-                </svg>
-            </button>
+
+            <!-- Botón Calendario (Verde) -->
+                <!--- AQUI SOLO VA LA VARIABLE $fechas--->
+
+                @if ($fechas)
+                @if ($fechaActual >= $fechas['fecha_inicio_proyectos'] && $fechaActual <= $fechas['fecha_fin_proyectos'])
+
+                <button type="button" id="calendar" onclick="openCalendarModal(this)"
+                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white px-3 py-1 rounded-lg relative">
+                    <i class="fa-regular fa-calendar"></i>
+                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none"
+                        xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                        <path
+                            d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
+                            stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <path
+                            d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
+                            stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"
+                            class="text-white">
+                        </path>
+                    </svg>
+                </button>
+                @endif
+                @endif
+
             @if (auth()->user()->hasRole(['estudiante']))
                 @can('create_proyecto_grado')
                     <button onclick="openCreateModal()" id="openCreateModalButton"
@@ -562,7 +581,7 @@
                     <form id="practicasForm" class="p-6 mt-2" method="POST" enctype="multipart/form-data">
                         @csrf
                         <p class="text-2xl font-bold mb-6" id="formTitle"></p>
-                        <p class="text-sm mb-6">En este formulario el estudiante registrará la información necesaria para la solicitud de prácticas empresariales.</p>
+                        <p class="text-md mb-6">En este formulario el estudiante registrará la información necesaria para la solicitud de prácticas empresariales.</p>
                         
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6">
                             
@@ -684,15 +703,13 @@
                                 </div>
                                 
                                 <div class="relative">
-                                    <input type="text" id="search_integrante_2"
-                                        placeholder="Escribe el documento del integrante"
-                                        class="border-gray-300 focus:border-uts-800 focus:ring-uts-800 rounded-md mt-1 block w-full"
-                                        autocomplete="off">
-                                    
-                                    <input type="hidden" name="id_integrante_2" id="id_integrante_2" value="">
-                                    
-                                    <!-- Lista desplegable -->
-                                    <div id="integrantes_list" class="absolute w-full bg-white border border-gray-200 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto mt-1"></div>
+                                    <select id="id_integrante_2"
+                                            name="id_integrante_2"
+                                            class="w-full">
+                                        <option value=""></option>
+                                    </select>
+
+                                    <span id="id_integrante_2Error" class="text-red-500 text-sm"></span>
                                 </div>
                                 
                                 <!-- Contenedor para mostrar el seleccionado -->
@@ -756,7 +773,7 @@
                                     <div class="grid gap-1">
                                         <i class="mx-auto text-4xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
                                         <h2 class="text-center text-gray-400 text-xs leading-4">
-                                            Solo archivos de PDF de máximo {{ config('custom.peso_maximo_propuesta') }}MB
+                                            Solo archivos de PDF de máximo {{ config('practicas.peso_maximo_archivos') }} MB
                                         </h2>
                                     </div>
                                     <div class="grid gap-2">
@@ -789,7 +806,7 @@
                                             <i class="mx-auto text-4xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
 
                                             <h2 class="text-center text-gray-400 text-xs leading-4">
-                                                Solo archivos PDF
+                                                Solo archivos de PDF de máximo {{ config('practicas.peso_maximo_archivos') }} MB
                                             </h2>
                                         </div>
 
@@ -836,12 +853,12 @@
 
                         </div>
 
-                        <p class="text-red-600 text-mb mb-2">
+                        <p class="text-red-600 text-mb mb-6">
                             <i class="fa-solid fa-circle-info mr-1"></i>
                            Si selecciona un segundo integrante, el comité evaluará si la propuesta puede realizarse entre dos estudiantes. Luego, aprobará o rechazará la solicitud.
                         </p>
                         
-                        <p class="text-sm mb-2"><strong>NOTA: </strong>El estudiante debe tener aprobado el <strong>90%</strong> de los créditos (Tecnología: 97 / Profesional: 65).</p>
+                        <p class="text-sm mb-6"><strong>NOTA: </strong>El estudiante debe tener aprobado el <strong>90%</strong> de los créditos (Tecnología: 97 / Profesional: 65).</p>
                         <p class="text-sm mb-6"><strong>NOTA: </strong>Verifique si la empresa tiene convenio vigente en la pagina de la Oficina de Relaciones Interinstitucionales (ORI) :<a href="https://oriapp.uts.edu.co/activities_guest" target="_blank" class="text-uts-500 underline hover:text-uts-800"> Consultar convenios aquí </a></p>
 
                         <div class="flex justify-end space-x-2">
@@ -1079,7 +1096,7 @@
                     </button>
                     <form id="warningForm" class="p-6 mt-2">
                         @csrf
-                        <p class="text-2xl font-bold" style="margin: 0.8rem 0 1.5rem 0;" id="warningTitle">Enviar Reporte <span class="bg-uts-500 text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">PQRSD</span></p>
+                        <p class="text-2xl font-bold" style="margin: 0.8rem 0 1.5rem 0;" id="warningTitle">Enviar Reporte <span class="bg-uts-500 text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow text-lg">PQRSD</span></p>
                         <div class="mb-4">
                             <label for="mensaje_warning" class="block font-medium text-md text-gray-700 mb-4">
                                 En caso de presentar problemas con el sistema, por favor describa su reporte y envíelo:
@@ -1172,6 +1189,10 @@
     @push('scripts')
         <script src="{{ asset('js/fases/practicas/fase_0.js') }}"></script>
 
+        <script>
+            const MAX_FILE_SIZE_MB = {{ config('practicas.peso_maximo_archivos') }};
+        </script>
+        
         <!--Crear solicitud modal-->
 
         <script>
@@ -1186,14 +1207,12 @@
                 // Limpiar campos (igual que antes)
                 $('#modalidad').val('');
                 $('#id_integrante_2').val('').trigger('change');
-                $('#id_integrante_3').val('').trigger('change');
                 $('#periodo').val(periodo_academico);
 
                 $('#nivelError').text('');
                 $('#modalidadError').text('');
                 $('#id_integrante_1Error').text('');
                 $('#id_integrante_2Error').text('');
-                $('#id_integrante_3Error').text('');
                 $('#periodoError').text('');
 
                 // ÚNICA FORMA DE ABRIR: añadir clase show (sin tocar display)
@@ -1201,10 +1220,42 @@
             }
 
             function closeCreateModal() {
-                // ÚNICA FORMA DE CERRAR: quitar clase show
-                $('#createModal').removeClass('show');
-            }
 
+    // Limpiar formulario
+    $('#practicasForm')[0].reset();
+
+    // Limpiar segundo integrante
+    $('#id_integrante_2').val('');
+    $('#search_integrante_2').val('');
+    $('#selected_integrante_2').html('').addClass('hidden');
+    $('#integrantes_list').empty().addClass('hidden');
+
+    // Limpiar errores
+    $('#id_integrante_2Error').text('');
+    $('#tiene_empresaError').text('');
+    $('#hoja_vidaError').text('');
+    $('#hoja_vida2Error').text('');
+
+    // Limpiar archivos
+    $('#hoja_vida').val('');
+    $('#hoja_vida_2').val('');
+
+    $('#file-list-fase0').empty();
+    $('#file-list-fase0-2').empty();
+
+    $('#files-size-fase0').text('');
+    $('#files-size-fase0-2').text('');
+
+    // Ocultar contenedores de hojas de vida
+    $('#hojaVidaContainer').hide();
+    $('#hojaVidaLabel').hide();
+
+    $('#hojaVidaContainer2').hide();
+    $('#hojaVidaLabel2').hide();
+
+    // Cerrar modal
+    $('#createModal').removeClass('show');
+}
         </script>
 
         <script>
@@ -1212,74 +1263,34 @@
         let searchTimeout;
         
         // Búsqueda de estudiantes para segundo integrante
-        $(document).on('input', '#search_integrante_2', function() {
-            clearTimeout(searchTimeout);
-            let searchTerm = $(this).val().trim();
-            
-            if (searchTerm.length >= 5) {
-                searchTimeout = setTimeout(function() {
-                    $.ajax({
-                        url: '{{ route("practicas.buscar_estudiantes") }}',
-                        method: 'GET',
-                        data: { search: searchTerm },
-                        success: function(estudiantes) {
-                            let list = $('#integrantes_list');
-                            list.empty();
-                            
-                            if (estudiantes.length > 0) {
-                                estudiantes.forEach(function(estudiante) {
-                                    list.append(`
-                                        <div class="integrante-item"
-                                             onclick="seleccionarIntegrante2(${estudiante.id}, '${estudiante.nombre_completo.replace(/'/g, "\\'")}')"
-                                             data-documento="${estudiante.documento}">
-                                            <div class="font-medium">${estudiante.documento} | ${estudiante.nombre_completo}</div>
-                                            <div class="text-sm text-gray-500">${estudiante.nivel}</div>
-                                        </div>
-                                    `);
-                                });
-                                list.removeClass('hidden');
-                            } else {
-                                list.html('<div class="text-center py-3 text-gray-500">No se encontraron estudiantes</div>');
-                                list.removeClass('hidden');
-                            }
-                        },
-                        error: function(xhr) {
-                            console.error('Error en búsqueda:', xhr);
-                            $('#integrantes_list').html('<div class="text-center py-3 text-red-500">Error al buscar estudiantes</div>');
-                            $('#integrantes_list').removeClass('hidden');
-                        }
-                    });
-                }, 500);
-            } else if (searchTerm.length > 0 && searchTerm.length < 5) {
-                $('#integrantes_list').html('<div class="text-center py-3 text-gray-500">Por favor introduzca cinco (5) caracteres</div>');
-                $('#integrantes_list').removeClass('hidden');
-            } else {
-                $('#integrantes_list').addClass('hidden');
-            }
-        });
+        $('#id_integrante_2').select2({
+    dropdownParent: $('#createModal'),
+    placeholder: 'Escribe el documento del integrante',
+    allowClear: true,
+    width: '100%',
+    minimumInputLength: 5,
+    ajax: {
+        url: '{{ route("practicas.buscar_estudiantes") }}',
+        dataType: 'json',
+        delay: 500,
+        data: function(params) {
+            return {
+                search: params.term
+            };
+        },
+        processResults: function(data) {
+            return {
+                results: $.map(data, function(item) {
+                    return {
+                        id: item.id,
+                        text: item.documento + ' | ' + item.nombre_completo
+                    };
+                })
+            };
+        }
+    }
+});
     });
-    
-    function seleccionarIntegrante2(id, nombre) {
-        $('#id_integrante_2').val(id);
-        $('#selected_integrante_2').html(`
-            <div>
-                <span><i class="fa-solid fa-user-check text-uts-500 mr-2"></i>${nombre}</span>
-                <button type="button" onclick="limpiarIntegrante2()">
-                    <i class="fa-solid fa-times"></i>
-                </button>
-            </div>
-        `);
-        $('#selected_integrante_2').removeClass('hidden');
-        $('#search_integrante_2').val(nombre);
-        $('#integrantes_list').addClass('hidden');
-    }
-    
-    function limpiarIntegrante2() {
-        $('#id_integrante_2').val('');
-        $('#selected_integrante_2').addClass('hidden');
-        $('#search_integrante_2').val('');
-        $('#integrantes_list').addClass('hidden');
-    }
     
     // Cerrar lista al hacer clic fuera
     $(document).on('click', function(e) {
@@ -1288,6 +1299,62 @@
         }
     });
 </script>
+
+    <script>
+
+        // VALIDAR HOJA DE VIDA ARRASTAR Y SOLTAR EN PDF
+        
+        $('#hoja_vida').on('change', function () {
+
+    const file = this.files[0];
+
+    if (!file) return;
+
+    const allowedTypes = ['application/pdf'];
+
+    if (!allowedTypes.includes(file.type)) {
+
+        Swal.fire({
+            icon: 'error',
+            title: 'Archivo inválido',
+            text: 'Solo se permiten archivos en formato PDF.'
+        });
+
+        $(this).val('');
+
+        $('#file-list-fase0').empty();
+        $('#files-size-fase0').text('');
+
+        return;
+    }
+});
+
+    $('#hoja_vida_2').on('change', function () {
+
+    const file = this.files[0];
+
+    if (!file) return;
+
+    const allowedTypes = ['application/pdf'];
+
+    if (!allowedTypes.includes(file.type)) {
+
+        Swal.fire({
+            icon: 'error',
+            title: 'Archivo inválido',
+            text: 'Solo se permiten archivos en formato PDF.'
+        });
+
+        $(this).val('');
+
+        $('#file-list-fase0-2').empty();
+        $('#files-size-fase0-2').text('');
+
+        return;
+    }
+});
+
+    </script>
 
         <!--Responder solicitud modal-->
 <script>
@@ -1471,8 +1538,7 @@ function showToast(message, type = 'success') {
                             contentType: false,
                             success: function(response) {
                                 closeCreateModal();
-                                showToast('Solicitud de Práctica enviada correctamente');
-                                //  Recargar el DataTable
+                                showToast('Solicitud enviada correctamente');
                                 $('#practicasTable').DataTable().ajax.reload();
                             },
                             error: function(xhr) {
@@ -1482,7 +1548,6 @@ function showToast(message, type = 'success') {
                                         $('#' + campo + 'Error').text(errors[campo][0]);
                                     }
                                 } else {
-                                    // Si no hay errores de validación, recargar la tabla igualmente
                                     $('#practicasTable').DataTable().ajax.reload();
                                     closeCreateModal();
                                     showToast('Solicitud enviada (recarga para ver los cambios)');
@@ -1532,16 +1597,13 @@ function toggleHojaVida() {
 
     if (!container1) return;
 
-    // SI NO TIENE EMPRESA
     if (tieneEmpresaNo && tieneEmpresaNo.checked) {
 
-        // Mostrar primera hoja de vida
         container1.style.display = 'block';
 
         if (label1) {
             label1.style.display = 'flex';
         }
-        // SI EXISTE SEGUNDO INTEGRANTE
         if (integrante2 && integrante2.value !== '') {
 
             container2.style.display = 'block';
@@ -1560,7 +1622,6 @@ function toggleHojaVida() {
         }
     } else {
 
-        // Ocultar todo
         container1.style.display = 'none';
         if (label1) {
             label1.style.display = 'none';
@@ -1576,7 +1637,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     toggleHojaVida();
 
-    // Detectar cambios del segundo integrante
     const integrante2 = document.getElementById('id_integrante_2');
 
     if (integrante2) {
@@ -1591,9 +1651,11 @@ document.addEventListener('DOMContentLoaded', function () {
         <!--Datatables-->
 
         <script>
-            // Inicializar DataTable (como ya lo tienes)
 var table = $('#practicasTable').DataTable({
-    processing: false,
+
+    order: [[0, 'desc']],
+
+    processing: true,
     serverSide: true,
     ajax: {
         url: '{{ route("practicas.data") }}',
@@ -1605,27 +1667,33 @@ var table = $('#practicasTable').DataTable({
             { 
                 data: 'formatted_id', 
                 name: 'formatted_id', 
-                className: 'text-center'
+                className: 'text-center',
+                orderable: true,
+                searchable: true
             },
             { 
                 data: 'descripcion', 
                 name: 'descripcion', 
                 className: 'text-center',
-                orderable: false 
+                orderable: false,
+                sortable: false,
             },
             { 
                 data: 'estado', 
                 name: 'estado', 
-                className: 'text-center' 
+                className: 'text-center',
+                orderable: true,
+                searchable: true
             },
             { 
                 data: 'acciones', 
                 name: 'acciones', 
-                orderable: false, 
-                searchable: false, 
-                className: 'text-center' 
+                className: 'text-center',
+                orderable: false,
+                searchable: false 
             }
         ],
+        responsive: true,
         language: {
             "sProcessing": "",
             "sLengthMenu": "Mostrar _MENU_ registros por página",
@@ -1637,10 +1705,10 @@ var table = $('#practicasTable').DataTable({
             "sSearch": "Buscar:",
             "sLoadingRecords": "",
             "oPaginate": {
-                "sFirst": "<<",
-                "sLast": ">>",
-                "sNext": ">",
-                "sPrevious": "<"
+                "sFirst": '<i class="fa-solid fa-angles-left" style="font-size: 10px;"></i>',
+                "sLast": '<i class="fa-solid fa-angles-right" style="font-size: 10px;"></i>',
+                "sNext": '<i class="fa-solid fa-angle-right" style="font-size: 10px;"></i>',
+                "sPrevious": '<i class="fa-solid fa-angle-left" style="font-size: 10px;"></i>'
             }
         },
         pagingType: "full_numbers",
@@ -1648,7 +1716,9 @@ var table = $('#practicasTable').DataTable({
         pageLength: 5
 });
 
-// Evento cambio del filtro
+    $('#practicasTable_filter input')
+    .attr('placeholder', 'Ingrese una clave');
+
 $('#filtroRolesPracticas').on('change', function() {
     table.ajax.reload();
 });
@@ -1999,7 +2069,6 @@ $(document).ready(function() {
                             for (let key in errors) {
                                 $('#' + key + 'Error').text(errors[key][0]);
                             }
-                            // Limpiar errores después de 5 segundos
                             setTimeout(() => {
                                 for (let key in errors) {
                                     $('#' + key + 'Error').text('');
@@ -2224,7 +2293,6 @@ $(document).ready(function() {
     </script>
 
         <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
-        <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
 
     @endpush
 

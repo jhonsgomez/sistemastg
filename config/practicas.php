@@ -7,6 +7,8 @@ return [
     'dias_prorroga' => env('PRACTICA_PRORROGA_DIAS', 90),
     'dias_gracia_fase5' => env('PRACTICA_GRACIA_ENVIO_FASE5', 15),
 
+    'peso_maximo_archivos' => env('PESO_MAXIMO_ARCHIVOS', 8),
+    
     'correos' => [
 
         'practicas_fase_0' => [

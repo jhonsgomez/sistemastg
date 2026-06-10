@@ -163,7 +163,31 @@ class PracticaController extends Controller
                 if (is_numeric($search)) {
                     $q->orWhere('id', $search);
                 }
-                $q->orWhere('estado', 'LIKE', "%{$search}%");
+                $searchLower = strtolower(trim($search));
+
+if (preg_match('/^fase\s+([1-6])$/i', $searchLower, $matches)) {
+
+    $q->where('estado', 'Fase ' . $matches[1]);
+
+} else {
+
+    $q->orWhereHas('user', function ($uq) use ($search) {
+        $uq->where('name', 'LIKE', "%{$search}%")
+            ->orWhere('email', 'LIKE', "%{$search}%")
+            ->orWhere('nro_documento', 'LIKE', "%{$search}%")
+            ->orWhere('nro_celular', 'LIKE', "%{$search}%");
+    });
+
+    $q->orWhereHas('user.nivel', function ($nq) use ($search) {
+        $nq->where('nombre', 'LIKE', "%{$search}%");
+    });
+
+    $q->orWhereHas('valoresCampos', function ($vcq) use ($search) {
+        $vcq->whereHas('campo', function ($cq) {
+            $cq->whereIn('name', ['titulo', 'nombre_empresa']);
+        })->where('valor', 'LIKE', "%{$search}%");
+    });
+}
                 $q->orWhereHas('user', function ($uq) use ($search) {
                     $uq->where('name', 'LIKE', "%{$search}%")
                         ->orWhere('email', 'LIKE', "%{$search}%")
@@ -232,10 +256,11 @@ class PracticaController extends Controller
 
             } else {
 
-                $practicas = Practica::with('valoresCampos.campo')
+                $practicas = $practicas
+                    ->with('valoresCampos.campo')
                     ->orderBy('id', 'desc')
                     ->get();
-            }
+            }   
 
         return DataTables::of($practicas)
             ->addColumn('formatted_id', function ($p) {
