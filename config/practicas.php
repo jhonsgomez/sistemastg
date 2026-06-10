@@ -117,7 +117,64 @@ return [
 
             'view' =>
                 'emails.practicas.respuestaF6',
-        ]
+        ],
+
+          'recordatorio_practica' => [
+
+            'subject' =>
+                'RECORDATORIO PRÁCTICAS',
+
+            'view' =>
+                'emails.practicas.recordatorio',
+        ],
+
+        'recordatorio_prorroga' => [
+
+            'subject' =>
+                'RECORDATORIO SOLICITUD DE PRÓRROGA - PRÁCTICAS',
+
+            'view' =>
+                'emails.practicas.recordatorioProrroga',
+        ],
+
+        'recordatorio_revision_director_fase5' => [
+
+            'subject' =>
+                'RECORDATORIO REVISIÓN DOCUMENTOS FINALES - PRÁCTICAS',
+
+            'view' =>
+                'emails.practicas.recordatorioRevisionDirectorFase5',
+        ],
+
+        'solicitud_icfes_practicas' => [
+
+            'subject' =>
+                'SOLICITUD BENEFICIO ICFES - PRÁCTICAS EMPRESARIALES',
+
+            'view' =>
+                'emails.practicas.solicitudIcfes',
+        ],
+
+        'respuesta_icfes_practicas' => [
+
+            'subject' =>
+                'RESPUESTA SOLICITUD BENEFICIO ICFES - PRÁCTICAS',
+
+            'view' =>
+                'emails.practicas.respuestaIcfes',
+        ],
+
+        'practica_habilitada' => [
+            'subject' => 'PRÁCTICA HABILITADA',
+            'view' => 'emails.practicas.practicaHabilitada',
+        ],
+
+        'practica_deshabilitada' => [
+            'subject' => 'PRÁCTICA DESHABILITADA',
+            'view' => 'emails.practicas.practicaDeshabilitada',
+        ],
+
+
 
 
 

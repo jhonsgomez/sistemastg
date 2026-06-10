@@ -69,4 +69,8 @@ class PracticasMail extends Mailable implements ShouldQueue
 
         return $attachments;
     }
+
+    
+
+
 }

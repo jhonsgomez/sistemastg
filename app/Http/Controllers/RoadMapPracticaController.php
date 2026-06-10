@@ -10,6 +10,7 @@ use App\Models\TipoSolicitud;
 use App\Models\User;
 use Carbon\Carbon;
 use Exception;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
@@ -18,6 +19,8 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Fecha;
 use App\Services\PracticaMailService;
 use App\Services\PracticaService;
+use App\Mail\PracticasMail;
+use Illuminate\Support\Facades\Mail;
 
 
 class RoadMapPracticaController extends Controller
@@ -1606,10 +1609,6 @@ class RoadMapPracticaController extends Controller
                 );
             }
 
-            // Guardar fechas
-        $this->guardarValorCampo($practica->id, 'fecha_inicio_practica', Carbon::now()->toDateTimeString());
-        $this->guardarValorCampo($practica->id, 'fecha_limite_practica', Carbon::now()->addDays(180)->toDateTimeString());
-        $this->guardarValorCampo($practica->id, 'solicitudes_prorroga', '0');
 
             // Crear acta
             ActaPractica::create([
@@ -1618,14 +1617,22 @@ class RoadMapPracticaController extends Controller
                 'fecha' => $request->fecha_acta,
                 'descripcion' => $request->respuesta ?? '',
             ]);
-            
+
             // Pasar a Fase 5
             $practica->estado = 'Fase 5';
+
             $tipoFase5 = TipoSolicitud::where('nombre', 'practicas_fase_5')->first();
+
             if ($tipoFase5) {
                 $practica->tipo_solicitud_id = $tipoFase5->id;
             }
+
             $practica->save();
+
+            // Guardar fechas DESPUÉS de pasar a Fase 5
+            $this->guardarValorCampo($practica->id, 'fecha_inicio_practica', Carbon::now()->toDateTimeString());
+            $this->guardarValorCampo($practica->id, 'fecha_limite_practica', Carbon::now()->addDays(180)->toDateTimeString());
+            $this->guardarValorCampo($practica->id, 'solicitudes_prorroga', '0');
 
            
             Log::info('Fase 4 - Comité APROBÓ, pasa a Fase 5');
@@ -3059,8 +3066,42 @@ class RoadMapPracticaController extends Controller
             ['valor' => json_encode($submitedData)]
         );
 
-        return response()->json(['success' => 'Solicitud enviada correctamente']);
-    }
+        $integrante2 = null;
+
+        $campos = $practica->camposConValores();
+
+        foreach ($campos as $campo) {
+            if (($campo['campo'] ?? null) === 'id_integrante_2' && !empty($campo['valor'])) {
+                $integrante2 = User::with('tipo_documento')->find($campo['valor']);
+                break;
+            }
+        }
+
+        $data = [
+            'tipo_correo' => 'solicitud_icfes_practicas',
+
+            'cuerpo_correo' => [
+                'estado' => $practica->estado,
+                'estudiante' => auth()->user(),
+                'integrante_2' => $integrante2,
+            ],
+        ];
+
+        $destinatarios = [
+            auth()->user()->email,
+        ];
+
+        if (!empty($integrante2?->email)) {
+            $destinatarios[] = $integrante2->email;
+        }
+
+        $destinatarios = array_unique(array_filter($destinatarios));
+
+        Mail::to($destinatarios)
+            ->queue(new PracticasMail($data));
+
+                return response()->json(['success' => 'Solicitud enviada correctamente']);
+            }
 
     /* FASE 5/6 - Admin/Comité: Responder solicitud de beneficio ICFES */
     public function responderIcfesSolicitud(Request $request)
@@ -3139,6 +3180,24 @@ class RoadMapPracticaController extends Controller
                     );
                 }
             }
+        }
+        $estudiante = User::find($request->estudiante_id);
+
+        if ($estudiante && $estudiante->email) {
+            $data = [
+                'tipo_correo' => 'respuesta_icfes_practicas',
+
+                'cuerpo_correo' => [
+                    'estudiante' => $estudiante,
+                    'estado' => $request->estado_icfes_practicas,
+                    'respuesta' => $request->respuesta_icfes_practicas,
+                    'nro_acta' => $request->nro_acta_icfes_practicas,
+                    'fecha_acta' => $request->fecha_acta_icfes_practicas,
+                ],
+            ];
+
+            Mail::to($estudiante->email)
+                ->queue(new PracticasMail($data));
         }
 
         return response()->json(['success' => 'Respuesta enviada correctamente']);
@@ -3406,19 +3465,29 @@ class RoadMapPracticaController extends Controller
     // Funciones auxiliares privadas
     private function guardarValorCampo($practicaId, $campoName, $valor)
     {
-        $campo = Campo::where('name', $campoName)
-            ->where('tipo_solicitud_id', function($q) use ($practicaId) {
-                $practica = Practica::find($practicaId);
-                $q->select('id')->from('tipos_solicitudes')->where('nombre', 'practicas_fase_5');
-            })
+        $tipoFase5 = TipoSolicitud::where('nombre', 'practicas_fase_5')->first();
+
+        if (!$tipoFase5) {
+            return;
+        }
+
+        $campo = Campo::where('tipo_solicitud_id', $tipoFase5->id)
+            ->where('name', $campoName)
             ->first();
 
-        if ($campo) {
-            PracticaValorCampo::updateOrCreate(
-                ['practica_id' => $practicaId, 'campo_id' => $campo->id],
-                ['valor' => $valor]
-            );
+        if (!$campo) {
+            return;
         }
+
+        PracticaValorCampo::updateOrCreate(
+            [
+                'practica_id' => $practicaId,
+                'campo_id' => $campo->id,
+            ],
+            [
+                'valor' => $valor,
+            ]
+        );
     }
 
     private function actualizarCampo($practicaId, $campoName, $valor)

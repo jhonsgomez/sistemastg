@@ -886,16 +886,32 @@ class PracticaController extends Controller
     // Habilitar una práctica (cambiar deshabilitado a false)
     public function habilitar(Request $request)
     {
-        $practica = Practica::findOrFail($request->id);
-        $practica->update(['deshabilitado' => false]);
+        $practica = Practica::with(['user', 'valoresCampos.campo'])
+            ->findOrFail($request->id);
+
+        $practica->update([
+            'deshabilitado' => false
+        ]);
+
+        $this->practicaMailService
+            ->sendEstadoHabilitacion($practica, 'practica_habilitada');
+
         return response()->json(['success' => true]);
     }
 
     // Deshabilitar una práctica
     public function deshabilitar(Request $request)
     {
-        $practica = Practica::findOrFail($request->id);
-        $practica->update(['deshabilitado' => true]);
+        $practica = Practica::with(['user', 'valoresCampos.campo'])
+            ->findOrFail($request->id);
+
+        $practica->update([
+            'deshabilitado' => true
+        ]);
+
+        $this->practicaMailService
+            ->sendEstadoHabilitacion($practica, 'practica_deshabilitada');
+
         return response()->json(['success' => true]);
     }
 

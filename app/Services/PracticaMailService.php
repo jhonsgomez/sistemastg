@@ -1289,5 +1289,51 @@ class PracticaMailService
     }
 
 
+    public function sendEstadoHabilitacion($practica, string $tipoCorreo): void
+    {
+        try {
+            $user = $practica->user;
+            $campos = $practica->camposConValores();
+
+            $integrante2 = null;
+            $integrante2Correo = null;
+
+            foreach ($campos as $campo) {
+                if (($campo['campo'] ?? null) === 'id_integrante_2' && !empty($campo['valor'])) {
+                    $integrante2 = User::with('tipo_documento')->find($campo['valor']);
+                    $integrante2Correo = $integrante2->email ?? null;
+                    break;
+                }
+            }
+
+            $data = [
+                'tipo_correo' => $tipoCorreo,
+
+                'cuerpo_correo' => [
+                    'estado' => $practica->estado,
+                    'estudiante' => $user,
+                    'integrante_2' => $integrante2,
+                    'campos' => $campos,
+                ],
+            ];
+
+            $destinatarios = [
+                $user->email,
+            ];
+
+            if (!empty($integrante2Correo)) {
+                $destinatarios[] = $integrante2Correo;
+            }
+
+            $destinatarios = array_unique(array_filter($destinatarios));
+
+            Mail::to($destinatarios)
+                ->queue(new PracticasMail($data));
+
+        } catch (\Throwable $e) {
+            Log::error('Error enviando correo de habilitación/deshabilitación de práctica: ' . $e->getMessage());
+        }
+    }
+
 
 }

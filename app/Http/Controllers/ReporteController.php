@@ -26,7 +26,9 @@ class ReporteController extends Controller
 
             $mensaje = $request->mensaje_warning;
 
-            self::sendEmail($mensaje);
+            $modulo = $request->modulo ?? 'PROYECTOS DE GRADO';
+
+            $this->sendEmail($mensaje, $modulo);
 
             return response()->json(['mensaje' => $mensaje], 200);
         } catch (Exception $e) {
@@ -34,13 +36,15 @@ class ReporteController extends Controller
         }
     }
 
-    public function sendEmail($mensaje)
+    public function sendEmail($mensaje, $modulo = 'PROYECTOS DE GRADO')
     {
         try {
-            $asunto_correo = 'PQRSD - SOFTWARE DE PROYECTOS DE GRADO';
+            $asunto_correo = 'PQRSD - SOFTWARE DE ' . $modulo;
+
             $cuerpo_correo = [
                 'mensaje' => $mensaje,
                 'email' => auth()->user()->email,
+                'modulo' => $modulo,
             ];
 
             Mail::queue(new ReportesMail($asunto_correo, $cuerpo_correo));

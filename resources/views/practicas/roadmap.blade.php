@@ -2276,7 +2276,7 @@
                                 <a href="https://www.dropbox.com/scl/fo/pudgcaq639agy7t06ahjs/AN084HnuyHffgYL5i--v_Ks/DOCUMENTOS%20DE%20GRADO?dl=0&preview=F-DC-196+Acta+de+Terminaci%C3%B3n+y+Recibo+a+Satisfacci%C3%B3n+de+Pr%C3%A1cticas+V2.doc&rlkey=6s0b9ajweteyx2ang7ywvk6xm&subfolder_nav_tracking=1"
                                 target="_blank"
                                 class="text-blue-600 underline">
-                                Acta de Terminacion
+                                ACTA DE TERMINACIÓN
                                 </a>
 
                                 y la
@@ -4219,6 +4219,65 @@
                 $('#warningForm')[0].reset();
                 if (window.quillWarning) window.quillWarning.root.innerHTML = '';
             }
+
+            $('#warningForm').on('submit', function (e) {
+                e.preventDefault();
+
+                const loadingSpinner = document.getElementById('loadingSpinner-warning');
+
+                $('#mensaje_warning').val(window.quillWarning.root.innerHTML);
+
+                const url = `${window.APP_URL}/reportes/enviar`;
+                const method = 'POST';
+
+                const formData = new FormData(this);
+
+                formData.append('modulo', 'PRÁCTICAS EMPRESARIALES');
+
+                Swal.fire({
+                    heightAuto: false,
+                    title: '¿Está seguro?',
+                    text: "No podrá editar la información una vez se envíe",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#C1D631',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Sí, enviar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        loadingSpinner.classList.remove('hidden');
+
+                        $.ajax({
+                            url: url,
+                            method: method,
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+
+                            success: function () {
+                                closeWarningModal();
+                                showToast('Reporte enviado correctamente');
+                            },
+
+                            error: function (xhr) {
+                                const errors = xhr.responseJSON?.errors;
+                                $('#mensaje_warningError').text(errors?.mensaje_warning?.[0] || '');
+                            },
+
+                            complete: function () {
+                                loadingSpinner.classList.add('hidden');
+
+                                if (window.quillWarning) {
+                                    window.quillWarning.root.innerHTML = '';
+                                }
+
+                                $('#mensaje_warning').val('');
+                            }
+                        });
+                    }
+                });
+            });
         </script>
 
         <script>
@@ -4596,8 +4655,8 @@ $('#configAdminForm').on('submit', function(e) {
             formData.set('comentarios_config_admin', comentarios);
 
             // Después de sincronizar, ANTES de crear FormData
-console.log('Valor del campo hidden aprobar_prorroga:', $('input[name="aprobar_prorroga"]').val());
-console.log('Checkbox marcado:', $('#aprobar_prorroga').is(':checked'));
+            console.log('Valor del campo hidden aprobar_prorroga:', $('input[name="aprobar_prorroga"]').val());
+            console.log('Checkbox marcado:', $('#aprobar_prorroga').is(':checked'));
 
             $.ajax({
                 url: '{{ route("practicas.configurar_admin") }}',
@@ -4636,27 +4695,27 @@ function closeConfigAdminModal() {
     $('#configAdminModal').removeClass('show');
 }
 
-// Mostrar/ocultar campos según tipo de solicitud
-$(document).ready(function() {
-    $('#tipo_solicitud').on('change', function() {
-        var tipo = $(this).val();
-        $('#container-doc_prorroga_config').addClass('hidden');
-        $('#container-doc_retiro_config').addClass('hidden');
-        if (tipo === 'prorroga') {
-            $('#container-doc_prorroga_config').removeClass('hidden');
-        } else if (tipo === 'retiro') {
-            $('#container-doc_retiro_config').removeClass('hidden');
-        }
-    });
-});
+        // Mostrar/ocultar campos según tipo de solicitud
+        $(document).ready(function() {
+            $('#tipo_solicitud').on('change', function() {
+                var tipo = $(this).val();
+                $('#container-doc_prorroga_config').addClass('hidden');
+                $('#container-doc_retiro_config').addClass('hidden');
+                if (tipo === 'prorroga') {
+                    $('#container-doc_prorroga_config').removeClass('hidden');
+                } else if (tipo === 'retiro') {
+                    $('#container-doc_retiro_config').removeClass('hidden');
+                }
+            });
+        });
 
-</script>
+    </script>
 
         <script>
 
         // Submit del formulario de estudiante
-$('#configModalForm').on('submit', function(e) {
-    e.preventDefault();
+        $('#configModalForm').on('submit', function(e) {
+            e.preventDefault();
     
     // Validar que se haya seleccionado un tipo de solicitud
     const tipoSolicitud = $('#tipo_solicitud').val();
