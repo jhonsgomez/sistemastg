@@ -176,6 +176,24 @@ return [
             'view' => 'emails.practicas.practicaDeshabilitada',
         ],
 
+        'solicitud_ajuste_practica' => [
+
+            'subject' =>
+                'SOLICITUD DE AJUSTE DE PRÁCTICA EMPRESARIAL',
+
+            'view' =>
+                'emails.practicas.solicitudAjustePractica',
+        ],
+
+        'respuesta_ajuste_practica' => [
+
+            'subject' =>
+                'RESPUESTA SOLICITUD DE AJUSTE - PRÁCTICAS',
+
+            'view' =>
+                'emails.practicas.respuestaAjustePractica',
+        ],
+
 
 
 

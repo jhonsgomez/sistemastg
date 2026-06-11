@@ -3208,14 +3208,12 @@ class RoadMapPracticaController extends Controller
      */
     public function configEstudiante(Request $request)
     {
-        // Reglas de validación según el tipo de solicitud
         $rules = [
             'practica_id' => 'required|exists:practicas,id',
             'tipo_solicitud' => 'required|in:retiro,cambio_director,cambio_evaluador,prorroga',
             'comentarios_config' => 'nullable|string',
         ];
 
-        // Agregar reglas según el tipo de solicitud
         if ($request->tipo_solicitud === 'prorroga') {
             $rules['carta_prorroga'] = 'required|array|max:1';
             $rules['carta_prorroga.*'] = 'file|mimes:pdf|max:4096';
@@ -3230,8 +3228,6 @@ class RoadMapPracticaController extends Controller
             $rules['carta_retiro.*'] = 'file|mimes:pdf|max:4096';
         }
 
-        // Para cambio de director y cambio de evaluador no se requieren archivos
-
         $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
@@ -3241,59 +3237,124 @@ class RoadMapPracticaController extends Controller
         $practica = Practica::findOrFail($request->practica_id);
         $userId = auth()->id();
         $fase_actual = $this->getFaseActual($practica->estado);
-        
-        // Validar fase según tipo de solicitud
+
         if ($request->tipo_solicitud === 'prorroga' && !in_array($fase_actual, [5, 6])) {
             return response()->json(['error' => 'La prórroga solo se puede solicitar en Fase 5 o 6'], 422);
         }
-        
+
         if (in_array($request->tipo_solicitud, ['cambio_director', 'cambio_evaluador']) && $fase_actual < 3) {
             return response()->json(['error' => 'Los cambios solo se pueden solicitar desde Fase 3'], 422);
         }
-        
+
         if ($request->tipo_solicitud === 'retiro' && $fase_actual < 1) {
             return response()->json(['error' => 'El retiro solo se puede solicitar desde Fase 1'], 422);
         }
 
-        // Guardar según tipo de solicitud
+        $adjuntosCorreo = [];
+
         if ($request->tipo_solicitud === 'prorroga') {
             if ($request->hasFile('carta_prorroga')) {
                 $file = $request->file('carta_prorroga')[0];
-                $path = $file->storeAs('practicas/solicitudes', 'carta_prorroga_' . $practica->id . '_' . $userId . '_' . time() . '.pdf', 'public');
+
+                $path = $file->storeAs(
+                    'practicas/solicitudes',
+                    'carta_prorroga_' . $practica->id . '_' . $userId . '_' . time() . '.pdf',
+                    'public'
+                );
+
                 $this->guardarValorCampo($practica->id, 'carta_prorroga', $path);
+                $adjuntosCorreo[] = $path;
             }
 
             if ($request->hasFile('liquidacion_prorroga')) {
                 $file = $request->file('liquidacion_prorroga')[0];
-                $path = $file->storeAs('practicas/solicitudes', 'liquidacion_prorroga_' . $practica->id . '_' . $userId . '_' . time() . '.pdf', 'public');
+
+                $path = $file->storeAs(
+                    'practicas/solicitudes',
+                    'liquidacion_prorroga_' . $practica->id . '_' . $userId . '_' . time() . '.pdf',
+                    'public'
+                );
+
                 $this->guardarValorCampo($practica->id, 'liquidacion_prorroga', $path);
+                $adjuntosCorreo[] = $path;
             }
 
             if ($request->hasFile('soporte_prorroga')) {
                 $file = $request->file('soporte_prorroga')[0];
-                $path = $file->storeAs('practicas/solicitudes', 'soporte_prorroga_' . $practica->id . '_' . $userId . '_' . time() . '.pdf', 'public');
+
+                $path = $file->storeAs(
+                    'practicas/solicitudes',
+                    'soporte_prorroga_' . $practica->id . '_' . $userId . '_' . time() . '.pdf',
+                    'public'
+                );
+
                 $this->guardarValorCampo($practica->id, 'soporte_prorroga', $path);
+                $adjuntosCorreo[] = $path;
             }
         }
 
         if ($request->tipo_solicitud === 'retiro') {
             if ($request->hasFile('carta_retiro')) {
                 $file = $request->file('carta_retiro')[0];
-                $path = $file->storeAs('practicas/solicitudes', 'carta_retiro_' . $practica->id . '_' . $userId . '_' . time() . '.pdf', 'public');
+
+                $path = $file->storeAs(
+                    'practicas/solicitudes',
+                    'carta_retiro_' . $practica->id . '_' . $userId . '_' . time() . '.pdf',
+                    'public'
+                );
+
                 $this->guardarValorCampo($practica->id, 'carta_retiro', $path);
+                $adjuntosCorreo[] = $path;
             }
         }
 
-        // Guardar comentarios
         if ($request->filled('comentarios_config')) {
             $this->guardarValorCampo($practica->id, 'comentarios_solicitud', $request->comentarios_config);
         }
 
-        // Guardar tipo de solicitud y estado pendiente
         $this->guardarValorCampo($practica->id, 'tipo_solicitud_pendiente', $request->tipo_solicitud);
         $this->guardarValorCampo($practica->id, 'estado_solicitud', 'pendiente');
 
-        // TODO: Enviar correo al comité
+        $practica->load(['user.tipo_documento', 'valoresCampos.campo']);
+
+        $campos = $practica->camposConValores();
+
+        $integrante2Id = collect($campos)
+            ->firstWhere('campo', 'id_integrante_2')['valor'] ?? null;
+
+        $integrante2 = null;
+
+        if (!empty($integrante2Id)) {
+            $integrante2 = User::with('tipo_documento')->find($integrante2Id);
+        }
+
+        $data = [
+            'tipo_correo' => 'solicitud_ajuste_practica',
+
+            'adjuntos' => $adjuntosCorreo,
+
+            'cuerpo_correo' => [
+                'estado' => $practica->estado,
+                'tipo_solicitud' => $request->tipo_solicitud,
+                'comentarios' => $request->comentarios_config,
+                'estudiante' => auth()->user(),
+                'integrante_2' => $integrante2,
+                'campos' => $campos,
+            ],
+        ];
+
+        $destinatarios = [
+            auth()->user()->email,
+        ];
+
+        if (!empty($integrante2?->email)) {
+            $destinatarios[] = $integrante2->email;
+        }
+
+        $destinatarios = array_unique(array_filter($destinatarios));
+
+        Mail::to($destinatarios)
+            ->queue(new PracticasMail($data));
 
         return response()->json(['success' => 'Solicitud enviada correctamente']);
     }
@@ -3330,25 +3391,78 @@ class RoadMapPracticaController extends Controller
         $cambiosRealizados = false;
         
         $descripcionActa = '';
+
+        $tipoSolicitudCorreo = null;
+        $nuevaFechaLimiteCorreo = null;
+        $nuevoDirectorCorreo = null;
+        $nuevoEvaluadorCorreo = null;
+        $estudianteRetiradoCorreo = null;
         
         // Verificar prórroga
-        if ($request->has('aprobar_prorroga') && $request->aprobar_prorroga == true) {
-            
-            // Obtener fecha límite actual
-            $fechaLimiteActual = $this->obtenerValorCampo($practica->id, 'fecha_limite_practica');
-            
-            if ($fechaLimiteActual) {
-                $nuevaFechaLimite = Carbon::parse($fechaLimiteActual)->addDays(90);
-                
-                // Guardar nueva fecha límite
-                $this->guardarValorCampo($practica->id, 'fecha_limite_practica', $nuevaFechaLimite->toDateTimeString());
-                
-                // Incrementar contador de prórrogas
-                $prorrogas = (int) $this->obtenerValorCampo($practica->id, 'solicitudes_prorroga');
-                $this->guardarValorCampo($practica->id, 'solicitudes_prorroga', (string) ($prorrogas + 1));
-                
-                $cambiosRealizados = true;
+
+        $aprobarProrroga = $request->boolean('aprobar_prorroga');
+
+        \Log::info('configAdmin - aprobar prórroga validado:', [
+            'aprobar_prorroga' => $request->input('aprobar_prorroga'),
+            'boolean' => $aprobarProrroga,
+        ]);
+
+        if ($aprobarProrroga) {
+
+            $registroFechaLimite = PracticaValorCampo::with('campo')
+                ->where('practica_id', $practica->id)
+                ->whereHas('campo', function ($q) {
+                    $q->where('name', 'fecha_limite_practica');
+                })
+                ->first();
+
+            \Log::info('configAdmin - registro fecha límite práctica:', [
+                'existe' => $registroFechaLimite ? true : false,
+                'valor' => $registroFechaLimite->valor ?? null,
+            ]);
+
+            if (!$registroFechaLimite || empty($registroFechaLimite->valor)) {
+                return response()->json([
+                    'error' => 'No se encontró la fecha límite de la práctica para aprobar la prórroga'
+                ], 422);
             }
+
+            $nuevaFechaLimite = Carbon::parse($registroFechaLimite->valor)->addDays(90);
+
+            $registroFechaLimite->valor = $nuevaFechaLimite->toDateTimeString();
+            $registroFechaLimite->save();
+
+            $registroProrrogas = PracticaValorCampo::where('practica_id', $practica->id)
+                ->whereHas('campo', function ($q) {
+                    $q->where('name', 'solicitudes_prorroga');
+                })
+                ->first();
+
+            if ($registroProrrogas) {
+                $prorrogas = (int) $registroProrrogas->valor;
+                $registroProrrogas->valor = (string) ($prorrogas + 1);
+                $registroProrrogas->save();
+            } else {
+                $campoProrrogas = Campo::where('name', 'solicitudes_prorroga')
+                    ->first();
+
+                if ($campoProrrogas) {
+                    PracticaValorCampo::create([
+                        'practica_id' => $practica->id,
+                        'campo_id' => $campoProrrogas->id,
+                        'valor' => '1',
+                    ]);
+                }
+            }
+
+            $cambiosRealizados = true;
+            $tipoSolicitudCorreo = 'prorroga';
+            $nuevaFechaLimiteCorreo = $nuevaFechaLimite->format('d/m/Y');
+
+            \Log::info('configAdmin - prórroga aprobada correctamente:', [
+                'practica_id' => $practica->id,
+                'nueva_fecha_limite' => $nuevaFechaLimiteCorreo,
+            ]);
         }
 
         // Guardar acta
@@ -3374,6 +3488,8 @@ class RoadMapPracticaController extends Controller
                     $registroDirector->valor = $request->director_id;
                     $registroDirector->save();
                     $cambiosRealizados = true;
+                    $tipoSolicitudCorreo = 'cambio_director';
+                    $nuevoDirectorCorreo = User::with('tipo_documento')->find($request->director_id);
                     \Log::info('Director actualizado:', ['anterior' => $registroDirector->getOriginal('valor'), 'nuevo' => $request->director_id]);
                 }
             } else {
@@ -3396,6 +3512,8 @@ class RoadMapPracticaController extends Controller
                     $registroEvaluador->valor = $request->evaluador_id;
                     $registroEvaluador->save();
                     $cambiosRealizados = true;
+                    $tipoSolicitudCorreo = 'cambio_evaluador';
+                    $nuevoEvaluadorCorreo = User::with('tipo_documento')->find($request->evaluador_id);
                     \Log::info('Evaluador actualizado:', ['anterior' => $registroEvaluador->getOriginal('valor'), 'nuevo' => $request->evaluador_id]);
                 }
             } else {
@@ -3432,6 +3550,8 @@ class RoadMapPracticaController extends Controller
                     );
                     
                     $cambiosRealizados = true;
+                    $tipoSolicitudCorreo = 'retiro';
+                    $estudianteRetiradoCorreo = User::with('tipo_documento')->find($estudianteId);
                     \Log::info('Estudiante retirado:', ['estudiante_id' => $estudianteId, 'practica_id' => $practica->id]);
                 }
             }
@@ -3440,6 +3560,51 @@ class RoadMapPracticaController extends Controller
         if (!$cambiosRealizados) {
             return response()->json(['error' => 'No se realizó ningún cambio'], 422);
         }
+
+        $practica->load(['user.tipo_documento', 'valoresCampos.campo']);
+
+        $campos = $practica->camposConValores();
+
+        $integrante2Id = collect($campos)
+            ->firstWhere('campo', 'id_integrante_2')['valor'] ?? null;
+
+        $integrante2 = null;
+
+        if (!empty($integrante2Id)) {
+            $integrante2 = User::with('tipo_documento')->find($integrante2Id);
+        }
+
+        $data = [
+            'tipo_correo' => 'respuesta_ajuste_practica',
+
+            'cuerpo_correo' => [
+                'estado' => $practica->estado,
+                'tipo_solicitud' => $tipoSolicitudCorreo,
+                'comentarios' => $request->comentarios_config_admin,
+                'nro_acta' => $request->nro_acta_ajustes,
+                'fecha_acta' => $request->fecha_acta_ajustes,
+                'estudiante' => $practica->user,
+                'integrante_2' => $integrante2,
+                'nueva_fecha_limite' => $nuevaFechaLimiteCorreo,
+                'nuevo_director' => $nuevoDirectorCorreo,
+                'nuevo_evaluador' => $nuevoEvaluadorCorreo,
+                'estudiante_retirado' => $estudianteRetiradoCorreo,
+                'campos' => $campos,
+            ],
+        ];
+
+        $destinatarios = [
+            $practica->user->email,
+        ];
+
+        if (!empty($integrante2?->email)) {
+            $destinatarios[] = $integrante2->email;
+        }
+
+        $destinatarios = array_unique(array_filter($destinatarios));
+
+        Mail::to($destinatarios)
+            ->queue(new PracticasMail($data));
 
         return response()->json(['success' => 'Respuesta enviada correctamente']);
     }
