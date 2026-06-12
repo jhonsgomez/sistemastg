@@ -49,6 +49,23 @@ class RoadMapPracticaController extends Controller
 
     public function index(Request $request)
     {
+        $rol_especifico = $request->input('rol_especifico');
+
+        if ($request->routeIs('director.roadmap')) {
+            $rol_especifico = 'director_practica';
+        } elseif ($request->routeIs('evaluador.roadmap')) {
+            $rol_especifico = 'evaluador_practica';
+        }
+
+        $rutaRetorno = 'practicas.index';
+
+        if ($rol_especifico === 'director_practica') {
+            $rutaRetorno = 'director.practicas.index';
+        }
+
+        if ($rol_especifico === 'evaluador_practica') {
+            $rutaRetorno = 'evaluador.practicas.index';
+        }
         // Obtener el periodo actual
         $periodoActual = session('periodo_academico', '2026-1');
 
@@ -85,7 +102,7 @@ class RoadMapPracticaController extends Controller
             $codigo_practica = 'PRA-' . str_pad($practica->id, 5, '0', STR_PAD_LEFT);
 
             if ($practica->deshabilitado) {
-                return redirect()->route('practicas.index')
+                return redirect()->route($rutaRetorno)
                     ->with('error', 'Esta práctica se encuentra deshabilitada. No se puede acceder al seguimiento.');
             }
 
@@ -107,14 +124,24 @@ class RoadMapPracticaController extends Controller
             }
 
             if (in_array($estado, ['Pendiente', 'Rechazada'])) {
-                return redirect()->route('practicas.index')
-                    ->with('info', 'La práctica aún no ha sido aprobada para iniciar el seguimiento.');
+        return redirect()->route($rutaRetorno)
+            ->with('info', 'La práctica aún no ha sido aprobada para iniciar el seguimiento.');
             }
 
             // Cargar TODOS los valores de campos
             $valores = [];
             foreach ($practica->valoresCampos as $vc) {
                 $valores[$vc->campo->name] = $vc->valor;
+            }
+
+            $rol_especifico = null;
+
+            if ($request->routeIs('director.roadmap')) {
+                $rol_especifico = 'director_practica';
+            } elseif ($request->routeIs('evaluador.roadmap')) {
+                $rol_especifico = 'evaluador_practica';
+            } else {
+                $rol_especifico = $request->input('rol_especifico');
             }
 
         // ========== INTEGRANTES PARA EL SELECT ICFES (MÁXIMO 2) ==========
@@ -222,6 +249,7 @@ class RoadMapPracticaController extends Controller
             $evaluador_actual = $valores['evaluador_id'] ?? null;
             $docentes = User::role('docente')->get();
             
+
             // Log para depuración
             \Log::info('Roadmap - Variables cargadas:', [
                 'practica_id' => $practica->id,
@@ -256,9 +284,8 @@ class RoadMapPracticaController extends Controller
                 'docentes',
                 'codigo_practica', 
                 'fechas',
-
-                'codigo_modalidad_generado',  // ← Pasar a la vista
-
+                'codigo_modalidad_generado',  
+                'rol_especifico',
                 'lista_integrantes',
             // NUEVAS VARIABLES
             'yaEnvio',
@@ -281,7 +308,9 @@ class RoadMapPracticaController extends Controller
             
         } catch (Exception $e) {
             \Log::error('Error en roadmap: ' . $e->getMessage());
-            return redirect()->route('practicas.index')->with('error', 'No se pudo cargar el seguimiento.');
+
+            return redirect()->route($rutaRetorno)
+                ->with('error', 'No se pudo cargar el seguimiento.');
         }
     }
 
@@ -322,15 +351,73 @@ class RoadMapPracticaController extends Controller
 
     public function indexDirector()
     {
+        $periodoActual = session('periodo_academico', '2026-1');
+
+        $fechasData = Fecha::where('periodo', $periodoActual)->first();
+
+        if ($fechasData) {
+            $fechasArray = $fechasData->fechas;
+
+            $fechas = [
+                'fecha_inicio_banco' => $fechasArray['fecha_inicio_banco'] ?? 'No definida',
+                'fecha_fin_banco' => $fechasArray['fecha_fin_banco'] ?? 'No definida',
+                'fecha_inicio_proyectos' => $fechasArray['fecha_inicio_proyectos'] ?? 'No definida',
+                'fecha_fin_proyectos' => $fechasArray['fecha_fin_proyectos'] ?? 'No definida',
+                'fecha_aprobacion_propuesta' => $fechasArray['fecha_aprobacion_propuesta'] ?? 'No definida',
+            ];
+        } else {
+            $fechas = [
+                'fecha_inicio_banco' => '2026-01-30',
+                'fecha_fin_banco' => '2026-09-30',
+                'fecha_inicio_proyectos' => '2026-02-09',
+                'fecha_fin_proyectos' => '2026-09-30',
+                'fecha_aprobacion_propuesta' => '2026-09-30',
+            ];
+        }
+
+        $fechaActual = now()->format('Y-m-d');
+
         return view('practicas.index', [
-            'rol_especifico' => 'director_practica'
+            'rol_especifico' => 'director_practica',
+            'dataRoute' => route('director.practicas.data'),
+            'fechas' => $fechas,
+            'fechaActual' => $fechaActual,
         ]);
     }
 
     public function indexEvaluador()
     {
+        $periodoActual = session('periodo_academico', '2026-1');
+
+        $fechasData = Fecha::where('periodo', $periodoActual)->first();
+
+        if ($fechasData) {
+            $fechasArray = $fechasData->fechas;
+
+            $fechas = [
+                'fecha_inicio_banco' => $fechasArray['fecha_inicio_banco'] ?? 'No definida',
+                'fecha_fin_banco' => $fechasArray['fecha_fin_banco'] ?? 'No definida',
+                'fecha_inicio_proyectos' => $fechasArray['fecha_inicio_proyectos'] ?? 'No definida',
+                'fecha_fin_proyectos' => $fechasArray['fecha_fin_proyectos'] ?? 'No definida',
+                'fecha_aprobacion_propuesta' => $fechasArray['fecha_aprobacion_propuesta'] ?? 'No definida',
+            ];
+        } else {
+            $fechas = [
+                'fecha_inicio_banco' => '2026-01-30',
+                'fecha_fin_banco' => '2026-09-30',
+                'fecha_inicio_proyectos' => '2026-02-09',
+                'fecha_fin_proyectos' => '2026-09-30',
+                'fecha_aprobacion_propuesta' => '2026-09-30',
+            ];
+        }
+
+        $fechaActual = now()->format('Y-m-d');
+
         return view('practicas.index', [
-            'rol_especifico' => 'evaluador_practica'
+            'rol_especifico' => 'evaluador_practica',
+            'dataRoute' => route('evaluador.practicas.data'),
+            'fechas' => $fechas,
+            'fechaActual' => $fechaActual,
         ]);
     }
 
@@ -686,6 +773,10 @@ class RoadMapPracticaController extends Controller
             'nro_acta' => 'required|string',
             'fecha_acta' => 'required|date',
             'respuesta' => 'required|string',
+
+            'director_id' => 'required_if:estado,Aprobada|nullable|exists:users,id',
+            'evaluador_id' => 'required_if:estado,Aprobada|nullable|exists:users,id',
+            'codirector_id' => 'nullable|exists:users,id',
         ]);
 
         if ($validator->fails()) {

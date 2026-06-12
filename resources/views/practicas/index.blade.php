@@ -1658,9 +1658,9 @@ var table = $('#practicasTable').DataTable({
     processing: true,
     serverSide: true,
     ajax: {
-        url: '{{ route("practicas.data") }}',
-        data: function(d) {
-            d.filter = $('#filtroRolesPracticas').val();
+        url: "{{ $dataRoute ?? route('practicas.data') }}",
+        data: function (d) {
+            d.rol_especifico = "{{ $rol_especifico ?? '' }}";
         }
     },
     columns: [
@@ -1710,18 +1710,18 @@ var table = $('#practicasTable').DataTable({
                 "sNext": '<i class="fa-solid fa-angle-right" style="font-size: 10px;"></i>',
                 "sPrevious": '<i class="fa-solid fa-angle-left" style="font-size: 10px;"></i>'
             }
-        },
-        pagingType: "full_numbers",
-        lengthMenu: [[5, 10, 20], [5, 10, 20]],
-        pageLength: 5
-});
+                },
+                pagingType: "full_numbers",
+                lengthMenu: [[5, 10, 20], [5, 10, 20]],
+                pageLength: 5
+        });
 
-    $('#practicasTable_filter input')
-    .attr('placeholder', 'Ingrese una clave');
+            $('#practicasTable_filter input')
+            .attr('placeholder', 'Ingrese una clave');
 
-$('#filtroRolesPracticas').on('change', function() {
-    table.ajax.reload();
-});
+        $('#filtroRolesPracticas').on('change', function() {
+            table.ajax.reload();
+        });
 
             // Funciones para habilitar/deshabilitar (ya existentes)
             function habilitarPractica(id) {

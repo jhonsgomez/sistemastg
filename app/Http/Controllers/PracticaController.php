@@ -83,186 +83,133 @@ class PracticaController extends Controller
     
     public function getData(Request $request)
     {
+        $user = auth()->user();
 
-    
-            // CORREGIDO: Mostrar TODAS las prácticas, no solo tipo_solicitud_id = 9
-            $practicas = Practica::with('user')
-                ->where('tipo_solicitud_id', '>=', 9);  // Todas las fases de prácticas (9, 10, 11, 12, 13, 14)
+        $rol_especifico = $request->input('rol_especifico');
 
-                \Log::info('ESTADO PRACTICAS', 
-            $practicas->pluck('estado')->toArray()
-        );
-
-        // DIRECTOR
-        if (auth()->user()->hasRole('director_practica')) {
-
-
-            $practicas->whereHas('valoresCampos', function ($vc) {
-
-                $vc->whereHas('campo', function ($c) {
-                    $c->where('name', 'director_id');
-                })->where('valor', auth()->id());
-
-            });
-
+        if ($request->routeIs('director.practicas.data')) {
+            $rol_especifico = 'director_practica';
         }
 
-        // EVALUADOR
-        if (auth()->user()->hasRole('evaluador_practica')) {
-
-            
-
-            $practicas->whereHas('valoresCampos', function ($vc) {
-
-                $vc->whereHas('campo', function ($c) {
-                    $c->where('name', 'evaluador_id');
-                })->where('valor', auth()->id());
-
-            });
-
+        if ($request->routeIs('evaluador.practicas.data')) {
+            $rol_especifico = 'evaluador_practica';
         }
 
-        // FILTRO PARA CODIRECTOR (si lo necesitas)
-        if (auth()->user()->hasRole('codirector_practica')) {
-            $practicas->whereHas('valoresCampos', function ($vc) {
-                $vc->whereHas('campo', function ($c) {
-                    $c->where('name', 'codirector_id');
-                })->where('valor', auth()->id());
+        $query = Practica::with(['user', 'user.nivel', 'valoresCampos.campo']);
+
+        // ================= DIRECTOR PRÁCTICAS =================
+        if ($rol_especifico === 'director_practica') {
+            $query->whereHas('valoresCampos', function ($vc) use ($user) {
+                $vc->where('valor', (string) $user->id)
+                    ->whereHas('campo', function ($c) {
+                        $c->where('name', 'director_id');
+                    });
+            })
+            ->whereIn('estado', ['Fase 3', 'Fase 4', 'Fase 5', 'Fase 6', 'Finalizado']);
+        }
+
+        // ================= EVALUADOR PRÁCTICAS =================
+        elseif ($rol_especifico === 'evaluador_practica') {
+            $query->whereHas('valoresCampos', function ($vc) use ($user) {
+                $vc->where('valor', (string) $user->id)
+                    ->whereHas('campo', function ($c) {
+                        $c->where('name', 'evaluador_id');
+                    });
+            })
+            ->whereIn('estado', ['Fase 4', 'Fase 5', 'Fase 6', 'Finalizado']);
+        }
+
+        // ================= ESTUDIANTE =================
+        elseif ($user->hasRole('estudiante')) {
+            $query->where(function ($q) use ($user) {
+                $q->where('user_id', $user->id)
+                    ->orWhereHas('valoresCampos', function ($vc) use ($user) {
+                        $vc->where('valor', (string) $user->id)
+                            ->whereHas('campo', function ($c) {
+                                $c->where('name', 'id_integrante_2');
+                            });
+                    });
             });
         }
 
-        if (auth()->user()->hasRole(['super_admin', 'admin', 'coordinador'])) {
+        // ================= CODIRECTOR PRÁCTICAS =================
+        elseif ($rol_especifico === 'codirector_practica') {
+            $query->whereHas('valoresCampos', function ($vc) use ($user) {
+                $vc->where('valor', (string) $user->id)
+                    ->whereHas('campo', function ($c) {
+                        $c->where('name', 'codirector_id');
+                    });
+            });
+        }
+
+        // ================= COMITÉ / ADMIN / COORDINADOR =================
+        elseif ($user->hasRole(['super_admin', 'admin', 'coordinador'])) {
             $filter = $request->input('filter');
-            
+
             switch ($filter) {
                 case 'pendientes_comite':
-                    $practicas->whereIn('estado', ['Pendiente', 'Fase 1', 'Fase 5']);
+                    $query->whereIn('estado', ['Pendiente', 'Fase 1', 'Fase 5']);
                     break;
+
                 case 'pendientes_director':
-                    $practicas->where('estado', 'Fase 3');
+                    $query->where('estado', 'Fase 3');
                     break;
+
                 case 'pendientes_evaluador':
-                    $practicas->where('estado', 'Fase 4');
+                    $query->where('estado', 'Fase 4');
                     break;
+
                 case 'propuestas_pendientes':
-                    $practicas->where('estado', 'Fase 1');
+                    $query->where('estado', 'Fase 1');
                     break;
+
                 case 'informes_pendientes':
-                    $practicas->where('estado', 'Fase 4');
+                    $query->where('estado', 'Fase 4');
                     break;
             }
         }
 
-        // BÚSQUEDA AVANZADA
+        // ================= BÚSQUEDA AVANZADA =================
         if ($request->has('search') && $search = $request->input('search.value')) {
-            $practicas->where(function ($q) use ($search) {
+            $query->where(function ($q) use ($search) {
+
                 if (preg_match('/GRA-00(\d+)/i', $search, $matches)) {
                     $idNumero = intval($matches[1]);
                     $q->orWhere('id', $idNumero);
                 }
+
                 if (is_numeric($search)) {
                     $q->orWhere('id', $search);
                 }
+
                 $searchLower = strtolower(trim($search));
 
-if (preg_match('/^fase\s+([1-6])$/i', $searchLower, $matches)) {
+                if (preg_match('/^fase\s+([1-6])$/i', $searchLower, $matches)) {
+                    $q->orWhere('estado', 'Fase ' . $matches[1]);
+                }
 
-    $q->where('estado', 'Fase ' . $matches[1]);
-
-} else {
-
-    $q->orWhereHas('user', function ($uq) use ($search) {
-        $uq->where('name', 'LIKE', "%{$search}%")
-            ->orWhere('email', 'LIKE', "%{$search}%")
-            ->orWhere('nro_documento', 'LIKE', "%{$search}%")
-            ->orWhere('nro_celular', 'LIKE', "%{$search}%");
-    });
-
-    $q->orWhereHas('user.nivel', function ($nq) use ($search) {
-        $nq->where('nombre', 'LIKE', "%{$search}%");
-    });
-
-    $q->orWhereHas('valoresCampos', function ($vcq) use ($search) {
-        $vcq->whereHas('campo', function ($cq) {
-            $cq->whereIn('name', ['titulo', 'nombre_empresa']);
-        })->where('valor', 'LIKE', "%{$search}%");
-    });
-}
                 $q->orWhereHas('user', function ($uq) use ($search) {
                     $uq->where('name', 'LIKE', "%{$search}%")
                         ->orWhere('email', 'LIKE', "%{$search}%")
                         ->orWhere('nro_documento', 'LIKE', "%{$search}%")
                         ->orWhere('nro_celular', 'LIKE', "%{$search}%");
                 });
+
                 $q->orWhereHas('user.nivel', function ($nq) use ($search) {
                     $nq->where('nombre', 'LIKE', "%{$search}%");
                 });
+
                 $q->orWhereHas('valoresCampos', function ($vcq) use ($search) {
-                    $vcq->whereHas('campo', function ($cq) use ($search) {
+                    $vcq->whereHas('campo', function ($cq) {
                         $cq->whereIn('name', ['titulo', 'nombre_empresa']);
                     })->where('valor', 'LIKE', "%{$search}%");
                 });
             });
         }
 
-    
-        // DATATABLE - AQUI LE SALE LAS PRACTICAS A CADA USUARIO
+        $query->orderBy('id', 'desc');
 
-            if (auth()->user()->hasRole('estudiante')) 
-            {
-
-                $practicas = Practica::with('valoresCampos.campo')
-                    ->where(function ($q) {
-                        $q->where('user_id', auth()->id())
-                        ->orWhereHas('valoresCampos', function ($vc) {
-                            $vc->whereHas('campo', function ($c) {
-                                $c->where('name', 'id_integrante_2');
-                            })->where('valor', auth()->id());
-                        });
-                    })
-                    ->orderBy('id', 'desc')
-                    ->get();
-
-            } elseif (auth()->user()->hasRole('director_practica')) 
-            {
-
-                $practicas = Practica::with('valoresCampos.campo')
-                    ->whereHas('valoresCampos', function ($vc) {
-
-                        $vc->whereHas('campo', function ($c) {
-                            $c->where('name', 'director_id');
-                        })
-
-                        ->where('valor', auth()->id());
-
-                    })
-                    ->orderBy('id', 'desc')
-                    ->get();
-
-            } elseif (auth()->user()->hasRole('evaluador_practica')) {
-
-                $practicas = Practica::with('valoresCampos.campo')
-                    ->whereHas('valoresCampos', function ($vc) {
-
-                        $vc->whereHas('campo', function ($c) {
-                            $c->where('name', 'evaluador_id');
-                        })
-
-                        ->where('valor', auth()->id());
-
-                    })
-                    ->orderBy('id', 'desc')
-                    ->get();
-
-            } else {
-
-                $practicas = $practicas
-                    ->with('valoresCampos.campo')
-                    ->orderBy('id', 'desc')
-                    ->get();
-            }   
-
-        return DataTables::of($practicas)
+        return DataTables::of($query)
             ->addColumn('formatted_id', function ($p) {
                 return 'GRA-00' . $p->id;
             })
@@ -448,7 +395,7 @@ if (preg_match('/^fase\s+([1-6])$/i', $searchLower, $matches)) {
 
                 return $return_html . $htmlEstado . "</div>";
             })
-            ->addColumn('acciones', function ($p) {
+            ->addColumn('acciones', function ($p) use ($rol_especifico) {
                 $user = auth()->user();
                 $buttons = '<div class="flex items-center justify-center gap-2">';
 
@@ -495,20 +442,32 @@ if (preg_match('/^fase\s+([1-6])$/i', $searchLower, $matches)) {
                 }
 
                 if ($puedeVerRoadmap) {
+
+                    $rutaRoadmap = route('practicas.roadmap');
+
+                    if (($rol_especifico ?? null) === 'director_practica') {
+                        $rutaRoadmap = route('director.roadmap');
+                    }
+
+                    if (($rol_especifico ?? null) === 'evaluador_practica') {
+                        $rutaRoadmap = route('evaluador.roadmap');
+                    }
+
                     $buttons .= '
-                        <form action="' . route('practicas.roadmap') . '" method="POST" class="inline-block m-0" onsubmit="return showRoadmapSpinner(this)">
+                        <form action="' . $rutaRoadmap . '" method="POST" class="inline-block m-0" onsubmit="return showRoadmapSpinner(this)">
                             ' . csrf_field() . '
                             <input type="hidden" name="practica_id" value="' . $p->id . '">
+                            <input type="hidden" name="rol_especifico" value="' . ($rol_especifico ?? '') . '">
+
                             <button type="submit" class="btn-action shadow bg-indigo-500 hover:bg-indigo-800 text-white rounded-lg inline-flex items-center justify-center">
                                 <i class="fa-solid fa-map-location-dot"></i>
                                 <svg class="loading-spinner hidden text-white animate-spin" viewBox="0 0 64 64" fill="none">
-                                    <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    <path d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 58.7925 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
                                     <path d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white"></path>
                                 </svg>
                             </button>
                         </form>';
                 }
-
                 // Botón Deshabilitar/Habilitar (SOLO para Comité)
                 if ($esComite && $esFaseActiva && $p->estado !== 'Rechazada') {
                     if (!$p->deshabilitado) {
