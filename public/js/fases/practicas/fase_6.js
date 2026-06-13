@@ -44,7 +44,7 @@ function openFase6EvaluadorModal(btn) {
             if (quillFase6Evaluador === null) {
                 quillFase6Evaluador = new Quill('#txt-editor-fase6-evaluador', {
                     theme: 'snow',
-                    placeholder: 'Ingrese comentarios de respuesta...',
+                    placeholder: 'Describa los detalles de la respuesta para el estudiante.',
                     modules: {
                     toolbar: [
                         [{ 'header': 1}],
@@ -515,7 +515,7 @@ function openFase6ComiteModal(btn) {
             if (quillFase6Comite === null) {
                 quillFase6Comite = new Quill('#txt-editor-fase6-comite', {
                     theme: 'snow',
-                    placeholder: 'Ingrese comentarios de respuesta...',
+                    placeholder: 'Describa los detalles de la respuesta para el estudiante.',
                     modules: {
                     toolbar: [
                         [{ 'header': 1}],

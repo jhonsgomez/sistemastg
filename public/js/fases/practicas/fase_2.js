@@ -13,7 +13,9 @@ function openFase2EstudianteModal(btn) {
         if (spinner) spinner.classList.remove('hidden');
         btn.disabled = true;
     }
+
     
+
     $('#liquidacion_pago').val('');
     $('#soporte_pago').val('');
     $('#file-list-liquidacion').empty();
@@ -141,23 +143,43 @@ function openFase2AdminModal(btn) {
         if (spinner) spinner.classList.remove('hidden');
         btn.disabled = true;
     }
-    
-    // Limpiar campos
-    $('#nro_acta_fase2').val('');
-    $('#fecha_acta_fase2').val('');
-    $('#estado_fase2').val('');
-    $('#respuesta_fase2').val('');
-    $('#director_id_fase2').val('');
-    $('#evaluador_id_fase2').val('');
-    $('#codirector_id_fase2').val('');
-    // NO limpiar el código de modalidad porque ya viene de la vista
-    $('#nro_acta_fase2Error').text('');
-    $('#fecha_acta_fase2Error').text('');
-    $('#estado_fase2Error').text('');
-    $('#respuesta_fase2Error').text('');
-    $('#director_id_fase2Error').text('');
-    $('#evaluador_id_fase2Error').text('');
-    $('#codirector_id_fase2Error').text('');
+
+    setTimeout(() => {
+
+    // Director
+    if (!$('#director_id_fase2').hasClass("select2-hidden-accessible")) {
+        $('#director_id_fase2').select2({
+            dropdownParent: $('#fase2AdminModal'),
+            placeholder: 'Seleccione un director para la práctica',
+            allowClear: true,
+            width: '100%',
+            minimumInputLength: 5
+        });
+    }
+
+    // Evaluador
+    if (!$('#evaluador_id_fase2').hasClass("select2-hidden-accessible")) {
+        $('#evaluador_id_fase2').select2({
+            dropdownParent: $('#fase2AdminModal'),
+            placeholder: 'Seleccione un evaluador para la práctica',
+            allowClear: true,
+            width: '100%',
+            minimumInputLength: 5
+        });
+    }
+
+    // Codirector
+    if (!$('#codirector_id_fase2').hasClass("select2-hidden-accessible")) {
+        $('#codirector_id_fase2').select2({
+            dropdownParent: $('#fase2AdminModal'),
+            placeholder: 'Seleccione un codirector para la práctica',
+            allowClear: true,
+            width: '100%',
+            minimumInputLength: 5
+        });
+    }
+
+}, 100);
     
     // Ocultar contenedores inicialmente
     $('#container_docentes_fase2').addClass('hidden');
@@ -172,16 +194,17 @@ function openFase2AdminModal(btn) {
             if (quillFase2 === null) {
                 quillFase2 = new Quill('#txt-editor-fase2', {
                     theme: 'snow',
-                    placeholder: 'Ingrese el mensaje de respuesta...',
+                    placeholder: 'Describa los detalles de la respuesta para el estudiante.',
                     modules: {
-                        toolbar: [
-                            [{ 'header': [1, 2, false] }],
-                            ['bold', 'italic', 'underline'],
-                            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                            [{ 'color': [] }],
-                            ['clean']
-                        ]
-                    }
+                    toolbar: [
+                        [{ 'header': 1}],
+                        [{ 'header': 2}],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        [{ 'color': [] }],
+                        ['bold', 'italic', 'underline'],
+                        ['clean']
+                    ]
+                }
                 });
             } else {
                 quillFase2.root.innerHTML = '';
@@ -207,6 +230,29 @@ function closeFase2AdminModal() {
     if (quillFase2) {
         quillFase2.root.innerHTML = '';
     }
+
+    // Limpiar campos
+    $('#nro_acta_fase2').val('');
+    $('#fecha_acta_fase2').val('');
+    $('#estado_fase2').val('');
+    $('#respuesta_fase2').val('');
+    $('#director_id_fase2').val('');
+    $('#evaluador_id_fase2').val('');
+    $('#codirector_id_fase2').val('');
+    // NO limpiar el código de modalidad porque ya viene de la vista
+    $('#nro_acta_fase2Error').text('');
+    $('#fecha_acta_fase2Error').text('');
+    $('#estado_fase2Error').text('');
+    $('#respuesta_fase2Error').text('');
+    $('#director_id_fase2Error').text('');
+    $('#evaluador_id_fase2Error').text('');
+    $('#codirector_id_fase2Error').text('');
+
+    $('#director_id_fase2').val(null).trigger('change');
+    $('#evaluador_id_fase2').val(null).trigger('change');
+    $('#codirector_id_fase2').val(null).trigger('change');
+
+    
 }
 
 // ==================== EVENTOS Y FORMULARIOS ====================
@@ -222,51 +268,123 @@ $(document).ready(function() {
         $('#' + tooltipId).addClass('hidden');
     });
     
-    // Vista previa Liquidación
-    $('#liquidacion_pago').on('change', function(e) {
-        const file = e.target.files[0];
-        const fileList = $('#file-list-liquidacion');
-        fileList.empty();
-        
-        if (file) {
-            const fileSizeMB = file.size / (1024 * 1024);
-            if (fileSizeMB > 5) {
-                showToast('El archivo no puede superar los 5MB', 'error');
-                $(this).val('');
-                return;
-            }
-            const fileExtension = file.name.split('.').pop().toLowerCase();
-            if (fileExtension !== 'pdf') {
-                showToast('Solo se permiten archivos PDF', 'error');
-                $(this).val('');
-                return;
-            }
-            fileList.append(`<li><i class="fa-regular fa-file-pdf text-red-500 mr-2"></i>${file.name}</li>`);
-        }
-    });
+    // ==================== LIQUIDACIÓN ====================
+
+$('#liquidacion_pago').on('change', function (e) {
+
+    const file = e.target.files[0];
+    const fileList = $('#file-list-liquidacion');
+
+    fileList.empty();
+
+    if (!file) return;
+
+    const maxSizeBytes = MAX_FILE_SIZE_MB * 1024 * 1024;
+
+    if (file.size > maxSizeBytes) {
+
+        Swal.fire({
+            icon: 'error',
+            title: 'Archivo demasiado grande',
+            text: `El archivo no puede superar los ${MAX_FILE_SIZE_MB} MB.`,
+            confirmButtonColor: '#C1D631',
+            confirmButtonText: 'Aceptar'
+        });
+
+        $(this).val('');
+        return;
+    }
+
+    const extension = file.name.split('.').pop().toLowerCase();
+
+    if (extension !== 'pdf') {
+
+        Swal.fire({
+            icon: 'error',
+            title: 'Archivo inválido',
+            text: 'Solo se permiten archivos PDF.',
+            confirmButtonColor: '#C1D631',
+            confirmButtonText: 'Aceptar'
+        });
+
+        $(this).val('');
+        return;
+    }
+
+    const fileSizeMB2 = parseFloat(
+        (file.size / (1024 * 1024)).toFixed(2)
+    );
     
-    // Vista previa Soporte
-    $('#soporte_pago').on('change', function(e) {
-        const file = e.target.files[0];
-        const fileList = $('#file-list-soporte');
-        fileList.empty();
-        
-        if (file) {
-            const fileSizeMB = file.size / (1024 * 1024);
-            if (fileSizeMB > 5) {
-                showToast('El archivo no puede superar los 5MB', 'error');
-                $(this).val('');
-                return;
-            }
-            const fileExtension = file.name.split('.').pop().toLowerCase();
-            if (fileExtension !== 'pdf') {
-                showToast('Solo se permiten archivos PDF', 'error');
-                $(this).val('');
-                return;
-            }
-            fileList.append(`<li><i class="fa-regular fa-file-pdf text-red-500 mr-2"></i>${file.name}</li>`);
-        }
-    });
+fileList.append(`
+    <li class="mb-2 mt-4">
+        <div class="text-gray-600 text-sm mb-4">
+            ${file.name}
+        </div>
+        <div class="text-sm ml-6 text-gray-900">
+            Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_MB} MB permitidos
+        </div>
+    </li>
+`);
+});
+    
+    // ==================== SOPORTE ====================
+
+$('#soporte_pago').on('change', function (e) {
+
+    const file = e.target.files[0];
+    const fileList = $('#file-list-soporte');
+
+    fileList.empty();
+
+    if (!file) return;
+
+    const maxSizeBytes = MAX_FILE_SIZE_MB * 1024 * 1024;
+
+    if (file.size > maxSizeBytes) {
+
+        Swal.fire({
+            icon: 'error',
+            title: 'Archivo demasiado grande',
+            text: `El archivo no puede superar los ${MAX_FILE_SIZE_MB} MB.`,
+            confirmButtonColor: '#C1D631',
+            confirmButtonText: 'Aceptar'
+        });
+
+        $(this).val('');
+        return;
+    }
+
+    const extension = file.name.split('.').pop().toLowerCase();
+
+    if (extension !== 'pdf') {
+
+        Swal.fire({
+            icon: 'error',
+            title: 'Archivo inválido',
+            text: 'Solo se permiten archivos PDF.',
+            confirmButtonColor: '#C1D631',
+            confirmButtonText: 'Aceptar'
+        });
+
+        $(this).val('');
+        return;
+    }
+
+    const fileSizeMB2 = parseFloat(
+        (file.size / (1024 * 1024)).toFixed(2)
+    );
+    
+fileList.append(`
+    <li class="mb-2 mt-4">
+        <div class="text-gray-600 text-sm mb-4">
+            ${file.name}
+        </div>
+        <div class="text-sm ml-6 text-gray-900">
+            Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_MB} MB permitidos
+        </div>
+    </li>
+`);
+});
     
     // Mostrar/ocultar docentes y código de modalidad según estado
 $(document).ready(function() {

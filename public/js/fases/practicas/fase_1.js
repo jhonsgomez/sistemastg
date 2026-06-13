@@ -27,6 +27,17 @@ function openFase1EstudianteModal(btn) {
 function closeFase1EstudianteModal() {
     TooltipManager.closeTooltips();
     $('#fase1EstudianteModal').removeClass('show');
+
+    $('#doc_fdc126').val('');
+
+    $('#nombre_empresa').val('');
+    
+    $('#file-list-fase1').empty();
+
+    $('#files-size-fase1').text('');
+
+    $('#doc_fdc126Error').text('');
+
 }
 
 // ========== FUNCIONES PARA FASE 1 ==========
@@ -142,7 +153,7 @@ function openFase1AdminModal(btn) {
             if (quillFase1 === null) {
                 quillFase1 = new Quill('#txt-editor-fase1', {
                     theme: 'snow',
-                    placeholder: 'Ingrese el mensaje de respuesta indicando detalles al destinatario.',
+                    placeholder: 'Describa los detalles de la respuesta para el estudiante.',
                     modules: {
                     toolbar: [
                         [{ 'header': 1}],
@@ -181,6 +192,16 @@ function closeFase1AdminModal() {
     if (quillFase1) {
         quillFase1.root.innerHTML = '';
     }
+
+    $('#nro_acta_fase1').val('');
+    $('#fecha_acta_fase1').val('');
+    $('#estado_fase1').val('');
+    $('#respuesta_fase1').val('');
+    $('#nro_acta_fase1Error').text('');
+    $('#fecha_acta_fase1Error').text('');
+    $('#estado_fase1Error').text('');
+    $('#respuesta_fase1Error').text('');
+
 }
 
 $(document).ready(function() {
@@ -338,28 +359,62 @@ $('#fase1AdminForm').on('submit', function(e) {
     
     // ========== VISTA PREVIA DEL ARCHIVO ==========
     $('#doc_fdc126').on('change', function(e) {
-        const file = e.target.files[0];
-        const fileList = $('#file-list-fase1');
-        fileList.empty();
-        
-        if (file) {
-            const fileSizeMB = file.size / (1024 * 1024);
-            if (fileSizeMB > 5) {
-                showToast('El archivo no puede superar los 5MB', 'error');
-                $(this).val('');
-                return;
-            }
-            
-            const fileExtension = file.name.split('.').pop().toLowerCase();
-            if (!['doc', 'docx'].includes(fileExtension)) {
-                showToast('Solo se permiten archivos Word (.doc, .docx)', 'error');
-                $(this).val('');
-                return;
-            }
-            
-            fileList.append(`<li><i class="fa-regular fa-file-word text-blue-500 mr-2"></i>${file.name}</li>`);
-        }
-    });
+
+    const file = e.target.files[0];
+    const fileList = $('#file-list-fase1');
+
+    fileList.empty();
+
+    if (!file) return;
+
+    const maxSizeMB = MAX_FILE_SIZE_MB;
+    const fileSizeMB = file.size / (1024 * 1024);
+
+    if (fileSizeMB > maxSizeMB) {
+
+        Swal.fire({
+            icon: 'error',
+            title: 'Archivo demasiado grande',
+            text: `El archivo no puede superar los ${maxSizeMB} MB.`,
+            confirmButtonColor: '#C1D631',
+            confirmButtonText: 'Aceptar'
+        });
+
+        $(this).val('');
+        return;
+    }
+
+    const fileExtension = file.name.split('.').pop().toLowerCase();
+
+    if (!['doc', 'docx'].includes(fileExtension)) {
+
+        Swal.fire({
+            icon: 'error',
+            title: 'Archivo inválido',
+            text: 'Solo se permiten archivos Word (.doc, .docx).',
+            confirmButtonColor: '#C1D631',
+            confirmButtonText: 'Aceptar'
+        });
+
+        $(this).val('');
+        return;
+    }
+
+    const fileSizeMB2 = parseFloat(
+        (file.size / (1024 * 1024)).toFixed(2)
+    );
+    
+fileList.append(`
+    <li class="mb-2 mt-4">
+        <div class="text-gray-600 text-sm mb-4">
+            ${file.name}
+        </div>
+        <div class="text-sm ml-6 text-gray-900">
+            Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_MB} MB permitidos
+        </div>
+    </li>
+`);
+});
 });
 
 // ========== FUNCIONES EXISTENTES ==========
