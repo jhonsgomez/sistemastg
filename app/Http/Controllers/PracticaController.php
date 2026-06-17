@@ -4,6 +4,16 @@ namespace App\Http\Controllers;
 use App\Mail\PracticasMail;
 use App\Models\ActaPractica;
 use App\Models\Campo;
+use App\Models\User;
+use App\Models\TipoDocumento;
+use Illuminate\Support\Facades\Log;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use Carbon\Carbon;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Exception;
 use App\Models\Practica;
 use App\Models\PracticaValorCampo;
 use App\Models\TipoSolicitud;
@@ -143,69 +153,361 @@ class PracticaController extends Controller
         }
 
         // ================= COMITÉ / ADMIN / COORDINADOR =================
-        elseif ($user->hasRole(['super_admin', 'admin', 'coordinador'])) {
-            $filter = $request->input('filter');
+    elseif ($user->hasRole(['super_admin', 'admin', 'coordinador', 'comité'])) {
+        $filter = $request->input('filter');
 
-            switch ($filter) {
-                case 'pendientes_comite':
-                    $query->whereIn('estado', ['Pendiente', 'Fase 1', 'Fase 5']);
-                    break;
+        switch ($filter) {
+            // ========== PENDIENTES COMITÉ ==========
+            case 'pendientes_comite':
+                $query->where(function ($q) {
+                    // Pendiente (Fase 0 - Comité)
+                    $q->orWhere('estado', 'Pendiente');
+                    
+                    // Fase 1 Comité (submited_fase1 = true)
+                    $q->orWhere(function ($sub) {
+                        $sub->where('estado', 'Fase 1')
+                            ->whereHas('valoresCampos', function ($vc) {
+                                $vc->whereHas('campo', function ($c) {
+                                    $c->where('name', 'submited_fase1');
+                                })->where('valor', 'true');
+                            });
+                    });
+                    
+                    // Fase 2 Comité (submited_fase2 = true)
+                    $q->orWhere(function ($sub) {
+                        $sub->where('estado', 'Fase 2')
+                            ->whereHas('valoresCampos', function ($vc) {
+                                $vc->whereHas('campo', function ($c) {
+                                    $c->where('name', 'submited_fase2');
+                                })->where('valor', 'true');
+                            });
+                    });
+                    
+                    // Fase 4 Comité (estado_evaluador_fase4 tiene valor)
+                    $q->orWhere(function ($sub) {
+                        $sub->where('estado', 'Fase 4')
+                            ->whereHas('valoresCampos', function ($vc) {
+                                $vc->whereHas('campo', function ($c) {
+                                    $c->where('name', 'estado_evaluador_fase4');
+                                })->whereNotNull('valor')
+                                  ->where('valor', '!=', '');
+                            });
+                    });
+                });
+                break;
 
-                case 'pendientes_director':
-                    $query->where('estado', 'Fase 3');
-                    break;
+            // ========== PENDIENTES DIRECTOR ==========
+            case 'pendientes_director':
+                $query->where(function ($q) {
+                    // Fase 3 Director (submited_fase3 = true)
+                    $q->orWhere(function ($sub) {
+                        $sub->where('estado', 'Fase 3')
+                            ->whereHas('valoresCampos', function ($vc) {
+                                $vc->whereHas('campo', function ($c) {
+                                    $c->where('name', 'submited_fase3');
+                                })->where('valor', 'true');
+                            });
+                    });
+                    
+                    // Fase 5 Director (submited_fase5 = true)
+                    $q->orWhere(function ($sub) {
+                        $sub->where('estado', 'Fase 5')
+                            ->whereHas('valoresCampos', function ($vc) {
+                                $vc->whereHas('campo', function ($c) {
+                                    $c->where('name', 'submited_fase5');
+                                })->where('valor', 'true');
+                            });
+                    });
+                });
+                break;
 
-                case 'pendientes_evaluador':
-                    $query->where('estado', 'Fase 4');
-                    break;
+            // ========== PENDIENTES EVALUADOR ==========
+            case 'pendientes_evaluador':
+                $query->where(function ($q) {
+                    // Fase 4 Evaluador (estado_evaluador_fase4 está vacío o no existe)
+                    $q->orWhere(function ($sub) {
+                        $sub->where('estado', 'Fase 4')
+                            ->where(function ($where) {
+                                $where->whereDoesntHave('valoresCampos', function ($vc) {
+                                    $vc->whereHas('campo', function ($c) {
+                                        $c->where('name', 'estado_evaluador_fase4');
+                                    });
+                                })
+                                ->orWhereHas('valoresCampos', function ($vc) {
+                                    $vc->whereHas('campo', function ($c) {
+                                        $c->where('name', 'estado_evaluador_fase4');
+                                    })->where(function ($w) {
+                                        $w->whereNull('valor')
+                                          ->orWhere('valor', '');
+                                    });
+                                });
+                            });
+                    });
+                    
+                    // Fase 6 Evaluador (estado_evaluador_fase6 está vacío o no existe)
+                    $q->orWhere(function ($sub) {
+                        $sub->where('estado', 'Fase 6')
+                            ->where(function ($where) {
+                                $where->whereDoesntHave('valoresCampos', function ($vc) {
+                                    $vc->whereHas('campo', function ($c) {
+                                        $c->where('name', 'estado_evaluador_fase6');
+                                    });
+                                })
+                                ->orWhereHas('valoresCampos', function ($vc) {
+                                    $vc->whereHas('campo', function ($c) {
+                                        $c->where('name', 'estado_evaluador_fase6');
+                                    })->where(function ($w) {
+                                        $w->whereNull('valor')
+                                          ->orWhere('valor', '');
+                                    });
+                                });
+                            });
+                    });
+                });
+                break;
 
-                case 'propuestas_pendientes':
-                    $query->where('estado', 'Fase 1');
-                    break;
+            // ========== PROPUESTAS SIN APROBAR ==========
+            case 'propuestas_pendientes':
+                $query->where(function ($q) {
+                    // Fase 1 Estudiante (submited_fase1 = false o no existe)
+                    $q->orWhere(function ($sub) {
+                        $sub->where('estado', 'Fase 1')
+                            ->where(function ($where) {
+                                $where->whereDoesntHave('valoresCampos', function ($vc) {
+                                    $vc->whereHas('campo', function ($c) {
+                                        $c->where('name', 'submited_fase1');
+                                    });
+                                })
+                                ->orWhereHas('valoresCampos', function ($vc) {
+                                    $vc->whereHas('campo', function ($c) {
+                                        $c->where('name', 'submited_fase1');
+                                    })->where('valor', 'false');
+                                });
+                            });
+                    });
+                    
+                    // Fase 1 Comité (submited_fase1 = true)
+                    $q->orWhere(function ($sub) {
+                        $sub->where('estado', 'Fase 1')
+                            ->whereHas('valoresCampos', function ($vc) {
+                                $vc->whereHas('campo', function ($c) {
+                                    $c->where('name', 'submited_fase1');
+                                })->where('valor', 'true');
+                            });
+                    });
+                });
+                break;
 
-                case 'informes_pendientes':
-                    $query->where('estado', 'Fase 4');
-                    break;
-            }
+            // ========== INFORMES FINALES SIN APROBAR ==========
+            case 'informes_pendientes':
+                $query->where(function ($q) {
+                    // Fase 5 Estudiante (submited_fase5 = false o no existe)
+                    $q->where('estado', 'Fase 5')
+                        ->where(function ($where) {
+                            $where->whereDoesntHave('valoresCampos', function ($vc) {
+                                $vc->whereHas('campo', function ($c) {
+                                    $c->where('name', 'submited_fase5');
+                                });
+                            })
+                            ->orWhereHas('valoresCampos', function ($vc) {
+                                $vc->whereHas('campo', function ($c) {
+                                    $c->where('name', 'submited_fase5');
+                                })->where('valor', 'false');
+                            });
+                        });
+                });
+                break;
         }
+    }
 
         // ================= BÚSQUEDA AVANZADA =================
-        if ($request->has('search') && $search = $request->input('search.value')) {
-            $query->where(function ($q) use ($search) {
+if ($request->has('search') && $search = $request->input('search.value')) {
+    $query->where(function ($q) use ($search) {
 
-                if (preg_match('/GRA-00(\d+)/i', $search, $matches)) {
-                    $idNumero = intval($matches[1]);
-                    $q->orWhere('id', $idNumero);
-                }
+        $searchLower = strtolower(trim($search));
 
-                if (is_numeric($search)) {
-                    $q->orWhere('id', $search);
-                }
+        // ========== 1. BÚSQUEDA POR ID ==========
+        if (preg_match('/GRA-00(\d+)/i', $search, $matches)) {
+            $idNumero = intval($matches[1]);
+            $q->orWhere('id', $idNumero);
+        }
 
-                $searchLower = strtolower(trim($search));
+        if (is_numeric($search)) {
+            $q->orWhere('id', $search);
+        }
 
-                if (preg_match('/^fase\s+([1-6])$/i', $searchLower, $matches)) {
-                    $q->orWhere('estado', 'Fase ' . $matches[1]);
-                }
+        // ========== 2. BÚSQUEDA POR ESTADO ==========
+        if (preg_match('/^fase\s+([1-6])$/i', $searchLower, $matches)) {
+            $q->orWhere('estado', 'Fase ' . $matches[1]);
+        }
 
-                $q->orWhereHas('user', function ($uq) use ($search) {
-                    $uq->where('name', 'LIKE', "%{$search}%")
-                        ->orWhere('email', 'LIKE', "%{$search}%")
-                        ->orWhere('nro_documento', 'LIKE', "%{$search}%")
-                        ->orWhere('nro_celular', 'LIKE', "%{$search}%");
+        if (in_array($searchLower, ['pendiente', 'pendientes'])) {
+            $q->orWhere('estado', 'Pendiente');
+        }
+
+        if (in_array($searchLower, ['rechazada', 'rechazado'])) {
+            $q->orWhere('estado', 'Rechazada');
+        }
+
+        if (in_array($searchLower, ['finalizado', 'finalizada'])) {
+            $q->orWhere('estado', 'Finalizado');
+        }
+
+        // ========== 3. BÚSQUEDA POR RESPONSABLE ==========
+        // Estudiante
+        if (in_array($searchLower, ['estudiante', 'estudiantes'])) {
+                $q->orWhere(function ($sub) {
+                    $sub->where('estado', 'Fase 1')
+                        ->where(function ($where) {
+                            $where->whereDoesntHave('valoresCampos', function ($vc) {
+                                $vc->whereHas('campo', function ($c) {
+                                    $c->where('name', 'submited_fase1');
+                                });
+                            })
+                            ->orWhereHas('valoresCampos', function ($vc) {
+                                $vc->whereHas('campo', function ($c) {
+                                    $c->where('name', 'submited_fase1');
+                                })->where('valor', 'false');
+                            });
+                        });
                 });
+            }
 
-                $q->orWhereHas('user.nivel', function ($nq) use ($search) {
-                    $nq->where('nombre', 'LIKE', "%{$search}%");
-                });
-
-                $q->orWhereHas('valoresCampos', function ($vcq) use ($search) {
+        // Comité
+        if (in_array($searchLower, ['comité', 'comite'])) {
+            $q->orWhere(function ($sub) {
+                $sub->whereHas('valoresCampos', function ($vcq) {
                     $vcq->whereHas('campo', function ($cq) {
-                        $cq->whereIn('name', ['titulo', 'nombre_empresa']);
-                    })->where('valor', 'LIKE', "%{$search}%");
+                        $cq->whereIn('name', ['submited_fase1', 'submited_fase2']);
+                    })->where('valor', 'true');
                 });
             });
         }
+
+        // Director
+        if (in_array($searchLower, ['director'])) {
+                $q->orWhere(function ($sub) {
+                    $sub->where('estado', 'Fase 3')
+                        ->whereHas('valoresCampos', function ($vc) {
+                            $vc->whereHas('campo', function ($c) {
+                                $c->where('name', 'submited_fase3');
+                            })->where('valor', 'true');
+                        });
+                });
+                $q->orWhere(function ($sub) {
+                    $sub->where('estado', 'Fase 5')
+                        ->whereHas('valoresCampos', function ($vc) {
+                            $vc->whereHas('campo', function ($c) {
+                                $c->where('name', 'submited_fase5');
+                            })->where('valor', 'true');
+                        });
+                });
+            }
+
+        // Evaluador
+        if (in_array($searchLower, ['evaluador'])) {
+                $q->orWhere(function ($sub) {
+                    $sub->where('estado', 'Fase 4')
+                        ->whereHas('valoresCampos', function ($vc) {
+                            $vc->whereHas('campo', function ($c) {
+                                $c->where('name', 'estado_evaluador_fase4');
+                            })->whereNotNull('valor')
+                              ->where('valor', '!=', '');
+                        });
+                });
+                $q->orWhere(function ($sub) {
+                    $sub->where('estado', 'Fase 6')
+                        ->whereHas('valoresCampos', function ($vc) {
+                            $vc->whereHas('campo', function ($c) {
+                                $c->where('name', 'estado_evaluador_fase6');
+                            })->whereNotNull('valor')
+                              ->where('valor', '!=', '');
+                        });
+                });
+            }
+
+        // ========== 4. BÚSQUEDA POR BENEFICIARIO ICFES ==========
+        if (in_array($searchLower, ['beneficiario', 'beneficiarios', 'icfes', 'beneficiario icfes'])) {
+            $q->orWhereHas('valoresCampos', function ($vcq) {
+                $vcq->whereHas('campo', function ($cq) {
+                    $cq->where('name', 'beneficiarios_icfes_practicas');
+                })->whereNotNull('valor')
+                  ->where('valor', '!=', '[]')
+                  ->where('valor', '!=', '{}');
+            });
+        }
+
+        // ========== 5. BÚSQUEDA POR RETIRADO ==========
+        if (in_array($searchLower, ['retirado', 'retirados', 'retiro'])) {
+            $q->orWhereHas('valoresCampos', function ($vcq) {
+                $vcq->whereHas('campo', function ($cq) {
+                    $cq->where('name', 'retirados_practica');
+                })->whereNotNull('valor')
+                  ->where('valor', '!=', '[]')
+                  ->where('valor', '!=', '{}');
+            });
+        }
+
+        // ========== 6. BÚSQUEDA POR VENCIDO ==========
+        if (in_array($searchLower, ['vencido', 'vencidos', 'vencida'])) {
+            $q->orWhere('vencido', 1);
+        }
+
+        // ========== 7. BÚSQUEDA POR DESHABILITADO ==========
+        if (in_array($searchLower, ['deshabilitado', 'deshabilitados', 'deshabilitada', 'deshabilitadas'])) {
+            $q->orWhere('deshabilitado', 1);
+        }
+
+        // ========== 7. BÚSQUEDA POR SEGUNDO INTEGRANTE ==========
+        $q->orWhereHas('valoresCampos', function ($vcq) use ($search) {
+            $vcq->whereHas('campo', function ($cq) {
+                $cq->where('name', 'id_integrante_2');
+            })->whereHas('practica', function ($pq) use ($search) {
+                $pq->whereHas('user', function ($uq) use ($search) {
+                    $uq->where('name', 'LIKE', "%{$search}%")
+                        ->orWhere('nro_documento', 'LIKE', "%{$search}%")
+                        ->orWhere('email', 'LIKE', "%{$search}%");
+                });
+            });
+        });
+
+        // ========== 8. BÚSQUEDA POR USUARIO (primer integrante) ==========
+        $q->orWhereHas('user', function ($uq) use ($search) {
+            $uq->where('name', 'LIKE', "%{$search}%")
+                ->orWhere('email', 'LIKE', "%{$search}%")
+                ->orWhere('nro_documento', 'LIKE', "%{$search}%")
+                ->orWhere('nro_celular', 'LIKE', "%{$search}%");
+        });
+
+        // ========== 9. BÚSQUEDA POR NIVEL ==========
+        $q->orWhereHas('user.nivel', function ($nq) use ($search) {
+            $nq->where('nombre', 'LIKE', "%{$search}%");
+        });
+
+        // ========== 10. BÚSQUEDA POR TÍTULO O EMPRESA ==========
+        $q->orWhereHas('valoresCampos', function ($vcq) use ($search) {
+            $vcq->whereHas('campo', function ($cq) {
+                $cq->whereIn('name', ['titulo', 'nombre_empresa']);
+            })->where('valor', 'LIKE', "%{$search}%");
+        });
+
+        // ========== 11. BÚSQUEDA POR DESCRIPCIÓN ==========
+        // Buscar en la descripción de la práctica (columna descripcion en la tabla practicas)
+        // o en la descripción de los valores de campos
+        $q->orWhereHas('valoresCampos', function ($vcq) use ($search) {
+            $vcq->whereHas('campo', function ($cq) {
+                $cq->where('name', 'descripcion');
+            })->where('valor', 'LIKE', "%{$search}%");
+        });
+
+        // Buscar también en el campo 'objetivo' o 'descripcion' si existen
+        $q->orWhereHas('valoresCampos', function ($vcq) use ($search) {
+            $vcq->whereHas('campo', function ($cq) {
+                $cq->whereIn('name', ['descripcion', 'objetivo', 'observaciones', 'comentarios']);
+            })->where('valor', 'LIKE', "%{$search}%");
+        });
+    });
+}
 
         $query->orderBy('id', 'desc');
 
@@ -372,7 +674,7 @@ class PracticaController extends Controller
                     if ($respondioEvaluador) {
                         $htmlEstado = "
                             <span class='shadow bg-uts-300 text-sm font-medium px-2.5 py-0.5 rounded border border-uts-500'>Fase 6</span>
-                            <span class='shadow bg-purple-100 text-purple-800 text-sm font-medium px-2.5 py-0.5 rounded border border-purple-300'>Comité</span>
+                            <span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Comité</span>
                             $badgeBeneficiario
                         ";
                     } else {
@@ -385,7 +687,7 @@ class PracticaController extends Controller
                 }
 
                 elseif ($p->estado === 'Finalizado') {
-                    $htmlEstado = "<span class='px-2 py-1 shadow rounded-md text-sm font-semibold bg-green-100 text-green-800 border border-green-300'>Finalizado</span>";
+                    $htmlEstado = "<span class='shadow bg-green-100 text-green-800 text-sm font-medium px-2.5 py-0.5 rounded border border-green-300'>Finalizado</span>";
                 }
 
                 if ($p->deshabilitado && $p->estado !== 'Rechazada') {
@@ -586,73 +888,72 @@ class PracticaController extends Controller
     }
 
     public function buscarEstudiantes(Request $request)
-    {
-        try {
-            $search = $request->get('search');
+{
+    try {
+        $search = $request->get('search');
 
-            if (strlen($search) < 5) {
-                return response()->json([]);
-            }
-
-            $userId      = auth()->id();
-            $userNivelId = auth()->user()->nivel_id;
-
-            // Subconsulta para encontrar estudiantes que NO tienen prácticas activas
-            // Estados que se consideran "activos" (no se puede agregar a estos estudiantes)
-            $estadosActivos = ['Pendiente', 'Fase 1', 'Fase 2', 'Fase 3', 'Fase 4', 'Fase 5', 'Fase 6'];
-
-            $estudiantes = \App\Models\User::where('id', '!=', $userId)
-                ->where('nivel_id', $userNivelId) // Mismo nivel académico
-                ->where(function ($q) use ($search) {
-                    $q->where('name', 'LIKE', "%{$search}%")
-                        ->orWhere('nro_documento', 'LIKE', "%{$search}%")
-                        ->orWhere('email', 'LIKE', "%{$search}%");
-                })
-            // Excluir estudiantes que tienen prácticas activas
-                ->whereNotIn('id', function ($subquery) use ($estadosActivos) {
-                    $subquery->select('user_id')
-                        ->from('practicas')
-                        ->whereIn('estado', $estadosActivos)
-                        ->where('tipo_solicitud_id', 9); // Solo prácticas, no proyectos
-                })
-            // También excluir estudiantes que son segundo integrante en prácticas activas
-                ->whereNotIn('id', function ($subquery) use ($estadosActivos) {
-                    $subquery->select('valor')
-                        ->from('practica_valores_campos')
-                        ->whereIn('practica_id', function ($q) use ($estadosActivos) {
-                            $q->select('id')
-                                ->from('practicas')
-                                ->whereIn('estado', $estadosActivos)
-                                ->where('tipo_solicitud_id', 9);
-                        })
-                        ->where('campo_id', function ($cq) {
-                            $cq->select('id')
-                                ->from('campos')
-                                ->where('name', 'id_integrante_2')
-                                ->where('tipo_solicitud_id', 9);
-                        });
-                })
-                ->with('nivel')
-                ->limit(10)
-                ->get();
-
-            $resultado = $estudiantes->map(function ($user) {
-                return [
-                    'id'              => $user->id,
-                    'nombre_completo' => $user->name,
-                    'documento'       => $user->nro_documento,
-                    'email'           => $user->email,
-                    'nivel'           => $user->nivel ? $user->nivel->nombre : 'N/A',
-                ];
-            });
-
-            return response()->json($resultado);
-
-        } catch (\Exception $e) {
-            \Log::error('Error en buscarEstudiantes: ' . $e->getMessage());
-            return response()->json(['error' => 'Error interno del servidor'], 500);
+        if (strlen($search) < 5) {
+            return response()->json([]);
         }
+
+        $userId = auth()->id();
+        $userNivelId = auth()->user()->nivel_id;
+
+        // Estados que se consideran "activos" (no se puede agregar a estos estudiantes)
+        $estadosActivos = ['Pendiente', 'Fase 1', 'Fase 2', 'Fase 3', 'Fase 4', 'Fase 5', 'Fase 6'];
+
+        $estudiantes = \App\Models\User::where('id', '!=', $userId)
+            ->where('nivel_id', $userNivelId)
+            ->where(function ($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                    ->orWhere('nro_documento', 'LIKE', "%{$search}%")
+                    ->orWhere('email', 'LIKE', "%{$search}%");
+            })
+            // Excluir estudiantes que tienen prácticas activas (TODAS las fases)
+            ->whereNotIn('id', function ($subquery) use ($estadosActivos) {
+                $subquery->select('user_id')
+                    ->from('practicas')
+                    ->whereIn('estado', $estadosActivos)
+                    ->where('tipo_solicitud_id', '>=', 9);
+            })
+            // Excluir estudiantes que son segundo integrante en prácticas activas
+            ->whereNotIn('id', function ($subquery) use ($estadosActivos) {
+                $subquery->select('valor')
+                    ->from('practica_valores_campos')
+                    ->whereIn('practica_id', function ($q) use ($estadosActivos) {
+                        $q->select('id')
+                            ->from('practicas')
+                            ->whereIn('estado', $estadosActivos)
+                            ->where('tipo_solicitud_id', '>=', 9);
+                    })
+                    ->where('campo_id', function ($cq) {
+                        $cq->select('id')
+                            ->from('campos')
+                            ->where('name', 'id_integrante_2')
+                            ->where('tipo_solicitud_id', '>=', 9);
+                    });
+            })
+            ->with('nivel')
+            ->limit(10)
+            ->get();
+
+        $resultado = $estudiantes->map(function ($user) {
+            return [
+                'id'              => $user->id,
+                'nombre_completo' => $user->name,
+                'documento'       => $user->nro_documento,
+                'email'           => $user->email,
+                'nivel'           => $user->nivel ? $user->nivel->nombre : 'N/A',
+            ];
+        });
+
+        return response()->json($resultado);
+
+    } catch (\Exception $e) {
+        \Log::error('Error en buscarEstudiantes: ' . $e->getMessage());
+        return response()->json(['error' => 'Error interno del servidor'], 500);
     }
+}
     
     
 
@@ -732,7 +1033,13 @@ class PracticaController extends Controller
     {
         try {
             $practica = Practica::with('user.nivel', 'valoresCampos.campo')->findOrFail($id);
-            
+
+            // Obtener fechas de propuesta
+    $fechasPropuesta = $this->getFechasPropuesta($practica);
+    
+    // Obtener fechas de informe
+    $fechasInforme = $this->getFechasInforme($practica);
+
             $data = [];
             foreach ($practica->valoresCampos as $vc) {
                 if ($vc->campo && $vc->campo->name) {
@@ -852,7 +1159,9 @@ class PracticaController extends Controller
                 'tiene_empresa' => $tieneEmpresa === 'true',
                 'hoja_vida' => $hojaVida,
                 'hoja_vida_2' => $hojaVida2,
-                'es_estudiante' => $esEstudiante
+                'es_estudiante' => $esEstudiante,
+                'fechas_propuesta' => $fechasPropuesta,
+                'fechas_informe' => $fechasInforme
             ]);
             
         } catch (\Exception $e) {
@@ -865,38 +1174,6 @@ class PracticaController extends Controller
     {
         $practica = Practica::with('user')->findOrFail($id);
         return view('practicas.show', compact('practica'));
-    }
-
-    // Habilitar una práctica (cambiar deshabilitado a false)
-    public function habilitar(Request $request)
-    {
-        $practica = Practica::with(['user', 'valoresCampos.campo'])
-            ->findOrFail($request->id);
-
-        $practica->update([
-            'deshabilitado' => false
-        ]);
-
-        $this->practicaMailService
-            ->sendEstadoHabilitacion($practica, 'practica_habilitada');
-
-        return response()->json(['success' => true]);
-    }
-
-    // Deshabilitar una práctica
-    public function deshabilitar(Request $request)
-    {
-        $practica = Practica::with(['user', 'valoresCampos.campo'])
-            ->findOrFail($request->id);
-
-        $practica->update([
-            'deshabilitado' => true
-        ]);
-
-        $this->practicaMailService
-            ->sendEstadoHabilitacion($practica, 'practica_deshabilitada');
-
-        return response()->json(['success' => true]);
     }
 
     public function deshabilitarConActa(Request $request)
@@ -922,6 +1199,9 @@ class PracticaController extends Controller
             'fecha'       => $request->fecha_acta_desactivar,
             'descripcion' => $request->descripcion_desactivar,
         ]);
+
+        $this->practicaMailService
+            ->sendEstadoHabilitacion($practica, 'practica_deshabilitada');
 
         return response()->json(['success' => 'Práctica deshabilitada correctamente']);
     }
@@ -950,7 +1230,321 @@ class PracticaController extends Controller
             'descripcion' => $request->descripcion_activar,
         ]);
 
+        $this->practicaMailService
+            ->sendEstadoHabilitacion($practica, 'practica_habilitada');
+
         return response()->json(['success' => 'Práctica habilitada correctamente']);
     }
 
+    private function getFechasPropuesta($practica)
+{
+    $fechas = [
+        'envio_estudiante' => 'No disponible',
+        'revision_director' => 'No disponible', 
+        'revision_evaluador' => 'No disponible'
+    ];
+    
+    // 1. Envío de propuesta (estudiante) - submited_fase3
+    $campoEnvio = $practica->valoresCampos->where('campo.name', 'submited_fase3')->first();
+    if ($campoEnvio && $campoEnvio->valor === 'true' && $campoEnvio->updated_at) {
+        $fechas['envio_estudiante'] = $campoEnvio->updated_at->format('d/m/Y, H:i');
+    }
+    
+    // 2. Revisión director - estado_director_fase3 (solo si fue aprobado)
+    $campoDirector = $practica->valoresCampos->where('campo.name', 'estado_director_fase3')->first();
+    if ($campoDirector && $campoDirector->valor === 'Aprobada' && $campoDirector->updated_at) {
+        $fechas['revision_director'] = $campoDirector->updated_at->format('d/m/Y, H:i');
+    }
+    
+    // 3. Revisión evaluador - estado_evaluador_fase4 (solo si fue aprobado)
+    $campoEvaluador = $practica->valoresCampos->where('campo.name', 'estado_evaluador_fase4')->first();
+    if ($campoEvaluador && $campoEvaluador->valor === 'Aprobada' && $campoEvaluador->updated_at) {
+        $fechas['revision_evaluador'] = $campoEvaluador->updated_at->format('d/m/Y, H:i');
+    }
+    
+    return $fechas;
 }
+
+private function getFechasInforme($practica)
+{
+    $fechas = [
+        'envio_estudiante' => 'No disponible',
+        'revision_director' => 'No disponible',
+        'revision_evaluador' => 'No disponible'
+    ];
+    
+    // 1. Envío de informe (estudiante) - submited_fase5
+    $campoEnvio = $practica->valoresCampos->where('campo.name', 'submited_fase5')->first();
+    if ($campoEnvio && $campoEnvio->valor === 'true' && $campoEnvio->updated_at) {
+        $fechas['envio_estudiante'] = $campoEnvio->updated_at->format('d/m/Y, H:i');
+    }
+    
+    // 2. Revisión director - estado_director_fase5 (solo si fue aprobado)
+    $campoDirector = $practica->valoresCampos->where('campo.name', 'estado_director_fase5')->first();
+    if ($campoDirector && $campoDirector->valor == 'Aprobada' && $campoDirector->updated_at) {
+        $fechas['revision_director'] = $campoDirector->updated_at->format('d/m/Y, H:i');
+    }
+    
+    // 3. Revisión evaluador - estado_evaluador_fase6 (solo si fue aprobado)
+    $campoEvaluador = $practica->valoresCampos->where('campo.name', 'estado_evaluador_fase6')->first();
+    if ($campoEvaluador && $campoEvaluador->valor == 'Aprobada' && $campoEvaluador->updated_at) {
+        $fechas['revision_evaluador'] = $campoEvaluador->updated_at->format('d/m/Y, H:i');
+    }
+    
+    return $fechas;
+}
+
+    public function generarReportePracticas(Request $request)
+{
+    try {
+        $validator = Validator::make($request->all(), [
+            'periodo_reporte' => 'required',
+        ], [
+            'periodo_reporte.required' => 'El campo periodo es obligatorio',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $periodo = $request->periodo_reporte;
+        
+        // Crear directorio si no existe
+        $formatosPath = public_path('formatos');
+        if (!file_exists($formatosPath)) {
+            mkdir($formatosPath, 0777, true);
+        }
+        
+        $formato_reporte = $formatosPath . '/informe_practicas.xlsx';
+
+        // Si no existe el formato, crear uno nuevo
+        if (!file_exists($formato_reporte)) {
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+            
+            // Título
+            $sheet->mergeCells('A1:R1');
+            $sheet->setCellValue('A1', 'Unidades Tecnológicas de Santander');
+            $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+            $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            
+            $sheet->mergeCells('A2:R2');
+            $sheet->setCellValue('A2', 'Informe de prácticas empresariales');
+            $sheet->getStyle('A2')->getFont()->setBold(true)->setSize(12);
+            $sheet->getStyle('A2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            
+            $sheet->mergeCells('A3:R3');
+            $sheet->setCellValue('A3', 'Ingeniería de sistemas');
+            $sheet->getStyle('A3')->getFont()->setBold(true)->setSize(12);
+            $sheet->getStyle('A3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            
+            // Encabezados
+            $headers = [
+                'ID', 'Código modalidad', 'Título del proyecto', 'Modalidad', 
+                'Nivel académico', 'Línea de investigación', 'Tipo de idea', 
+                'Estado', 'Integrantes', 'Documento', 'Correo electrónico', 
+                'Celular', 'Director', 'Evaluador', 'Actas de registro', 
+                'Inicio Práctica', 'Aprobación Propuesta', 'Fin Práctica'
+            ];
+            
+            $col = 'A';
+            foreach ($headers as $header) {
+                $sheet->setCellValue($col . '5', $header);
+                $sheet->getStyle($col . '5')->getFont()->setBold(true);
+                $sheet->getStyle($col . '5')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                $sheet->getColumnDimension($col)->setWidth(20);
+                $col++;
+            }
+            
+            // Guardar el formato
+            $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+            $writer->save($formato_reporte);
+        }
+
+        // Cargar el archivo de Excel existente
+        $spreadsheet = IOFactory::load($formato_reporte);
+        $sheet = $spreadsheet->getActiveSheet();
+        $fila = 6;
+
+        // ============ CONSULTA SIMPLIFICADA ============
+        // Traer TODAS las prácticas con estados válidos
+        $practicas = Practica::with(['user', 'user.nivel', 'valoresCampos.campo'])
+            ->whereIn('estado', ['Fase 2', 'Fase 3', 'Fase 4', 'Fase 5', 'Fase 6', 'Finalizado'])
+            ->get();
+
+        foreach ($practicas as $practica) {
+            $campos = $practica->valoresCampos->pluck('valor', 'campo.name')->toArray();
+
+            // Obtener el periodo de la práctica
+            $periodoPractica = $campos['periodo'] ?? 'No disponible';
+            
+            // Si la práctica no tiene el periodo seleccionado o no coincide con el filtro, la saltamos
+            if ($periodoPractica !== $periodo) {
+                continue;
+            }
+
+            $id = 'GRA-00' . $practica->id;
+            $codigo_modalidad = $campos['codigo_modalidad'] ?? 'No disponible';
+            $titulo = mb_strtoupper($this->getTituloPractica($practica)) ?? 'No disponible';
+            
+            $modalidad = 'Prácticas empresariales';
+            $nivel = $practica->user->nivel->nombre ?? 'No disponible';
+            $linea_investigacion = $campos['linea_investigacion'] ?? 'No disponible';
+            $tipo_idea = $campos['tipo_idea'] ?? 'No disponible';
+            
+            $estado = $practica->estado ?? 'No disponible';
+            if ($practica->vencido) $estado .= ' (Vencido)';
+            if ($practica->deshabilitado) $estado .= ' (Deshabilitado)';
+
+            // Integrantes
+            $integrante_1_id = $practica->user_id;
+            $integrante_2_id = $campos['id_integrante_2'] ?? null;
+
+            $beneficiarios_icfes = $campos['beneficiarios_icfes_practicas'] ?? '[]';
+            $beneficiarios_icfes = json_decode($beneficiarios_icfes, true) ?? [];
+
+            $integrantes = '';
+            $documentos = '';
+            $emails = '';
+            $nros_celulares = '';
+
+            // Integrante 1
+            if ($integrante_1_id) {
+                $integrante_1 = User::find($integrante_1_id);
+                if ($integrante_1) {
+                    $tipo_documento = TipoDocumento::find($integrante_1->tipo_documento_id);
+                    $documento = ($tipo_documento ? $tipo_documento->tag : 'CC') . " " . ($integrante_1->nro_documento ?? 'N/A');
+                    
+                    $integrantes = mb_strtoupper($integrante_1->name);
+                    $documentos = $documento;
+                    $emails = $integrante_1->email ?? 'N/A';
+                    $nros_celulares = $integrante_1->nro_celular ?? 'N/A';
+
+                    if ($beneficiarios_icfes && in_array($integrante_1->id, $beneficiarios_icfes)) {
+                        $integrantes .= ' - BENEFICIARIO ICFES';
+                    }
+                }
+            }
+
+            // Integrante 2
+            if ($integrante_2_id) {
+                $integrante_2 = User::find($integrante_2_id);
+                if ($integrante_2) {
+                    $tipo_documento = TipoDocumento::find($integrante_2->tipo_documento_id);
+                    $documento = ($tipo_documento ? $tipo_documento->tag : 'CC') . " " . ($integrante_2->nro_documento ?? 'N/A');
+                    
+                    $integrantes .= "\n" . mb_strtoupper($integrante_2->name);
+                    $documentos .= "\n" . $documento;
+                    $emails .= "\n" . ($integrante_2->email ?? 'N/A');
+                    $nros_celulares .= "\n" . ($integrante_2->nro_celular ?? 'N/A');
+
+                    if ($beneficiarios_icfes && in_array($integrante_2->id, $beneficiarios_icfes)) {
+                        $integrantes .= ' - BENEFICIARIO ICFES';
+                    }
+                }
+            }
+
+            // Director
+            $director_id = $campos['director_id'] ?? null;
+            $director = 'No disponible';
+            if ($director_id) {
+                $director_user = User::find($director_id);
+                $director = $director_user ? mb_strtoupper($director_user->name) : 'No disponible';
+            }
+
+            // Evaluador
+            $evaluador_id = $campos['evaluador_id'] ?? null;
+            $evaluador = 'No disponible';
+            if ($evaluador_id) {
+                $evaluador_user = User::find($evaluador_id);
+                $evaluador = $evaluador_user ? mb_strtoupper($evaluador_user->name) : 'No disponible';
+            }
+
+            // Actas
+            $actas = ActaPractica::where('practica_id', $practica->id)
+                ->orderBy('numero', 'asc')
+                ->get();
+
+            $actas_registro = $actas->map(function ($acta) {
+                $fecha = Carbon::parse($acta->fecha);
+                return "Nro. {$acta->numero} - Fecha: {$fecha->format('d-m-Y')} - {$acta->descripcion}";
+            })->implode("\n");
+
+            // Fechas
+            $inicio_practica = $actas->firstWhere('descripcion', 'Aprobación del pago de la modalidad');
+            $inicio_practica = $inicio_practica ? Carbon::parse($inicio_practica->fecha)->format('d-m-Y') : 'No disponible';
+            
+            $aprobacion_propuesta = $actas->firstWhere('descripcion', 'Aprobación de la propuesta');
+            $aprobacion_propuesta = $aprobacion_propuesta ? Carbon::parse($aprobacion_propuesta->fecha)->format('d-m-Y') : 'No disponible';
+            
+            $fin_practica = $actas->firstWhere('descripcion', 'Aprobación del informe final');
+            $fin_practica = $fin_practica ? Carbon::parse($fin_practica->fecha)->format('d-m-Y') : 'No disponible';
+
+            // Insertar valores
+            $sheet->setCellValue("A{$fila}", $id);
+            $sheet->setCellValue("B{$fila}", $codigo_modalidad);
+            $sheet->setCellValue("C{$fila}", $titulo);
+            $sheet->setCellValue("D{$fila}", $modalidad);
+            $sheet->setCellValue("E{$fila}", $nivel);
+            $sheet->setCellValue("F{$fila}", $linea_investigacion);
+            $sheet->setCellValue("G{$fila}", $tipo_idea);
+            $sheet->setCellValue("H{$fila}", $estado);
+            $sheet->setCellValue("I{$fila}", $integrantes);
+            $sheet->setCellValue("J{$fila}", $documentos);
+            $sheet->setCellValue("K{$fila}", $emails);
+            $sheet->setCellValue("L{$fila}", $nros_celulares);
+            $sheet->setCellValue("M{$fila}", $director);
+            $sheet->setCellValue("N{$fila}", $evaluador);
+            $sheet->setCellValue("O{$fila}", $actas_registro);
+            $sheet->setCellValue("P{$fila}", $inicio_practica);
+            $sheet->setCellValue("Q{$fila}", $aprobacion_propuesta);
+            $sheet->setCellValue("R{$fila}", $fin_practica);
+
+            // Aplicar estilos
+            foreach (range('A', 'R') as $col) {
+                $sheet->getStyle("{$col}{$fila}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+                $sheet->getStyle("{$col}{$fila}")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+                $sheet->getStyle("{$col}{$fila}")->getAlignment()->setWrapText(true);
+            }
+
+            $fila++;
+        }
+
+        // Definir el nombre del archivo a descargar
+        $fileName = "Informe - Prácticas empresariales ({$periodo}).xlsx";
+
+        // Guardar en un stream para descargar
+        $response = new StreamedResponse(function () use ($spreadsheet) {
+            $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+            $writer->save('php://output');
+        });
+
+        $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $response->headers->set('Content-Disposition', "attachment; filename=\"{$fileName}\"");
+
+        return $response;
+        
+    } catch (Exception $e) {
+        Log::error('Error en generarReportePracticas: ' . $e->getMessage());
+        Log::error('Stack trace: ' . $e->getTraceAsString());
+        return response()->json(['message' => 'Ha ocurrido un error: ' . $e->getMessage()], 500);
+    }
+}
+
+private function getTituloPractica($practica)
+{
+    $campos = $practica->valoresCampos->pluck('valor', 'campo.name')->toArray();
+    
+    if (isset($campos['titulo_propuesta_fase4']) && !empty($campos['titulo_propuesta_fase4'])) {
+        return $campos['titulo_propuesta_fase4'];
+    } elseif (isset($campos['titulo_propuesta_director_fase3']) && !empty($campos['titulo_propuesta_director_fase3'])) {
+        return $campos['titulo_propuesta_director_fase3'];
+    } elseif (isset($campos['titulo']) && !empty($campos['titulo'])) {
+        return $campos['titulo'];
+    }
+    
+    return 'No disponible';
+}
+
+}
+

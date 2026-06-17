@@ -271,7 +271,11 @@ Route::middleware([
             // Configuraciones de prácticas
             Route::post('/configurar/estudiante', [RoadMapPracticaController::class, 'configEstudiante'])->name('practicas.configurar_estudiante');
             Route::post('/configurar/admin', [RoadMapPracticaController::class, 'configAdmin'])->name('practicas.configurar_admin');
-                    
+
+            // Informe de reporte
+            
+            Route::post('/practicas/reporte', [PracticaController::class, 'generarReportePracticas'])->name('practicas.reporte');
+        
             
             // Rutas POST para seguimiento (sin duplicar)
             Route::post('/seguimiento', [RoadMapPracticaController::class, 'index'])->name('practicas.roadmap');

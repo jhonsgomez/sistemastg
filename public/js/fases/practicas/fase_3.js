@@ -599,7 +599,7 @@ function openFase3DetailsModal(btn) {
                                     <i class="fa-regular fa-file-word text-blue-600 mr-2"></i>
                                     <a href="${response.doc_fdc127_url}" target="_blank"
                                         class="text-blue-600 underline hover:text-blue-800">
-                                        Ver documento
+                                        Ver F-DC-127
                                     </a>
                                 </div>
                             `
@@ -622,7 +622,7 @@ function openFase3DetailsModal(btn) {
                                     <i class="fa-regular fa-file-word text-blue-600 mr-2"></i>
                                     <a href="${response.doc_fdc195_url}" target="_blank"
                                         class="text-blue-600 underline hover:text-blue-800">
-                                        Ver documento
+                                        Ver F-DC-195
                                     </a>
                                 </div>
                             `

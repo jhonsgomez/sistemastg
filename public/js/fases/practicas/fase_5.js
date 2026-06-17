@@ -652,7 +652,7 @@ function openFase5DetailsModal(btn) {
                                         target="_blank"
                                         class="text-blue-600 underline hover:text-blue-800">
 
-                                        Ver informe final
+                                        Ver F-DC-128
 
                                     </a>
 
@@ -684,7 +684,7 @@ function openFase5DetailsModal(btn) {
                                         target="_blank"
                                         class="text-blue-600 underline hover:text-blue-800">
 
-                                        Ver documento
+                                        Ver F-DC-129
 
                                     </a>
 
@@ -717,7 +717,7 @@ function openFase5DetailsModal(btn) {
                                         target="_blank"
                                         class="text-blue-600 underline hover:text-blue-800">
 
-                                        Ver documento
+                                        Ver F-DC-196
 
                                     </a>
 

@@ -1185,7 +1185,68 @@ $mes_actual = Carbon::now()->month;
             </div>
         </div>
     @endif
-    
+
+    <div id="reporteModal" class="fixed z-50 inset-0 overflow-y-auto">
+    <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeReporteModal()">
+        <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative" onclick="event.stopPropagation()">
+                <button class="modal-close-btn-custom" onclick="closeReporteModal()">
+                    &times;
+                </button>
+                <form action="{{ route('practicas.reporte') }}" method="POST" id="reporteForm" class="p-6 mt-2">
+                    @csrf
+                    <p class="text-2xl font-bold" style="margin: 0.8rem 0 1.5rem 0;" id="reporteTitle"></p>
+                    <div class="mb-4">
+                        <label for="periodo_reporte" class="block font-medium text-md text-gray-700 mb-4">
+                            Periodo académico:
+                        </label>
+                        <select name="periodo_reporte" id="periodo_reporte"
+                            class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full focus:ring-uts-500 focus:border-uts-500" required>
+                            <option value="" selected disabled>Seleccione una opción</option>
+                            @for ($anio = $anio_actual; $anio >= $anio_inicio; $anio--)
+                            @if ($anio == $anio_actual)
+                            @if ($mes_actual > 6)
+                            <option value="{{ $anio }}-2">{{ $anio }}-2</option>
+                            @endif
+                            <option value="{{ $anio }}-1">{{ $anio }}-1</option>
+                            @else
+                            <option value="{{ $anio }}-2">{{ $anio }}-2</option>
+                            <option value="{{ $anio }}-1">{{ $anio }}-1</option>
+                            @endif
+                            @endfor
+                        </select>
+                        <span id="periodo_reporteError" class="text-red-500 text-sm"></span>
+                    </div>
+                    <div class="flex justify-end space-x-2 mt-8">
+                        <button
+                            type="button"
+                            onclick="closeReporteModal()"
+                            class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">
+                            Cancelar
+                        </button>
+                        <button
+                            type="submit"
+                            id="reporteSubmitButton"
+                            class="flex bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg">
+                            <svg id="loadingSpinner-reporte" style="margin: 4px 10px 4px 0" class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64" fill="none"
+                                xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                                <path
+                                    d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
+                                    stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                <path
+                                    d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
+                                    stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-white">
+                                </path>
+                            </svg>
+                            Enviar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
     @push('scripts')
         <script src="{{ asset('js/fases/practicas/fase_0.js') }}"></script>
 
@@ -1220,15 +1281,12 @@ $mes_actual = Carbon::now()->month;
             }
 
             function closeCreateModal() {
-
     // Limpiar formulario
     $('#practicasForm')[0].reset();
 
-    // Limpiar segundo integrante
-    $('#id_integrante_2').val('');
-    $('#search_integrante_2').val('');
+    // Limpiar segundo integrante con Select2
+    $('#id_integrante_2').val(null).trigger('change');
     $('#selected_integrante_2').html('').addClass('hidden');
-    $('#integrantes_list').empty().addClass('hidden');
 
     // Limpiar errores
     $('#id_integrante_2Error').text('');
@@ -1239,17 +1297,14 @@ $mes_actual = Carbon::now()->month;
     // Limpiar archivos
     $('#hoja_vida').val('');
     $('#hoja_vida_2').val('');
-
     $('#file-list-fase0').empty();
     $('#file-list-fase0-2').empty();
-
     $('#files-size-fase0').text('');
     $('#files-size-fase0-2').text('');
 
     // Ocultar contenedores de hojas de vida
     $('#hojaVidaContainer').hide();
     $('#hojaVidaLabel').hide();
-
     $('#hojaVidaContainer2').hide();
     $('#hojaVidaLabel2').hide();
 
@@ -1260,44 +1315,35 @@ $mes_actual = Carbon::now()->month;
 
         <script>
     $(document).ready(function() {
-        let searchTimeout;
-        
-        // Búsqueda de estudiantes para segundo integrante
-        $('#id_integrante_2').select2({
-    dropdownParent: $('#createModal'),
-    placeholder: 'Escribe el documento del integrante',
-    allowClear: true,
-    width: '100%',
-    minimumInputLength: 5,
-    ajax: {
-        url: '{{ route("practicas.buscar_estudiantes") }}',
-        dataType: 'json',
-        delay: 500,
-        data: function(params) {
-            return {
-                search: params.term
-            };
-        },
-        processResults: function(data) {
-            return {
-                results: $.map(data, function(item) {
-                    return {
-                        id: item.id,
-                        text: item.documento + ' | ' + item.nombre_completo
-                    };
-                })
-            };
+    // Select2 para segundo integrante
+    $('#id_integrante_2').select2({
+        dropdownParent: $('#createModal'),
+        placeholder: 'Buscar por documento o nombre',
+        allowClear: true,
+        width: '100%',
+        minimumInputLength: 5,
+        ajax: {
+            url: '{{ route("practicas.buscar_estudiantes") }}',
+            dataType: 'json',
+            delay: 500,
+            data: function(params) {
+                return {
+                    search: params.term
+                };
+            },
+            processResults: function(data) {
+                return {
+                    results: $.map(data, function(item) {
+                        return {
+                            id: item.id,
+                            text: item.documento + ' | ' + item.nombre_completo
+                        };
+                    })
+                };
+            }
         }
-    }
+    });
 });
-    });
-    
-    // Cerrar lista al hacer clic fuera
-    $(document).on('click', function(e) {
-        if (!$(e.target).closest('#search_integrante_2, #integrantes_list').length) {
-            $('#integrantes_list').addClass('hidden');
-        }
-    });
 </script>
 
     <script>
@@ -1661,6 +1707,11 @@ var table = $('#practicasTable').DataTable({
         url: "{{ $dataRoute ?? route('practicas.data') }}",
         data: function (d) {
             d.rol_especifico = "{{ $rol_especifico ?? '' }}";
+
+            // ========== AGREGAR ESTO ==========
+            d.filter = $('#filtroRolesPracticas').val();
+            // ==================================
+
         }
     },
     columns: [
@@ -1752,7 +1803,7 @@ var table = $('#practicasTable').DataTable({
         if (spinner) spinner.classList.remove('hidden');
         btn.disabled = true;
     }
-
+    
     $('#detailsTitle').html(`Detalles de la <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Práctica</span>`);
 
     $.get('/practicas/' + id + '/detalle', function(response) {
@@ -1839,26 +1890,27 @@ var table = $('#practicasTable').DataTable({
 
          }
         
-        // Fechas
-        html += `
-                <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
-                    <p class="font-semibold text-gray-700 mb-2 sm:mb-0  w-1/3 min-w-[100px]">Fechas propuesta:</p>
-                    <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">
-                        <span><b>Envío de propuesta:</b> No disponible</span><br>
-                        <span><b>Revisión director:</b> No disponible</span><br>
-                        <span><b>Revisión evaluador:</b> No disponible</span>
-                    </span>
-                </div>
-                <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
-                    <p class="font-semibold text-gray-700 mb-2 sm:mb-0  w-1/3 min-w-[100px]">Fechas informe:</p>
-                    <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">
-                        <span><b>Envío de informe:</b> No disponible</span><br>
-                        <span><b>Revisión director:</b> No disponible</span><br>
-                        <span><b>Revisión evaluador:</b> No disponible</span>
-                    </span>
-                </div>
-            </div>
-        `;
+        // En la función openDetailsModal, reemplaza la sección de fechas:
+
+// Fechas
+html += `
+    <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
+        <p class="font-semibold text-gray-700 mb-2 sm:mb-0 w-1/3 min-w-[100px]">Fechas propuesta:</p>
+        <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">
+            <span><b>Envío de propuesta:</b> ${escapeHtml(response.fechas_propuesta.envio_estudiante)}</span><br>
+            <span><b>Revisión director:</b> ${escapeHtml(response.fechas_propuesta.revision_director)}</span><br>
+            <span><b>Revisión evaluador:</b> ${escapeHtml(response.fechas_propuesta.revision_evaluador)}</span>
+        </span>
+    </div>
+    <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
+        <p class="font-semibold text-gray-700 mb-2 sm:mb-0 w-1/3 min-w-[100px]">Fechas informe:</p>
+        <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">
+            <span><b>Envío de informe:</b> ${escapeHtml(response.fechas_informe.envio_estudiante)}</span><br>
+            <span><b>Revisión director:</b> ${escapeHtml(response.fechas_informe.revision_director)}</span><br>
+            <span><b>Revisión evaluador:</b> ${escapeHtml(response.fechas_informe.revision_evaluador)}</span>
+        </span>
+    </div>
+`;
         
         $('#content-details').html(html);
         $('#detailsModal').addClass('show');
@@ -2274,6 +2326,114 @@ $(document).ready(function() {
                     console.log('Modal cerrado');
                 }
             }
+    </script>
+
+    <script>
+        // Reportes - Prácticas
+function openReporteModal() {
+    $('#reporteTitle').html(`Generar <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Reporte de Prácticas</span>`);
+
+    $('#periodo_reporte').val('');
+    $('#periodo_reporteError').text('');
+    $('#reporteModal').addClass('show');
+}
+
+function closeReporteModal() {
+    $('#reporteModal').removeClass('show');
+}
+
+// Submit del formulario de reporte
+$(document).ready(function() {
+    $('#reporteForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        // Limpiar errores
+        $('#periodo_reporteError').text('');
+        
+        const periodo = $('#periodo_reporte').val();
+        if (!periodo) {
+            $('#periodo_reporteError').text('Debe seleccionar un periodo académico');
+            return;
+        }
+        
+        const button = $('#reporteSubmitButton');
+        const spinner = $('#loadingSpinner-reporte');
+        
+        button.prop('disabled', true);
+        spinner.removeClass('hidden');
+        
+        // Crear un FormData para enviar el formulario
+        const formData = new FormData(this);
+        
+        $.ajax({
+            url: $(this).attr('action'),
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            xhrFields: {
+                responseType: 'blob' // Importante para manejar la descarga de archivos
+            },
+            success: function(response, status, xhr) {
+                // Crear un enlace para descargar el archivo
+                const blob = new Blob([response], {
+                    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                });
+                
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                
+                // Obtener el nombre del archivo del header Content-Disposition
+                const contentDisposition = xhr.getResponseHeader('Content-Disposition');
+                let filename = 'reporte_practicas.xlsx';
+                if (contentDisposition) {
+                    const matches = contentDisposition.match(/filename="?([^"]+)"?/);
+                    if (matches && matches[1]) {
+                        filename = matches[1];
+                    }
+                }
+                
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                
+                closeReporteModal();
+                showToast('Reporte generado correctamente', 'success');
+            },
+            error: function(xhr) {
+                if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
+                    const errors = xhr.responseJSON.errors;
+                    if (errors.periodo_reporte) {
+                        $('#periodo_reporteError').text(errors.periodo_reporte[0]);
+                    }
+                } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                    showToast(xhr.responseJSON.message, 'error');
+                } else {
+                    showToast('Error al generar el reporte', 'error');
+                }
+            },
+            complete: function() {
+                button.prop('disabled', false);
+                spinner.addClass('hidden');
+            }
+        });
+    });
+});
+
+function showToast(message, type = 'success') {
+    Swal.fire({
+        title: type === 'success' ? '¡Éxito!' : 'Error',
+        text: message,
+        icon: type,
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000
+    });
+}
     </script>
 
     <script>

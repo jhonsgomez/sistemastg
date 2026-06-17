@@ -27,6 +27,7 @@ function openFase7DetailsModal(btn) {
 
                 {
                     nombre: 'Rejilla F-DC-129',
+                    title: 'F-DC-129',
                     url: response.rejilla_fdc129_url,
                     icono: 'fa-file-word',
                     color: 'text-blue-600'
@@ -34,6 +35,7 @@ function openFase7DetailsModal(btn) {
 
                 {
                     nombre: 'Informe Final F-DC-128',
+                    title: 'F-DC-128',
                     url: response.informe_final_fdc128_url,
                     icono: 'fa-file-word',
                     color: 'text-blue-600'
@@ -41,6 +43,7 @@ function openFase7DetailsModal(btn) {
 
                 {
                     nombre: 'Turnitin F-DC-128',
+                    title: 'Turnitin F-DC-128',
                     url: response.turnitin_fdc128_url,
                     icono: 'fa-file-pdf',
                     color: 'text-red-600'
@@ -48,6 +51,7 @@ function openFase7DetailsModal(btn) {
 
                 {
                     nombre: 'Propuesta F-DC-127',
+                    title: 'F-DC-127',
                     url: response.propuesta_fdc127_url,
                     icono: 'fa-file-word',
                     color: 'text-blue-600'
@@ -55,6 +59,7 @@ function openFase7DetailsModal(btn) {
 
                 {
                     nombre: 'Turnitin F-DC-127',
+                    title: 'Turnitin F-DC-127',
                     url: response.turnitin_fdc127_url,
                     icono: 'fa-file-pdf',
                     color: 'text-red-600'
@@ -86,7 +91,7 @@ function openFase7DetailsModal(btn) {
                                         target="_blank"
                                         class="${doc.color} underline hover:opacity-80">
 
-                                        Ver documento
+                                        ${doc.title}
 
                                     </a>
 

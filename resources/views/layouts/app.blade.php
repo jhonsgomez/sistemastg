@@ -263,7 +263,7 @@
                         <li>
                             <a href="{{ route('evaluador.practicas.index') }}"
                                 class="flex items-center gap-3 w-full p-3 
-                                {{ request()->routeIs('evaluador.practicas.index') || request()->routeIs('evaluador.roadmap') 
+                                {{ request()->routeIs('evaluador.practicas.index') || request()->routeIs('evaluador.practicas.*') 
                                     ? 'bg-uts-500 text-white' 
                                     : 'text-gray-600 hover:bg-uts-500 hover:text-white' }} 
                                 rounded-lg transition-colors">

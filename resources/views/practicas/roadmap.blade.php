@@ -71,11 +71,6 @@
             #fase3DirModal,
             #fase4EvaluadorModal,
             #fase4ComiteModal,
-            #fase5EstudianteModal,
-            #fase5DetailsModal,
-            #fase6EvaluadorModal,
-            #fase6DetailsModal,
-            #fase6ComiteModal,
             #icfesEstudianteModal,
             #icfesAdminModal,
             #configAdminModal,
@@ -116,11 +111,6 @@
             #fase3DirModal.show,
             #fase4EvaluadorModal.show,
             #fase4ComiteModal.show,
-            #fase5EstudianteModal.show,
-            #fase5DetailsModal.show,
-            #fase6EvaluadorModal.show,
-            #fase6ComiteModal.show,
-            #fase6DetailsModal.show,
             #icfesEstudianteModal.show,
             #icfesAdminModal.show,
             #configAdminModal.show,
@@ -276,12 +266,12 @@
                 @if (($puedeSolicitarRetiro || $puedeSolicitarCambioDocente || $puedeSolicitarProrroga) && !$tieneSolicitudPendiente)
                     @if (auth()->user()->hasRole(['super_admin', 'admin', 'coordinador']))
                         <button type="button" onclick="openConfigAdminModal()"
-                            class="btn-action shadow bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded-lg">
+                            class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white px-3 py-1 rounded-lg relative">
                             <i class="fa-solid fa-gear"></i>
                         </button>
                     @elseif (auth()->user()->hasRole('estudiante'))
                         <button type="button" onclick="openConfigModal({{ $fase_numerica }})"
-                            class="btn-action shadow bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded-lg">
+                            class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white px-3 py-1 rounded-lg relative">
                             <i class="fa-solid fa-gear"></i>
                         </button>
                     @endif
@@ -1911,7 +1901,7 @@
                             <div class="flex items-center gap-2 mb-2">
                                 <label class="block font-medium text-sm text-gray-700">
                                     <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
-                                    Propuesta (F-DC-127)
+                                    F-DC-127
                                 </label>
                                 <div class="relative inline-block">
                                     <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
@@ -1947,7 +1937,7 @@
                             <div class="flex items-center gap-2 mb-2">
                                 <label class="block font-medium text-sm text-gray-700">
                                     <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
-                                    Acta de Inicio (F-DC-195)
+                                    F-DC-195
                                 </label>
                                 <div class="relative inline-block">
                                     <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
@@ -2086,7 +2076,7 @@
                             <div class="flex items-center gap-2 mb-2">
                                 <label class="block font-medium text-sm text-gray-700">
                                     <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
-                                    Propuesta (F-DC-127)
+                                    F-DC-127
                                 </label>
                                 <div class="relative inline-block">
                                     <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
@@ -2124,7 +2114,7 @@
                             <div class="flex items-center gap-2 mb-2">
                                 <label class="block font-medium text-sm text-gray-700">
                                     <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
-                                    Acta de Inicio (F-DC-195)
+                                    F-DC-195
                                 </label>
                                 <div class="relative inline-block">
                                     <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
@@ -2262,7 +2252,7 @@
                             <div class="flex items-center gap-2 mb-2">
                                 <label class="block font-medium text-sm text-gray-700">
                                     <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
-                                    Propuesta (F-DC-127)
+                                    F-DC-127
                                 </label>
                                 <div class="relative inline-block">
                                     <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
@@ -2298,7 +2288,7 @@
                             <div class="flex items-center gap-2 mb-2">
                                 <label class="block font-medium text-sm text-gray-700">
                                     <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
-                                    Acta de Inicio (F-DC-195)
+                                    F-DC-195
                                 </label>
                                 <div class="relative inline-block">
                                     <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
@@ -2420,7 +2410,7 @@
                             <div class="flex items-center gap-2 mb-2">
                                 <label class="block font-medium text-sm text-gray-700 mb-2">
                                     <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
-                                    <span class="text-red-500">*</span> Informe Final F-DC-128
+                                    <span class="text-red-500">*</span> F-DC-128
                                 </label>
                                 <div class="relative inline-block">
                                     <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
@@ -2460,7 +2450,7 @@
                             <div class="flex items-center gap-2 mb-2">
                                 <label class="block font-medium text-sm text-gray-700 mb-2">
                                     <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
-                                    <span class="text-red-500">*</span>Rejilla de Evaluación F-DC-129
+                                    <span class="text-red-500">*</span>F-DC-129
                                 </label>
                                 <div class="relative inline-block">
                                     <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
@@ -2501,7 +2491,7 @@
                             <div class="flex items-center gap-2 mb-2">
                                 <label class="block font-medium text-sm text-gray-700 mb-2">
                                     <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
-                                    <span class="text-red-500">*</span> Acta de Terminación F-DC-196
+                                    <span class="text-red-500">*</span> F-DC-196
                                 </label>
                                 <div class="relative inline-block">
                                     <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
@@ -2712,9 +2702,8 @@
                             <div class="flex items-center gap-2 mb-2">
 
                                 <label class="block font-medium text-sm text-gray-700">
-                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
-                                    <span class="text-red-500">*</span>
-                                    Informe Final (F-DC-128)
+                                    <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                                    F-DC-128
                                 </label>
 
                                 <div class="relative inline-block">
@@ -2777,7 +2766,7 @@
                                 <label class="block font-medium text-sm text-gray-700">
                                     <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
                                     <span class="text-red-500">*</span>
-                                    Evaluación Final (F-DC-129)
+                                    F-DC-129
                                 </label>
 
                                 <div class="relative inline-block">
@@ -2840,7 +2829,7 @@
                                 <label class="block font-medium text-sm text-gray-700">
                                     <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
                                     <span class="text-red-500">*</span>
-                                    Acta Final (F-DC-196)
+                                    F-DC-196
                                 </label>
 
                                 <div class="relative inline-block">
@@ -2901,8 +2890,7 @@
                             <div class="flex items-center gap-2 mb-2">
 
                                 <label class="block font-medium text-sm text-gray-700">
-                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
-                                    <span class="text-red-500">*</span>
+                                <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
                                     Informe de plagio (Turnitin)
                                 </label>
 
@@ -3039,7 +3027,7 @@
                 <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
                     onclick="event.stopPropagation()">
 
-                    <button class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
+                    <button class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500 mt-2"
                         onclick="closeFase6EvaluadorModal()">&times;</button>
 
                     <form class="p-6 mt-2" id="fase6EvaluadorForm" enctype="multipart/form-data">
@@ -3053,10 +3041,6 @@
                             <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">
                                 Fase 6
                             </span>
-                        </p>
-
-                        <p class="text-sm text-gray-600 mb-4">
-                            Apruebe o rechace los documentos finales de las prácticas empresariales.
                         </p>
 
                         <!-- ESTADO -->
@@ -3080,9 +3064,8 @@
                         <div class="mb-4">
                             <div class="flex items-center gap-2 mb-2">
                                 <label class="block font-medium text-sm text-gray-700">
-                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
-                                    <span class="text-red-500">*</span>
-                                    Informe Final (F-DC-128)
+                                    <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                                    F-DC-128
                                 </label>
 
                                 <div class="relative inline-block">
@@ -3129,9 +3112,8 @@
                         <div class="mb-4">
                             <div class="flex items-center gap-2 mb-2">
                                 <label class="block font-medium text-sm text-gray-700">
-                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
-                                    <span class="text-red-500">*</span>
-                                    Evaluación Final (F-DC-129)
+                                <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                                    F-DC-129
                                 </label>
 
                                 <div class="relative inline-block">
@@ -3320,7 +3302,7 @@
                 <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
                     onclick="event.stopPropagation()">
 
-                    <button class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
+                    <button class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500 mt-2"
                         onclick="closeFase6ComiteModal()">&times;</button>
 
                     <form class="p-6 mt-2" id="fase6ComiteForm" enctype="multipart/form-data">
@@ -3335,10 +3317,6 @@
                             <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">
                                 Fase 6
                             </span>
-                        </p>
-
-                        <p class="text-sm text-gray-600 mb-4">
-                            El comité revisa la documentación final de las prácticas empresariales.
                         </p>
 
                         <!-- ESTADO -->
@@ -3397,7 +3375,8 @@
                         <!-- F-DC-128 -->
                         <div class="mb-4">
                             <label class="block font-medium text-sm text-gray-700 mb-2">
-                                Informe Final (F-DC-128)
+                                <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                                F-DC-128
                             </label>
 
                             <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
@@ -3436,7 +3415,8 @@
                         <!-- F-DC-129 -->
                         <div class="mb-4">
                             <label class="block font-medium text-sm text-gray-700 mb-2">
-                                Evaluación Final (F-DC-129)
+                                <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                                F-DC-129
                             </label>
 
                             <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
@@ -3502,14 +3482,19 @@
 
                             <button type="submit"
                                 class="flex bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg">
-
-                                <svg id="loadingSpinner-fase6-comite"
-                                    style="margin: 4px 10px 4px 0"
-                                    class="hidden text-gray-300 animate-spin w-4 h-4"
-                                    viewBox="0 0 64 64" fill="none">
-                                    <!-- mismo SVG que usas en los demás modales -->
+                                <svg id="loadingSpinner-warning" style="margin: 4px 10px 4px 0"
+                                    class="hidden text-gray-300 animate-spin w-4 h-4" viewBox="0 0 64 64"
+                                    fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                                    <path
+                                        d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
+                                        stroke="currentColor" stroke-width="5" stroke-linecap="round"
+                                        stroke-linejoin="round"></path>
+                                    <path
+                                        d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
+                                        stroke="currentColor" stroke-width="5" stroke-linecap="round"
+                                        stroke-linejoin="round" class="text-white">
+                                    </path>
                                 </svg>
-
                                 Responder
                             </button>
 
@@ -3730,6 +3715,13 @@
                                         <li class="ml-4 font-medium text-sm text-gray-700 text-justify">Si <strong>TODOS</strong> los integrantes cumplen con el puntaje, cada uno deberá cargar los resultados desde su propia cuenta en formato PDF. El comité se encargará de finalizar toda la práctica.</li>
                                         <li class="ml-4 font-medium text-sm text-gray-700 text-justify">Si <strong>NINGUNO</strong> cumple con el puntaje, el comité no aprobará ningún beneficio a los estudiantes.</li>
                                     </ul>
+
+                                        <div class="flex items-start my-4">
+                                            <p class="font-medium text-sm text-red-700 text-justify">
+                                                <i class="fa-solid fa-circle-info text-red-500 text-xl mr-2 mt-1"></i><strong>IMPORTANTE:</strong> Una vez aprobados los documentos de la propuesta de prácticas empresariales (ARL, FDC-127, FDC195) <strong>SOLO en esa etapa</strong>, el estudiante podrá aplicar al beneficio, y de acuerdo a la desición tomada por coordinación, el estudiante será eximido de la entrega de los documentos finales, <strong>Sin embargo, deberá terminar las 600 horas prácticas en la empresa. </strong>
+                                            </p>
+                                        </div>
+
                                     <input type="hidden" name="practica_id" id="practica_id" value="{{ $practica->id }}">
                                     <input type="hidden" name="submited_icfes_practicas" id="submited_icfes_practicas" value="{{ auth()->user()->id }}_true">
                                     <div class="grid grid-cols-1 gap-6 mt-4">
@@ -3809,7 +3801,7 @@
                     {{-- Integrante de la práctica (SOLO los que han enviado solicitud) --}}
                     <div class="mb-4">
                         <label for="estudiante_id_practicas" class="block font-medium text-sm text-gray-700">
-                            <i class="fa-solid fa-user mr-2 text-gray-500"></i>
+                            <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
                             Integrante de la práctica:
                         </label>
                         <select name="estudiante_id" id="estudiante_id_practicas" lang="es" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full focus:ring-uts-500 focus:border-uts-500">
@@ -3919,7 +3911,7 @@
                     <div id="container-doc_prorroga_config" class="mb-5 hidden">
                         <div class="mb-4">
                             <label for="carta_prorroga" class="block font-medium text-sm text-gray-700">
-                                <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                                <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
                                 <span class="text-red-600 mr-1 text-lg">*</span>
                                 Carta de solicitud de prórroga:
                             </label>
@@ -3942,7 +3934,7 @@
                         </div>
                         <div class="mb-4">
                             <label for="liquidacion_prorroga" class="block font-medium text-sm text-gray-700">
-                                <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                                <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
                                 <span class="text-red-600 mr-1 text-lg">*</span>
                                 Liquidación de prórroga:
                             </label>
@@ -3965,14 +3957,14 @@
                         </div>
                         <div>
                             <label for="soporte_prorroga" class="block font-medium text-sm text-gray-700">
-                                <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                                <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
                                 <span class="text-red-600 mr-1 text-lg">*</span>
                                 Soporte de pago de prórroga:
                             </label>
                             <div class="w-full mt-2 relative py-9 bg-gray-50 rounded-2xl border border-2 border-gray-300 gap-3 grid border-dashed" id="dropzone_soporte_prorroga">
                                 <div class="grid gap-1">
                                     <i class="mx-auto text-4xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                    <h2 class="text-center text-gray-400 text-xs leading-4">Solo archivos de PDF de máximo 4MB</h2>
+                                    <h2 class="text-center text-gray-400 text-xs leading-4">Solo archivos de PDF de máximo  {{ config('practicas.peso_maximo_archivos') }} MB</h2>
                                 </div>
                                 <div class="grid gap-2">
                                     <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
@@ -3990,7 +3982,7 @@
 
                     <div id="container-doc_retiro_config" class="mb-5 hidden">
                         <label for="carta_retiro" class="block font-medium text-sm text-gray-700">
-                            <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                            <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
                             <span class="text-red-600 mr-1 text-lg">*</span>
                             Carta de solicitud de retiro:
                         </label>
@@ -4447,80 +4439,191 @@
 
         <script>
     // ==================== ESTUDIANTE ====================
+
+    $('#doc_icfes_practicas').on('change', function(e){
+
+    const file = e.target.files[0];
+
+    const fileList = $('#doc_icfes_practicas-file-list');
+
+    fileList.empty();
+
+    if (!file) return;
+
+    const extension = file.name.split('.').pop().toLowerCase();
+
+    if (extension !== 'pdf') {
+
+        Swal.fire({
+            icon: 'error',
+            title: 'Formato inválido',
+            text: 'Solo se permiten archivos PDF.',
+            confirmButtonColor: '#C1D631'
+        });
+
+        $(this).val('');
+        return;
+    }
+
+    const maxSizeBytes = MAX_FILE_SIZE_MB * 1024 * 1024;
+
+    if (file.size > maxSizeBytes) {
+
+        Swal.fire({
+            icon: 'error',
+            title: 'Archivo demasiado grande',
+            text: `El archivo no puede superar los ${MAX_FILE_SIZE_MB} MB.`,
+            confirmButtonColor: '#C1D631'
+        });
+
+        $(this).val('');
+        return;
+    }
+
+    const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+
+    fileList.html(`
+        <li class="mb-2 mt-4">
+            <div class="text-gray-600 text-sm mb-4">
+                ${file.name}
+            </div>
+            <div class="text-sm ml-6 text-gray-900">
+                Tamaño total: ${fileSizeMB} MB de ${MAX_FILE_SIZE_MB} MB permitidos
+            </div>
+        </li>
+    `);
+
+});
+
     $(document).ready(function() {
         $('#icfesEstudianteForm').submit(function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            console.log('Formulario ICFES estudiante - Enviando AJAX');
-            
-            const loadingSpinner = document.getElementById('loadingSpinner-icfesEstudiante');
-            const url = '/practicas/icfes';
-            const formData = new FormData(this);
+    e.preventDefault();
+    e.stopPropagation();
 
-            const fileInput = document.getElementById('doc_icfes_practicas');
-            if (!fileInput.files || fileInput.files.length === 0) {
-                Swal.fire({
-                    title: 'Error',
-                    text: 'Debe seleccionar un archivo PDF',
-                    icon: 'error',
-                    confirmButtonColor: '#C1D631'
-                });
-                return false;
+    console.log('Formulario ICFES estudiante - Enviando AJAX');
+
+    const loadingSpinner = document.getElementById('loadingSpinner-icfesEstudiante');
+    const url = '/practicas/icfes';
+
+    const fileInput = document.getElementById('doc_icfes_practicas');
+
+    // ================= VALIDAR EXISTENCIA =================
+    if (!fileInput.files || fileInput.files.length === 0) {
+        Swal.fire({
+            title: 'Error',
+            text: 'Debe seleccionar un archivo PDF',
+            icon: 'error',
+            confirmButtonColor: '#C1D631'
+        });
+        return false;
+    }
+
+    const file = fileInput.files[0];
+
+    // ================= VALIDAR EXTENSIÓN =================
+    const extension = file.name.split('.').pop().toLowerCase();
+
+    if (extension !== 'pdf') {
+        Swal.fire({
+            title: 'Formato inválido',
+            text: 'Solo se permiten archivos PDF.',
+            icon: 'error',
+            confirmButtonColor: '#C1D631'
+        });
+
+        fileInput.value = '';
+        return false;
+    }
+
+    // ================= VALIDAR TAMAÑO =================
+    const maxSizeBytes = MAX_FILE_SIZE_MB * 1024 * 1024;
+
+    if (file.size > maxSizeBytes) {
+        Swal.fire({
+            title: 'Archivo demasiado grande',
+            text: `El archivo no puede superar los ${MAX_FILE_SIZE_MB} MB.`,
+            icon: 'error',
+            confirmButtonColor: '#C1D631'
+        });
+
+        fileInput.value = '';
+        return false;
+    }
+
+    // Crear FormData SOLO cuando todo esté validado
+    const formData = new FormData(this);
+
+    Swal.fire({
+        heightAuto: false,
+        title: '¿Está seguro?',
+        text: 'No podrá editar la información una vez se envíe',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#C1D631',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, enviar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+
+        if (result.isConfirmed) {
+
+            if (loadingSpinner) {
+                loadingSpinner.classList.remove('hidden');
             }
 
-            Swal.fire({
-                heightAuto: false,
-                title: '¿Está seguro?',
-                text: "No podrá editar la información una vez se envíe",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#C1D631',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Sí, enviar',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    if (loadingSpinner) loadingSpinner.classList.remove('hidden');
-                    
-                    $.ajax({
-                        url: url,
-                        type: 'POST',
-                        data: formData,
-                        processData: false,
-                        contentType: false,
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        success: function(response) {
-                            closeIcfesEstudianteModal();
-                            showToast(response.success || 'Información enviada correctamente', 'success');
-                            setTimeout(() => location.reload(), 3000);
-                        },
-                        error: function(xhr) {
-                            if (xhr.responseJSON && xhr.responseJSON.errors) {
-                                const errors = xhr.responseJSON.errors;
-                                if (errors.doc_icfes_practicas) {
-                                    $('#doc_icfes_practicasError').text(errors.doc_icfes_practicas[0]);
-                                }
-                            } else {
-                                Swal.fire({
-                                    title: 'Error',
-                                    text: xhr.responseJSON?.error || 'Ocurrió un error',
-                                    icon: 'error',
-                                    confirmButtonColor: '#C1D631'
-                                });
-                            }
-                        },
-                        complete: function() {
-                            if (loadingSpinner) loadingSpinner.classList.add('hidden');
-                        }
-                    });
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(response) {
+
+                    closeIcfesEstudianteModal();
+
+                    showToast(
+                        response.success || 'Información enviada correctamente',
+                        'success'
+                    );
+
+                    setTimeout(() => location.reload(), 3000);
+                },
+                error: function(xhr) {
+
+                    if (xhr.responseJSON && xhr.responseJSON.errors) {
+
+                        const errors = xhr.responseJSON.errors;
+
+                        $('#doc_icfes_practicasError')
+                            .text(errors.doc_icfes_practicas?.[0] || '');
+
+                    } else {
+
+                        Swal.fire({
+                            title: 'Error',
+                            text: xhr.responseJSON?.error || 'Ocurrió un error',
+                            icon: 'error',
+                            confirmButtonColor: '#C1D631'
+                        });
+
+                    }
+                },
+                complete: function() {
+
+                    if (loadingSpinner) {
+                        loadingSpinner.classList.add('hidden');
+                    }
+
                 }
             });
-            
-            return false;
-        });
+        }
+    });
+
+    return false;
+});
         
         // ==================== ADMIN ====================
         $('#icfesAdminForm').on('submit', function(e) {
@@ -4591,7 +4694,6 @@
     // ==================== FUNCIONES ====================
     
     function openIcfesEstudianteModal() {
-        new fileInput('doc_icfes_practicas', 'dropzone_doc_icfes_practicas', 'pdf', 1, 4, 'doc_icfes_practicas-file-list', 'doc_icfes_practicas-files-size');
         $('#icfesEstudianteTitle').html(`Beneficio saber <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">TYT/PRO</span>`);
         $('#doc_icfes_practicas').val('');
         $('#doc_icfes_practicasError').text('');
@@ -4632,11 +4734,239 @@
 
 <script>
 
+    $(document).ready(function () {
+
+    // ================= CARTA PRÓRROGA =================
+    $('#carta_prorroga').on('change', function (e) {
+
+        const file = e.target.files[0];
+        const fileList = $('#file-list-prorroga-carta');
+
+        fileList.empty();
+
+        if (!file) return;
+
+        const extension = file.name.split('.').pop().toLowerCase();
+
+        if (extension !== 'pdf') {
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Formato inválido',
+                text: 'Solo se permiten archivos PDF.',
+                confirmButtonColor: '#C1D631',
+                confirmButtonText: 'Aceptar'
+            });
+
+            $(this).val('');
+            return;
+        }
+
+        const maxSizeBytes = MAX_FILE_SIZE_MB * 1024 * 1024;
+
+        if (file.size > maxSizeBytes) {
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Archivo demasiado grande',
+                text: `El archivo no puede superar los ${MAX_FILE_SIZE_MB} MB.`,
+                confirmButtonColor: '#C1D631',
+                confirmButtonText: 'Aceptar'
+            });
+
+            $(this).val('');
+            return;
+        }
+
+        const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+
+        fileList.html(`
+            <li class="mb-2 mt-4">
+                <div class="text-gray-600 text-sm mb-4">
+                    ${file.name}
+                </div>
+                <div class="text-sm ml-6 text-gray-900">
+                    Tamaño total: ${fileSizeMB} MB de ${MAX_FILE_SIZE_MB} MB permitidos
+                </div>
+            </li>
+        `);
+
+    });
+
+    // ================= LIQUIDACIÓN PRÓRROGA =================
+    $('#liquidacion_prorroga').on('change', function (e) {
+
+        const file = e.target.files[0];
+        const fileList = $('#file-list-liquidacion-prorroga');
+
+        fileList.empty();
+
+        if (!file) return;
+
+        const extension = file.name.split('.').pop().toLowerCase();
+
+        if (extension !== 'pdf') {
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Formato inválido',
+                text: 'Solo se permiten archivos PDF.',
+                confirmButtonColor: '#C1D631',
+                confirmButtonText: 'Aceptar'
+            });
+
+            $(this).val('');
+            return;
+        }
+
+        const maxSizeBytes = MAX_FILE_SIZE_MB * 1024 * 1024;
+
+        if (file.size > maxSizeBytes) {
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Archivo demasiado grande',
+                text: `El archivo no puede superar los ${MAX_FILE_SIZE_MB} MB.`,
+                confirmButtonColor: '#C1D631',
+                confirmButtonText: 'Aceptar'
+            });
+
+            $(this).val('');
+            return;
+        }
+
+        const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+
+        fileList.html(`
+            <li class="mb-2 mt-4">
+                <div class="text-gray-600 text-sm mb-4">
+                    ${file.name}
+                </div>
+                <div class="text-sm ml-6 text-gray-900">
+                    Tamaño total: ${fileSizeMB} MB de ${MAX_FILE_SIZE_MB} MB permitidos
+                </div>
+            </li>
+        `);
+
+    });
+
+    // ================= SOPORTE PRÓRROGA =================
+    $('#soporte_prorroga').on('change', function (e) {
+
+        const file = e.target.files[0];
+        const fileList = $('#file-list-soporte-prorroga');
+
+        fileList.empty();
+
+        if (!file) return;
+
+        const extension = file.name.split('.').pop().toLowerCase();
+
+        if (extension !== 'pdf') {
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Formato inválido',
+                text: 'Solo se permiten archivos PDF.',
+                confirmButtonColor: '#C1D631',
+                confirmButtonText: 'Aceptar'
+            });
+
+            $(this).val('');
+            return;
+        }
+
+        const maxSizeBytes = MAX_FILE_SIZE_MB * 1024 * 1024;
+
+        if (file.size > maxSizeBytes) {
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Archivo demasiado grande',
+                text: `El archivo no puede superar los ${MAX_FILE_SIZE_MB} MB.`,
+                confirmButtonColor: '#C1D631',
+                confirmButtonText: 'Aceptar'
+            });
+
+            $(this).val('');
+            return;
+        }
+
+        const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+
+        fileList.html(`
+            <li class="mb-2 mt-4">
+                <div class="text-gray-600 text-sm mb-4">
+                    ${file.name}
+                </div>
+                <div class="text-sm ml-6 text-gray-900">
+                    Tamaño total: ${fileSizeMB} MB de ${MAX_FILE_SIZE_MB} MB permitidos
+                </div>
+            </li>
+        `);
+
+    });
+
+    // ================= CARTA RETIRO =================
+    $('#carta_retiro').on('change', function (e) {
+
+        const file = e.target.files[0];
+        const fileList = $('#file-list-retiro');
+
+        fileList.empty();
+
+        if (!file) return;
+
+        const extension = file.name.split('.').pop().toLowerCase();
+
+        if (extension !== 'pdf') {
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Formato inválido',
+                text: 'Solo se permiten archivos PDF.',
+                confirmButtonColor: '#C1D631',
+                confirmButtonText: 'Aceptar'
+            });
+
+            $(this).val('');
+            return;
+        }
+
+        const maxSizeBytes = MAX_FILE_SIZE_MB * 1024 * 1024;
+        
+        if (file.size > maxSizeBytes) {
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Archivo demasiado grande',
+                text: `El archivo no puede superar los ${MAX_FILE_SIZE_MB} MB.`,
+                confirmButtonColor: '#C1D631',
+                confirmButtonText: 'Aceptar'
+            });
+
+            $(this).val('');
+            return;
+        }
+
+        const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+
+        fileList.html(`
+            <li class="mb-2 mt-4">
+                <div class="text-gray-600 text-sm mb-4">
+                    ${file.name}
+                </div>
+                <div class="text-sm ml-6 text-gray-900">
+                    Tamaño total: ${fileSizeMB} MB de ${MAX_FILE_SIZE_MB} MB permitidos
+                </div>
+            </li>
+        `);
+
+    });
+
+});
+
     function openConfigModal() {
-    new fileInput('carta_prorroga', 'dropzone_carta_prorroga', 'pdf', 1, 4, 'file-list-prorroga-carta', 'files-size-prorroga-carta');
-    new fileInput('liquidacion_prorroga', 'dropzone_liquidacion_prorroga', 'pdf', 1, 4, 'file-list-liquidacion-prorroga', 'files-size-liquidacion-prorroga');
-    new fileInput('soporte_prorroga', 'dropzone_soporte_prorroga', 'pdf', 1, 4, 'file-list-soporte-prorroga', 'files-size-soporte-prorroga');
-    new fileInput('carta_retiro', 'dropzone_carta_retiro', 'pdf', 1, 4, 'file-list-retiro', 'files-size-retiro');
 
     initQuillEditor(undefined, "Describa su solicitud detalladamente.", 'txt-editor-config', 'comentarios_config');
 
@@ -4669,6 +4999,33 @@ var evaluadorOriginalGlobal = null;
     var prorrogaOriginalValue = false;
 
 function openConfigAdminModal() {
+
+    // ================= SELECT2 =================
+    if (!$('#director_id-config').hasClass('select2-hidden-accessible')) {
+        $('#director_id-config').select2({
+            dropdownParent: $('#configAdminModal'),
+            width: '100%',
+            minimumInputLength: 5,
+        });
+    }
+
+    if (!$('#evaluador_id-config').hasClass('select2-hidden-accessible')) {
+        $('#evaluador_id-config').select2({
+            dropdownParent: $('#configAdminModal'),
+            width: '100%',
+            minimumInputLength: 5,
+        });
+    }
+
+    if (!$('#retirar_estudiante').hasClass('select2-hidden-accessible')) {
+        $('#retirar_estudiante').select2({
+            dropdownParent: $('#configAdminModal'),
+            placeholder: 'Seleccione el estudiante para retirar',
+            allowClear: true,
+            width: '100%',
+        });
+    }
+
     initQuillEditor(undefined, "Describa la respuesta para el estudiante.", 'txt-editor-config-admin', 'comentarios_config_admin');
 
     $('#configAdminTitle').html(`Ajustes de la <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Práctica</span>`);
@@ -4680,7 +5037,7 @@ function openConfigAdminModal() {
         prorrogaOriginalValue = $('#aprobar_prorroga').is(':checked');
 
     // Limpiar otros campos
-    $('#retirar_estudiante').val('');
+    $('#retirar_estudiante').val('').trigger('change');
     $('#nro_acta_ajustes').val('');
     $('#fecha_acta_ajustes').val('');
     $('#comentarios_config_admin').val('');
@@ -4776,6 +5133,8 @@ $('#configAdminForm').on('submit', function(e) {
             var formData = new FormData(this);
             formData.set('comentarios_config_admin', comentarios);
 
+                                                
+            
             // Después de sincronizar, ANTES de crear FormData
             console.log('Valor del campo hidden aprobar_prorroga:', $('input[name="aprobar_prorroga"]').val());
             console.log('Checkbox marcado:', $('#aprobar_prorroga').is(':checked'));
