@@ -31,8 +31,7 @@
 
         <p>Buen día,</p>
 
-        <p>Estimado usuario, en este correo se le informa que se ha realizado una nueva solicitud para iniciar de
-            prácticas empresarial u institucional con la siguiente información:</p>
+        <p>Estimado usuario, en este correo se le informa que se ha realizado una nueva solicitud para iniciar la modalidad de trabajo de grado correspondiente a prácticas, con la siguiente información:</p>
         <ul>
             <li><strong>Tipo de solicitud:</strong> SOLICITUD PRACTICAS EMPRESARIALES
                 {{ $data['cuerpo_correo']['periodo'] ?? '' }}</li>
@@ -84,7 +83,7 @@
 
             {{-- CAMPOS DINÁMICOS --}}
             @forelse ($data['cuerpo_correo']['campos'] as $campo)
-                @if (!in_array($campo['campo'], ['id_integrante_2', 'tiene_empresa', 'periodo', 'hoja_vida', 'respuesta_comite', 'submited_fase0']))
+                @if (!in_array($campo['campo'], ['id_integrante_2', 'tiene_empresa', 'periodo', 'hoja_vida', 'respuesta_comite', 'submited_fase0', 'hoja_vida_2']))
                     <li>
                         <strong>
                             {{ ucfirst(str_replace('_', ' ', $campo['campo'] ?? '')) }}:

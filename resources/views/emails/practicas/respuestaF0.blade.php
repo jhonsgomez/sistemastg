@@ -119,7 +119,8 @@
         @endforelse
 
         @if (!empty($data['comentarios']))
-            <p><strong>Comentarios: </strong>{{ strip_tags($data['comentarios']) }}</p>
+            <p><strong>Comentarios: </strong>
+            {{ strip_tags($data['comentarios']) }}</p>
         @endif
 
         <div class="footer">

@@ -26,7 +26,7 @@
 
     <p>
         Estimado usuario, en este correo se le informa que se ha realizado el envío de documentos
-        correspondientes a la <strong>FASE 3</strong> de prácticas empresariales.
+        correspondientes a la <strong>FASE 3</strong> de prácticas.
     </p>
 
     <ul>
@@ -95,7 +95,7 @@
     </ul>
 
     <p>
-        Fecha y hora de envío:
+       <strong>Fecha y hora de envío:</strong>
         {{ now()->format('d/m/Y H:i:s') }}
     </p>
 
