@@ -3362,6 +3362,12 @@ class RoadMapPracticaController extends Controller
                 'estudiante' => auth()->user(),
                 'integrante_2' => $integrante2,
             ],
+
+            'adjuntos' => [
+                $docData[$userId] ?? null,
+            ],
+
+            'adjuntar_archivos' => true,
         ];
 
         $destinatarios = [
@@ -3378,9 +3384,10 @@ class RoadMapPracticaController extends Controller
             ->queue(new PracticasMail($data));
 
                 return response()->json(['success' => 'Solicitud enviada correctamente']);
-            }
+    }
 
-    /* FASE 5/6 - Admin/Comité: Responder solicitud de beneficio ICFES */
+    
+            /* FASE 5/6 - Admin/Comité: Responder solicitud de beneficio ICFES */
     public function responderIcfesSolicitud(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -3471,6 +3478,7 @@ class RoadMapPracticaController extends Controller
                     'nro_acta' => $request->nro_acta_icfes_practicas,
                     'fecha_acta' => $request->fecha_acta_icfes_practicas,
                 ],
+                'adjuntar_archivos' => false,
             ];
 
             Mail::to($estudiante->email)
@@ -3609,6 +3617,8 @@ class RoadMapPracticaController extends Controller
             'tipo_correo' => 'solicitud_ajuste_practica',
 
             'adjuntos' => $adjuntosCorreo,
+
+            'adjuntar_archivos' => !empty($adjuntosCorreo),
 
             'cuerpo_correo' => [
                 'estado' => $practica->estado,
@@ -3870,6 +3880,8 @@ class RoadMapPracticaController extends Controller
                 'estudiante_retirado' => $estudianteRetiradoCorreo,
                 'campos' => $campos,
             ],
+
+            'adjuntar_archivos' => false,
         ];
 
         $destinatarios = [

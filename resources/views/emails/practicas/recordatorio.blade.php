@@ -34,7 +34,7 @@
 <p>Buen día,</p>
 
 <p>
-    Estimado estudiante, en este correo se le recuerda que su práctica empresarial
+    Estimado estudiante, en este correo se le recuerda que su práctica
     se encuentra actualmente en estado
     <strong class="uppercase">{{ $estado }}</strong>.
 </p>

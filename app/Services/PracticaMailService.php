@@ -39,6 +39,8 @@ class PracticaMailService
 
                     'adjuntos' => [],
 
+                    'adjuntar_archivos' => $extraData['adjuntar_archivos'] ?? false,
+
                     'cuerpo_correo' => [
 
                         'estudiante' => $user,
@@ -182,6 +184,7 @@ class PracticaMailService
                 'estado' => $estadoRespuesta,
                 'nuevo_estado' => $nuevoEstado,
                 'mensaje' => $mensaje,
+                'adjuntar_archivos' => false,
             ]
         );
     }
@@ -252,6 +255,7 @@ class PracticaMailService
             'adjuntos' => [
                 $fdc126['valor'] ?? null
             ],
+            'adjuntar_archivos' => false,
         ];
 
         $data['adjuntos'] = array_filter($data['adjuntos']);
@@ -330,6 +334,7 @@ class PracticaMailService
                     : null,
                 'integrante_2_celular' => $integrante2->nro_celular ?? null,
             ],
+            'adjuntar_archivos' => false,
         ];
 
         $destinatarios = [
@@ -397,6 +402,8 @@ class PracticaMailService
 
                 $soportePago['valor'] ?? null,
             ],
+
+            'adjuntar_archivos' => false,
         ];
 
         // Limpiar adjuntos null
@@ -503,6 +510,8 @@ class PracticaMailService
 
                 'campos' => $campos,
             ],
+
+            'adjuntar_archivos' => false,
         ];
 
         // 1. Correo para estudiante e integrante 2
@@ -640,6 +649,7 @@ class PracticaMailService
                 $fdc127['valor'] ?? null,
                 $fdc195['valor'] ?? null,
             ],
+            'adjuntar_archivos' => false,
         ];
 
         $data['adjuntos'] = array_filter($data['adjuntos']);
@@ -724,6 +734,7 @@ class PracticaMailService
 
                 'campos' => $campos,
             ],
+            'adjuntar_archivos' => false,
         ];
 
         // 1. Correo para estudiante e integrante 2
@@ -818,6 +829,7 @@ class PracticaMailService
 
                 'campos' => $campos,
             ],
+            'adjuntar_archivos' => false,
         ];
 
         // Correo a estudiantes
@@ -911,6 +923,7 @@ class PracticaMailService
 
                 'campos' => $campos,
             ],
+            'adjuntar_archivos' => false,
         ];
 
         $destinatarios = [
@@ -999,6 +1012,7 @@ class PracticaMailService
                 $fdc129['valor'] ?? null,
                 $fdc196['valor'] ?? null,
             ],
+            'adjuntar_archivos' => false,
         ];
 
         $data['adjuntos'] = array_filter($data['adjuntos']);
@@ -1073,6 +1087,7 @@ class PracticaMailService
 
                 'campos' => $campos,
             ],
+            'adjuntar_archivos' => false,
         ];
 
         $destinatariosEstudiantes = [
@@ -1165,6 +1180,7 @@ class PracticaMailService
 
                 'campos' => $campos,
             ],
+            'adjuntar_archivos' => false,
         ];
 
         $destinatariosEstudiantes = [
@@ -1260,6 +1276,7 @@ class PracticaMailService
 
                 'campos' => $campos,
             ],
+            'adjuntar_archivos' => false,
         ];
 
         $destinatarios = [

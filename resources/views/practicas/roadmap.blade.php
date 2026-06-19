@@ -1701,7 +1701,7 @@
                                 </span>
                             </p>
                             <p class="text-gray-950 mt-6 text-sm">En este formulario el estudiante podrá cargar los documentos requeridos para formalizar su propuesta de prácticas empresariales. Los siguientes archivos: </p>
-                            <ul class="text-gray-950 mt-6 text-sm list-disc pl-5">
+                            <ul class="text-gray-500 mt-6 text-sm list-disc pl-5">
                                 <li>ARL (.PDF)</li>
                                 <li>Formato propuesta de prácticas (F-DC-127)</li>
                                 <li>Acta de inicio de prácticas (F-DC-195)</li>
@@ -1714,7 +1714,7 @@
                         <div class="mb-6">
                             <div class="flex items-center gap-2 mb-2 mt-6">
                                 <label class="block font-medium text-sm text-gray-700">
-                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i><span class="text-red-500">*</span> ARL
+                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i><span class="text-red-500">*</span> Certificado ARL: 
                                 </label>
                                 <div class="relative inline-block">
                                     <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
@@ -1722,21 +1722,36 @@
                                 </div>
                             </div>
                             <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
-                                <div class="grid gap-1 text-center">
+                                <div class="grid gap-2 text-center">
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                    <h2 class="text-center text-gray-400 text-xs">Solo archivos de PDF de máximo {{ config('practicas.peso_maximo_archivos') }} MB</h2>
+
+                                    <h4 class="text-center text-gray-900 text-sm font-medium">
+                                        Arrastra o carga tu archivo aquí
+                                    </h4>
+
+                                    <h2 class="text-center text-gray-400 text-xs">
+                                        Solo archivos PDF de máximo {{ config('practicas.peso_maximo_archivos') }} MB
+                                    </h2>
                                 </div>
+
                                 <div class="text-center">
                                     <input type="file" name="arl" id="arl"
-                                        class="absolute inset-0 opacity-0 cursor-pointer w-full" accept=".pdf" />
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                                        accept=".pdf" />
+
                                     <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
                                         Cargar
                                     </div>
                                 </div>
                             </div>
-                            <span id="arlError" class="text-red-500 text-xs"></span>
-                            <ul id="file-list-arl" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
-                            <ul id="files-size-arl" class="mt-4 text-gray-600 text-sm list-disc pl-5"></ul>
+                            <div class="mt-4 mb-4">
+                                <span id="arlError" class="block text-red-500 text-sm mb-2"></span>
+
+                                <div class="pl-5">
+                                    <ul id="file-list-arl" class="text-gray-600 text-sm list-disc"></ul>
+                                    <span id="files-size-arl" class="block text-gray-800 text-sm mt-2"></span>
+                                </div>
+                            </div>
 
                             <div id="tooltip-arl-fase3"
                                 class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
@@ -1748,7 +1763,7 @@
                         <div class="mb-6">
                             <div class="flex items-center gap-2 mb-2">
                                 <label class="block font-medium text-sm text-gray-700">
-                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i><span class="text-red-500">*</span> F-DC-127
+                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i><span class="text-red-500">*</span>Formato F-DC-127:
                                 </label>
                                 <div class="relative inline-block">
                                     <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
@@ -1756,21 +1771,36 @@
                                 </div>
                             </div>
                             <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
-                                <div class="grid gap-1 text-center">
+                                <div class="grid gap-2 text-center">
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                    <h2 class="text-center text-gray-400 text-xs">Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_archivos') }} MB</h2>
+
+                                    <h4 class="text-center text-gray-900 text-sm font-medium">
+                                        Arrastra o carga tu archivo aquí
+                                    </h4>
+
+                                    <h2 class="text-center text-gray-400 text-xs">
+                                        Solo archivos WORD de máximo {{ config('practicas.peso_maximo_archivos') }} MB
+                                    </h2>
                                 </div>
+
                                 <div class="text-center">
                                     <input type="file" name="doc_fdc127" id="doc_fdc127"
-                                        class="absolute inset-0 opacity-0 cursor-pointer w-full" accept=".doc,.docx" />
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                                        accept=".doc,.docx" />
+
                                     <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
                                         Cargar
                                     </div>
                                 </div>
                             </div>
-                            <span id="doc_fdc127Error" class="text-red-500 text-xs"></span>
-                            <ul id="file-list-fdc127" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
-                            <ul id="files-size-fdc127" class="mt-4 text-gray-600 text-sm list-disc pl-5"></ul>
+                            <div class="mt-4 mb-4">
+                                <span id="doc_fdc127Error" class="block text-red-500 text-sm mb-2"></span>
+
+                                <div class="pl-5">
+                                    <ul id="file-list-fdc127" class="text-gray-600 text-sm list-disc"></ul>
+                                    <span id="files-size-fdc127" class="block text-gray-800 text-sm mt-2"></span>
+                                </div>
+                            </div>
 
                             <div id="tooltip-fdc127-fase3"
                                 class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
@@ -1782,7 +1812,7 @@
                         <div class="mb-6">
                             <div class="flex items-center gap-2 mb-2">
                                 <label class="block font-medium text-sm text-gray-700">
-                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i><span class="text-red-500">*</span> F-DC-195
+                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i><span class="text-red-500">*</span>Formato F-DC-195:
                                 </label>
                                 <div class="relative inline-block">
                                     <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
@@ -1790,20 +1820,37 @@
                                 </div>
                             </div>
                             <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
-                                <div class="grid gap-1 text-center">
+                                <div class="grid gap-2 text-center">
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                    <h2 class="text-center text-gray-400 text-xs">Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_archivos') }} MB</h2>
+
+                                    <h4 class="text-center text-gray-900 text-sm font-medium">
+                                        Arrastra o carga tu archivo aquí
+                                    </h4>
+
+                                    <h2 class="text-center text-gray-400 text-xs">
+                                        Solo archivos WORD de máximo {{ config('practicas.peso_maximo_archivos') }} MB
+                                    </h2>
                                 </div>
+
                                 <div class="text-center">
                                     <input type="file" name="doc_fdc195" id="doc_fdc195"
-                                        class="absolute inset-0 opacity-0 cursor-pointer w-full" accept=".doc,.docx" />
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                                        accept=".doc,.docx" />
+
                                     <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
                                         Cargar
                                     </div>
                                 </div>
                             </div>
-                            <span id="doc_fdc195Error" class="text-red-500 text-xs"></span>
-                            <ul id="file-list-fdc195" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                            <div class="mt-4 mb-4">
+                                <span id="doc_fdc195Error" class="block text-red-500 text-sm mb-2"></span>
+
+                                <div class="pl-5">
+                                    <ul id="file-list-fdc195" class="text-gray-600 text-sm list-disc"></ul>
+                                    <span id="files-size-fdc195" class="block text-gray-800 text-sm mt-2"></span>
+                                </div>
+                            </div>
+
                             <div id="tooltip-fdc195-fase3"
                                 class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
                                 Suba el documento F-DC-195 en WORD

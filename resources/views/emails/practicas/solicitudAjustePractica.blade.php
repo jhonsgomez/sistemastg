@@ -12,6 +12,7 @@
         .uppercase {
             text-transform: uppercase;
         }
+
     </style>
 </head>
 

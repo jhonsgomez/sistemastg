@@ -581,8 +581,15 @@ $mes_actual = Carbon::now()->month;
                     <form id="practicasForm" class="p-6 mt-2" method="POST" enctype="multipart/form-data">
                         @csrf
                         <p class="text-2xl font-bold mb-6" id="formTitle"></p>
-                        <p class="text-md mb-6">En este formulario el estudiante registrará la información necesaria para la solicitud de prácticas empresariales.</p>
-                        
+                        <p class="text-md mb-2">
+                            En este formulario, el estudiante registrará la información necesaria para realizar la solicitud de prácticas empresariales.
+                        </p>
+
+                        <p class="text-sm text-gray-600 mb-6">
+                            <i class="fa-solid fa-circle-info mr-1 text-uts-500"></i>
+                            Tener en cuenta que la solicitud de prácticas empresariales es individual.
+                        </p>
+
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6">
                             
                             {{-- FILA 1: NOMBRE COMPLETO --}}
@@ -785,18 +792,33 @@ $mes_actual = Carbon::now()->month;
                                         </div>
                                     </div>
                                 </div>
-                                <span id="hoja_vidaError" class="text-red-500 text-sm"></span>
-                                <ul id="file-list-fase0" class="mt-4 text-gray-600 text-sm list-disc pl-5"></ul>
-                                <span id="files-size-fase0" class="text-gray-800 text-sm"></span>
+                                <div class="mt-4 mb-4">
+                                    <span id="hoja_vidaError" class="block text-red-500 text-sm mb-2"></span>
 
+                                    <div class="pl-5">
+                                        <ul id="file-list-fase0" class="text-gray-600 text-sm list-disc"></ul>
+                                        <span id="files-size-fase0" class="block text-gray-800 text-sm mt-2"></span>
+                                    </div>
+                                </div>
+                          
                                 {{-- HOJA DE VIDA SEGUNDO INTEGRANTE --}}
                                 <div class="col-span-1 sm:col-span-2">
 
                                     <div class="flex items-center gap-2" id="hojaVidaLabel2" style="display:none;">
                                         <label class="block font-medium text-sm text-gray-700">
                                             <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
-                                            Hoja de vida segundo integrante
+                                            Hoja de vida integrante 2:
                                         </label>
+
+                                        <div class="relative inline-block">
+                                            <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                                data-tooltip="tooltip-hoja_vida2"></i>
+
+                                            <div id="tooltip-hoja_vida2"
+                                                class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg w-44">
+                                                Suba la hoja de vida del integrante 2 en formato PDF si no cuenta con empresa.
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <div id="hojaVidaContainer2" style="display:none;"
@@ -828,10 +850,15 @@ $mes_actual = Carbon::now()->month;
                                             </div>
                                         </div>
                                     </div>
-                                    <span id="hoja_vida2Error" class="text-red-500 text-sm"></span>
-                                    <ul id="file-list-fase0-2" class="mt-4 text-gray-600 text-sm list-disc pl-5"></ul>
-                                    <span id="files-size-fase0-2" class="text-gray-800 text-sm"></span>
+                                    <div class="mt-4 mb-4">
+                                        <span id="hoja_vida2Error" class="block text-red-500 text-sm mb-2"></span>
 
+                                        <div class="pl-5">
+                                            <ul id="file-list-fase0-2" class="text-gray-600 text-sm list-disc"></ul>
+                                            <span id="files-size-fase0-2" class="block text-gray-800 text-sm mt-2"></span>
+                                        </div>
+                                    </div>
+                          
             
 
                                 </div>
@@ -1412,14 +1439,21 @@ $mes_actual = Carbon::now()->month;
                 theme: 'snow',
                 placeholder: 'Ingrese el mensaje de respuesta indicando detalles al destinatario.',
                 modules: {
-                    toolbar: [
-                        [{ 'header': 1}],
-                        [{ 'header': 2}],
-                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                        ['bold', 'italic', 'underline'],
-                        [{ 'color': [] }],
-                        ['clean']
-                    ]
+                    toolbar: {
+                        container: [
+                            [{ 'header': 1 }],
+                            [{ 'header': 2 }],
+                            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                            ['bold', 'italic', 'underline'],
+                            [{ 'color': [] }],
+                            [{ 'align': [] }],
+                            ['image'],
+                            ['clean']
+                        ],
+                        handlers: {
+                            image: imageHandler
+                        }
+                    }
                 }
             });
         } else {
@@ -1434,6 +1468,38 @@ $mes_actual = Carbon::now()->month;
         $('#mensajeError').text('');
         
         $('#responderSolicitudPractica').addClass('show');
+    }
+
+            function imageHandler() {
+        const input = document.createElement('input');
+        input.setAttribute('type', 'file');
+        input.setAttribute('accept', 'image/*');
+        input.click();
+
+        input.onchange = function () {
+            const file = input.files[0];
+
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('image', file);
+            formData.append('_token', '{{ csrf_token() }}');
+
+            $.ajax({
+                url: '{{ route("practicas.quill.upload") }}',
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    const range = window.quill.getSelection();
+                    window.quill.insertEmbed(range.index, 'image', response.url);
+                },
+                error: function() {
+                    showToast('No se pudo cargar la imagen', 'error');
+                }
+            });
+        };
     }
 
     // ========== CERRAR MODAL RESPONDER ==========
@@ -1853,7 +1919,7 @@ var table = $('#practicasTable').DataTable({
             if (response.hoja_vida) {
                 html += `
                     <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
-                        <p class="font-semibold text-gray-700 mb-2 sm:mb-0  w-1/3 min-w-[100px]">Hoja de vida:</p>
+                        <p class="font-semibold text-gray-700 mb-2 sm:mb-0  w-1/3 min-w-[100px]">Hoja de vida integrante 1:</p>
                         <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">
                             <a target="_blank"
                                 class="text-red-600 text-sm underline"
@@ -1872,13 +1938,12 @@ var table = $('#practicasTable').DataTable({
                 html += `
                     <div class="flex flex-col sm:flex-row items-start justify-between my-3 p-3 bg-gray-50 rounded-lg shadow-sm">
                         <p class="font-semibold text-gray-700 mb-2 sm:mb-0  w-1/3 min-w-[100px]">
-                            Hoja de vida segundo integrante:
+                           Hoja de vida integrante 2:
                         </p>
                         <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">
                             <a target="_blank"
                                 class="text-red-600 text-sm underline"
                                 href="/storage/${response.hoja_vida_2}">
-
                                     <i class="fa-regular fa-file-pdf text-red-600 mr-1"></i>
                                     Documento 2
                             </a>

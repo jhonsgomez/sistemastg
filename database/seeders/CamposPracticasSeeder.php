@@ -56,13 +56,13 @@ class CamposPracticasSeeder extends Seeder
             // 7. Hoja de vida (PDF)
             Campo::updateOrCreate(
                 ['tipo_solicitud_id' => $practicas_fase_0->id, 'name' => 'hoja_vida'],
-                ['label' => 'Hoja de vida (PDF)', 'type' => 'file', 'required' => false, 'instructions' => 'Suba la hoja de vida si NO cuenta con empresa.']
+                ['label' => 'Hoja de vida integrante 1:', 'type' => 'file', 'required' => false, 'instructions' => 'Suba la hoja de vida si NO cuenta con empresa.']
             );
 
             // 7.1 Hoja de vida segundo integrante
             Campo::updateOrCreate(
                 ['tipo_solicitud_id' => $practicas_fase_0->id,'name' => 'hoja_vida_2'],
-                ['label' => 'Hoja de vida segundo integrante (PDF)','type' => 'file','required' => false,'instructions' => 'Suba la hoja de vida del segundo integrante si NO cuenta con empresa.']
+                ['label' => 'Hoja de vida integrante 2:','type' => 'file','required' => false,'instructions' => 'Suba la hoja de vida del segundo integrante si NO cuenta con empresa.']
             );
 
             // 8. Título de la práctica
