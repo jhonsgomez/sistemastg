@@ -1072,7 +1072,7 @@
                 <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
                     onclick="event.stopPropagation()">
                     <button
-                        class="modal-close-btn-custom absolute mt-2 top-4 right-4 text-2xl text-gray-500 hover:text-red-500"
+                        class="modal-close-btn-custom absolute mt-2 top-4 right-4 text-2xl text-gray-500 hover:text-red-500 mt-2"
                         onclick="closeFase1EstudianteModal()">&times;</button>
                     <form class="p-6 mt-2" id="fase1EstudianteForm" enctype="multipart/form-data">
                         @csrf
@@ -1215,7 +1215,7 @@
                 <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
                     onclick="event.stopPropagation()">
                     <button
-                        class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
+                        class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500 mt-2"
                         onclick="closeFase1DetailsModal()">&times;</button>
                     <div class="p-6 mt-2">
                         <p class="text-2xl font-bold mb-4">Detalles de la <span
@@ -1276,7 +1276,7 @@
                                     <i class="fa-regular fa-file-lines mr-1 text-gray-500"></i>    
                                     Número de acta:
                                 </label>
-                                <input type="text" name="nro_acta" id="nro_acta_fase1"
+                                <input type="number" name="nro_acta" id="nro_acta_fase1"
                                     class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500" placeholder="Ingrese el número de acta">
                                 <span id="nro_acta_fase1Error" class="text-red-500 text-sm"></span>
                             </div>
@@ -1332,7 +1332,7 @@
                 <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full modal-content relative"
                     onclick="event.stopPropagation()" style="max-width: 900px !important; width: 100%;">
                     
-                    <button class="modal-close-btn-custom absolute top-3 right-4 text-gray-400 hover:text-red-500 text-2xl z-10"
+                    <button class="modal-close-btn-custom absolute top-3 right-4 text-gray-400 hover:text-red-500 text-2xl z-10 mt-2"
                         onclick="closeFase2EstudianteModal()">&times;</button>
 
                     <form class="p-8" id="fase2EstudianteForm" enctype="multipart/form-data">
@@ -1494,7 +1494,7 @@
                 <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
                     onclick="event.stopPropagation()">
                     <button
-                        class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
+                        class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500 mt-2"
                         onclick="closeFase2DetailsModal()">&times;</button>
                     <div class="p-6 mt-2">
                         <p class="text-2xl font-bold mb-4">Detalles de la <span
@@ -1554,7 +1554,7 @@
                                     <i class="fa-regular fa-file-lines mr-1 text-gray-500"></i>    
                                     Número de acta:
                                 </label>
-                                <input type="text" name="nro_acta" id="nro_acta_fase2"
+                                <input type="number" name="nro_acta" id="nro_acta_fase2"
                                     class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500" placeholder="Ingrese el número de acta">
                                 <span id="nro_acta_fase2Error" class="text-red-500 text-sm"></span>
                             </div>
@@ -1724,7 +1724,7 @@
                             <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
                                 <div class="grid gap-1 text-center">
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                    <h2 class="text-center text-gray-400 text-xs">Solo archivos de PDF de máximo {{ config('practicas.peso_maximo_archivos') }} MB</h2>
+                                    <h2 class="text-center text-gray-400 text-xs">Solo archivos de PDF de máximo {{ config('practicas.peso_maximo_propuesta') }} MB</h2>
                                 </div>
                                 <div class="text-center">
                                     <input type="file" name="arl" id="arl"
@@ -1758,7 +1758,7 @@
                             <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
                                 <div class="grid gap-1 text-center">
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                    <h2 class="text-center text-gray-400 text-xs">Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_archivos') }} MB</h2>
+                                    <h2 class="text-center text-gray-400 text-xs">Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_propuesta') }} MB</h2>
                                 </div>
                                 <div class="text-center">
                                     <input type="file" name="doc_fdc127" id="doc_fdc127"
@@ -1792,7 +1792,7 @@
                             <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
                                 <div class="grid gap-1 text-center">
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                    <h2 class="text-center text-gray-400 text-xs">Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_archivos') }} MB</h2>
+                                    <h2 class="text-center text-gray-400 text-xs">Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_propuesta') }} MB</h2>
                                 </div>
                                 <div class="text-center">
                                     <input type="file" name="doc_fdc195" id="doc_fdc195"
@@ -1837,7 +1837,7 @@
                 <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
                     onclick="event.stopPropagation()">
                     <button
-                        class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
+                        class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500 mt-2"
                         onclick="closeFase3DetailsModal()">&times;</button>
                     <div class="p-6 mt-2">
                         <p class="text-2xl font-bold mb-4">Detalles de la <span
@@ -1868,7 +1868,7 @@
             <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
                 <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
                     onclick="event.stopPropagation()">
-                    <button class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
+                    <button class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500 mt-2"
                         onclick="closeFase3DirModal()">&times;</button>
                     <form class="p-6 mt-2" id="fase3DirForm" enctype="multipart/form-data">
                         @csrf
@@ -1912,7 +1912,7 @@
                                 <div class="grid gap-1 text-center">
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
                                     <h2 class="text-center text-gray-400 text-xs">
-                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_archivos') }} MB
+                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_propuesta')}} MB
                                     </h2>
                                 </div>
                                 <div class="text-center">
@@ -1948,7 +1948,7 @@
                                 <div class="grid gap-1 text-center">
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
                                     <h2 class="text-center text-gray-400 text-xs">
-                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_archivos') }} MB
+                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_propuesta')}} MB
                                     </h2>
                                 </div>
                                 <div class="text-center">
@@ -1984,7 +1984,7 @@
                                 <div class="grid gap-1 text-center">
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
                                     <h2 class="text-center text-gray-400 text-xs">
-                                        Solo archivos de PDF de máximo {{ config('practicas.peso_maximo_archivos') }} MB
+                                        Solo archivos de PDF de máximo {{ config('practicas.peso_maximo_propuesta') }} MB
                                     </h2>
                                 </div>
                                 <div class="text-center">
@@ -2087,7 +2087,7 @@
                                 <div class="grid gap-1 text-center">
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
                                     <h2 class="text-center text-gray-400 text-xs">
-                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_archivos') }} MB
+                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_propuesta') }} MB
                                     </h2>
                                 </div>
                                 <div class="text-center">
@@ -2125,7 +2125,7 @@
                                 <div class="grid gap-1 text-center">
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
                                     <h2 class="text-center text-gray-400 text-xs">
-                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_archivos') }} MB
+                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_propuesta')}} MB
                                     </h2>
                                 </div>
                                 <div class="text-center">
@@ -2216,7 +2216,7 @@
                                     <i class="fa-regular fa-file-lines mr-1 text-gray-500"></i>
                                     Número de acta:
                                 </label>
-                                <input type="text" name="nro_acta" id="nro_acta_fase4_comite"
+                                <input type="number" name="nro_acta" id="nro_acta_fase4_comite"
                                 class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500"
                                 placeholder="Ingrese el número de acta">
                                 <span id="nro_acta_fase4_comiteError" class="text-red-500 text-sm"></span>
@@ -2263,7 +2263,7 @@
                                 <div class="grid gap-1 text-center">
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
                                     <h2 class="text-center text-gray-400 text-xs">
-                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_archivos') }} MB
+                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_propuesta')}} MB
                                     </h2>
                                 </div>
                                 <div class="text-center">
@@ -2299,7 +2299,7 @@
                                 <div class="grid gap-1 text-center">
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
                                     <h2 class="text-center text-gray-400 text-xs">
-                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_archivos') }} MB
+                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_propuesta') }} MB
                                     </h2>
                                 </div>
                                 <div class="text-center">
@@ -2421,7 +2421,7 @@
                             <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
                                 <div class="grid gap-1 text-center">
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                    <h2 class="text-gray-400 text-xs">Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_archivos') }} MB</h2>
+                                    <h2 class="text-gray-400 text-xs">Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_informe') }} MB</h2>
                                 </div>
 
                                 <div class="text-center">
@@ -2463,7 +2463,7 @@
 
                                 <div class="grid gap-1 text-center">
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                    <h2 class="text-gray-400 text-xs">Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_archivos') }} MB</h2>
+                                    <h2 class="text-gray-400 text-xs">Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_informe') }} MB</h2>
                                 </div>
 
                                 <div class="text-center">
@@ -2504,7 +2504,7 @@
 
                                 <div class="grid gap-1 text-center">
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                    <h2 class="text-gray-400 text-xs">Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_archivos') }} MB</h2>
+                                    <h2 class="text-gray-400 text-xs">Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_informe') }} MB</h2>
                                 </div>
 
                                 <div class="text-center">
@@ -2572,7 +2572,7 @@
 
                     <!-- BOTÓN CERRAR -->
                     <button
-                        class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
+                        class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500 mt-2"
                         onclick="closeFase5DetailsModal()">
                         &times;
                     </button>
@@ -2650,7 +2650,7 @@
 
                     <!-- BOTÓN CERRAR -->
                     <button
-                        class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
+                        class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500 mt-2"
                         onclick="closeFase5DirModal()">
                         &times;
                     </button>
@@ -2668,10 +2668,6 @@
                                 class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">
                                 Fase 5
                             </span>
-                        </p>
-
-                        <p class="text-sm text-gray-600 mb-4">
-                            Apruebe o rechace la entrega final de prácticas empresariales.
                         </p>
 
                         <!-- ESTADO -->
@@ -2722,7 +2718,7 @@
                                         class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
 
                                     <h2 class="text-center text-gray-400 text-xs">
-                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_archivos') }} MB
+                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_informe') }} MB
                                     </h2>
 
                                 </div>
@@ -2785,7 +2781,7 @@
                                         class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
 
                                     <h2 class="text-center text-gray-400 text-xs">
-                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_archivos') }} MB
+                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_informe') }} MB
                                     </h2>
 
                                 </div>
@@ -2848,7 +2844,7 @@
                                         class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
 
                                     <h2 class="text-center text-gray-400 text-xs">
-                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_archivos') }} MB
+                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_informe') }} MB
                                     </h2>
 
                                 </div>
@@ -2910,7 +2906,7 @@
                                         class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
 
                                     <h2 class="text-center text-gray-400 text-xs">
-                                        Solo archivos de PDF de máximo {{ config('practicas.peso_maximo_archivos') }} MB
+                                        Solo archivos de PDF de máximo {{ config('practicas.peso_maximo_informe') }} MB
                                     </h2>
 
                                 </div>
@@ -3080,7 +3076,7 @@
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
 
                                     <h2 class="text-center text-gray-400 text-xs">
-                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_archivos') }} MB
+                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_informe')}} MB
                                     </h2>
                                 </div>
 
@@ -3128,7 +3124,7 @@
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
 
                                     <h2 class="text-center text-gray-400 text-xs">
-                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_archivos') }} MB
+                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_informe') }} MB
                                     </h2>
                                 </div>
 
@@ -3227,7 +3223,7 @@
 
                     <!-- BOTÓN CERRAR -->
                     <button
-                        class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
+                        class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500 mt-2"
                         onclick="closeFase6DetailsModal()">
                         &times;
                     </button>
@@ -3345,7 +3341,7 @@
                                     Número de acta:
                                 </label>
 
-                                <input type="text"
+                                <input type="number"
                                     name="nro_acta"
                                     id="nro_acta_fase6_comite"
                                     class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500"
@@ -3385,7 +3381,7 @@
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
 
                                     <h2 class="text-center text-gray-400 text-xs">
-                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_archivos') }} MB
+                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_informe') }} MB
                                     </h2>
                                 </div>
 
@@ -3425,7 +3421,7 @@
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
 
                                     <h2 class="text-center text-gray-400 text-xs">
-                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_archivos') }} MB
+                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_informe') }} MB
                                     </h2>
                                 </div>
 
@@ -3520,7 +3516,7 @@
 
                     <!-- BOTÓN CERRAR -->
                     <button
-                        class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500"
+                        class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500 mt-2"
                         onclick="closeFase7DetailsModal()">
                         &times;
                     </button>
@@ -3647,7 +3643,7 @@
             style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;"
             onclick="closeWarningModal()">
             <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
-                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative"
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative "
                     onclick="event.stopPropagation()">
                     <button class="modal-close-btn-custom" onclick="closeWarningModal()">
                         &times;
@@ -3870,7 +3866,7 @@
 <div id="configModal" class="fixed z-50 inset-0 overflow-y-auto">
     <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeConfigModal()">
         <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative" onclick="event.stopPropagation()">
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative mt-2" onclick="event.stopPropagation()">
                 <button class="modal-close-btn-custom" onclick="closeConfigModal()">&times;</button>
                 <form class="p-6 mt-2" id="configModalForm" enctype="multipart/form-data">
                     @csrf
@@ -4034,7 +4030,7 @@
 <div id="configAdminModal" class="fixed z-50 inset-0 overflow-y-auto">
     <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeConfigAdminModal()">
         <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative" onclick="event.stopPropagation()">
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative mt-2" onclick="event.stopPropagation()">
                 <button class="modal-close-btn-custom" onclick="closeConfigAdminModal()">&times;</button>
                 <form class="p-6 mt-2" id="configAdminForm" enctype="multipart/form-data">
                     @csrf
@@ -4140,7 +4136,7 @@
                                 <i class="fa-regular fa-file-lines mr-1 text-gray-500"></i>
                                 Número de acta:
                             </label>
-                            <input type="text" name="nro_acta_ajustes" id="nro_acta_ajustes" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full focus:ring-uts-500 focus:border-uts-500" placeholder="Ingrese el número de acta" required>
+                            <input type="number" name="nro_acta_ajustes" id="nro_acta_ajustes" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full focus:ring-uts-500 focus:border-uts-500" placeholder="Ingrese el número de acta" required>
                             <span id="nro_acta_ajustesError" class="text-red-500 text-sm"></span>
                         </div>
                         <div>
@@ -4266,6 +4262,14 @@
 
     <script>
         const MAX_FILE_SIZE_MB = {{ config('practicas.peso_maximo_archivos') }};
+    </script>
+
+    <script>
+        const MAX_FILE_SIZE_PR = {{ config('practicas.peso_maximo_propuesta') }};
+    </script>
+
+    <script>
+        const MAX_FILE_SIZE_IN = {{ config('practicas.peso_maximo_informe') }};
     </script>
 
         <script>
@@ -4487,7 +4491,7 @@
             <div class="text-gray-600 text-sm mb-4">
                 ${file.name}
             </div>
-            <div class="text-sm ml-6 text-gray-900">
+            <div class="text-sm text-gray-900">
                 Tamaño total: ${fileSizeMB} MB de ${MAX_FILE_SIZE_MB} MB permitidos
             </div>
         </li>
@@ -4785,7 +4789,7 @@
                 <div class="text-gray-600 text-sm mb-4">
                     ${file.name}
                 </div>
-                <div class="text-sm ml-6 text-gray-900">
+                <div class="text-sm text-gray-900">
                     Tamaño total: ${fileSizeMB} MB de ${MAX_FILE_SIZE_MB} MB permitidos
                 </div>
             </li>
@@ -4842,7 +4846,7 @@
                 <div class="text-gray-600 text-sm mb-4">
                     ${file.name}
                 </div>
-                <div class="text-sm ml-6 text-gray-900">
+                <div class="text-sm text-gray-900">
                     Tamaño total: ${fileSizeMB} MB de ${MAX_FILE_SIZE_MB} MB permitidos
                 </div>
             </li>
@@ -4899,7 +4903,7 @@
                 <div class="text-gray-600 text-sm mb-4">
                     ${file.name}
                 </div>
-                <div class="text-sm ml-6 text-gray-900">
+                <div class="text-sm text-gray-900">
                     Tamaño total: ${fileSizeMB} MB de ${MAX_FILE_SIZE_MB} MB permitidos
                 </div>
             </li>
@@ -4956,7 +4960,7 @@
                 <div class="text-gray-600 text-sm mb-4">
                     ${file.name}
                 </div>
-                <div class="text-sm ml-6 text-gray-900">
+                <div class="text-sm text-gray-900">
                     Tamaño total: ${fileSizeMB} MB de ${MAX_FILE_SIZE_MB} MB permitidos
                 </div>
             </li>

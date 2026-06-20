@@ -97,14 +97,14 @@ function closeFase4EvaluadorModal() {
 
     if (!file) return;
 
-    const maxSizeBytes = MAX_FILE_SIZE_MB * 1024 * 1024;
+    const maxSizeBytes = MAX_FILE_SIZE_PR * 1024 * 1024;
 
     if (file.size > maxSizeBytes) {
 
         Swal.fire({
             icon: 'error',
             title: 'Archivo demasiado grande',
-            text: `El archivo no puede superar los ${MAX_FILE_SIZE_MB} MB.`,
+            text: `El archivo no puede superar los ${MAX_FILE_SIZE_PR} MB.`,
             confirmButtonColor: '#C1D631',
             confirmButtonText: 'Aceptar'
         });
@@ -138,8 +138,8 @@ function closeFase4EvaluadorModal() {
             <div class="text-gray-600 text-sm mb-4">
                 ${file.name}
             </div>
-            <div class="text-sm ml-6 text-gray-900">
-                Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_MB} MB permitidos
+            <div class="text-sm text-gray-900">
+                Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_PR} MB permitidos
             </div>
         </li>
     `);
@@ -156,14 +156,14 @@ function closeFase4EvaluadorModal() {
 
     if (!file) return;
 
-    const maxSizeBytes = MAX_FILE_SIZE_MB * 1024 * 1024;
+    const maxSizeBytes = MAX_FILE_SIZE_PR * 1024 * 1024;
 
     if (file.size > maxSizeBytes) {
 
         Swal.fire({
             icon: 'error',
             title: 'Archivo demasiado grande',
-            text: `El archivo no puede superar los ${MAX_FILE_SIZE_MB} MB.`,
+            text: `El archivo no puede superar los ${MAX_FILE_SIZE_PR} MB.`,
             confirmButtonColor: '#C1D631',
             confirmButtonText: 'Aceptar'
         });
@@ -197,8 +197,8 @@ function closeFase4EvaluadorModal() {
             <div class="text-gray-600 text-sm mb-4">
                 ${file.name}
             </div>
-            <div class="text-sm ml-6 text-gray-900">
-                Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_MB} MB permitidos
+            <div class="text-sm text-gray-900">
+                Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_PR} MB permitidos
             </div>
         </li>
     `);
@@ -413,14 +413,14 @@ $(document).ready(function() {
 
     if (!file) return;
 
-    const maxSizeBytes = MAX_FILE_SIZE_MB * 1024 * 1024;
+    const maxSizeBytes = MAX_FILE_SIZE_PR * 1024 * 1024;
 
     if (file.size > maxSizeBytes) {
 
         Swal.fire({
             icon: 'error',
             title: 'Archivo demasiado grande',
-            text: `El archivo no puede superar los ${MAX_FILE_SIZE_MB} MB.`,
+            text: `El archivo no puede superar los ${MAX_FILE_SIZE_PR} MB.`,
             confirmButtonColor: '#C1D631',
             confirmButtonText: 'Aceptar'
         });
@@ -454,8 +454,8 @@ $(document).ready(function() {
             <div class="text-gray-600 text-sm mb-4">
                 ${file.name}
             </div>
-            <div class="text-sm ml-6 text-gray-900">
-                Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_MB} MB permitidos
+            <div class="text-sm text-gray-900">
+                Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_PR} MB permitidos
             </div>
         </li>
     `);
@@ -467,14 +467,14 @@ $(document).ready(function() {
         fileList.empty();
         
         if (file) {
-            const maxSizeBytes = MAX_FILE_SIZE_MB * 1024 * 1024;
+            const maxSizeBytes = MAX_FILE_SIZE_PR * 1024 * 1024;
 
     if (file.size > maxSizeBytes) {
 
         Swal.fire({
             icon: 'error',
             title: 'Archivo demasiado grande',
-            text: `El archivo no puede superar los ${MAX_FILE_SIZE_MB} MB.`,
+            text: `El archivo no puede superar los ${MAX_FILE_SIZE_PR} MB.`,
             confirmButtonColor: '#C1D631',
             confirmButtonText: 'Aceptar'
         });
@@ -508,8 +508,8 @@ $(document).ready(function() {
             <div class="text-gray-600 text-sm mb-4">
                 ${file.name}
             </div>
-            <div class="text-sm ml-6 text-gray-900">
-                Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_MB} MB permitidos
+            <div class="text-sm text-gray-900">
+                Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_PR} MB permitidos
             </div>
         </li>
     `);
@@ -555,7 +555,7 @@ $(document).ready(function() {
         Swal.fire({
             heightAuto: false,
             title: '¿Está seguro?',
-            text: estado === mensajeConfirmacion,
+            text: mensajeConfirmacion,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#C1D631',

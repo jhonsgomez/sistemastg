@@ -17,14 +17,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const file = this.files[0];
 
-    const maxSizeBytes = MAX_FILE_SIZE_MB * 1024 * 1024;
+    const maxSizeBytes = MAX_FILE_SIZE_HV * 1024 * 1024;
 
 if (file.size > maxSizeBytes) {
 
     Swal.fire({
         icon: 'error',
         title: 'Archivo demasiado grande',
-        text: `El archivo no puede superar los ${MAX_FILE_SIZE_MB} MB.`,
+        text: `El archivo no puede superar los ${MAX_FILE_SIZE_HV} MB.`,
         confirmButtonColor: '#C1D631',
         confirmButtonText: 'Aceptar'
     });
@@ -56,36 +56,29 @@ if (file.size > maxSizeBytes) {
         return;
     }
 
-    let totalSize = 0;
+    const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
 
-    Array.from(this.files).forEach(file => {
+const fileSizeContainer = $('#' + sizeId);
 
-        totalSize += file.size;
+fileSizeContainer.empty();
 
-        const fileSizeMB =
-            (file.size / (1024 * 1024)).toFixed(2);
-
-        const li = document.createElement('li');
-
-        li.textContent =
-            `${file.name} (${fileSizeMB} MB)`;
-
-        list.appendChild(li);
+fileSizeContainer.append(`
+    <li class="mb-2 ms-4 mt-4">
+        <div class="text-gray-600 text-sm mb-4">
+            ${file.name}
+        </div>
+        <div class="text-sm text-gray-900">
+            Tamaño total: ${fileSizeMB} MB de ${MAX_FILE_SIZE_HV} MB permitidos
+        </div>
+    </li>
+`);
 
     });
-
-    sizeText.textContent =
-        `Tamaño total: ${(totalSize / (1024 * 1024)).toFixed(8)} MB`;
-
-});
 
     }
 
     // Fase 0
     setupFilePreview('hoja_vida', 'file-list-fase0', 'files-size-fase0');
     setupFilePreview('hoja_vida_2', 'file-list-fase0-2', 'files-size-fase0-2');
-
-    
-
 
 });

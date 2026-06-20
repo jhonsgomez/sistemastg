@@ -8,6 +8,9 @@ return [
     'dias_gracia_fase5' => env('PRACTICA_GRACIA_ENVIO_FASE5', 15),
 
     'peso_maximo_archivos' => env('PESO_MAXIMO_ARCHIVOS', 8),
+    'peso_maximo_propuesta' => env('PESO_MAXIMO_PROPUESTA', 4),
+    'peso_maximo_informe' => env('PESO_MAXIMO_ARCHIVO', 6),
+    'peso_maximo_hojavida' => env('PESO_MAXIMO_HOJAVIDA', 9),
     
     'correos' => [
 

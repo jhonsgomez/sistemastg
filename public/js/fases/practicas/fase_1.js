@@ -268,26 +268,20 @@ $('#fase1EstudianteForm').on('submit', function(e) {
 $('#fase1AdminForm').on('submit', function(e) {
     e.preventDefault();
     
-    // Obtener el contenido del editor Quill
     if (quillFase1) {
         $('#respuesta_fase1').val(quillFase1.root.innerHTML);
     }
     
-    // Validar que haya seleccionado un estado
     const estadoSeleccionado = $('#estado_fase1').val();
     if (!estadoSeleccionado) {
         $('#estado_fase1Error').text('Debe seleccionar un estado');
         return;
     }
     
-   
-    // Obtener contenido de Quill
     const mensaje = quillFase1.root.innerHTML;
 
-    // Pasarlo al textarea oculto
     $('#respuesta_fase1').val(mensaje);
 
-    // Validar contenido limpio
     const mensajeLimpio = quillFase1.getText().trim();
 
     if (!mensajeLimpio) {
@@ -323,7 +317,6 @@ $('#fase1AdminForm').on('submit', function(e) {
                 success: function(response) {
                     closeFase1AdminModal();
                     showToast('Respuesta enviada correctamente', 'success');
-                    // Esperar 3 segundos (duración del toast) antes de recargar
                     setTimeout(() => {
                         location.reload();
                     }, 3000);
@@ -409,7 +402,7 @@ fileList.append(`
         <div class="text-gray-600 text-sm mb-4">
             ${file.name}
         </div>
-        <div class="text-sm ml-6 text-gray-900">
+        <div class="text-sm text-gray-900">
             Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_MB} MB permitidos
         </div>
     </li>

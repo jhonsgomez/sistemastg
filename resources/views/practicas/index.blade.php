@@ -773,7 +773,7 @@ $mes_actual = Carbon::now()->month;
                                     <div class="grid gap-1">
                                         <i class="mx-auto text-4xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
                                         <h2 class="text-center text-gray-400 text-xs leading-4">
-                                            Solo archivos de PDF de máximo {{ config('practicas.peso_maximo_archivos') }} MB
+                                            Solo archivos de PDF de máximo {{ config('practicas.peso_maximo_hojavida') }} MB
                                         </h2>
                                     </div>
                                     <div class="grid gap-2">
@@ -806,7 +806,7 @@ $mes_actual = Carbon::now()->month;
                                             <i class="mx-auto text-4xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
 
                                             <h2 class="text-center text-gray-400 text-xs leading-4">
-                                                Solo archivos de PDF de máximo {{ config('practicas.peso_maximo_archivos') }} MB
+                                                Solo archivos de PDF de máximo {{ config('practicas.peso_maximo_hojavida') }} MB
                                             </h2>
                                         </div>
 
@@ -1252,6 +1252,7 @@ $mes_actual = Carbon::now()->month;
 
         <script>
             const MAX_FILE_SIZE_MB = {{ config('practicas.peso_maximo_archivos') }};
+            const MAX_FILE_SIZE_HV = {{ config('practicas.peso_maximo_hojavida') }};
         </script>
         
         <!--Crear solicitud modal-->
@@ -1265,7 +1266,6 @@ $mes_actual = Carbon::now()->month;
 
                 $('#formTitle').html(`Iniciar nueva <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">práctica</span>`);
 
-                // Limpiar campos (igual que antes)
                 $('#modalidad').val('');
                 $('#id_integrante_2').val('').trigger('change');
                 $('#periodo').val(periodo_academico);
@@ -1276,25 +1276,20 @@ $mes_actual = Carbon::now()->month;
                 $('#id_integrante_2Error').text('');
                 $('#periodoError').text('');
 
-                // ÚNICA FORMA DE ABRIR: añadir clase show (sin tocar display)
                 $('#createModal').addClass('show');
             }
 
             function closeCreateModal() {
-    // Limpiar formulario
     $('#practicasForm')[0].reset();
 
-    // Limpiar segundo integrante con Select2
     $('#id_integrante_2').val(null).trigger('change');
     $('#selected_integrante_2').html('').addClass('hidden');
 
-    // Limpiar errores
     $('#id_integrante_2Error').text('');
     $('#tiene_empresaError').text('');
     $('#hoja_vidaError').text('');
     $('#hoja_vida2Error').text('');
 
-    // Limpiar archivos
     $('#hoja_vida').val('');
     $('#hoja_vida_2').val('');
     $('#file-list-fase0').empty();
@@ -1302,20 +1297,17 @@ $mes_actual = Carbon::now()->month;
     $('#files-size-fase0').text('');
     $('#files-size-fase0-2').text('');
 
-    // Ocultar contenedores de hojas de vida
     $('#hojaVidaContainer').hide();
     $('#hojaVidaLabel').hide();
     $('#hojaVidaContainer2').hide();
     $('#hojaVidaLabel2').hide();
 
-    // Cerrar modal
     $('#createModal').removeClass('show');
 }
         </script>
 
         <script>
     $(document).ready(function() {
-    // Select2 para segundo integrante
     $('#id_integrante_2').select2({
         dropdownParent: $('#createModal'),
         placeholder: 'Buscar por documento o nombre',
@@ -1346,67 +1338,9 @@ $mes_actual = Carbon::now()->month;
 });
 </script>
 
-    <script>
-
-        // VALIDAR HOJA DE VIDA ARRASTAR Y SOLTAR EN PDF
-        
-        $('#hoja_vida').on('change', function () {
-
-    const file = this.files[0];
-
-    if (!file) return;
-
-    const allowedTypes = ['application/pdf'];
-
-    if (!allowedTypes.includes(file.type)) {
-
-        Swal.fire({
-            icon: 'error',
-            title: 'Archivo inválido',
-            text: 'Solo se permiten archivos en formato PDF.'
-        });
-
-        $(this).val('');
-
-        $('#file-list-fase0').empty();
-        $('#files-size-fase0').text('');
-
-        return;
-    }
-});
-
-    $('#hoja_vida_2').on('change', function () {
-
-    const file = this.files[0];
-
-    if (!file) return;
-
-    const allowedTypes = ['application/pdf'];
-
-    if (!allowedTypes.includes(file.type)) {
-
-        Swal.fire({
-            icon: 'error',
-            title: 'Archivo inválido',
-            text: 'Solo se permiten archivos en formato PDF.'
-        });
-
-        $(this).val('');
-
-        $('#file-list-fase0-2').empty();
-        $('#files-size-fase0-2').text('');
-
-        return;
-    }
-});
-
-    </script>
-
         <!--Responder solicitud modal-->
 <script>
-    // ========== ABRIR MODAL RESPONDER ==========
     function openResponderSolicitudModal(id) {
-        // Inicializar Quill si es necesario
         if (!window.quill) {
             window.quill = new Quill('#txt-editor', {
                 theme: 'snow',
@@ -1436,7 +1370,6 @@ $mes_actual = Carbon::now()->month;
         $('#responderSolicitudPractica').addClass('show');
     }
 
-    // ========== CERRAR MODAL RESPONDER ==========
     function closeResponderSolicitudModal() {
         $('#responderSolicitudPractica').removeClass('show');
         if (window.quill) {
@@ -1449,26 +1382,22 @@ $(document).ready(function() {
     $('#responderSolicitudForm').on('submit', function(e) {
         e.preventDefault();
 
-        // Obtener el contenido del editor Quill
         if (window.quill) {
             $('#mensaje').val(window.quill.root.innerHTML);
         }
 
-        // Validar que haya seleccionado un estado
         const estadoSeleccionado = $('#estado').val();
         if (!estadoSeleccionado) {
             $('#estadoError').text('Debe seleccionar un estado');
             return;
         }
 
-        // Validar que el mensaje no esté vacío
         const mensaje = $('#mensaje').val();
         if (!mensaje || mensaje === '<p><br></p>') {
             $('#mensajeError').text('Debe ingresar un mensaje de respuesta');
             return;
         }
 
-        // Personalizar el mensaje de confirmación según el estado
         let mensajeConfirmacion = "Esta acción no se puede deshacer";
         let tituloConfirmacion = "¿Está seguro?";
 
@@ -1478,7 +1407,6 @@ $(document).ready(function() {
             mensajeConfirmacion = "Esta acción no se podrá deshacer";
         }
 
-        // Mostrar alerta de confirmación
         Swal.fire({
             heightAuto: false,
             title: tituloConfirmacion,
@@ -1491,13 +1419,11 @@ $(document).ready(function() {
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-                // Mostrar spinner en el botón
                 const button = $('#responderSolicitudButton');
                 const loadingSpinner = $('#loadingSpinner-replyProyectos');
                 button.prop('disabled', true);
                 loadingSpinner.removeClass('hidden');
 
-                // Enviar el formulario
                 $.ajax({
                     url: '{{ route("practicas.responder") }}',
                     method: 'POST',
@@ -1506,7 +1432,6 @@ $(document).ready(function() {
                         $('#practicasTable').DataTable().ajax.reload();
                         closeResponderSolicitudModal();
                         
-                        // Mostrar toast de éxito
                         showToast('Respuesta enviada exitosamente', 'success');
                     },
                     error: function(xhr) {
@@ -1708,9 +1633,7 @@ var table = $('#practicasTable').DataTable({
         data: function (d) {
             d.rol_especifico = "{{ $rol_especifico ?? '' }}";
 
-            // ========== AGREGAR ESTO ==========
             d.filter = $('#filtroRolesPracticas').val();
-            // ==================================
 
         }
     },
@@ -1761,14 +1684,16 @@ var table = $('#practicasTable').DataTable({
                 "sNext": '<i class="fa-solid fa-angle-right" style="font-size: 10px;"></i>',
                 "sPrevious": '<i class="fa-solid fa-angle-left" style="font-size: 10px;"></i>'
             }
-                },
-                pagingType: "full_numbers",
-                lengthMenu: [[5, 10, 20], [5, 10, 20]],
-                pageLength: 5
+        },
+        pagingType: "full_numbers",
+        lengthMenu: [[5, 10, 20], [5, 10, 20]],
+        pageLength: 5,
+        initComplete: function () {
+    $('.dt-input').attr('placeholder', 'Ingrese una clave');
+}
         });
 
-            $('#practicasTable_filter input')
-            .attr('placeholder', 'Ingrese una clave');
+            
 
         $('#filtroRolesPracticas').on('change', function() {
             table.ajax.reload();
@@ -1951,26 +1876,24 @@ function escapeHtml(text) {
 
         <script>
 
-        // ========== DESACTIVAR PRÁCTICA ==========
 function deshabilitarPracticaConActa(id) {
     $('#desactivarPracticaTitle').html(`Desactivar <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Práctica</span>`);
     $('#practica_id').val(id);
     $('#nro_acta_desactivar').val('');
     $('#fecha_acta_desactivar').val('');
     
-    // Inicializar Quill para desactivar
     if (!window.quillDesactivar) {
         window.quillDesactivar = new Quill('#txt-editor-desactivar', {
             theme: 'snow',
             placeholder: 'Describa la respuesta para el estudiante.',
             modules: {
                 toolbar: [
-                    [{ 'header': 1}],  // H1
-                    [{ 'header': 2}],  // H2
-                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],  // Numeración y viñetas
-                    [{ 'color': [] }],  // Selector de color
-                    ['bold', 'italic', 'underline'],  // Negrita, cursiva, subrayado
-                    ['clean']  // Eliminar formato
+                    [{ 'header': 1}],
+                    [{ 'header': 2}],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'color': [] }],
+                    ['bold', 'italic', 'underline'],
+                    ['clean']
                 ]
             }
         });
@@ -2001,12 +1924,12 @@ function habilitarPracticaConActa(id) {
             placeholder: 'Describa la respuesta para el estudiante.',
             modules: {
                 toolbar: [
-                    [{ 'header': 1}],  // H1
-                    [{ 'header': 2}],  // H2
-                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],  // Numeración y viñetas
-                    [{ 'color': [] }],  // Selector de color
-                    ['bold', 'italic', 'underline'],  // Negrita, cursiva, subrayado
-                    ['clean']  // Eliminar formato
+                    [{ 'header': 1}],
+                    [{ 'header': 2}],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'color': [] }],
+                    ['bold', 'italic', 'underline'],
+                    ['clean']
                 ]
             }
         });
@@ -2023,21 +1946,19 @@ function closeActivarPracticaModal() {
     if (window.quillActivar) window.quillActivar.root.innerHTML = '';
 }
 
-// ========== REPORTE DE PROBLEMA ==========
 function openWarningModal() {
-    // Inicializar Quill para warning
     if (!window.quillWarning) {
         window.quillWarning = new Quill('#txt-editor-warning', {
             theme: 'snow',
             placeholder: 'Describa su reporte o inconveniente y déjenos saber sus recomendaciones.',
             modules: {
                 toolbar: [
-                    [{ 'header': 1}],  // H1
-                    [{ 'header': 2}],  // H2
-                    ['bold', 'italic', 'underline'],  // Negrita, cursiva, subrayado
-                    [{ 'color': [] }],  // Selector de color
-                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],  // Numeración y viñetas
-                    ['clean']  // Eliminar formato
+                    [{ 'header': 1}],
+                    [{ 'header': 2}],
+                    ['bold', 'italic', 'underline'],
+                    [{ 'color': [] }],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    ['clean']
                 ]
             }
         });
@@ -2054,40 +1975,33 @@ function closeWarningModal() {
     if (window.quillWarning) window.quillWarning.root.innerHTML = '';
 }
 
-//ENVIO DE FORMULARIOS
 
 $(document).ready(function() {
-    // ========== DESHABILITAR PRÁCTICA ==========
     $('#desactivarPracticaForm').on('submit', function(e) {
         e.preventDefault();
         
-        // Obtener el contenido del editor Quill
         if (window.quillDesactivar) {
             $('#descripcion_desactivar').val(window.quillDesactivar.root.innerHTML);
         }
         
-        // Validar que el mensaje no esté vacío
         const mensaje = $('#descripcion_desactivar').val();
         if (!mensaje || mensaje === '<p><br></p>') {
             $('#descripcion_desactivarError').text('Debe ingresar una justificación para deshabilitar la práctica');
             return;
         }
         
-        // Validar número de acta
         const nroActa = $('#nro_acta_desactivar').val();
         if (!nroActa) {
             $('#nro_acta_desactivarError').text('Debe ingresar el número de acta');
             return;
         }
         
-        // Validar fecha del acta
         const fechaActa = $('#fecha_acta_desactivar').val();
         if (!fechaActa) {
             $('#fecha_acta_desactivarError').text('Debe seleccionar la fecha del acta');
             return;
         }
         
-        // Mostrar alerta de confirmación
         Swal.fire({
             heightAuto: false,
             title: 'Desactivar práctica',
@@ -2331,7 +2245,7 @@ $(document).ready(function() {
     <script>
         // Reportes - Prácticas
 function openReporteModal() {
-    $('#reporteTitle').html(`Generar <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Reporte de Prácticas</span>`);
+    $('#reporteTitle').html(`Generar <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Reporte</span>`);
 
     $('#periodo_reporte').val('');
     $('#periodo_reporteError').text('');
