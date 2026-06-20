@@ -124,16 +124,20 @@
             <strong class="uppercase">COMITÉ DE TRABAJOS DE GRADO</strong>
             ha revisado los documentos correspondientes a la <strong>FASE 6</strong>
             de prácticas empresariales
-            {!! $estado === 'Aprobada'
-                ? 'y ha <strong>FINALIZADO</strong> el proceso de prácticas empresariales.'
-                : 'y la solicitud ha sido <strong>RECHAZADA</strong>.' !!}
+            @if($estado === 'Aprobada')
+                y ha <strong>FINALIZADO</strong> el proceso de prácticas empresariales.
+            @elseif($estado === 'Aplazada')
+                y la solicitud ha sido <strong>APLAZADA</strong>.
+            @elseif($estado === 'Rechazada')
+                y la solicitud ha sido <strong>RECHAZADA</strong>.
+            @endif
         </p>
 
     @endif
 
     <ul>
         <li><strong>Estado:</strong> {{ $estado }}</li>
-        <li><strong>Fecha y hora:</strong> {{ now()->format('d/m/Y H:i:s') }}</li>
+        <li><strong>Fecha y hora de envío:</strong> {{ now()->format('d/m/Y H:i:s') }}</li>
 
         @if (!empty($cuerpo['nro_acta']) && !empty($cuerpo['fecha_acta']))
             <li>

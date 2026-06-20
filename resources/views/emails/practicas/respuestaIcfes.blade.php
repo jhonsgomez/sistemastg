@@ -106,7 +106,10 @@
 
 @if ($respuesta)
     <p><strong>Respuesta del comité:</strong></p>
-    <p>{!! $respuesta !!}</p>
+
+    <div class="comentarios-quill">
+        {!! $respuesta !!}
+    </div>
 @endif
 
 <ul>

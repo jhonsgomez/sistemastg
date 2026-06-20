@@ -363,6 +363,9 @@ if ($request->has('search') && $search = $request->input('search.value')) {
         if (in_array($searchLower, ['rechazada', 'rechazado'])) {
             $q->orWhere('estado', 'Rechazada');
         }
+        if (in_array($searchLower, ['aplazada', 'aplazado'])) {
+            $q->orWhere('estado', 'Aplazada');
+        }
 
         if (in_array($searchLower, ['finalizado', 'finalizada'])) {
             $q->orWhere('estado', 'Finalizado');
@@ -557,7 +560,10 @@ if ($request->has('search') && $search = $request->input('search.value')) {
                         return 'Práctica empresarial finalizada';
 
                     case 'Rechazada':
-                        return 'Solicitud de prácticas rechazada';
+                    return 'Solicitud de prácticas rechazada';
+
+                    case 'Aplazada':
+                        return 'Solicitud de prácticas aplazada';
 
                     default:
                         return 'Solicitud de prácticas empresariales';
@@ -586,11 +592,17 @@ if ($request->has('search') && $search = $request->input('search.value')) {
                 
                 // Badge para beneficiario ICFES (solo estudiantes en Fase 5 o 6)
                 $badge_beneficiario_icfes = '<span class="shadow bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded border border-blue-300">Beneficiario ICFES</span>';
-                
+               
+                if ($p->estado === 'Aplazada') {
+                    $badge = "<span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Aplazada</span>";
+                    return $return_html . $badge . "</div>";
+                }
+
                 if ($p->estado === 'Rechazada') {
                     $badge = "<span class='shadow bg-red-100 text-red-800 text-sm font-medium px-2.5 py-0.5 rounded border border-red-300'>Rechazada</span>";
                     return $return_html . $badge . "</div>";
                 }
+
                 
                 $htmlEstado = '';
 
@@ -989,7 +1001,7 @@ if ($request->has('search') && $search = $request->input('search.value')) {
     {
         $validator = Validator::make($request->all(), [
             'solicitudPractica_id' => 'required',
-            'estado'               => 'required|in:Aprobada,Rechazada',
+            'estado'               => 'required|in:Aprobada,Rechazada,Aplazada',
             'mensaje'              => 'required',
         ]);
 
@@ -1032,8 +1044,8 @@ if ($request->has('search') && $search = $request->input('search.value')) {
             };
              $this->practicaMailService->sendRespuesta($practica,$estadoActual,$nuevoEstado,$request->mensaje,$request->estado);
         } else {
-            // Si es rechazada, el nuevo estado es 'Rechazada'
-            $nuevoEstado = 'Rechazada';
+            // Si es rechazada o aplazada, el nuevo estado es 'Rechazada' o 'Aplazada'
+            $nuevoEstado = $request->estado;
             $this->practicaMailService->sendRespuesta($practica,$estadoActual,$nuevoEstado,$request->mensaje,$request->estado);
         }
 

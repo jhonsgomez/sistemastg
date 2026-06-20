@@ -133,9 +133,14 @@
         <p>
             Estimado estudiante, en este correo se le informa la respuesta de su solicitud
             correspondiente a la <strong>FASE 2</strong> de prácticas empresariales
-            {!! $estado === 'Aprobada'
-                ? 'ha sido <strong>APROBADA</strong>.'
-                : 'ha sido <strong>RECHAZADA</strong>.' !!}
+            @if($estado === 'Aprobada')
+                ha pasado a <strong>{{ strtoupper($nuevoEstado) }}</strong>
+            @elseif($estado === 'Aplazada')
+                ha sido <strong>APLAZADA</strong>
+            @elseif($estado === 'Rechazada')
+                ha sido <strong>RECHAZADA</strong>
+            @endif
+            :
         </p>
     @endif
 
@@ -271,25 +276,29 @@
         @else
 
             @if (!empty($cuerpo['director']))
-                <p>
-                    <strong>Director asignado:</strong>
-                    {{ $cuerpo['director']->name ?? '' }}
-                    -
-                    <a href="mailto:{{ $cuerpo['director']->email ?? '' }}" class="email">
-                        {{ $cuerpo['director']->email ?? '' }}
-                    </a>
-                </p>
+            <p><strong>Director asignado:</strong></p>
+                <ul>
+                    <li><strong>Nombre:</strong> {{ $cuerpo['director']->name ?? '' }}</li>
+                    <li>
+                        <strong>Correo:</strong>
+                        <a href="mailto:{{ $cuerpo['director']->email ?? '' }}" class="email">
+                            {{ $cuerpo['director']->email ?? '' }}
+                        </a>
+                    </li>
+                </ul>
             @endif
 
             @if (!empty($cuerpo['codirector']))
-                <p>
-                    <strong>Codirector asignado:</strong>
-                    {{ $cuerpo['codirector']->name ?? '' }}
-                    -
-                    <a href="mailto:{{ $cuerpo['codirector']->email ?? '' }}" class="email">
-                        {{ $cuerpo['codirector']->email ?? '' }}
-                    </a>
-                </p>
+                <p><strong>Codirector asignado:</strong></p>
+                <ul>
+                    <li><strong>Nombre:</strong> {{ $cuerpo['codirector']->name ?? '' }}</li>
+                    <li>
+                        <strong>Correo:</strong>
+                        <a href="mailto:{{ $cuerpo['codirector']->email ?? '' }}" class="email">
+                            {{ $cuerpo['codirector']->email ?? '' }}
+                        </a>
+                    </li>
+                </ul>
             @endif
 
         @endif

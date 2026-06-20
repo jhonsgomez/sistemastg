@@ -18,8 +18,7 @@ function openFase2EstudianteModal(btn) {
 
     $('#liquidacion_pago').val('');
     $('#soporte_pago').val('');
-    $('#file-list-liquidacion').empty();
-    $('#file-list-soporte').empty();
+
     $('#liquidacion_pagoError').text('');
     $('#soporte_pagoError').text('');
     
@@ -193,19 +192,26 @@ function openFase2AdminModal(btn) {
         if ($('#txt-editor-fase2').length > 0) {
             if (quillFase2 === null) {
                 quillFase2 = new Quill('#txt-editor-fase2', {
-                    theme: 'snow',
-                    placeholder: 'Describa los detalles de la respuesta para el estudiante.',
-                    modules: {
-                    toolbar: [
-                        [{ 'header': 1}],
-                        [{ 'header': 2}],
-                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                        [{ 'color': [] }],
-                        ['bold', 'italic', 'underline'],
-                        ['clean']
-                    ]
+                theme: 'snow',
+                placeholder: 'Describa los detalles de la respuesta para el estudiante.',
+                modules: {
+                    toolbar: {
+                        container: [
+                            [{ 'header': 1 }],
+                            [{ 'header': 2 }],
+                            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                            ['bold', 'italic', 'underline'],
+                            [{ 'color': [] }],
+                            [{ 'align': [] }],
+                            ['image'],
+                            ['clean']
+                        ],
+                        handlers: {
+                            image: imageHandlerFase2
+                        }
+                    }
                 }
-                });
+            });
             } else {
                 quillFase2.root.innerHTML = '';
             }
@@ -223,6 +229,83 @@ function openFase2AdminModal(btn) {
             btn.disabled = false;
         }, 200);
     }
+}
+
+function imageHandlerFase2() {
+    let input = document.createElement('input');
+
+    input.type = 'file';
+    input.accept = 'image/jpeg,image/png,image/webp';
+    input.style.display = 'none';
+
+    document.body.appendChild(input);
+    input.click();
+
+    input.onchange = async function () {
+        const file = input.files[0];
+
+        if (!file) {
+            document.body.removeChild(input);
+            return;
+        }
+
+        if (file.size > 2 * 1024 * 1024) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Imagen demasiado grande',
+                text: 'La imagen no puede superar los 2 MB.',
+                confirmButtonColor: '#C1D631',
+                confirmButtonText: 'Aceptar'
+            });
+
+            document.body.removeChild(input);
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('image', file);
+
+        try {
+            const response = await fetch(window.quillUploadUrl, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': window.csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: formData
+            });
+
+            const text = await response.text();
+
+            if (!response.ok) {
+                throw new Error(text);
+            }
+
+            const data = JSON.parse(text);
+
+            if (!data.url) {
+                throw new Error('Laravel no devolvió data.url');
+            }
+
+            const range = quillFase2.getSelection(true);
+
+            quillFase2.insertEmbed(range.index, 'image', data.url);
+            quillFase2.setSelection(range.index + 1);
+
+        } catch (error) {
+            console.error('ERROR REAL FASE 2:', error);
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Error al subir imagen',
+                html: `<small style="text-align:left;display:block;max-height:200px;overflow:auto;">${error.message}</small>`,
+                confirmButtonColor: '#C1D631',
+                confirmButtonText: 'Aceptar'
+            });
+        }
+
+        document.body.removeChild(input);
+    };
 }
 
 function closeFase2AdminModal() {
@@ -258,6 +341,18 @@ function closeFase2AdminModal() {
 // ==================== EVENTOS Y FORMULARIOS ====================
 
 $(document).ready(function() {
+
+        $('#txt-editor-fase3-dir').on('drop', function(e) {
+        e.preventDefault();
+
+        Swal.fire({
+            icon: 'warning',
+            title: 'Use el botón de imagen',
+            text: 'Para evitar errores, suba la imagen desde el botón de imagen del editor.',
+            confirmButtonColor: '#C1D631',
+            confirmButtonText: 'Aceptar'
+        });
+    });
     
     // Tooltips
     $('.tooltip-icon').on('mouseenter', function() {
@@ -317,10 +412,11 @@ $('#liquidacion_pago').on('change', function (e) {
     
 fileList.append(`
     <li class="mb-2 mt-4">
-        <div class="text-gray-600 text-sm mb-4">
-            ${file.name}
+        <div class="text-gray-600 text-sm mb-1">
+            ${escapeHtml(file.name)}
         </div>
-        <div class="text-sm ml-6 text-gray-900">
+
+        <div class="text-sm text-gray-600">
             Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_MB} MB permitidos
         </div>
     </li>
@@ -376,10 +472,11 @@ $('#soporte_pago').on('change', function (e) {
     
 fileList.append(`
     <li class="mb-2 mt-4">
-        <div class="text-gray-600 text-sm mb-4">
-            ${file.name}
+        <div class="text-gray-600 text-sm mb-1">
+            ${escapeHtml(file.name)}
         </div>
-        <div class="text-sm ml-6 text-gray-900">
+
+        <div class="text-sm text-gray-600">
             Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_MB} MB permitidos
         </div>
     </li>
@@ -473,10 +570,18 @@ $(document).ready(function() {
     // ========== RESPUESTA DEL COMITÉ (ADMIN) FASE 2 ==========
     $('#fase2AdminForm').on('submit', function(e) {
         e.preventDefault();
-        
-        if (quillFase2) {
-            $('#respuesta_fase2').val(quillFase2.root.innerHTML);
+        if (!quillFase2) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'El editor no se ha cargado correctamente.',
+                confirmButtonColor: '#C1D631',
+                confirmButtonText: 'Aceptar'
+            });
+            return;
         }
+
+        $('#respuesta_fase2').val(quillFase2.root.innerHTML);
         
         const estadoSeleccionado = $('#estado_fase2').val();
         if (!estadoSeleccionado) {
@@ -484,8 +589,9 @@ $(document).ready(function() {
             return;
         }
         
-        const mensaje = $('#respuesta_fase2').val();
-        if (!mensaje || mensaje === '<p><br></p>') {
+        const mensajeLimpio = quillFase2.getText().trim();
+
+        if (!mensajeLimpio) {
             $('#respuesta_fase2Error').text('Debe ingresar un mensaje de respuesta');
             return;
         }

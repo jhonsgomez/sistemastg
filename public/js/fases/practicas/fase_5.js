@@ -5,7 +5,6 @@ let currentFase4DetailsButton = null;
 // ==================== MODAL ESTUDIANTE FASE 5 ====================
 
 function openFase5EstudianteModal(btn) {
-    console.log('click');
     // Spinner botón
     if (btn) {
         const icon = btn.querySelector('i');
@@ -21,9 +20,9 @@ function openFase5EstudianteModal(btn) {
     $('#doc_fdc196').val('');
 
     // ================= LIMPIAR LISTAS =================
-    $('#file-list-fdc128').empty();
-    $('#file-list-fdc129').empty();
-    $('#file-list-fdc196').empty();
+    $('#file-list-doc-fdc128').empty();
+    $('#file-list-doc-fdc129').empty();
+    $('#file-list-doc-fdc196').empty();
 
     // ================= LIMPIAR ERRORES =================
     $('#doc_fdc128Error').text('');
@@ -63,6 +62,18 @@ function closeFase5EstudianteModal() {
 
 // ==================== TOOLTIPS PARA FASE 3 ====================
 $(document).ready(function() {
+
+    $('#txt-editor-fase5-dir').on('drop', function(e) {
+    e.preventDefault();
+
+    Swal.fire({
+        icon: 'warning',
+        title: 'Use el botón de imagen',
+        text: 'Para evitar errores, suba la imagen desde el botón de imagen del editor.',
+        confirmButtonColor: '#C1D631',
+        confirmButtonText: 'Aceptar'
+    });
+});
 // ==================== FDC128 DIRECTOR ====================
 
 $('#fdc128_fase5').on('change', function(e) {
@@ -110,16 +121,17 @@ $('#fdc128_fase5').on('change', function(e) {
         (file.size / (1024 * 1024)).toFixed(2)
     );
 
-    fileList.append(`
-        <li class="mb-2 mt-4">
-            <div class="text-gray-600 text-sm mb-4">
-                ${file.name}
-            </div>
-            <div class="text-sm ml-6 text-gray-900">
-                Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_MB} MB permitidos
-            </div>
-        </li>
-    `);
+fileList.append(`
+    <li class="mb-2 mt-4">
+        <div class="text-gray-600 text-sm mb-1">
+            ${file.name}
+        </div>
+
+        <div class="text-sm text-gray-600">
+            Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_MB} MB permitidos
+        </div>
+    </li>
+`);
 });
 
 // ==================== FDC129 DIRECTOR ====================
@@ -171,10 +183,11 @@ $('#fdc129_fase5').on('change', function(e) {
 
     fileList.append(`
         <li class="mb-2 mt-4">
-            <div class="text-gray-600 text-sm mb-4">
+            <div class="text-gray-600 text-sm mb-1">
                 ${file.name}
             </div>
-            <div class="text-sm ml-6 text-gray-900">
+
+            <div class="text-sm text-gray-600">
                 Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_MB} MB permitidos
             </div>
         </li>
@@ -231,10 +244,11 @@ $('#fdc196_fase5').on('change', function(e) {
 
     fileList.append(`
         <li class="mb-2 mt-4">
-            <div class="text-gray-600 text-sm mb-4">
+            <div class="text-gray-600 text-sm mb-1">
                 ${file.name}
             </div>
-            <div class="text-sm ml-6 text-gray-900">
+
+            <div class="text-sm text-gray-600">
                 Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_MB} MB permitidos
             </div>
         </li>
@@ -290,10 +304,11 @@ $('#turnitin_fase5').on('change', function(e) {
 
     fileList.append(`
         <li class="mb-2 mt-4">
-            <div class="text-gray-600 text-sm mb-4">
+            <div class="text-gray-600 text-sm mb-1">
                 ${file.name}
             </div>
-            <div class="text-sm ml-6 text-gray-900">
+
+            <div class="text-sm text-gray-600">
                 Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_MB} MB permitidos
             </div>
         </li>
@@ -305,7 +320,7 @@ $('#turnitin_fase5').on('change', function(e) {
 $('#doc_fdc128').on('change', function(e) {
 
     const file = e.target.files[0];
-    const fileList = $('#file-list-fdc128');
+    const fileList = $('#file-list-doc-fdc128');
 
     fileList.empty();
 
@@ -345,10 +360,11 @@ $('#doc_fdc128').on('change', function(e) {
 
     fileList.append(`
         <li class="mb-2 mt-4">
-            <div class="text-gray-600 text-sm mb-4">
+            <div class="text-gray-600 text-sm mb-1">
                 ${file.name}
             </div>
-            <div class="text-sm ml-6 text-gray-900">
+
+            <div class="text-sm text-gray-600">
                 Tamaño total: ${fileSizeMB} MB de ${MAX_FILE_SIZE_MB} MB permitidos
             </div>
         </li>
@@ -361,7 +377,7 @@ $('#doc_fdc128').on('change', function(e) {
 $('#doc_fdc129').on('change', function(e) {
 
     const file = e.target.files[0];
-    const fileList = $('#file-list-fdc129');
+    const fileList = $('#file-list-doc-fdc129');
 
     fileList.empty();
 
@@ -401,10 +417,11 @@ $('#doc_fdc129').on('change', function(e) {
 
     fileList.append(`
         <li class="mb-2 mt-4">
-            <div class="text-gray-600 text-sm mb-4">
+            <div class="text-gray-600 text-sm mb-1">
                 ${file.name}
             </div>
-            <div class="text-sm ml-6 text-gray-900">
+
+            <div class="text-sm text-gray-600">
                 Tamaño total: ${fileSizeMB} MB de ${MAX_FILE_SIZE_MB} MB permitidos
             </div>
         </li>
@@ -417,7 +434,7 @@ $('#doc_fdc129').on('change', function(e) {
 $('#doc_fdc196').on('change', function(e) {
 
     const file = e.target.files[0];
-    const fileList = $('#file-list-fdc196');
+    const fileList = $('#file-list-doc-fdc196');
 
     fileList.empty();
 
@@ -457,10 +474,11 @@ $('#doc_fdc196').on('change', function(e) {
 
     fileList.append(`
         <li class="mb-2 mt-4">
-            <div class="text-gray-600 text-sm mb-4">
+            <div class="text-gray-600 text-sm mb-1">
                 ${file.name}
             </div>
-            <div class="text-sm ml-6 text-gray-900">
+
+            <div class="text-sm text-gray-600">
                 Tamaño total: ${fileSizeMB} MB de ${MAX_FILE_SIZE_MB} MB permitidos
             </div>
         </li>
@@ -519,20 +537,20 @@ $('#fase5EstudianteForm').on('submit', function (e) {
 
                         const errors = xhr.responseJSON.errors;
 
-                        if (errors.doc_fdc128)
-                            $('#doc_fdc128Error').text(errors.doc_fdc128[0]);
+                     if (errors.doc_fdc128)
+                        $('#fdc128_fase5Error').text(errors.doc_fdc128[0]);
 
-                        if (errors.doc_fdc129)
-                            $('#doc_fdc129Error').text(errors.doc_fdc129[0]);
+                    if (errors.doc_fdc129)
+                        $('#fdc129_fase5Error').text(errors.doc_fdc129[0]);
 
-                        if (errors.doc_fdc196)
-                            $('#doc_fdc196Error').text(errors.doc_fdc196[0]);
+                    if (errors.doc_fdc196)
+                        $('#fdc196_fase5Error').text(errors.doc_fdc196[0]);
 
                         // limpiar errores
                         setTimeout(() => {
-                            $('#doc_fdc128Error').text('');
-                            $('#doc_fdc129Error').text('');
-                            $('#doc_fdc196Error').text('');
+                            $('#fdc128_fase5Error').text('');
+                            $('#fdc129_fase5Error').text('');
+                            $('#fdc196_fase5Error').text('');
                         }, 5000);
 
                     } else {
@@ -598,7 +616,6 @@ $(document).ready(function() {
 // Abrir modal de detalles Fase 5
 function openFase5DetailsModal(btn) {
 
-    console.log('click fase 5');
 
     // Mostrar spinner y ocultar icono
     if (btn) {
@@ -626,9 +643,7 @@ function openFase5DetailsModal(btn) {
         },
 
         success: function(response) {
-            
 
-            console.log(response);
 
             let html = `
 
@@ -849,22 +864,25 @@ function openFase5DirModal(btn) {
             if (quillFase5Dir === null) {
 
                 quillFase5Dir = new Quill('#txt-editor-fase5-dir', {
-
                     theme: 'snow',
-
                     placeholder: 'Describa los detalles de la respuesta para el estudiante.',
-
                     modules: {
-                    toolbar: [
-                        [{ 'header': 1}],
-                        [{ 'header': 2}],
-                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                        [{ 'color': [] }],
-                        ['bold', 'italic', 'underline'],
-                        ['clean']
-                    ]
-                }
-
+                        toolbar: {
+                            container: [
+                                [{ 'header': 1 }],
+                                [{ 'header': 2 }],
+                                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                ['bold', 'italic', 'underline'],
+                                [{ 'color': [] }],
+                                [{ 'align': [] }],
+                                ['image'],
+                                ['clean']
+                            ],
+                            handlers: {
+                                image: imageHandlerFase5Dir
+                            }
+                        }
+                    }
                 });
 
             } else {
@@ -899,6 +917,85 @@ function openFase5DirModal(btn) {
 
 }
 
+
+function imageHandlerFase5Dir() {
+    let input = document.createElement('input');
+
+    input.type = 'file';
+    input.accept = 'image/jpeg,image/png,image/webp';
+    input.style.display = 'none';
+
+    document.body.appendChild(input);
+    input.click();
+
+    input.onchange = async function () {
+        const file = input.files[0];
+
+        if (!file) {
+            document.body.removeChild(input);
+            return;
+        }
+
+        if (file.size > 2 * 1024 * 1024) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Imagen demasiado grande',
+                text: 'La imagen no puede superar los 2 MB.',
+                confirmButtonColor: '#C1D631',
+                confirmButtonText: 'Aceptar'
+            });
+
+            document.body.removeChild(input);
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('image', file);
+
+        try {
+            const response = await fetch(window.quillUploadUrl, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': window.csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: formData
+            });
+
+            const text = await response.text();
+
+
+            if (!response.ok) {
+                throw new Error(text);
+            }
+
+            const data = JSON.parse(text);
+
+            if (!data.url) {
+                throw new Error('Laravel no devolvió data.url');
+            }
+
+            const range = quillFase5Dir.getSelection(true);
+
+            quillFase5Dir.insertEmbed(range.index, 'image', data.url);
+            quillFase5Dir.setSelection(range.index + 1);
+
+        } catch (error) {
+            console.error('ERROR REAL FASE 5 DIR:', error);
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Error al subir imagen',
+                html: `<small style="text-align:left;display:block;max-height:200px;overflow:auto;">${error.message}</small>`,
+                confirmButtonColor: '#C1D631',
+                confirmButtonText: 'Aceptar'
+            });
+        }
+
+        document.body.removeChild(input);
+    };
+}
+
 // ==================== CERRAR MODAL ====================
 
 function closeFase5DirModal() {
@@ -920,13 +1017,24 @@ $('#fase5DirForm').on('submit', function (e) {
     e.preventDefault();
 
     // ================= GUARDAR QUILL =================
+    if (!quillFase5Dir) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'El editor no se ha cargado correctamente.',
+            confirmButtonColor: '#C1D631',
+            confirmButtonText: 'Aceptar'
+        });
+        return;
+    }
 
-    if (quillFase5Dir) {
+    $('#respuesta_fase5_dir').val(quillFase5Dir.root.innerHTML);
 
-        $('#respuesta_fase5_dir').val(
-            quillFase5Dir.root.innerHTML
-        );
+    const mensajeLimpio = quillFase5Dir.getText().trim();
 
+    if (!mensajeLimpio) {
+        $('#respuesta_fase5_dirError').text('Debe ingresar un mensaje de respuesta');
+        return;
     }
 
     // ================= VALIDAR ESTADO =================
@@ -1017,9 +1125,7 @@ $('#fase5DirForm').on('submit', function (e) {
                 // ================= ERROR =================
 
                 error: function (xhr) {
-                    console.log('STATUS:', xhr.status);
-    console.log('RESPONSE:', xhr.responseText);
-    console.log(xhr);
+
 
                     if (
                         xhr.status === 422 &&
@@ -1045,7 +1151,7 @@ $('#fase5DirForm').on('submit', function (e) {
                                 .text(errors.fdc129[0]);
 
                         if (errors.fdc196)
-                            $('#fdc196Error')
+                            $('#fdc196_fase5Error')
                                 .text(errors.fdc196[0]);
 
                         if (errors.turnitin)

@@ -188,14 +188,16 @@
             </p>
 
             @if (!empty($cuerpo['director']))
-                <p>
-                    <strong>Director asignado:</strong>
-                    {{ $cuerpo['director']->name ?? '' }}
-                    -
-                    <a href="mailto:{{ $cuerpo['director']->email ?? '' }}" class="email">
-                        {{ $cuerpo['director']->email ?? '' }}
-                    </a>
-                </p>
+                <p><strong>Director asignado:</strong></p>
+                <ul>
+                    <li><strong>Nombre:</strong> {{ $cuerpo['director']->name ?? '' }}</li>
+                    <li>
+                        <strong>Correo:</strong>
+                        <a href="mailto:{{ $cuerpo['director']->email ?? '' }}" class="email">
+                            {{ $cuerpo['director']->email ?? '' }}
+                        </a>
+                    </li>
+                </ul>
             @endif
         @else
             <p>

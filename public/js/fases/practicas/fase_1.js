@@ -33,9 +33,7 @@ function closeFase1EstudianteModal() {
     $('#nombre_empresa').val('');
     
     $('#file-list-fase1').empty();
-
-    $('#files-size-fase1').text('');
-
+    
     $('#doc_fdc126Error').text('');
 
 }
@@ -150,23 +148,32 @@ function openFase1AdminModal(btn) {
     setTimeout(function() {
         // Verificar si el elemento existe
         if ($('#txt-editor-fase1').length > 0) {
-            if (quillFase1 === null) {
-                quillFase1 = new Quill('#txt-editor-fase1', {
+            if (!window.quillFase1) {
+                window.quillFase1 = new Quill('#txt-editor-fase1', {
+                    
                     theme: 'snow',
-                    placeholder: 'Describa los detalles de la respuesta para el estudiante.',
+                    placeholder: 'Ingrese el mensaje de respuesta indicando detalles al destinatario.',
                     modules: {
-                    toolbar: [
-                        [{ 'header': 1}],
-                        [{ 'header': 2}],
-                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                        [{ 'color': [] }],
-                        ['bold', 'italic', 'underline'],
-                        ['clean']
-                    ]
-                }
+                        toolbar: {
+                            container: [
+                                [{ 'header': 1 }],
+                                [{ 'header': 2 }],
+                                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                ['bold', 'italic', 'underline'],
+                                [{ 'color': [] }],
+                                [{ 'align': [] }],
+                                ['image'],
+                                ['clean']
+                            ],
+                            handlers: {
+                                image: imageHandlerFase1
+                            }
+                        }
+                    }
                 });
-            } else {
+            }else {
                 quillFase1.root.innerHTML = '';
+                quillFase1 = window.quillFase1;
             }
             // Forzar actualización
             quillFase1.update();
@@ -185,6 +192,84 @@ function openFase1AdminModal(btn) {
             btn.disabled = false;
         }, 200);
     }
+}
+
+function imageHandlerFase1() {
+    let input = document.createElement('input');
+
+    input.type = 'file';
+    input.accept = 'image/jpeg,image/png,image/webp';
+    input.style.display = 'none';
+
+    document.body.appendChild(input);
+    input.click();
+
+    input.onchange = async function () {
+        const file = input.files[0];
+
+        if (!file) {
+            document.body.removeChild(input);
+            return;
+        }
+
+        if (file.size > 2 * 1024 * 1024) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Imagen demasiado grande',
+                text: 'La imagen no puede superar los 2 MB.',
+                confirmButtonColor: '#C1D631',
+                confirmButtonText: 'Aceptar'
+            });
+
+            document.body.removeChild(input);
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('image', file);
+
+        try {
+            const response = await fetch(window.quillUploadUrl, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': window.csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: formData
+            });
+
+            const text = await response.text();
+
+
+            if (!response.ok) {
+                throw new Error(text);
+            }
+
+            const data = JSON.parse(text);
+
+            if (!data.url) {
+                throw new Error('Laravel no devolvió data.url');
+            }
+
+            const range = window.quillFase1.getSelection(true);
+
+            window.quillFase1.insertEmbed(range.index, 'image', data.url);
+            window.quillFase1.setSelection(range.index + 1);
+
+        } catch (error) {
+            console.error('ERROR REAL:', error);
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Error al subir imagen',
+                html: `<small style="text-align:left;display:block;max-height:200px;overflow:auto;">${error.message}</small>`,
+                confirmButtonColor: '#C1D631',
+                confirmButtonText: 'Aceptar'
+            });
+        }
+
+        document.body.removeChild(input);
+    };
 }
 
 function closeFase1AdminModal() {
@@ -269,9 +354,20 @@ $('#fase1AdminForm').on('submit', function(e) {
     e.preventDefault();
     
     // Obtener el contenido del editor Quill
-    if (quillFase1) {
+        quillFase1 = window.quillFase1;
+
+        if (!quillFase1) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'El editor no se ha cargado correctamente.',
+                confirmButtonColor: '#C1D631',
+                confirmButtonText: 'Aceptar'
+            });
+            return;
+        }
+
         $('#respuesta_fase1').val(quillFase1.root.innerHTML);
-    }
     
     // Validar que haya seleccionado un estado
     const estadoSeleccionado = $('#estado_fase1').val();
@@ -386,12 +482,12 @@ $('#fase1AdminForm').on('submit', function(e) {
 
     const fileExtension = file.name.split('.').pop().toLowerCase();
 
-    if (!['doc', 'docx'].includes(fileExtension)) {
+    if (!['doc', 'docx', 'pdf'].includes(fileExtension)) {
 
         Swal.fire({
             icon: 'error',
             title: 'Archivo inválido',
-            text: 'Solo se permiten archivos Word (.doc, .docx).',
+            text: 'Solo se permiten archivos Word o Pdf (.doc, .docx, .pdf).',
             confirmButtonColor: '#C1D631',
             confirmButtonText: 'Aceptar'
         });
@@ -406,10 +502,11 @@ $('#fase1AdminForm').on('submit', function(e) {
     
 fileList.append(`
     <li class="mb-2 mt-4">
-        <div class="text-gray-600 text-sm mb-4">
-            ${file.name}
+        <div class="text-gray-600 text-sm mb-1">
+            ${escapeHtml(file.name)}
         </div>
-        <div class="text-sm ml-6 text-gray-900">
+
+        <div class="text-sm text-gray-600">
             Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_MB} MB permitidos
         </div>
     </li>

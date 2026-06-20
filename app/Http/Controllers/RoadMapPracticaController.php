@@ -123,9 +123,9 @@ class RoadMapPracticaController extends Controller
                 $fase_actual = 0;
             }
 
-            if (in_array($estado, ['Pendiente', 'Rechazada'])) {
-        return redirect()->route($rutaRetorno)
-            ->with('info', 'La práctica aún no ha sido aprobada para iniciar el seguimiento.');
+            if (in_array($estado, ['Pendiente', 'Rechazada', 'Aplazada'])) {
+                return redirect()->route($rutaRetorno)
+                ->with('info', 'La práctica aún no ha sido aprobada para iniciar el seguimiento.');
             }
 
             // Cargar TODOS los valores de campos
@@ -433,7 +433,7 @@ class RoadMapPracticaController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'practica_id' => 'required|exists:practicas,id',
-            'doc_fdc126' => 'required|file|mimes:doc,docx|max:5120',
+            'doc_fdc126' => 'required|file|mimes:doc,docx,pdf|max:8192',
         ]);
 
         if ($validator->fails()) {
@@ -549,7 +549,7 @@ class RoadMapPracticaController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'practica_id' => 'required|exists:practicas,id',
-            'estado' => 'required|in:Aprobada,Rechazada',
+            'estado' => 'required|in:Aprobada,Rechazada,Aplazada',
             'nro_acta' => 'required|string',
             'fecha_acta' => 'required|date',
             'respuesta_fase1' => 'required|string',
@@ -769,7 +769,7 @@ class RoadMapPracticaController extends Controller
     
         $validator = Validator::make($request->all(), [
             'practica_id' => 'required|exists:practicas,id',
-            'estado' => 'required|in:Aprobada,Rechazada',
+            'estado' => 'required|in:Aprobada,Rechazada,Aplazada',
             'nro_acta' => 'required|string',
             'fecha_acta' => 'required|date',
             'respuesta' => 'required|string',
@@ -954,7 +954,7 @@ class RoadMapPracticaController extends Controller
             'practica_id' => 'required|exists:practicas,id',
             'arl' => 'required|file|mimes:pdf|max:5120',
             'doc_fdc127' => 'required|file|mimes:doc,docx|max:5120',
-            'doc_fdc195' => 'required|file|mimes:doc,docx|max:5120',
+            'doc_fdc195' => 'required|file|mimes:doc,docx,pdf|max:5120',
         ], [
             'arl.required' => 'El ARL es obligatorio.',
             'arl.mimes' => 'El ARL debe ser un archivo PDF.',
@@ -965,8 +965,8 @@ class RoadMapPracticaController extends Controller
             'doc_fdc127.max' => 'El formato F-DC-127 no puede superar los 5MB.',
 
             'doc_fdc195.required' => 'El formato F-DC-195 es obligatorio.',
-            'doc_fdc195.mimes' => 'El formato F-DC-195 debe ser un archivo WORD.',
-            'doc_fdc195.max' => 'El formato F-DC-195 no puede superar los 5MB.',
+            'doc_fdc195.mimes' => 'El formato F-DC-195 debe ser un archivo Word o PDF.',
+            'doc_fdc195.max' => 'El formato F-DC-195 no puede superar los 5 MB.',
         ]);
 
         if ($validator->fails()) {
@@ -1214,7 +1214,7 @@ class RoadMapPracticaController extends Controller
             
             $validator = Validator::make($request->all(), [
                 'practica_id' => 'required|exists:practicas,id',
-                'estado' => 'required|in:Aprobada,Rechazada',
+                'estado' => 'required|in:Aprobada,Rechazada,Aplazada',
                 'fdc127' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
                 'fdc195' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
                 'turnitin' => 'nullable|file|mimes:pdf|max:5120',
@@ -1436,7 +1436,7 @@ class RoadMapPracticaController extends Controller
             
             $validator = Validator::make($request->all(), [
                 'practica_id' => 'required|exists:practicas,id',
-                'estado' => 'required|in:Aprobada,Rechazada',
+                'estado' => 'required|in:Aprobada,Rechazada,Aplazada',
                 'fdc127' => 'nullable|file|mimes:doc,docx|max:5120',
                 'fdc195' => 'nullable|file|mimes:doc,docx|max:5120',
                 'respuesta' => 'nullable|string'
@@ -1621,7 +1621,7 @@ class RoadMapPracticaController extends Controller
             
             $validator = Validator::make($request->all(), [
                 'practica_id' => 'required|exists:practicas,id',
-                'estado' => 'required|in:Aprobada,Rechazada',
+                'estado' => 'required|in:Aprobada,Rechazada,Aplazada',
                 'titulo_propuesta' => 'nullable|string|max:255',
                 'nro_acta' => 'required_if:estado,Aprobada|string',
                 'fecha_acta' => 'required_if:estado,Aprobada|date',
@@ -2209,7 +2209,7 @@ class RoadMapPracticaController extends Controller
 
                 'practica_id' => 'required|exists:practicas,id',
 
-                'estado' => 'required|in:Aprobada,Rechazada',
+                'estado' => 'required|in:Aprobada,Rechazada,Aplazada',
 
                 'fdc128' => 'nullable|file|mimes:doc,docx,pdf|max:10240',
 
@@ -2645,7 +2645,7 @@ class RoadMapPracticaController extends Controller
             
             $validator = Validator::make($request->all(), [
                 'practica_id' => 'required|exists:practicas,id',
-                'estado' => 'required|in:Aprobada,Rechazada',
+                'estado' => 'required|in:Aprobada,Rechazada,Aplazada',
                 'fdc128' => 'nullable|file|mimes:doc,docx|max:5120',
                 'fdc129' => 'nullable|file|mimes:doc,docx|max:5120',
                 'respuesta' => 'nullable|string'
@@ -2880,7 +2880,7 @@ class RoadMapPracticaController extends Controller
                 
                 $validator = Validator::make($request->all(), [
                     'practica_id' => 'required|exists:practicas,id',
-                    'estado' => 'required|in:Aprobada,Rechazada',
+                    'estado' => 'required|in:Aprobada,Rechazada,Aplazada',
                     'nro_acta' => 'required_if:estado,Aprobada|string',
                     'fecha_acta' => 'required_if:estado,Aprobada|date',
                     'fdc128' => 'nullable|file|mimes:doc,docx|max:5120',

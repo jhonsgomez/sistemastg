@@ -422,6 +422,7 @@ $mes_actual = Carbon::now()->month;
                                 class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full focus:ring-uts-500 focus:border-uts-500">
                                 <option value="" selected disabled>Selecciona una opción</option>
                                 <option value="Aprobada">Aprobada</option>
+                                <option value="Aplazada">Aplazada</option>
                                 <option value="Rechazada">Rechazada</option>
                             </select>
                             <span id="estadoError" class="text-red-500 text-sm"></span>

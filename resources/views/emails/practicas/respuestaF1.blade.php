@@ -205,7 +205,12 @@
         <p> Su práctica ha avanzado correctamente a la<strong> FASE 2</strong>.</p>
 
         <p>Se recomienda ingresar al sistema para continuarel proceso correspondiente.</p>
-    @else
+
+    @elseif($estado === 'Aplazada')
+    <p>
+        Se recomienda revisar las observaciones realizadas y enviar nuevamente la información corregida.
+    </p>
+    @elseif($estado === 'Rechazada')
         <p>
             La solicitud fue rechazada.
         </p>

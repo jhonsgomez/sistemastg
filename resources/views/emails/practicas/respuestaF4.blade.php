@@ -150,28 +150,28 @@
 
 <ul>
     <li><strong>Estado:</strong> {{ $estado }}</li>
-    <li><strong>Fecha y hora:</strong> {{ now()->format('d/m/Y H:i:s') }}</li>
+    <li><strong>Fecha y hora de envío: </strong> {{ now()->format('d/m/Y H:i:s') }}</li>
 
     @if (!empty($cuerpo['titulo_propuesta']))
-        <li><strong>Título de la propuesta:</strong> {{ $cuerpo['titulo_propuesta'] }}</li>
+        <li><strong>Título de la propuesta: </strong> {{ $cuerpo['titulo_propuesta'] }}</li>
     @endif
 
     @if (!empty($cuerpo['nro_acta']) && !empty($cuerpo['fecha_acta']))
-        <li><strong>Acta de registro:</strong> #{{ $cuerpo['nro_acta'] }} - {{ $cuerpo['fecha_acta'] }}</li>
+        <li><strong>Acta de registro: </strong> #{{ $cuerpo['nro_acta'] }} - {{ $cuerpo['fecha_acta'] }}</li>
     @endif
 </ul>
 
-<p><strong>Integrantes:</strong></p>
+<p><strong>Integrantes: </strong></p>
 
 <ul>
-    <li><strong>Nombre:</strong> {{ $cuerpo['estudiante']->name ?? '' }}</li>
+    <li><strong>Nombre: </strong> {{ $cuerpo['estudiante']->name ?? '' }}</li>
     <li>
-        <strong>Documento:</strong>
+        <strong>Documento: </strong>
         {{ optional($cuerpo['estudiante']->tipo_documento)->tag }}
         {{ $cuerpo['estudiante']->nro_documento ?? '' }}
     </li>
     <li>
-        <strong>Correo:</strong>
+        <strong>Correo: </strong>
         <a href="mailto:{{ $cuerpo['correo'] ?? '' }}" class="email">
             {{ $cuerpo['correo'] ?? '' }}
         </a>
@@ -180,15 +180,15 @@
 
     @if (!empty($cuerpo['integrante_2']))
         <br>
-        <li><strong>Nombre:</strong> {{ $cuerpo['integrante_2']->name ?? '' }}</li>
+        <li><strong>Nombre: </strong> {{ $cuerpo['integrante_2']->name ?? '' }}</li>
         <li><strong>Documento:</strong> {{ $cuerpo['integrante_2_documento'] ?? '' }}</li>
         <li>
-            <strong>Correo:</strong>
+            <strong>Correo: </strong>
             <a href="mailto:{{ $cuerpo['integrante_2_correo'] ?? '' }}" class="email">
                 {{ $cuerpo['integrante_2_correo'] ?? '' }}
             </a>
         </li>
-        <li><strong>Celular:</strong> {{ $cuerpo['integrante_2_celular'] ?? '' }}</li>
+        <li><strong>Celular: </strong> {{ $cuerpo['integrante_2_celular'] ?? '' }}</li>
     @endif
 </ul>
 

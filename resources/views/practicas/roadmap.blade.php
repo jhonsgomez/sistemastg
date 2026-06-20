@@ -168,19 +168,19 @@
                 pointer-events: auto !important;
             }
 
-    .select2-container--default .select2-selection--single {
-    height: 38px !important;
-    border: 1px solid #d1d5db !important;
-    border-radius: 0.375rem !important;
-}
+            .select2-container--default .select2-selection--single {
+            height: 38px !important;
+            border: 1px solid #d1d5db !important;
+            border-radius: 0.375rem !important;
+         }
 
-.select2-container--default .select2-selection--single .select2-selection__rendered {
-    line-height: 36px !important;
-}
+            .select2-container--default .select2-selection--single .select2-selection__rendered {
+                line-height: 36px !important;
+            }
 
-.select2-container--default .select2-selection--single .select2-selection__arrow {
-    height: 36px !important;
-}
+            .select2-container--default .select2-selection--single .select2-selection__arrow {
+                height: 36px !important;
+            }
 
         
         </style>
@@ -494,7 +494,7 @@
                             $estado_director_valor = $practica->valoresCampos->where('campo.name', 'estado_director_fase3')->first();
                             
                             $estudianteYaEnvio = $submited_fase3_valor && $submited_fase3_valor->valor == 'true';
-                            $directorYaRespondio = $estado_director_valor && ($estado_director_valor->valor == 'Aprobada' || $estado_director_valor->valor == 'Rechazada');
+                            $directorYaRespondio = $estado_director_valor && ($estado_director_valor->valor == 'Aprobada' || $estado_director_valor->valor == 'Rechazada' || $estado_director_valor->valor == 'Aplazada');
                             $directorAprobo = $estado_director_valor && $estado_director_valor->valor == 'Aprobada';
                         @endphp
 
@@ -656,7 +656,7 @@
                             // El director aprobó en Fase 3 (eso permite que el evaluador vea y responda en Fase 4)
                             $directorAproboFase3 = $estado_director_fase3_valor && $estado_director_fase3_valor->valor == 'Aprobada';
                             
-                            $evaluadorYaRespondio = $estado_evaluador_fase4_valor && ($estado_evaluador_fase4_valor->valor == 'Aprobada' || $estado_evaluador_fase4_valor->valor == 'Rechazada');
+                            $evaluadorYaRespondio = $estado_evaluador_fase4_valor && ($estado_evaluador_fase4_valor->valor == 'Aprobada' || $estado_evaluador_fase4_valor->valor == 'Rechazada' || $estado_evaluador_fase4_valor->valor == 'Aplazada');
                             $evaluadorAprobo = $estado_evaluador_fase4_valor && $estado_evaluador_fase4_valor->valor == 'Aprobada';
                         @endphp
 
@@ -930,7 +930,7 @@
                                 $estado_director_fase6_valor->valor == 'Aprobada';
 
                             $evaluadorYaRespondio = $estado_evaluador_fase6_valor &&
-                                in_array($estado_evaluador_fase6_valor->valor, ['Aprobada', 'Rechazada']);
+                                in_array($estado_evaluador_fase6_valor->valor, ['Aprobada', 'Rechazada', 'Aplazada']);
 
                             $evaluadorAprobo = $estado_evaluador_fase6_valor &&
                                 $estado_evaluador_fase6_valor->valor == 'Aprobada';
@@ -1037,7 +1037,7 @@
 
                     <i class="fa-solid fa-user-graduate" style="font-size: 36px; margin-bottom: 20px;"></i>
                     <span class="text-center font-bold text-lg">Fase Final</span>
-                    <p class="text-center mt-2text-sm mx-4">Estudiantes, director y evaluador programan sustentación.</p>
+                    <p class="text-center mt-2 text-sm mx-4">Estudiantes, director y evaluador programan sustentación.</p>
 
                     @if($fase_actual >= 7)
 
@@ -1088,7 +1088,7 @@
                                 <div class="flex items-center gap-1">
                                     <label class="flex items-center gap-1">
                                         <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
-                                        <span class="text-red-500">*</span></label>
+                                        <span class="text-red-500"></span></label>
                                         <span class="text-sm font-medium text-gray-700">¿Es práctica institucional?</span>
                                         <div class="relative inline-block mr-1">
                                             <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
@@ -1131,15 +1131,15 @@
                             <div>
                                 <div class="flex items-center gap-1 mb-2">
                                     <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
-                                    <span class="text-red-500">*</span></label>
-                                    <label class="block font-medium text-sm text-gray-700">Formato F-DC-126 
+                                    <span class="text-red-500">*</span>
+                                    <label class="block font-medium text-sm text-gray-700">Formato F-DC-126 </label>
                                     <div class="relative inline-block">
                                         <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
                                             data-tooltip="tooltip-fdc126"></i>
-                                        <div id="tooltip-fdc126"
-                                            class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg w-64">
-                                            Suba el formato F-DC-126 diligenciado (Word, máximo 5MB).
-                                        </div>
+                                            <div id="tooltip-fdc126"
+                                                class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg w-64">
+                                                Suba el formato F-DC-126 diligenciado (.doc, .docx o .pdf, máximo {{ config('practicas.peso_maximo_archivos') }} MB).
+                                            </div>
                                     </div>
                                 </div>
 
@@ -1148,7 +1148,7 @@
                                     <div class="grid gap-1">
                                         <i class="mx-auto text-4xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
                                         <h2 class="text-center text-gray-400 text-xs leading-4">
-                                            Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_archivos') }} MB
+                                            Solo archivos de WORD o PDF de máximo {{ config('practicas.peso_maximo_archivos') }} MB
                                         </h2>
                                     </div>
                                     <div class="grid gap-2">
@@ -1157,26 +1157,25 @@
                                         <div class="flex items-center justify-center">
                                             <input type="file" name="doc_fdc126" id="doc_fdc126"
                                                 class="absolute inset-0 opacity-0 cursor-pointer"
-                                                accept=".doc,.docx" />
+                                                accept=".doc,.docx,.pdf" />
                                             <div
                                                 class="flex w-28 h-9 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer">
                                                 Cargar</div>
                                         </div>
                                     </div>
                                 </div>
-                                <span id="doc_fdc126Error" class="text-red-500 text-sm"></span>
-                                <ul id="file-list-fase1" class="text-gray-600 text-sm list-disc pl-5"></ul>
-                                <ul id="files-size-fase1" class="text-gray-600 text-sm list-disc pl-5"></ul>
-                                <br>
+                                <div class="mt-4 mb-4">
+                                    <span id="doc_fdc126Error" class="block text-red-500 text-sm mb-2"></span>
+
+                                    <ul id="file-list-fase1" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
+                                </div>
 
                                 <p class="text-red-600 text-sm mb-4">
                                     <i class="fa-solid fa-circle-info mr-1"></i>
                                     <strong>NOTA:</strong> Si selecciona la opción de práctica institucional tenga en cuenta de que previamente debe estar aprobado por la coordinación.
                                 </p>
 
-                                <p class="text-sm mb-4"><strong>NOTA:</strong> El formato F-DC-126 debe estar
-                                    debidamente diligenciado y firmado.</p>
-
+                                <p class="text-sm mb-4"><strong>NOTA:</strong> El formato F-DC-126 debe estar debidamente diligenciado y firmado.</p>
                                 
                             </div>
                         </div>
@@ -1265,6 +1264,7 @@
                                 class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
                                 <option value="">Seleccione un estado</option>
                                 <option value="Aprobada">Aprobar</option>
+                                <option value="Aplazada">Aplazada</option>
                                 <option value="Rechazada">Rechazar</option>
                             </select>
                             <span id="estado_fase1Error" class="text-red-500 text-sm"></span>
@@ -1393,20 +1393,33 @@
                                 </div>
                                 <div
                                     class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
-                                    <div class="grid gap-1 text-center">
+                                    
+                                    <div class="grid gap-1">
                                         <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                        <h2 class="text-center text-gray-400 text-xs">Solo archivos de PDF de máximo {{ config('practicas.peso_maximo_archivos') }} MB</h2>
+                                        <h2 class="text-center text-gray-400 text-xs leading-4">
+                                            Solo archivos de PDF de máximo {{ config('practicas.peso_maximo_archivos') }} MB
+                                        </h2>
                                     </div>
-                                    <div class="text-center">
-                                        <input type="file" name="liquidacion_pago" id="liquidacion_pago"
-                                            class="absolute inset-0 opacity-0 cursor-pointer w-full" accept=".pdf" />
-                                        <div
-                                            class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
-                                            Cargar</div>
+
+                                    <div class="grid gap-2">
+                                        <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
+
+                                        <div class="flex items-center justify-center">
+                                            <input type="file" name="liquidacion_pago" id="liquidacion_pago"
+                                                class="absolute inset-0 opacity-0 cursor-pointer w-full" accept=".pdf" />
+
+                                            <div
+                                                class="flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                                Cargar
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <span id="liquidacion_pagoError" class="text-red-500 text-xs"></span>
-                                <ul id="file-list-liquidacion" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                                <div class="mt-4 mb-4">
+                                    <span id="liquidacion_pagoError" class="block text-red-500 text-sm mb-2"></span>
+
+                                    <ul id="file-list-liquidacion" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
+                                </div>
 
                             </div>
 
@@ -1429,20 +1442,33 @@
                                 </div>
                                 <div
                                     class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
-                                    <div class="grid gap-1 text-center">
+                                    
+                                    <div class="grid gap-1">
                                         <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                        <h2 class="text-center text-gray-400 text-xs">Solo archivos de PDF de máximo {{ config('practicas.peso_maximo_archivos') }} MB</h2>
+                                        <h2 class="text-center text-gray-400 text-xs leading-4">
+                                            Solo archivos de PDF de máximo {{ config('practicas.peso_maximo_archivos') }} MB
+                                        </h2>
                                     </div>
-                                    <div class="text-center">
-                                        <input type="file" name="soporte_pago" id="soporte_pago"
-                                            class="absolute inset-0 opacity-0 cursor-pointer w-full" accept=".pdf" />
-                                        <div
-                                            class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
-                                            Cargar</div>
+
+                                    <div class="grid gap-2">
+                                        <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
+
+                                        <div class="flex items-center justify-center">
+                                            <input type="file" name="soporte_pago" id="soporte_pago"
+                                                class="absolute inset-0 opacity-0 cursor-pointer w-full" accept=".pdf" />
+
+                                            <div
+                                                class="flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                                Cargar
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <span id="soporte_pagoError" class="text-red-500 text-xs"></span>
-                                <ul id="file-list-soporte" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                                <div class="mt-4 mb-4">
+                                    <span id="soporte_pagoError" class="block text-red-500 text-sm mb-2"></span>
+
+                                    <ul id="file-list-soporte" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
+                                </div>
                                 
                             </div>
 
@@ -1543,6 +1569,7 @@
                                 class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
                                 <option value="">Seleccione un estado</option>
                                 <option value="Aprobada">Aprobar</option>
+                                <option value="Aplazada">Aplazada</option>
                                 <option value="Rechazada">Rechazar</option>
                             </select>
                             <span id="estado_fase2Error" class="text-red-500 text-sm"></span>
@@ -1700,15 +1727,39 @@
                                     Fase 3
                                 </span>
                             </p>
-                            <p class="text-gray-950 mt-6 text-sm">En este formulario el estudiante podrá cargar los documentos requeridos para formalizar su propuesta de prácticas empresariales. Los siguientes archivos: </p>
-                            <ul class="text-gray-500 mt-6 text-sm list-disc pl-5">
-                                <li>ARL (.PDF)</li>
-                                <li>Formato propuesta de prácticas (F-DC-127)</li>
-                                <li>Acta de inicio de prácticas (F-DC-195)</li>
+                 
+                            <p class="text-gray-950 mt-6 text-sm">
+                                En este formulario el estudiante podrá cargar los documentos necesarios para continuar con la propuesta de prácticas empresariales.
+                            </p>
+
+                            <!-- Documentos requeridos para formalizar la propuesta -->
+                            <div class="flex items-center my-5">
+                                <i class="fa-regular fa-bookmark mr-1 text-gray-500 text-sm"></i>
+                                <p class="font-medium text-gray-700 flex items-center gap-2 text-sm">
+                                    <span class="text-red-500">*</span>
+                                    Documentos de la propuesta de prácticas
+                                </p>
+                            </div>
+
+                            <ul class="space-y-2 text-sm mb-4 list-disc pl-5 text-gray-500">
+                                <li class="flex items-center gap-2 flex-wrap">
+                                    <span class="text-gray-600">ARL:</span>
+                                    <span class="text-gray-500">Archivo en formato PDF.</span>
+                                </li>
+
+                                <li class="flex items-center gap-2 flex-wrap">
+                                    <span class="text-gray-600">Formato propuesta de prácticas:</span>
+                                    <span class="text-gray-500">F-DC-127.</span>
+                                </li>
+
+                                <li class="flex items-center gap-2 flex-wrap">
+                                    <span class="text-gray-600">Acta de inicio de prácticas:</span>
+                                    <span class="text-gray-500">F-DC-195.</span>
+                                </li>
                             </ul>
                         </div>
 
-                        <p class="text-sm text-gray-950"><strong>NOTA: </strong>El formato F-DC-127 y F-DC-195 debe estar debidamente diligenciado, firmado y no debe superar los 5MB en formato Word.</p>
+                        <p class="text-sm text-gray-950"><strong>NOTA: </strong>El formato F-DC-127 y F-DC-195 debe estar debidamente diligenciado, firmado y no debe superar los {{ config('practicas.peso_maximo_archivos') }} MB en formato Word.</p>
 
                         <!-- Campo ARL -->
                         <div class="mb-6">
@@ -1724,10 +1775,7 @@
                             <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
                                 <div class="grid gap-2 text-center">
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-
-                                    <h4 class="text-center text-gray-900 text-sm font-medium">
-                                        Arrastra o carga tu archivo aquí
-                                    </h4>
+                                   <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
 
                                     <h2 class="text-center text-gray-400 text-xs">
                                         Solo archivos PDF de máximo {{ config('practicas.peso_maximo_archivos') }} MB
@@ -1747,10 +1795,7 @@
                             <div class="mt-4 mb-4">
                                 <span id="arlError" class="block text-red-500 text-sm mb-2"></span>
 
-                                <div class="pl-5">
-                                    <ul id="file-list-arl" class="text-gray-600 text-sm list-disc"></ul>
-                                    <span id="files-size-arl" class="block text-gray-800 text-sm mt-2"></span>
-                                </div>
+                                <ul id="file-list-arl" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
                             </div>
 
                             <div id="tooltip-arl-fase3"
@@ -1773,10 +1818,7 @@
                             <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
                                 <div class="grid gap-2 text-center">
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-
-                                    <h4 class="text-center text-gray-900 text-sm font-medium">
-                                        Arrastra o carga tu archivo aquí
-                                    </h4>
+                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
 
                                     <h2 class="text-center text-gray-400 text-xs">
                                         Solo archivos WORD de máximo {{ config('practicas.peso_maximo_archivos') }} MB
@@ -1796,10 +1838,7 @@
                             <div class="mt-4 mb-4">
                                 <span id="doc_fdc127Error" class="block text-red-500 text-sm mb-2"></span>
 
-                                <div class="pl-5">
-                                    <ul id="file-list-fdc127" class="text-gray-600 text-sm list-disc"></ul>
-                                    <span id="files-size-fdc127" class="block text-gray-800 text-sm mt-2"></span>
-                                </div>
+                                <ul id="file-list-fdc127" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
                             </div>
 
                             <div id="tooltip-fdc127-fase3"
@@ -1823,19 +1862,17 @@
                                 <div class="grid gap-2 text-center">
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
 
-                                    <h4 class="text-center text-gray-900 text-sm font-medium">
-                                        Arrastra o carga tu archivo aquí
-                                    </h4>
+                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
 
                                     <h2 class="text-center text-gray-400 text-xs">
-                                        Solo archivos WORD de máximo {{ config('practicas.peso_maximo_archivos') }} MB
+                                        Solo archivos WORD o PDF de máximo {{ config('practicas.peso_maximo_archivos') }} MB
                                     </h2>
                                 </div>
 
                                 <div class="text-center">
                                     <input type="file" name="doc_fdc195" id="doc_fdc195"
                                         class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                                        accept=".doc,.docx" />
+                                        accept=".doc,.docx,.pdf" />
 
                                     <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
                                         Cargar
@@ -1845,15 +1882,12 @@
                             <div class="mt-4 mb-4">
                                 <span id="doc_fdc195Error" class="block text-red-500 text-sm mb-2"></span>
 
-                                <div class="pl-5">
-                                    <ul id="file-list-fdc195" class="text-gray-600 text-sm list-disc"></ul>
-                                    <span id="files-size-fdc195" class="block text-gray-800 text-sm mt-2"></span>
-                                </div>
+                                <ul id="file-list-fdc195" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
                             </div>
 
                             <div id="tooltip-fdc195-fase3"
                                 class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                                Suba el documento F-DC-195 en WORD
+                                Suba el documento F-DC-195 en WORD o PDF
                             </div>
                         </div>
 
@@ -1938,6 +1972,7 @@
                                 class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
                                 <option value="">Seleccione un estado</option>
                                 <option value="Aprobada">Aprobar</option>
+                                <option value="Aplazada">Aplazada</option>
                                 <option value="Rechazada">Rechazar</option>
                             </select>
                             <span id="estado_fase3_dirError" class="text-red-500 text-sm"></span>
@@ -1948,7 +1983,7 @@
                             <div class="flex items-center gap-2 mb-2">
                                 <label class="block font-medium text-sm text-gray-700">
                                     <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
-                                    F-DC-127
+                                    Formato F-DC-127:
                                 </label>
                                 <div class="relative inline-block">
                                     <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
@@ -1963,6 +1998,8 @@
                                     </h2>
                                 </div>
                                 <div class="text-center">
+                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
+
                                     <input type="file" name="fdc127" id="fdc127_fase3"
                                         class="absolute inset-0 opacity-0 cursor-pointer w-full"
                                         accept=".doc,.docx" />
@@ -1971,8 +2008,11 @@
                                     </div>
                                 </div>
                             </div>
-                            <span id="fdc127_fase3Error" class="text-red-500 text-xs"></span>
-                            <ul id="file-list-fdc127-fase3" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                            <div class="mt-4 mb-4">
+                                <span id="fdc127_fase3Error" class="block text-red-500 text-sm mb-2"></span>
+                                <ul id="file-list-fdc127-fase3" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
+                            </div>
+
                             <div id="tooltip-fdc127-dir-fase3"
                                 class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
                                 Suba el documento F-DC-127 firmado o con comentarios del director.
@@ -1984,7 +2024,7 @@
                             <div class="flex items-center gap-2 mb-2">
                                 <label class="block font-medium text-sm text-gray-700">
                                     <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
-                                    F-DC-195
+                                    Formato F-DC-195:
                                 </label>
                                 <div class="relative inline-block">
                                     <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
@@ -1999,6 +2039,8 @@
                                     </h2>
                                 </div>
                                 <div class="text-center">
+                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
+
                                     <input type="file" name="fdc195" id="fdc195_fase3"
                                         class="absolute inset-0 opacity-0 cursor-pointer w-full"
                                         accept=".doc,.docx" />
@@ -2007,8 +2049,11 @@
                                     </div>
                                 </div>
                             </div>
-                            <span id="fdc195_fase3Error" class="text-red-500 text-xs"></span>
-                            <ul id="file-list-fdc195-fase3" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                            <div class="mt-4 mb-4">
+                                <span id="fdc195_fase3Error" class="block text-red-500 text-sm mb-2"></span>
+                                <ul id="file-list-fdc195-fase3" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
+                            </div>
+
                             <div id="tooltip-fdc195-dir-fase3"
                                 class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
                                 Suba el acta de inicio F-DC-195 firmada o con comentarios.
@@ -2035,6 +2080,8 @@
                                     </h2>
                                 </div>
                                 <div class="text-center">
+                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
+
                                     <input type="file" name="turnitin" id="turnitin_fase3"
                                         class="absolute inset-0 opacity-0 cursor-pointer w-full"
                                         accept=".pdf" />
@@ -2043,8 +2090,11 @@
                                     </div>
                                 </div>
                             </div>
-                            <span id="turnitin_fase3Error" class="text-red-500 text-xs"></span>
-                            <ul id="file-list-turnitin-fase3" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                            <div class="mt-4 mb-4">
+                                <span id="turnitin_fase3Error" class="block text-red-500 text-sm mb-2"></span>
+
+                                <ul id="file-list-turnitin-fase3" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
+                            </div>
                             <div id="tooltip-turnitin-dir-fase3"
                                 class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
                                 Suba el informe de similitud generado por Turnitin en formato PDF.
@@ -2113,7 +2163,9 @@
                                 class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
                                 <option value="">Seleccione un estado</option>
                                 <option value="Aprobada">Aprobar</option>
+                                <option value="Aplazada">Aplazada</option>
                                 <option value="Rechazada">Rechazar</option>
+                                
                             </select>
                             <span id="estado_fase4Error" class="text-red-500 text-sm"></span>
                         </div>
@@ -2123,7 +2175,7 @@
                             <div class="flex items-center gap-2 mb-2">
                                 <label class="block font-medium text-sm text-gray-700">
                                     <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
-                                    F-DC-127
+                                    Formato F-DC-127:
                                 </label>
                                 <div class="relative inline-block">
                                     <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
@@ -2132,12 +2184,15 @@
                             </div>
                             <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
                                 <div class="grid gap-1 text-center">
+                                    
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
                                     <h2 class="text-center text-gray-400 text-xs">
                                         Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_archivos') }} MB
                                     </h2>
                                 </div>
                                 <div class="text-center">
+                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
+
                                     <input type="file" name="fdc127" id="fdc127_fase4"
                                         class="absolute inset-0 opacity-0 cursor-pointer w-full"
                                         accept=".doc,.docx" />
@@ -2146,9 +2201,10 @@
                                     </div>
                                 </div>
                             </div>
-                            <span id="fdc127_fase4Error" class="text-red-500 text-xs"></span>
-                            <ul id="file-list-fdc127-fase4" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
-                            <ul id="files-size-fdc127-fase4" class="mt-4 text-gray-600 text-xs list-disc pl-5"></ul>
+                            <div class="mt-4 mb-4">
+                                <span id="fdc127_fase4Error" class="block text-red-500 text-sm mb-2"></span>
+                                <ul id="file-list-fdc127-fase4" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
+                            </div>
 
                             <div id="tooltip-fdc127-evaluador-fase4"
                                 class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
@@ -2161,7 +2217,7 @@
                             <div class="flex items-center gap-2 mb-2">
                                 <label class="block font-medium text-sm text-gray-700">
                                     <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
-                                    F-DC-195
+                                   Formato F-DC-195:
                                 </label>
                                 <div class="relative inline-block">
                                     <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
@@ -2176,6 +2232,7 @@
                                     </h2>
                                 </div>
                                 <div class="text-center">
+                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
                                     <input type="file" name="fdc195" id="fdc195_fase4"
                                         class="absolute inset-0 opacity-0 cursor-pointer w-full"
                                         accept=".doc,.docx" />
@@ -2184,9 +2241,12 @@
                                     </div>
                                 </div>
                             </div>
-                            <span id="fdc195_fase4Error" class="text-red-500 text-xs"></span>
-                            <ul id="file-list-fdc195-fase4" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
-                            <ul id="files-size-fdc195-fase4" class="mt-4 text-gray-600 text-xs list-disc pl-5"></ul>
+                            <div class="mt-4 mb-4">
+                                <span id="fdc195_fase4Error" class="block text-red-500 text-sm mb-2"></span>
+                                <ul id="file-list-fdc195-fase4" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
+
+                            </div>
+
                             <div id="tooltip-fdc195-evaluador-fase4"
                                 class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
                                 Suba el acta de inicio F-DC-195 firmada o con comentarios del evaluador.
@@ -2252,6 +2312,7 @@
                                 class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
                                 <option value="">Seleccione un estado</option>
                                 <option value="Aprobada">Aprobar</option>
+                                <option value="Aplazada">Aplazada</option>
                                 <option value="Rechazada">Rechazar</option>
                             </select>
                             <span id="estado_fase4_comiteError" class="text-red-500 text-sm"></span>
@@ -2299,7 +2360,7 @@
                             <div class="flex items-center gap-2 mb-2">
                                 <label class="block font-medium text-sm text-gray-700">
                                     <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
-                                    F-DC-127
+                                    Formato F-DC-127:
                                 </label>
                                 <div class="relative inline-block">
                                     <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
@@ -2314,6 +2375,8 @@
                                     </h2>
                                 </div>
                                 <div class="text-center">
+                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
+
                                     <input type="file" name="fdc127" id="fdc127_fase4_comite"
                                         class="absolute inset-0 opacity-0 cursor-pointer w-full"
                                         accept=".doc,.docx" />
@@ -2322,9 +2385,11 @@
                                     </div>
                                 </div>
                             </div>
-                            <span id="fdc127_fase4_comiteError" class="text-red-500 text-xs"></span>
-                            <ul id="file-list-fdc127-fase4-comite" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
-                            <ul id="files-size-fdc127-fase4-comite" class="mt-4 text-gray-600 text-xs list-disc pl-5"></ul>
+                            <div class="mt-4 mb-4">
+                                <span id="fdc127_fase4_comiteError" class="block text-red-500 text-sm mb-2"></span>
+
+                                <ul id="file-list-fdc127-fase4-comite" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
+                            </div>
 
                             <div id="tooltip-fdc127-comite-fase4"
                                 class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
@@ -2335,7 +2400,7 @@
                             <div class="flex items-center gap-2 mb-2">
                                 <label class="block font-medium text-sm text-gray-700">
                                     <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
-                                    F-DC-195
+                                  Formato  F-DC-195:
                                 </label>
                                 <div class="relative inline-block">
                                     <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
@@ -2350,6 +2415,8 @@
                                     </h2>
                                 </div>
                                 <div class="text-center">
+                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
+
                                     <input type="file" name="fdc195" id="fdc195_fase4_comite"
                                         class="absolute inset-0 opacity-0 cursor-pointer w-full"
                                         accept=".doc,.docx" />
@@ -2358,9 +2425,11 @@
                                     </div>
                                 </div>
                             </div>
-                            <span id="fdc195_fase4_comiteError" class="text-red-500 text-xs"></span>
-                            <ul id="file-list-fdc195-fase4-comite" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
-                            <ul id="files-size-fdc195-fase4-comite" class="mt-4 text-gray-600 text-xs list-disc pl-5"></ul>
+                            <div class="mt-4 mb-4">
+                                <span id="fdc195_fase4_comiteError" class="block text-red-500 text-sm mb-2"></span>
+
+                                <ul id="file-list-fdc195-fase4-comite" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
+                            </div>
                             <div id="tooltip-fdc195-comite-fase4"
                                 class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
                                 Suba el acta de inicio F-DC-195 firmada o con comentarios del comité.
@@ -2457,7 +2526,7 @@
                             <div class="flex items-center gap-2 mb-2">
                                 <label class="block font-medium text-sm text-gray-700 mb-2">
                                     <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
-                                    <span class="text-red-500">*</span> F-DC-128
+                                    <span class="text-red-500">*</span> Formato F-DC-128:
                                 </label>
                                 <div class="relative inline-block">
                                     <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
@@ -2472,6 +2541,8 @@
                                 </div>
 
                                 <div class="text-center">
+                                     <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
+
                                     <input type="file" name="doc_fdc128" id="doc_fdc128"
                                         class="absolute inset-0 opacity-0 cursor-pointer w-full"
                                         accept=".doc,.docx" />
@@ -2482,9 +2553,11 @@
                                     </div>
                                 </div>
                             </div>
-                            
-                            <span id="doc_fdc128Error" class="text-red-500 text-xs"></span>
-                            <ul id="file-list-fdc128" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                            <div class="mt-4 mb-4">
+                                <span id="doc_fdc128Error" class="block text-red-500 text-sm mb-2"></span>
+
+                                <ul id="file-list-doc-fdc128" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
+                            </div>
                             <div id="tooltip-fdc128-fase5"
                                 class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
                                 Suba el Informe Final F-DC-128. El documento debe incluir la información completa y legible.
@@ -2497,7 +2570,7 @@
                             <div class="flex items-center gap-2 mb-2">
                                 <label class="block font-medium text-sm text-gray-700 mb-2">
                                     <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
-                                    <span class="text-red-500">*</span>F-DC-129
+                                    <span class="text-red-500">*</span>Formato F-DC-129:
                                 </label>
                                 <div class="relative inline-block">
                                     <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
@@ -2514,6 +2587,8 @@
                                 </div>
 
                                 <div class="text-center">
+                                     <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
+
                                     <input type="file" name="doc_fdc129" id="doc_fdc129"
                                         class="absolute inset-0 opacity-0 cursor-pointer w-full"
                                         accept=".doc,.docx" />
@@ -2525,8 +2600,11 @@
                                 </div>
                             </div>
 
-                            <span id="doc_fdc129Error" class="text-red-500 text-xs"></span>
-                            <ul id="file-list-fdc129" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                            <div class="mt-4 mb-4">
+                                <span id="doc_fdc129Error" class="block text-red-500 text-sm mb-2"></span>
+
+                                <ul id="file-list-doc-fdc129" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
+                            </div>
                                 <div id="tooltip-fdc129-fase5"
                                 class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
                                 Suba el documento F-DC-129 en word
@@ -2538,7 +2616,7 @@
                             <div class="flex items-center gap-2 mb-2">
                                 <label class="block font-medium text-sm text-gray-700 mb-2">
                                     <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
-                                    <span class="text-red-500">*</span> F-DC-196
+                                    <span class="text-red-500">*</span> Formato F-DC-196:
                                 </label>
                                 <div class="relative inline-block">
                                     <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
@@ -2555,6 +2633,7 @@
                                 </div>
 
                                 <div class="text-center">
+                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
                                     <input type="file" name="doc_fdc196" id="doc_fdc196"
                                         class="absolute inset-0 opacity-0 cursor-pointer w-full"
                                         accept=".doc,.docx" />
@@ -2566,8 +2645,11 @@
                                 </div>
                             </div>
 
-                            <span id="doc_fdc196Error" class="text-red-500 text-xs"></span>
-                            <ul id="file-list-fdc196" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                            <div class="mt-4 mb-4">
+                                <span id="doc_fdc196Error" class="block text-red-500 text-sm mb-2"></span>
+
+                                <ul id="file-list-doc-fdc196" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
+                            </div>
                             <div id="tooltip-fdc196-fase5"
                                 class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
                                 Suba el documento F-DC-196 en word
@@ -2735,6 +2817,7 @@
 
                                 <option value="">Seleccione un estado</option>
                                 <option value="Aprobada">Aprobar</option>
+                                <option value="Aplazada">Aplazada</option>
                                 <option value="Rechazada">Rechazar</option>
 
                             </select>
@@ -2750,7 +2833,7 @@
 
                                 <label class="block font-medium text-sm text-gray-700">
                                     <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
-                                    F-DC-128
+                                   Formato F-DC-128:
                                 </label>
 
                                 <div class="relative inline-block">
@@ -2764,7 +2847,7 @@
                                 class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
 
                                 <div class="grid gap-1 text-center">
-
+                                  
                                     <i
                                         class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
 
@@ -2775,6 +2858,7 @@
                                 </div>
 
                                 <div class="text-center">
+                                       <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
 
                                     <input
                                         type="file"
@@ -2792,11 +2876,11 @@
 
                             </div>
 
-                            <span id="fdc128_fase5Error"
-                                class="text-red-500 text-xs"></span>
+                            <div class="mt-4 mb-4">
+                                <span id="fdc128_fase5Error" class="block text-red-500 text-sm mb-2"></span>
 
-                            <ul id="file-list-fdc128-fase5"
-                                class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                                <ul id="file-list-fdc128-fase5" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
+                            </div>
 
                             <div id="tooltip-fdc128-dir-fase5"
                                 class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
@@ -2813,7 +2897,7 @@
                                 <label class="block font-medium text-sm text-gray-700">
                                     <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
                                     <span class="text-red-500">*</span>
-                                    F-DC-129
+                                    Formato F-DC-129:
                                 </label>
 
                                 <div class="relative inline-block">
@@ -2827,7 +2911,7 @@
                                 class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
 
                                 <div class="grid gap-1 text-center">
-
+                                    
                                     <i
                                         class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
 
@@ -2838,6 +2922,7 @@
                                 </div>
 
                                 <div class="text-center">
+                                       <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
 
                                     <input
                                         type="file"
@@ -2855,11 +2940,11 @@
 
                             </div>
 
-                            <span id="fdc129_fase5Error"
-                                class="text-red-500 text-xs"></span>
+                            <div class="mt-4 mb-4">
+                                <span id="fdc129_fase5Error" class="block text-red-500 text-sm mb-2"></span>
 
-                            <ul id="file-list-fdc129-fase5"
-                                class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                                <ul id="file-list-fdc129-fase5" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
+                            </div>
 
                             <div id="tooltip-fdc129-dir-fase5"
                                 class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
@@ -2876,7 +2961,7 @@
                                 <label class="block font-medium text-sm text-gray-700">
                                     <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
                                     <span class="text-red-500">*</span>
-                                    F-DC-196
+                                   Formato F-DC-196:
                                 </label>
 
                                 <div class="relative inline-block">
@@ -2901,6 +2986,7 @@
                                 </div>
 
                                 <div class="text-center">
+                                       <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
 
                                     <input
                                         type="file"
@@ -2918,11 +3004,11 @@
 
                             </div>
 
-                            <span id="fdc196_fase5Error"
-                                class="text-red-500 text-xs"></span>
+                            <div class="mt-4 mb-4">
+                                <span id="fdc196_fase5Error" class="block text-red-500 text-sm mb-2"></span>
 
-                            <ul id="file-list-fdc196-fase5"
-                                class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                                <ul id="file-list-fdc196-fase5" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
+                            </div>
 
                             <div id="tooltip-fdc196-dir-fase5"
                                 class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
@@ -2963,6 +3049,7 @@
                                 </div>
 
                                 <div class="text-center">
+                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
 
                                     <input
                                         type="file"
@@ -2980,11 +3067,11 @@
 
                             </div>
 
-                            <span id="turnitin_fase5Error"
-                                class="text-red-500 text-xs"></span>
+                            <div class="mt-4 mb-4">
+                                <span id="turnitin_fase5Error" class="block text-red-500 text-sm mb-2"></span>
 
-                            <ul id="file-list-turnitin-fase5"
-                                class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
+                                <ul id="file-list-turnitin-fase5" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
+                            </div>
 
                             <div id="tooltip-turnitin-dir-fase5"
                                 class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
@@ -3101,6 +3188,7 @@
                                 class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
                                 <option value="">Seleccione un estado</option>
                                 <option value="Aprobada">Aprobar</option>
+                                <option value="Aplazada">Aplazada</option>
                                 <option value="Rechazada">Rechazar</option>
                             </select>
 
@@ -3112,7 +3200,7 @@
                             <div class="flex items-center gap-2 mb-2">
                                 <label class="block font-medium text-sm text-gray-700">
                                     <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
-                                    F-DC-128
+                                  Formato  F-DC-128:
                                 </label>
 
                                 <div class="relative inline-block">
@@ -3132,6 +3220,7 @@
                                 </div>
 
                                 <div class="text-center">
+                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
                                     <input type="file" name="fdc128" id="fdc128_fase6"
                                         class="absolute inset-0 opacity-0 cursor-pointer w-full"
                                         accept=".doc,.docx" />
@@ -3143,10 +3232,11 @@
                                 </div>
                             </div>
 
-                            <span id="fdc128_fase6Error" class="text-red-500 text-xs"></span>
+                            <div class="mt-4 mb-4">
+                                <span id="fdc128_fase6Error" class="block text-red-500 text-sm mb-2"></span>
 
-                            <ul id="file-list-fdc128-fase6" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
-                            <ul id="files-size-fdc128-fase6" class="mt-4 text-gray-600 text-xs list-disc pl-5"></ul>
+                                <ul id="file-list-fdc128-fase6" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
+                            </div>
 
 
                             <div id="tooltip-fdc128-evaluador-fase6"
@@ -3160,7 +3250,7 @@
                             <div class="flex items-center gap-2 mb-2">
                                 <label class="block font-medium text-sm text-gray-700">
                                 <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
-                                    F-DC-129
+                                  Formato  F-DC-129:
                                 </label>
 
                                 <div class="relative inline-block">
@@ -3180,6 +3270,7 @@
                                 </div>
 
                                 <div class="text-center">
+                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
                                     <input type="file" name="fdc129" id="fdc129_fase6"
                                         class="absolute inset-0 opacity-0 cursor-pointer w-full"
                                         accept=".doc,.docx" />
@@ -3190,11 +3281,11 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="mt-4 mb-4">
+                                <span id="fdc129_fase6Error" class="block text-red-500 text-sm mb-2"></span>
 
-                            <span id="fdc129_fase6Error" class="text-red-500 text-xs"></span>
-
-                            <ul id="file-list-fdc129-fase6"class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
-                            <ul id="files-size-fdc129-fase6" class="mt-4 text-gray-600 text-xs list-disc pl-5"></ul>
+                                <ul id="file-list-fdc129-fase6" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
+                            </div>
 
                             <div id="tooltip-fdc129-evaluador-fase6"
                                 class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
@@ -3377,6 +3468,7 @@
                                 class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
                                 <option value="">Seleccione un estado</option>
                                 <option value="Aprobada">Aprobar</option>
+                                <option value="Aplazada">Aplazada</option>
                                 <option value="Rechazada">Rechazar</option>
                             </select>
 
@@ -3423,7 +3515,7 @@
                         <div class="mb-4">
                             <label class="block font-medium text-sm text-gray-700 mb-2">
                                 <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
-                                F-DC-128
+                               Formato F-DC-128:
                             </label>
 
                             <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
@@ -3437,6 +3529,7 @@
                                 </div>
 
                                 <div class="text-center">
+                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
                                     <input type="file"
                                         name="fdc128"
                                         id="fdc128_fase6_comite"
@@ -3451,11 +3544,11 @@
 
                             </div>
 
-                            <span id="fdc128_fase6_comiteError" class="text-red-500 text-xs"></span>
+                            <div class="mt-4 mb-4">
+                                <span id="fdc128_fase6_comiteError" class="block text-red-500 text-sm mb-2"></span>
 
-                            <ul id="file-list-fdc128-fase6-comite" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
-                            <ul id="files-size-fdc128-fase6-comite" class="mt-4 text-gray-600 text-xs list-disc pl-5"></ul>
-
+                                <ul id="file-list-fdc128-fase6-comite" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
+                            </div>
 
                         </div>
 
@@ -3463,7 +3556,7 @@
                         <div class="mb-4">
                             <label class="block font-medium text-sm text-gray-700 mb-2">
                                 <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
-                                F-DC-129
+                              Formato  F-DC-129:
                             </label>
 
                             <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
@@ -3477,6 +3570,7 @@
                                 </div>
 
                                 <div class="text-center">
+                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
                                     <input type="file"
                                         name="fdc129"
                                         id="fdc129_fase6_comite"
@@ -3491,11 +3585,11 @@
 
                             </div>
 
-                            <span id="fdc129_fase6_comiteError"
-                                class="text-red-500 text-xs"></span>
+                            <div class="mt-4 mb-4">
+                                <span id="fdc129_fase6_comiteError" class="block text-red-500 text-sm mb-2"></span>
 
-                            <ul id="file-list-fdc129-fase6-comite" class="mt-2 text-gray-600 text-xs list-disc pl-5"></ul>
-                            <ul id="files-size-fdc129-fase6-comite" class="mt-4 text-gray-600 text-xs list-disc pl-5"></ul>
+                                <ul id="file-list-fdc129-fase6-comite" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
+                            </div>
                         </div>
 
                         <!-- RESPUESTA -->
@@ -4340,6 +4434,12 @@
         </script>
 
         <script>
+            window.quillUploadUrl = @json(route('practicas.quill.upload'));
+            window.csrfToken = @json(csrf_token());
+        </script>
+
+        <script>
+
             // ========== REPORTE DE PROBLEMA ==========
             function openWarningModal() {
                 // Inicializar Quill para warning
@@ -4457,7 +4557,7 @@
                 const modal = document.getElementById('calendarModal');
                 if (modal) {
                     modal.classList.add('show');
-                    console.log('Modal abierto');
+        
                 } else {
                     console.error('Modal no encontrado');
                 }
@@ -4479,7 +4579,7 @@
                 const modal = document.getElementById('calendarModal');
                 if (modal) {
                     modal.classList.remove('show');
-                    console.log('Modal cerrado');
+      
                 }
             }
         </script>
@@ -4547,7 +4647,6 @@
     e.preventDefault();
     e.stopPropagation();
 
-    console.log('Formulario ICFES estudiante - Enviando AJAX');
 
     const loadingSpinner = document.getElementById('loadingSpinner-icfesEstudiante');
     const url = '/practicas/icfes';

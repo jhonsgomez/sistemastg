@@ -49,12 +49,24 @@ function openFase3EstudianteModal(btn) {
 }
 
 function closeFase3EstudianteModal() {
-    console.log('cerrar');
+
     $('#fase3EstudianteModal').removeClass('show');
 }
 
 // ==================== TOOLTIPS PARA FASE 3 ====================
 $(document).ready(function() {
+
+        $('#txt-editor-fase3-dir').on('drop', function(e) {
+        e.preventDefault();
+
+        Swal.fire({
+            icon: 'warning',
+            title: 'Use el botón de imagen',
+            text: 'Para evitar errores, suba la imagen desde el botón de imagen del editor.',
+            confirmButtonColor: '#C1D631',
+            confirmButtonText: 'Aceptar'
+        });
+    });
 
     // CAMPOS VALIDACIONES PARA DIRECTOR
 
@@ -116,10 +128,11 @@ const fileSizeMB2 = parseFloat(
     
 fileList.append(`
     <li class="mb-2 mt-4">
-        <div class="text-gray-600 text-sm mb-4">
-            ${file.name}
+        <div class="text-gray-600 text-sm mb-1">
+            ${escapeHtml(file.name)}
         </div>
-        <div class="text-sm ml-6 text-gray-900">
+
+        <div class="text-sm text-gray-600">
             Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_MB} MB permitidos
         </div>
     </li>
@@ -185,10 +198,11 @@ if (file.size > maxSizeBytes) {
     
 fileList.append(`
     <li class="mb-2 mt-4">
-        <div class="text-gray-600 text-sm mb-4">
-            ${file.name}
+        <div class="text-gray-600 text-sm mb-1">
+            ${escapeHtml(file.name)}
         </div>
-        <div class="text-sm ml-6 text-gray-900">
+
+        <div class="text-sm text-gray-600">
             Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_MB} MB permitidos
         </div>
     </li>
@@ -249,10 +263,11 @@ if (file.size > maxSizeBytes){
     
 fileList.append(`
     <li class="mb-2 mt-4">
-        <div class="text-gray-600 text-sm mb-4">
-            ${file.name}
+        <div class="text-gray-600 text-sm mb-1">
+            ${escapeHtml(file.name)}
         </div>
-        <div class="text-sm ml-6 text-gray-900">
+
+        <div class="text-sm text-gray-600">
             Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_MB} MB permitidos
         </div>
     </li>
@@ -414,10 +429,11 @@ if (file.size > maxSizeBytes){
     
 fileList.append(`
     <li class="mb-2 mt-4">
-        <div class="text-gray-600 text-sm mb-4">
-            ${file.name}
+        <div class="text-gray-600 text-sm mb-1">
+            ${escapeHtml(file.name)}
         </div>
-        <div class="text-sm ml-6 text-gray-900">
+
+        <div class="text-sm text-gray-600">
             Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_MB} MB permitidos
         </div>
     </li>
@@ -472,10 +488,11 @@ if (file.size > maxSizeBytes) {
     
 fileList.append(`
     <li class="mb-2 mt-4">
-        <div class="text-gray-600 text-sm mb-4">
-            ${file.name}
+        <div class="text-gray-600 text-sm mb-1">
+            ${escapeHtml(file.name)}
         </div>
-        <div class="text-sm ml-6 text-gray-900">
+
+        <div class="text-sm text-gray-600">
             Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_MB} MB permitidos
         </div>
     </li>
@@ -511,12 +528,12 @@ if (file.size > maxSizeBytes) {
 
     const extension = file.name.split('.').pop().toLowerCase();
 
-    if (!['doc', 'docx'].includes(extension)) {
+    if (!['doc', 'docx', 'pdf'].includes(extension)) {
 
         Swal.fire({
             icon: 'error',
             title: 'Archivo inválido',
-            text: 'Solo se permiten archivos DOC o DOCX.',
+            text: 'Solo se permiten archivos .DOC, .DOCX o .PDF.',
             confirmButtonColor: '#C1D631'
         });
 
@@ -530,10 +547,11 @@ if (file.size > maxSizeBytes) {
     
 fileList.append(`
     <li class="mb-2 mt-4">
-        <div class="text-gray-600 text-sm mb-4">
-            ${file.name}
+        <div class="text-gray-600 text-sm mb-1">
+            ${escapeHtml(file.name)}
         </div>
-        <div class="text-sm ml-6 text-gray-900">
+
+        <div class="text-sm text-gray-600">
             Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_MB} MB permitidos
         </div>
     </li>
@@ -542,7 +560,7 @@ fileList.append(`
 
 // Abrir modal de detalles con spinner en el botón (exactamente como Fase 1)
 function openFase3DetailsModal(btn) {
-    console.log('click')
+
     // Mostrar spinner y ocultar icono en el botón
     if (btn) {
         const icon = btn.querySelector('i');
@@ -561,7 +579,7 @@ function openFase3DetailsModal(btn) {
             practica_id: $('input[name="practica_id"]').first().val()
         },
         success: function(response) {
-            console.log(response);
+
             let html = `
                 <div class="flex flex-col space-y-3">
 
@@ -721,15 +739,22 @@ function openFase3DirModal(btn) {
                     theme: 'snow',
                     placeholder: 'Describa los detalles de la respuesta para el estudiante.',
                     modules: {
-                    toolbar: [
-                        [{ 'header': 1}],
-                        [{ 'header': 2}],
-                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                        [{ 'color': [] }],
-                        ['bold', 'italic', 'underline'],
-                        ['clean']
-                    ]
-                }
+                        toolbar: {
+                            container: [
+                                [{ 'header': 1 }],
+                                [{ 'header': 2 }],
+                                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                ['bold', 'italic', 'underline'],
+                                [{ 'color': [] }],
+                                [{ 'align': [] }],
+                                ['image'],
+                                ['clean']
+                            ],
+                            handlers: {
+                                image: imageHandlerFase3Dir
+                            }
+                        }
+                    }
                 });
 
             } else {
@@ -763,6 +788,84 @@ function openFase3DirModal(btn) {
     }
 }
 
+function imageHandlerFase3Dir() {
+    let input = document.createElement('input');
+
+    input.type = 'file';
+    input.accept = 'image/jpeg,image/png,image/webp';
+    input.style.display = 'none';
+
+    document.body.appendChild(input);
+    input.click();
+
+    input.onchange = async function () {
+        const file = input.files[0];
+
+        if (!file) {
+            document.body.removeChild(input);
+            return;
+        }
+
+        if (file.size > 2 * 1024 * 1024) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Imagen demasiado grande',
+                text: 'La imagen no puede superar los 2 MB.',
+                confirmButtonColor: '#C1D631',
+                confirmButtonText: 'Aceptar'
+            });
+
+            document.body.removeChild(input);
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('image', file);
+
+        try {
+            const response = await fetch(window.quillUploadUrl, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': window.csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: formData
+            });
+
+            const text = await response.text();
+
+
+            if (!response.ok) {
+                throw new Error(text);
+            }
+
+            const data = JSON.parse(text);
+
+            if (!data.url) {
+                throw new Error('Laravel no devolvió data.url');
+            }
+
+            const range = quillFase3Dir.getSelection(true);
+
+            quillFase3Dir.insertEmbed(range.index, 'image', data.url);
+            quillFase3Dir.setSelection(range.index + 1);
+
+        } catch (error) {
+            console.error('ERROR REAL FASE 3 DIR:', error);
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Error al subir imagen',
+                html: `<small style="text-align:left;display:block;max-height:200px;overflow:auto;">${error.message}</small>`,
+                confirmButtonColor: '#C1D631',
+                confirmButtonText: 'Aceptar'
+            });
+        }
+
+        document.body.removeChild(input);
+    };
+}
+
 // ==================== CERRAR MODAL ====================
 
 function closeFase3DirModal() {
@@ -781,10 +884,24 @@ $('#fase3DirForm').on('submit', function (e) {
     e.preventDefault();
 
     // Guardar contenido quill
-    if (quillFase3Dir) {
-        $('#respuesta_fase3_dir').val(
-            quillFase3Dir.root.innerHTML
-        );
+    if (!quillFase3Dir) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'El editor no se ha cargado correctamente.',
+            confirmButtonColor: '#C1D631',
+            confirmButtonText: 'Aceptar'
+        });
+        return;
+    }
+
+    $('#respuesta_fase3_dir').val(quillFase3Dir.root.innerHTML);
+
+    const mensajeLimpio = quillFase3Dir.getText().trim();
+
+    if (!mensajeLimpio) {
+        $('#respuesta_fase3_dirError').text('Debe ingresar un mensaje de respuesta');
+        return;
     }
 
     // Validar estado

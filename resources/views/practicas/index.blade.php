@@ -784,7 +784,7 @@ $mes_actual = Carbon::now()->month;
                                         </h2>
                                     </div>
                                     <div class="grid gap-2">
-                                        <h4 class="text-center text-gray-900 text-sm font-medium">Arrastra o carga tus archivos aquí</h4>
+                                        <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
                                         <div class="flex items-center justify-center">
                                             <input type="file" name="hoja_vida" id="hoja_vida"
                                                 class="absolute inset-0 opacity-0 cursor-pointer" accept=".pdf" />
@@ -925,6 +925,7 @@ $mes_actual = Carbon::now()->month;
                             class="border-gray-300 rounded-md mt-1 block w-full focus:ring-uts-500 focus:border-uts-500">
                             <option value="" selected disabled>Seleccione una opción</option>
                             <option value="Aprobada">Aprobada</option>
+                            <option value="Aplazada">Aplazada</option>
                             <option value="Rechazada">Rechazada</option>
                         </select>
                             <span id="estadoError" class="text-red-500 text-sm"></span>
@@ -1077,14 +1078,14 @@ $mes_actual = Carbon::now()->month;
                         </div>
 
                         <div class="mb-4">
-    <label for="descripcion_activar" class="block font-medium text-sm text-gray-700" style="margin-bottom: 5px;">
-        <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
-        Descripción / motivo:
-    </label>
-    <div id="txt-editor-activar" class="shadow" style="height: 200px;"></div>
-    <textarea name="descripcion_activar" id="descripcion_activar" class="hidden"></textarea>
-    <span id="descripcion_activarError" class="text-red-500 text-sm"></span>
-</div>
+                            <label for="descripcion_activar" class="block font-medium text-sm text-gray-700" style="margin-bottom: 5px;">
+                                <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                                Descripción / motivo:
+                            </label>
+                            <div id="txt-editor-activar" class="shadow" style="height: 200px;"></div>
+                            <textarea name="descripcion_activar" id="descripcion_activar" class="hidden"></textarea>
+                            <span id="descripcion_activarError" class="text-red-500 text-sm"></span>
+                        </div>
 
                         <div class="flex justify-end space-x-2">
                             <button type="button" onclick="closeActivarPracticaModal()"
@@ -1540,7 +1541,7 @@ $(document).ready(function() {
 
         if (estadoSeleccionado === 'Aprobada') {
             mensajeConfirmacion = "Esta acción no se podrá deshacer";
-        } else if (estadoSeleccionado === 'Rechazada') {
+        } else if (estadoSeleccionado === 'Rechazada' || estadoSeleccionado === 'Aplazada') {
             mensajeConfirmacion = "Esta acción no se podrá deshacer";
         }
 
@@ -2367,7 +2368,6 @@ $(document).ready(function() {
                 const modal = document.getElementById('calendarModal');
                 if (modal) {
                     modal.classList.add('show');
-                    console.log('Modal abierto');
                 } else {
                     console.error('Modal no encontrado');
                 }
@@ -2388,7 +2388,6 @@ $(document).ready(function() {
                 const modal = document.getElementById('calendarModal');
                 if (modal) {
                     modal.classList.remove('show');
-                    console.log('Modal cerrado');
                 }
             }
     </script>

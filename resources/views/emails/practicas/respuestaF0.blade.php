@@ -125,7 +125,9 @@
             Estimado usuario, en este correo se le informa que su solicitud para iniciar prácticas
             @if($estado === 'Aprobada')
                 ha pasado a <strong>{{ strtoupper($nuevoEstado) }}</strong>
-            @else
+            @elseif($estado === 'Aplazada')
+                ha sido <strong>APLAZADA</strong>
+            @elseif($estado === 'Rechazada')
                 ha sido <strong>RECHAZADA</strong>
             @endif
             :

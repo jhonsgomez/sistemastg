@@ -156,19 +156,20 @@
         <p>
             Estimado estudiante, en este correo se le informa la respuesta del director a los documentos
             correspondientes a la <strong>FASE 5</strong> de prácticas empresariales
-            @if ($estado === 'Aprobada')
-                ha sido <strong>APROBADA</strong>.
-            @elseif ($estado === 'Aplazada' || $estado === 'Aplazado')
-                ha sido <strong>APLAZADA</strong>.
-            @else
-                ha sido <strong>RECHAZADA</strong>.
-            @endif
+               @if($estado === 'Aprobada')
+                    ha pasado a <strong>{{ strtoupper($nuevoEstado) }}</strong>
+                @elseif($estado === 'Aplazada')
+                    ha sido <strong>APLAZADA</strong>
+                @elseif($estado === 'Rechazada')
+                    ha sido <strong>RECHAZADA</strong>
+                @endif
+                :
         </p>
     @endif
 
     <ul>
         <li><strong>Estado:</strong> {{ $estado }}</li>
-        <li><strong>Fecha y hora:</strong> {{ now()->format('d/m/Y H:i:s') }}</li>
+        <li><strong>Fecha y hora de envío:</strong> {{ now()->format('d/m/Y H:i:s') }}</li>
     </ul>
 
     <p><strong>Integrantes:</strong></p>
@@ -232,14 +233,16 @@
             </p>
 
             @if (!empty($cuerpo['director']))
-                <p>
-                    <strong>Director asignado:</strong>
-                    {{ $cuerpo['director']->name ?? '' }}
-                    -
-                    <a href="mailto:{{ $cuerpo['director']->email ?? '' }}" class="email">
-                        {{ $cuerpo['director']->email ?? '' }}
-                    </a>
-                </p>
+            <p><strong>Director asignado:</strong></p>
+                <ul>
+                    <li><strong>Nombre:</strong> {{ $cuerpo['director']->name ?? '' }}</li>
+                    <li>
+                        <strong>Correo:</strong>
+                        <a href="mailto:{{ $cuerpo['director']->email ?? '' }}" class="email">
+                            {{ $cuerpo['director']->email ?? '' }}
+                        </a>
+                    </li>
+                </ul>
             @endif
         @else
             <p>
