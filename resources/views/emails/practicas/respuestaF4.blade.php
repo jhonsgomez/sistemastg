@@ -16,7 +16,90 @@
         .uppercase {
             text-transform: uppercase;
         }
+        .comentarios-quill {
+            font-family: Calibri, sans-serif;
+            color: #1f2937;
+            font-size: 15px;
+            line-height: 1.5;
+            margin-top: 5px;
+        }
+
+        .comentarios-quill p {
+            margin: 0 0 8px 0;
+        }
+
+        .comentarios-quill h1 {
+            font-size: 22px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .comentarios-quill h2 {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 8px 0;
+        }
+
+        .comentarios-quill ul,
+        .comentarios-quill ol {
+            margin: 8px 0 8px 25px;
+            padding-left: 18px;
+        }
+
+        .comentarios-quill li {
+            margin-bottom: 5px;
+        }
+
+        .comentarios-quill strong {
+            font-weight: bold;
+        }
+
+        .comentarios-quill em {
+            font-style: italic;
+        }
+
+        .comentarios-quill u {
+            text-decoration: underline;
+        }
+
+        .comentarios-quill img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 12px 0;
+            border-radius: 6px;
+        }
+
+        .comentarios-quill .ql-align-center {
+            text-align: center;
+        }
+
+        .comentarios-quill .ql-align-right {
+            text-align: right;
+        }
+
+        .comentarios-quill .ql-align-justify {
+            text-align: justify;
+        }
+
+        .comentarios-quill a {
+            color: blue;
+            text-decoration: underline;
+        }
+
+        .comentarios-quill .ql-size-small {
+            font-size: 12px;
+        }
+
+        .comentarios-quill .ql-size-large {
+            font-size: 18px;
+        }
+
+        .comentarios-quill .ql-size-huge {
+            font-size: 24px;
+        }
     </style>
+    
 </head>
 
 <body>
@@ -67,28 +150,28 @@
 
 <ul>
     <li><strong>Estado:</strong> {{ $estado }}</li>
-    <li><strong>Fecha y hora:</strong> {{ now()->format('d/m/Y H:i:s') }}</li>
+    <li><strong>Fecha y hora de envío: </strong> {{ now()->format('d/m/Y H:i:s') }}</li>
 
     @if (!empty($cuerpo['titulo_propuesta']))
-        <li><strong>Título de la propuesta:</strong> {{ $cuerpo['titulo_propuesta'] }}</li>
+        <li><strong>Título de la propuesta: </strong> {{ $cuerpo['titulo_propuesta'] }}</li>
     @endif
 
     @if (!empty($cuerpo['nro_acta']) && !empty($cuerpo['fecha_acta']))
-        <li><strong>Acta de registro:</strong> #{{ $cuerpo['nro_acta'] }} - {{ $cuerpo['fecha_acta'] }}</li>
+        <li><strong>Acta de registro: </strong> #{{ $cuerpo['nro_acta'] }} - {{ $cuerpo['fecha_acta'] }}</li>
     @endif
 </ul>
 
-<p><strong>Integrantes:</strong></p>
+<p><strong>Integrantes: </strong></p>
 
 <ul>
-    <li><strong>Nombre:</strong> {{ $cuerpo['estudiante']->name ?? '' }}</li>
+    <li><strong>Nombre: </strong> {{ $cuerpo['estudiante']->name ?? '' }}</li>
     <li>
-        <strong>Documento:</strong>
+        <strong>Documento: </strong>
         {{ optional($cuerpo['estudiante']->tipo_documento)->tag }}
         {{ $cuerpo['estudiante']->nro_documento ?? '' }}
     </li>
     <li>
-        <strong>Correo:</strong>
+        <strong>Correo: </strong>
         <a href="mailto:{{ $cuerpo['correo'] ?? '' }}" class="email">
             {{ $cuerpo['correo'] ?? '' }}
         </a>
@@ -97,20 +180,29 @@
 
     @if (!empty($cuerpo['integrante_2']))
         <br>
-        <li><strong>Nombre:</strong> {{ $cuerpo['integrante_2']->name ?? '' }}</li>
+        <li><strong>Nombre: </strong> {{ $cuerpo['integrante_2']->name ?? '' }}</li>
         <li><strong>Documento:</strong> {{ $cuerpo['integrante_2_documento'] ?? '' }}</li>
         <li>
-            <strong>Correo:</strong>
+            <strong>Correo: </strong>
             <a href="mailto:{{ $cuerpo['integrante_2_correo'] ?? '' }}" class="email">
                 {{ $cuerpo['integrante_2_correo'] ?? '' }}
             </a>
         </li>
-        <li><strong>Celular:</strong> {{ $cuerpo['integrante_2_celular'] ?? '' }}</li>
+        <li><strong>Celular: </strong> {{ $cuerpo['integrante_2_celular'] ?? '' }}</li>
     @endif
 </ul>
 
-<p><strong>Respuesta:</strong></p>
-<p>{!! $cuerpo['respuesta'] ?? '' !!}</p>
+    @if (!empty($cuerpo['respuesta']))
+        <p>
+            <strong>
+                {{ $remitente === 'evaluador' ? 'Respuesta del evaluador:' : 'Respuesta del comité:' }}
+            </strong>
+        </p>
+
+        <div class="comentarios-quill">
+            {!! $cuerpo['respuesta'] !!}
+        </div>
+    @endif
 
 @if ($remitente === 'evaluador')
 

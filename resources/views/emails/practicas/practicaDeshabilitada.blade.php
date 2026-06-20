@@ -42,7 +42,7 @@
 <p>Atentamente,</p>
 
 <p>
-    Software - Prácticas Empresariales<br>
+    Comité de Trabajos de Grado<br>
     Programa de Tecnología en Desarrollo de Sistemas Informáticos e Ingeniería de Sistemas<br>
     Unidades Tecnológicas de Santander
 </p>

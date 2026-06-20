@@ -4,7 +4,7 @@ let quillFase6Evaluador = null;
 
 function openFase6EvaluadorModal(btn) {
 
-    console.log("modal fase 6");
+
 
     // ================= SPINNER BOTÓN =================
     if (btn) {
@@ -43,19 +43,26 @@ function openFase6EvaluadorModal(btn) {
         if ($('#txt-editor-fase6-evaluador').length > 0) {
             if (quillFase6Evaluador === null) {
                 quillFase6Evaluador = new Quill('#txt-editor-fase6-evaluador', {
-                    theme: 'snow',
-                    placeholder: 'Describa los detalles de la respuesta para el estudiante.',
-                    modules: {
-                    toolbar: [
-                        [{ 'header': 1}],
-                        [{ 'header': 2}],
-                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                        [{ 'color': [] }],
-                        ['bold', 'italic', 'underline'],
-                        ['clean']
-                    ]
-                }
-                });
+                        theme: 'snow',
+                        placeholder: 'Describa los detalles de la respuesta para el estudiante.',
+                        modules: {
+                            toolbar: {
+                                container: [
+                                    [{ 'header': 1 }],
+                                    [{ 'header': 2 }],
+                                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                    ['bold', 'italic', 'underline'],
+                                    [{ 'color': [] }],
+                                    [{ 'align': [] }],
+                                    ['image'],
+                                    ['clean']
+                                ],
+                                handlers: {
+                                    image: imageHandlerFase6Evaluador
+                                }
+                            }
+                        }
+                    });
             } else {
                 quillFase6Evaluador.root.innerHTML = '';
             }
@@ -75,6 +82,84 @@ function openFase6EvaluadorModal(btn) {
     }
 }
 
+function imageHandlerFase6Evaluador() {
+    let input = document.createElement('input');
+
+    input.type = 'file';
+    input.accept = 'image/jpeg,image/png,image/webp';
+    input.style.display = 'none';
+
+    document.body.appendChild(input);
+    input.click();
+
+    input.onchange = async function () {
+        const file = input.files[0];
+
+        if (!file) {
+            document.body.removeChild(input);
+            return;
+        }
+
+        if (file.size > 2 * 1024 * 1024) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Imagen demasiado grande',
+                text: 'La imagen no puede superar los 2 MB.',
+                confirmButtonColor: '#C1D631',
+                confirmButtonText: 'Aceptar'
+            });
+
+            document.body.removeChild(input);
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('image', file);
+
+        try {
+            const response = await fetch(window.quillUploadUrl, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': window.csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: formData
+            });
+
+            const text = await response.text();
+
+
+            if (!response.ok) {
+                throw new Error(text);
+            }
+
+            const data = JSON.parse(text);
+
+            if (!data.url) {
+                throw new Error('Laravel no devolvió data.url');
+            }
+
+            const range = quillFase6Evaluador.getSelection(true);
+
+            quillFase6Evaluador.insertEmbed(range.index, 'image', data.url);
+            quillFase6Evaluador.setSelection(range.index + 1);
+
+        } catch (error) {
+            console.error('ERROR REAL FASE 6 EVALUADOR:', error);
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Error al subir imagen',
+                html: `<small style="text-align:left;display:block;max-height:200px;overflow:auto;">${error.message}</small>`,
+                confirmButtonColor: '#C1D631',
+                confirmButtonText: 'Aceptar'
+            });
+        }
+
+        document.body.removeChild(input);
+    };
+}
+
 // ==================== CERRAR MODAL ====================
 
 function closeFase6EvaluadorModal() {
@@ -86,6 +171,18 @@ function closeFase6EvaluadorModal() {
 
 // ==================== DOCUMENT READY ====================
 $(document).ready(function () {
+
+    $('#txt-editor-fase6-evaluador, #txt-editor-fase6-comite').on('drop', function(e) {
+    e.preventDefault();
+
+    Swal.fire({
+        icon: 'warning',
+        title: 'Use el botón de imagen',
+        text: 'Para evitar errores, suba la imagen desde el botón de imagen del editor.',
+        confirmButtonColor: '#C1D631',
+        confirmButtonText: 'Aceptar'
+    });
+});
 
     // ==================== FDC128 EVALUADOR ====================
 
@@ -139,8 +236,8 @@ $('#fdc128_fase6').on('change', function(e) {
             <div class="text-gray-600 text-sm mb-4">
                 ${file.name}
             </div>
-            <div class="text-sm text-gray-900">
-                Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_IN} MB permitidos
+            <div class="text-sm ml-6 text-gray-900">
+                Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_MB} MB permitidos
             </div>
         </li>
     `);
@@ -198,8 +295,8 @@ $('#fdc129_fase6').on('change', function(e) {
             <div class="text-gray-600 text-sm mb-4">
                 ${file.name}
             </div>
-            <div class="text-sm text-gray-900">
-                Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_IN} MB permitidos
+            <div class="text-sm ml-6 text-gray-900">
+                Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_MB} MB permitidos
             </div>
         </li>
     `);
@@ -208,11 +305,27 @@ $('#fdc129_fase6').on('change', function(e) {
     // ==================== SUBMIT ====================
     $('#fase6EvaluadorForm').on('submit', function (e) {
         e.preventDefault();
-        console.log('responder');
+
 
         // ================= GUARDAR QUILL =================
-        if (typeof quillFase6Evaluador !== 'undefined' && quillFase6Evaluador) {
-            $('#respuesta_fase6').val(quillFase6Evaluador.root.innerHTML);
+        if (!quillFase6Evaluador) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'El editor no se ha cargado correctamente.',
+                confirmButtonColor: '#C1D631',
+                confirmButtonText: 'Aceptar'
+            });
+            return;
+        }
+
+        $('#respuesta_fase6').val(quillFase6Evaluador.root.innerHTML);
+
+        const mensajeLimpio = quillFase6Evaluador.getText().trim();
+
+        if (!mensajeLimpio) {
+            $('#respuesta_fase6Error').text('Debe ingresar un mensaje de respuesta');
+            return;
         }
 
         // ================= VALIDAR ESTADO =================
@@ -325,7 +438,6 @@ function showToast(message, type = 'success') {
     // Abrir modal de detalles Fase 6
 function openFase6DetailsModal(btn) {
 
-    console.log('click fase 6');
 
     if (btn) {
 
@@ -521,7 +633,7 @@ function closeFase6DetailsModal() {
 let quillFase6Comite = null;
 
 function openFase6ComiteModal(btn) {
-    console.log('MODAL COMITE')
+
     if (btn) {
         const icon = btn.querySelector('i');
         const spinner = btn.querySelector('.loading-spinner');
@@ -555,15 +667,22 @@ function openFase6ComiteModal(btn) {
                     theme: 'snow',
                     placeholder: 'Describa los detalles de la respuesta para el estudiante.',
                     modules: {
-                    toolbar: [
-                        [{ 'header': 1}],
-                        [{ 'header': 2}],
-                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                        [{ 'color': [] }],
-                        ['bold', 'italic', 'underline'],
-                        ['clean']
-                    ]
-                }
+                        toolbar: {
+                            container: [
+                                [{ 'header': 1 }],
+                                [{ 'header': 2 }],
+                                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                ['bold', 'italic', 'underline'],
+                                [{ 'color': [] }],
+                                [{ 'align': [] }],
+                                ['image'],
+                                ['clean']
+                            ],
+                            handlers: {
+                                image: imageHandlerFase6Comite
+                            }
+                        }
+                    }
                 });
             } else {
                 quillFase6Comite.root.innerHTML = '';
@@ -583,6 +702,84 @@ function openFase6ComiteModal(btn) {
     }
 }
 
+function imageHandlerFase6Comite() {
+    let input = document.createElement('input');
+
+    input.type = 'file';
+    input.accept = 'image/jpeg,image/png,image/webp';
+    input.style.display = 'none';
+
+    document.body.appendChild(input);
+    input.click();
+
+    input.onchange = async function () {
+        const file = input.files[0];
+
+        if (!file) {
+            document.body.removeChild(input);
+            return;
+        }
+
+        if (file.size > 2 * 1024 * 1024) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Imagen demasiado grande',
+                text: 'La imagen no puede superar los 2 MB.',
+                confirmButtonColor: '#C1D631',
+                confirmButtonText: 'Aceptar'
+            });
+
+            document.body.removeChild(input);
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('image', file);
+
+        try {
+            const response = await fetch(window.quillUploadUrl, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': window.csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: formData
+            });
+
+            const text = await response.text();
+
+
+            if (!response.ok) {
+                throw new Error(text);
+            }
+
+            const data = JSON.parse(text);
+
+            if (!data.url) {
+                throw new Error('Laravel no devolvió data.url');
+            }
+
+            const range = quillFase6Comite.getSelection(true);
+
+            quillFase6Comite.insertEmbed(range.index, 'image', data.url);
+            quillFase6Comite.setSelection(range.index + 1);
+
+        } catch (error) {
+            console.error('ERROR REAL FASE 6 COMITÉ:', error);
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Error al subir imagen',
+                html: `<small style="text-align:left;display:block;max-height:200px;overflow:auto;">${error.message}</small>`,
+                confirmButtonColor: '#C1D631',
+                confirmButtonText: 'Aceptar'
+            });
+        }
+
+        document.body.removeChild(input);
+    };
+}
+
 function closeFase6ComiteModal() {
     $('#fase6ComiteModal').removeClass('show');
     if (quillFase6Comite) {
@@ -592,6 +789,17 @@ function closeFase6ComiteModal() {
 
 // Submit del formulario del Comité
 $(document).ready(function() {
+    $('#txt-editor-fase6-evaluador, #txt-editor-fase6-comite').on('drop', function(e) {
+    e.preventDefault();
+
+    Swal.fire({
+        icon: 'warning',
+        title: 'Use el botón de imagen',
+        text: 'Para evitar errores, suba la imagen desde el botón de imagen del editor.',
+        confirmButtonColor: '#C1D631',
+        confirmButtonText: 'Aceptar'
+    });
+});
     // Vista previa de archivos
     $('#fdc128_fase6_comite').on('change', function(e) {
 
@@ -637,14 +845,13 @@ $(document).ready(function() {
     const fileSizeMB2 = parseFloat(
         (file.size / (1024 * 1024)).toFixed(2)
     );
-
     fileList.append(`
         <li class="mb-2 mt-4">
             <div class="text-gray-600 text-sm mb-4">
                 ${file.name}
             </div>
-            <div class="text-sm text-gray-900">
-                Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_IN} MB permitidos
+            <div class="text-sm ml-6 text-gray-900">
+                Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_MB} MB permitidos
             </div>
         </li>
     `);
@@ -700,8 +907,8 @@ $(document).ready(function() {
             <div class="text-gray-600 text-sm mb-4">
                 ${file.name}
             </div>
-            <div class="text-sm text-gray-900">
-                Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_IN} MB permitidos
+            <div class="text-sm ml-6 text-gray-900">
+                Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_MB} MB permitidos
             </div>
         </li>
     `);
@@ -710,8 +917,24 @@ $(document).ready(function() {
     $('#fase6ComiteForm').on('submit', function(e) {
         e.preventDefault();
         
-        if (quillFase6Comite) {
-            $('#respuesta_fase6_comite').val(quillFase6Comite.root.innerHTML);
+        if (!quillFase6Comite) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'El editor no se ha cargado correctamente.',
+                confirmButtonColor: '#C1D631',
+                confirmButtonText: 'Aceptar'
+            });
+            return;
+        }
+
+        $('#respuesta_fase6_comite').val(quillFase6Comite.root.innerHTML);
+
+        const mensajeLimpio = quillFase6Comite.getText().trim();
+
+        if (!mensajeLimpio) {
+            $('#respuesta_fase6_comiteError').text('Debe ingresar un mensaje de respuesta');
+            return;
         }
         
         const estado = $('#estado_fase6_comite').val();

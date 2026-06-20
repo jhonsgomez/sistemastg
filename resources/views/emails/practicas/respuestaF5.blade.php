@@ -17,7 +17,123 @@
         .uppercase {
             text-transform: uppercase;
         }
+
+        .comentarios-quill {
+            font-family: Calibri, sans-serif;
+            color: #1f2937;
+            font-size: 15px;
+            line-height: 1.5;
+            margin-top: 5px;
+        }
+
+        .comentarios-quill p {
+            margin: 0 0 8px 0;
+        }
+
+        .comentarios-quill h1 {
+            font-size: 22px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .comentarios-quill h2 {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 8px 0;
+        }
+
+        .comentarios-quill ul,
+        .comentarios-quill ol {
+            margin: 8px 0 8px 25px;
+            padding-left: 18px;
+        }
+
+        .comentarios-quill li {
+            margin-bottom: 5px;
+        }
+
+        .comentarios-quill strong {
+            font-weight: bold;
+        }
+
+        .comentarios-quill em {
+            font-style: italic;
+        }
+
+        .comentarios-quill u {
+            text-decoration: underline;
+        }
+
+        .comentarios-quill img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 12px 0;
+            border-radius: 6px;
+        }
+
+        .comentarios-quill .ql-align-center {
+            text-align: center;
+        }
+
+        .comentarios-quill .ql-align-right {
+            text-align: right;
+        }
+
+        .comentarios-quill .ql-align-justify {
+            text-align: justify;
+        }
+
+        .comentarios-quill a {
+            color: blue;
+            text-decoration: underline;
+        }
+
+        .comentarios-quill blockquote {
+            border-left: 4px solid #d1d5db;
+            margin: 10px 0;
+            padding-left: 12px;
+            color: #4b5563;
+        }
+
+        .comentarios-quill pre {
+            background: #f3f4f6;
+            padding: 10px;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+
+        .comentarios-quill code {
+            background: #f3f4f6;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+
+        .comentarios-quill .ql-size-small {
+            font-size: 12px;
+        }
+
+        .comentarios-quill .ql-size-large {
+            font-size: 18px;
+        }
+
+        .comentarios-quill .ql-size-huge {
+            font-size: 24px;
+        }
+
+        .comentarios-quill .ql-indent-1 {
+            padding-left: 3em;
+        }
+
+        .comentarios-quill .ql-indent-2 {
+            padding-left: 6em;
+        }
+
+        .comentarios-quill .ql-indent-3 {
+            padding-left: 9em;
+        }
     </style>
+    
 </head>
 
 <body>
@@ -40,15 +156,20 @@
         <p>
             Estimado estudiante, en este correo se le informa la respuesta del director a los documentos
             correspondientes a la <strong>FASE 5</strong> de prácticas empresariales
-            {!! $estado === 'Aprobada'
-                ? 'ha sido <strong>APROBADA</strong>.'
-                : 'ha sido <strong>RECHAZADA</strong>.' !!}
+               @if($estado === 'Aprobada')
+                    ha pasado a <strong>{{ strtoupper($nuevoEstado) }}</strong>
+                @elseif($estado === 'Aplazada')
+                    ha sido <strong>APLAZADA</strong>
+                @elseif($estado === 'Rechazada')
+                    ha sido <strong>RECHAZADA</strong>
+                @endif
+                :
         </p>
     @endif
 
     <ul>
         <li><strong>Estado:</strong> {{ $estado }}</li>
-        <li><strong>Fecha y hora:</strong> {{ now()->format('d/m/Y H:i:s') }}</li>
+        <li><strong>Fecha y hora de envío:</strong> {{ now()->format('d/m/Y H:i:s') }}</li>
     </ul>
 
     <p><strong>Integrantes:</strong></p>
@@ -95,9 +216,13 @@
         @endif
     </ul>
 
-    <p><strong>Respuesta del director:</strong></p>
+    @if (!empty($cuerpo['respuesta']))
+        <p><strong>Respuesta del director:</strong></p>
 
-    <p>{!! $cuerpo['respuesta'] ?? '' !!}</p>
+        <div class="comentarios-quill">
+            {!! $cuerpo['respuesta'] !!}
+        </div>
+    @endif
 
     @if ($estado === 'Aprobada')
 
@@ -108,14 +233,16 @@
             </p>
 
             @if (!empty($cuerpo['director']))
-                <p>
-                    <strong>Director asignado:</strong>
-                    {{ $cuerpo['director']->name ?? '' }}
-                    -
-                    <a href="mailto:{{ $cuerpo['director']->email ?? '' }}" class="email">
-                        {{ $cuerpo['director']->email ?? '' }}
-                    </a>
-                </p>
+            <p><strong>Director asignado:</strong></p>
+                <ul>
+                    <li><strong>Nombre:</strong> {{ $cuerpo['director']->name ?? '' }}</li>
+                    <li>
+                        <strong>Correo:</strong>
+                        <a href="mailto:{{ $cuerpo['director']->email ?? '' }}" class="email">
+                            {{ $cuerpo['director']->email ?? '' }}
+                        </a>
+                    </li>
+                </ul>
             @endif
         @else
             <p>

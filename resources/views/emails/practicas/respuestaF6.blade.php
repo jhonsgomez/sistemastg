@@ -17,6 +17,71 @@
         .uppercase {
             text-transform: uppercase;
         }
+        .comentarios-quill {
+            font-family: Calibri, sans-serif;
+            color: #1f2937;
+            font-size: 15px;
+            line-height: 1.5;
+            margin-top: 5px;
+        }
+
+        .comentarios-quill p {
+            margin: 0 0 8px 0;
+        }
+
+        .comentarios-quill h1 {
+            font-size: 22px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .comentarios-quill h2 {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 8px 0;
+        }
+
+        .comentarios-quill ul,
+        .comentarios-quill ol {
+            margin: 8px 0 8px 25px;
+            padding-left: 18px;
+        }
+
+        .comentarios-quill li {
+            margin-bottom: 5px;
+        }
+
+        .comentarios-quill strong {
+            font-weight: bold;
+        }
+
+        .comentarios-quill em {
+            font-style: italic;
+        }
+
+        .comentarios-quill u {
+            text-decoration: underline;
+        }
+
+        .comentarios-quill img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 12px 0;
+            border-radius: 6px;
+        }
+
+        .comentarios-quill .ql-align-center {
+            text-align: center;
+        }
+
+        .comentarios-quill .ql-align-right {
+            text-align: right;
+        }
+
+        .comentarios-quill .ql-align-justify {
+            text-align: justify;
+        }
     </style>
 </head>
 
@@ -59,16 +124,20 @@
             <strong class="uppercase">COMITÉ DE TRABAJOS DE GRADO</strong>
             ha revisado los documentos correspondientes a la <strong>FASE 6</strong>
             de prácticas empresariales
-            {!! $estado === 'Aprobada'
-                ? 'y ha <strong>FINALIZADO</strong> el proceso de prácticas empresariales.'
-                : 'y la solicitud ha sido <strong>RECHAZADA</strong>.' !!}
+            @if($estado === 'Aprobada')
+                y ha <strong>FINALIZADO</strong> el proceso de prácticas empresariales.
+            @elseif($estado === 'Aplazada')
+                y la solicitud ha sido <strong>APLAZADA</strong>.
+            @elseif($estado === 'Rechazada')
+                y la solicitud ha sido <strong>RECHAZADA</strong>.
+            @endif
         </p>
 
     @endif
 
     <ul>
         <li><strong>Estado:</strong> {{ $estado }}</li>
-        <li><strong>Fecha y hora:</strong> {{ now()->format('d/m/Y H:i:s') }}</li>
+        <li><strong>Fecha y hora de envío:</strong> {{ now()->format('d/m/Y H:i:s') }}</li>
 
         @if (!empty($cuerpo['nro_acta']) && !empty($cuerpo['fecha_acta']))
             <li>
@@ -122,9 +191,17 @@
         @endif
     </ul>
 
-    <p><strong>Respuesta:</strong></p>
+    @if (!empty($cuerpo['respuesta']))
+        <p>
+            <strong>
+                {{ $remitente === 'evaluador' ? 'Respuesta del evaluador:' : 'Respuesta del comité:' }}
+            </strong>
+        </p>
 
-    <p>{!! $cuerpo['respuesta'] ?? '' !!}</p>
+        <div class="comentarios-quill">
+            {!! $cuerpo['respuesta'] !!}
+        </div>
+    @endif
 
     @if ($remitente === 'evaluador')
 

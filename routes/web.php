@@ -230,6 +230,8 @@ Route::middleware([
             Route::post('/deshabilitar-con-acta', [PracticaController::class, 'deshabilitarConActa'])->name('practicas.deshabilitar_con_acta');
             Route::post('/habilitar-con-acta', [PracticaController::class, 'habilitarConActa'])->name('practicas.habilitar_con_acta');
             Route::post('/reportar-problema', [PracticaController::class, 'reportarProblema'])->name('practicas.reportar_problema');
+            Route::post('/quill/upload', [PracticaController::class, 'uploadQuillImage'])->name('practicas.quill.upload');
+
 
             // Rutas para Fase 1 del roadmap
             Route::post('/fase1/store', [RoadMapPracticaController::class, 'storeFase1'])->name('practicas.fase1.store');

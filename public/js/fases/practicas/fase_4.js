@@ -4,8 +4,6 @@ let quillFase4Evaluador = null;
 
 function openFase4EvaluadorModal(btn) {
 
-    console.log("modal fase 4");
-
     // ================= SPINNER BOTÓN =================
     if (btn) {
         const icon = btn.querySelector('i');
@@ -42,20 +40,28 @@ function openFase4EvaluadorModal(btn) {
     setTimeout(function () {
         if ($('#txt-editor-fase4-evaluador').length > 0) {
             if (quillFase4Evaluador === null) {
-                quillFase4Evaluador = new Quill('#txt-editor-fase4-evaluador', {
-                    theme: 'snow',
-                    placeholder: 'Describa los detalles de la respuesta para el estudiante.',
-                    modules: {
-                    toolbar: [
-                        [{ 'header': 1}],
-                        [{ 'header': 2}],
-                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                        [{ 'color': [] }],
-                        ['bold', 'italic', 'underline'],
-                        ['clean']
-                    ]
-                }
-                });
+                    quillFase4Evaluador = new Quill('#txt-editor-fase4-evaluador', {
+                        theme: 'snow',
+                        placeholder: 'Describa los detalles de la respuesta para el estudiante.',
+                        modules: {
+                            toolbar: {
+                                container: [
+                                    [{ 'header': 1 }],
+                                    [{ 'header': 2 }],
+                                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                    ['bold', 'italic', 'underline'],
+                                    [{ 'color': [] }],
+                                    [{ 'align': [] }],
+                                    ['image'],
+                                    ['clean']
+                                ],
+                                handlers: {
+                                    image: imageHandlerFase4Evaluador
+                                }
+                            }
+                        }
+                    });
+       
             } else {
                 quillFase4Evaluador.root.innerHTML = '';
             }
@@ -73,6 +79,83 @@ function openFase4EvaluadorModal(btn) {
             btn.disabled = false;
         }, 200);
     }
+}
+
+function imageHandlerFase4Evaluador() {
+    let input = document.createElement('input');
+
+    input.type = 'file';
+    input.accept = 'image/jpeg,image/png,image/webp';
+    input.style.display = 'none';
+
+    document.body.appendChild(input);
+    input.click();
+
+    input.onchange = async function () {
+        const file = input.files[0];
+
+        if (!file) {
+            document.body.removeChild(input);
+            return;
+        }
+
+        if (file.size > 2 * 1024 * 1024) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Imagen demasiado grande',
+                text: 'La imagen no puede superar los 2 MB.',
+                confirmButtonColor: '#C1D631',
+                confirmButtonText: 'Aceptar'
+            });
+
+            document.body.removeChild(input);
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('image', file);
+
+        try {
+            const response = await fetch(window.quillUploadUrl, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': window.csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: formData
+            });
+
+            const text = await response.text();
+
+            if (!response.ok) {
+                throw new Error(text);
+            }
+
+            const data = JSON.parse(text);
+
+            if (!data.url) {
+                throw new Error('Laravel no devolvió data.url');
+            }
+
+            const range = quillFase4Evaluador.getSelection(true);
+
+            quillFase4Evaluador.insertEmbed(range.index, 'image', data.url);
+            quillFase4Evaluador.setSelection(range.index + 1);
+
+        } catch (error) {
+            console.error('ERROR REAL FASE 4 EVALUADOR:', error);
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Error al subir imagen',
+                html: `<small style="text-align:left;display:block;max-height:200px;overflow:auto;">${error.message}</small>`,
+                confirmButtonColor: '#C1D631',
+                confirmButtonText: 'Aceptar'
+            });
+        }
+
+        document.body.removeChild(input);
+    };
 }
 
 // ==================== CERRAR MODAL ====================
@@ -132,10 +215,9 @@ function closeFase4EvaluadorModal() {
     const fileSizeMB2 = parseFloat(
         (file.size / (1024 * 1024)).toFixed(2)
     );
-
     fileList.append(`
         <li class="mb-2 mt-4">
-            <div class="text-gray-600 text-sm mb-4">
+            <div class="text-gray-600 text-sm mb-1">
                 ${file.name}
             </div>
             <div class="text-sm text-gray-900">
@@ -191,10 +273,9 @@ function closeFase4EvaluadorModal() {
     const fileSizeMB2 = parseFloat(
         (file.size / (1024 * 1024)).toFixed(2)
     );
-
     fileList.append(`
         <li class="mb-2 mt-4">
-            <div class="text-gray-600 text-sm mb-4">
+            <div class="text-gray-600 text-sm mb-1">
                 ${file.name}
             </div>
             <div class="text-sm text-gray-900">
@@ -207,16 +288,43 @@ function closeFase4EvaluadorModal() {
 // ==================== DOCUMENT READY ====================
 $(document).ready(function () {
 
+    $('#txt-editor-fase4-evaluador, #txt-editor-fase4-comite').on('drop', function(e) {
+    e.preventDefault();
+
+    Swal.fire({
+        icon: 'warning',
+        title: 'Use el botón de imagen',
+        text: 'Para evitar errores, suba la imagen desde el botón de imagen del editor.',
+        confirmButtonColor: '#C1D631',
+        confirmButtonText: 'Aceptar'
+    });
+});
+
     // ==================== SUBMIT ====================
     $('#fase4EvaluadorForm').on('submit', function (e) {
         e.preventDefault();
-        console.log('responder');
 
 
 
         // ================= GUARDAR QUILL =================
-        if (typeof quillFase4Evaluador !== 'undefined' && quillFase4Evaluador) {
-            $('#respuesta_fase4').val(quillFase4Evaluador.root.innerHTML);
+        if (!quillFase4Evaluador) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'El editor no se ha cargado correctamente.',
+                confirmButtonColor: '#C1D631',
+                confirmButtonText: 'Aceptar'
+            });
+            return;
+        }
+
+        $('#respuesta_fase4').val(quillFase4Evaluador.root.innerHTML);
+
+        const mensajeLimpio = quillFase4Evaluador.getText().trim();
+
+        if (!mensajeLimpio) {
+            $('#respuesta_fase4Error').text('Debe ingresar un mensaje de respuesta');
+            return;
         }
 
         // ================= VALIDAR ESTADO =================
@@ -366,15 +474,22 @@ function openFase4ComiteModal(btn) {
                     theme: 'snow',
                     placeholder: 'Describa los detalles de la respuesta para el estudiante.',
                     modules: {
-                    toolbar: [
-                        [{ 'header': 1}],
-                        [{ 'header': 2}],
-                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                        [{ 'color': [] }],
-                        ['bold', 'italic', 'underline'],
-                        ['clean']
-                    ]
-                }
+                        toolbar: {
+                            container: [
+                                [{ 'header': 1 }],
+                                [{ 'header': 2 }],
+                                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                ['bold', 'italic', 'underline'],
+                                [{ 'color': [] }],
+                                [{ 'align': [] }],
+                                ['image'],
+                                ['clean']
+                            ],
+                            handlers: {
+                                image: imageHandlerFase4Comite
+                            }
+                        }
+                    }
                 });
             } else {
                 quillFase4Comite.root.innerHTML = '';
@@ -392,6 +507,84 @@ function openFase4ComiteModal(btn) {
             btn.disabled = false;
         }, 200);
     }
+}
+
+function imageHandlerFase4Comite() {
+    let input = document.createElement('input');
+
+    input.type = 'file';
+    input.accept = 'image/jpeg,image/png,image/webp';
+    input.style.display = 'none';
+
+    document.body.appendChild(input);
+    input.click();
+
+    input.onchange = async function () {
+        const file = input.files[0];
+
+        if (!file) {
+            document.body.removeChild(input);
+            return;
+        }
+
+        if (file.size > 2 * 1024 * 1024) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Imagen demasiado grande',
+                text: 'La imagen no puede superar los 2 MB.',
+                confirmButtonColor: '#C1D631',
+                confirmButtonText: 'Aceptar'
+            });
+
+            document.body.removeChild(input);
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('image', file);
+
+        try {
+            const response = await fetch(window.quillUploadUrl, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': window.csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: formData
+            });
+
+            const text = await response.text();
+
+
+            if (!response.ok) {
+                throw new Error(text);
+            }
+
+            const data = JSON.parse(text);
+
+            if (!data.url) {
+                throw new Error('Laravel no devolvió data.url');
+            }
+
+            const range = quillFase4Comite.getSelection(true);
+
+            quillFase4Comite.insertEmbed(range.index, 'image', data.url);
+            quillFase4Comite.setSelection(range.index + 1);
+
+        } catch (error) {
+            console.error('ERROR REAL FASE 4 COMITÉ:', error);
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Error al subir imagen',
+                html: `<small style="text-align:left;display:block;max-height:200px;overflow:auto;">${error.message}</small>`,
+                confirmButtonColor: '#C1D631',
+                confirmButtonText: 'Aceptar'
+            });
+        }
+
+        document.body.removeChild(input);
+    };
 }
 
 function closeFase4ComiteModal() {
@@ -451,7 +644,7 @@ $(document).ready(function() {
 
     fileList.append(`
         <li class="mb-2 mt-4">
-            <div class="text-gray-600 text-sm mb-4">
+            <div class="text-gray-600 text-sm mb-1">
                 ${file.name}
             </div>
             <div class="text-sm text-gray-900">
@@ -521,8 +714,24 @@ $(document).ready(function() {
     $('#fase4ComiteForm').on('submit', function(e) {
         e.preventDefault();
         
-        if (quillFase4Comite) {
-            $('#respuesta_fase4_comite').val(quillFase4Comite.root.innerHTML);
+        if (!quillFase4Comite) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'El editor no se ha cargado correctamente.',
+                confirmButtonColor: '#C1D631',
+                confirmButtonText: 'Aceptar'
+            });
+            return;
+        }
+
+        $('#respuesta_fase4_comite').val(quillFase4Comite.root.innerHTML);
+
+        const mensajeLimpio = quillFase4Comite.getText().trim();
+
+        if (!mensajeLimpio) {
+            $('#respuesta_fase4_comiteError').text('Debe ingresar un mensaje de respuesta');
+            return;
         }
         
         const estado = $('#estado_fase4_comite').val();
@@ -555,6 +764,7 @@ $(document).ready(function() {
         Swal.fire({
             heightAuto: false,
             title: '¿Está seguro?',
+            text: mensajeConfirmacion,
             text: mensajeConfirmacion,
             icon: 'warning',
             showCancelButton: true,

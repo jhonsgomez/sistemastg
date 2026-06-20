@@ -33,7 +33,7 @@
 <p>Buen día,</p>
 
 <p>
-    Estimado estudiante, en este correo se le informa que su práctica empresarial
+    Estimado estudiante, en este correo se le informa que su práctica
     se encuentra próxima a finalizar.
 </p>
 

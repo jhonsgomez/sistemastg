@@ -25,6 +25,88 @@
             color: blue;
             text-decoration: underline;
         }
+        .comentarios-quill {
+            font-family: Calibri, sans-serif;
+            color: #1f2937;
+            font-size: 15px;
+            line-height: 1.5;
+            margin-top: 5px;
+        }
+
+        .comentarios-quill p {
+            margin: 0 0 8px 0;
+        }
+
+        .comentarios-quill h1 {
+            font-size: 22px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .comentarios-quill h2 {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 8px 0;
+        }
+
+        .comentarios-quill ul,
+        .comentarios-quill ol {
+            margin: 8px 0 8px 25px;
+            padding-left: 18px;
+        }
+
+        .comentarios-quill li {
+            margin-bottom: 5px;
+        }
+
+        .comentarios-quill strong {
+            font-weight: bold;
+        }
+
+        .comentarios-quill em {
+            font-style: italic;
+        }
+
+        .comentarios-quill u {
+            text-decoration: underline;
+        }
+
+        .comentarios-quill img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 12px 0;
+            border-radius: 6px;
+        }
+
+        .comentarios-quill .ql-align-center {
+            text-align: center;
+        }
+
+        .comentarios-quill .ql-align-right {
+            text-align: right;
+        }
+
+        .comentarios-quill .ql-align-justify {
+            text-align: justify;
+        }
+
+        .comentarios-quill a {
+            color: blue;
+            text-decoration: underline;
+        }
+
+        .comentarios-quill .ql-size-small {
+            font-size: 12px;
+        }
+
+        .comentarios-quill .ql-size-large {
+            font-size: 18px;
+        }
+
+        .comentarios-quill .ql-size-huge {
+            font-size: 24px;
+        }
        
     </style>
 
@@ -43,7 +125,9 @@
             Estimado usuario, en este correo se le informa que su solicitud para iniciar prácticas
             @if($estado === 'Aprobada')
                 ha pasado a <strong>{{ strtoupper($nuevoEstado) }}</strong>
-            @else
+            @elseif($estado === 'Aplazada')
+                ha sido <strong>APLAZADA</strong>
+            @elseif($estado === 'Rechazada')
                 ha sido <strong>RECHAZADA</strong>
             @endif
             :
@@ -103,34 +187,20 @@
             <p>Se le recomienda ingresar al sistema para volver a realizar su solicitud.</p>
         @endif
 
-
-        {{-- CAMPOS DINÁMICOS --}}
-        @forelse ($data['cuerpo_correo']['campos'] as $campo)
-            @if (!in_array($campo['campo'], ['id_integrante_2', 'tiene_empresa', 'periodo', 'hoja_vida', 'respuesta_comite', 'submited_fase0']))
-                <li>
-                    <strong>
-                        {{ ucfirst(str_replace('_', ' ', $campo['campo'] ?? '')) }}:
-                    </strong>
-                    {{ $campo['valor'] ?? '' }}
-                </li>
-            @endif
-            @empty
-   
-        @endforelse
-
         @if (!empty($data['comentarios']))
-            <p><strong>Comentarios: </strong>{{ strip_tags($data['comentarios']) }}</p>
+            <p><strong>Comentarios:</strong></p>
+
+            <div class="comentarios-quill">
+                {!! $data['comentarios'] !!}
+            </div>
         @endif
 
         <div class="footer">
-
             <br>
-
             <p>
                 Este es un correo generado automáticamente por el sistema de prácticas,
                 por favor no responder.
             </p>
-
             <br>
 
             <p>Atentamente,</p>

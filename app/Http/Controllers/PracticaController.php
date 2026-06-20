@@ -25,6 +25,8 @@ use App\Models\Fecha;
 use App\Services\PracticaMailService;
 use App\Services\PracticaService;
 use App\Http\Requests\StorePracticaRequest;
+use Illuminate\Support\Facades\Storage;
+
 
 
 class PracticaController extends Controller
@@ -43,6 +45,19 @@ class PracticaController extends Controller
 
         $this->practicaService =
             $practicaService;
+    }
+
+    public function uploadQuillImage(Request $request)
+    {
+        $request->validate([
+            'image' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+        ]);
+
+        $path = $request->file('image')->store('quill/practicas', 'public');
+
+        return response()->json([
+            'url' => asset('storage/' . $path)
+        ]);
     }
 
     public function index(Request $request)
@@ -348,6 +363,9 @@ if ($request->has('search') && $search = $request->input('search.value')) {
         if (in_array($searchLower, ['rechazada', 'rechazado'])) {
             $q->orWhere('estado', 'Rechazada');
         }
+        if (in_array($searchLower, ['aplazada', 'aplazado'])) {
+            $q->orWhere('estado', 'Aplazada');
+        }
 
         if (in_array($searchLower, ['finalizado', 'finalizada'])) {
             $q->orWhere('estado', 'Finalizado');
@@ -542,7 +560,10 @@ if ($request->has('search') && $search = $request->input('search.value')) {
                         return 'Práctica empresarial finalizada';
 
                     case 'Rechazada':
-                        return 'Solicitud de prácticas rechazada';
+                    return 'Solicitud de prácticas rechazada';
+
+                    case 'Aplazada':
+                        return 'Solicitud de prácticas aplazada';
 
                     default:
                         return 'Solicitud de prácticas empresariales';
@@ -571,11 +592,17 @@ if ($request->has('search') && $search = $request->input('search.value')) {
                 
                 // Badge para beneficiario ICFES (solo estudiantes en Fase 5 o 6)
                 $badge_beneficiario_icfes = '<span class="shadow bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded border border-blue-300">Beneficiario ICFES</span>';
-                
+               
+                if ($p->estado === 'Aplazada') {
+                    $badge = "<span class='shadow bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded border border-yellow-300'>Aplazada</span>";
+                    return $return_html . $badge . "</div>";
+                }
+
                 if ($p->estado === 'Rechazada') {
                     $badge = "<span class='shadow bg-red-100 text-red-800 text-sm font-medium px-2.5 py-0.5 rounded border border-red-300'>Rechazada</span>";
                     return $return_html . $badge . "</div>";
                 }
+
                 
                 $htmlEstado = '';
 
@@ -974,7 +1001,7 @@ if ($request->has('search') && $search = $request->input('search.value')) {
     {
         $validator = Validator::make($request->all(), [
             'solicitudPractica_id' => 'required',
-            'estado'               => 'required|in:Aprobada,Rechazada',
+            'estado'               => 'required|in:Aprobada,Rechazada,Aplazada',
             'mensaje'              => 'required',
         ]);
 
@@ -1017,8 +1044,8 @@ if ($request->has('search') && $search = $request->input('search.value')) {
             };
              $this->practicaMailService->sendRespuesta($practica,$estadoActual,$nuevoEstado,$request->mensaje,$request->estado);
         } else {
-            // Si es rechazada, el nuevo estado es 'Rechazada'
-            $nuevoEstado = 'Rechazada';
+            // Si es rechazada o aplazada, el nuevo estado es 'Rechazada' o 'Aplazada'
+            $nuevoEstado = $request->estado;
             $this->practicaMailService->sendRespuesta($practica,$estadoActual,$nuevoEstado,$request->mensaje,$request->estado);
         }
 
@@ -1237,314 +1264,314 @@ if ($request->has('search') && $search = $request->input('search.value')) {
     }
 
     private function getFechasPropuesta($practica)
-{
-    $fechas = [
-        'envio_estudiante' => 'No disponible',
-        'revision_director' => 'No disponible', 
-        'revision_evaluador' => 'No disponible'
-    ];
-    
-    // 1. Envío de propuesta (estudiante) - submited_fase3
-    $campoEnvio = $practica->valoresCampos->where('campo.name', 'submited_fase3')->first();
-    if ($campoEnvio && $campoEnvio->valor === 'true' && $campoEnvio->updated_at) {
-        $fechas['envio_estudiante'] = $campoEnvio->updated_at->format('d/m/Y, H:i');
+    {
+        $fechas = [
+            'envio_estudiante' => 'No disponible',
+            'revision_director' => 'No disponible', 
+            'revision_evaluador' => 'No disponible'
+        ];
+        
+        // 1. Envío de propuesta (estudiante) - submited_fase3
+        $campoEnvio = $practica->valoresCampos->where('campo.name', 'submited_fase3')->first();
+        if ($campoEnvio && $campoEnvio->valor === 'true' && $campoEnvio->updated_at) {
+            $fechas['envio_estudiante'] = $campoEnvio->updated_at->format('d/m/Y, H:i');
+        }
+        
+        // 2. Revisión director - estado_director_fase3 (solo si fue aprobado)
+        $campoDirector = $practica->valoresCampos->where('campo.name', 'estado_director_fase3')->first();
+        if ($campoDirector && $campoDirector->valor === 'Aprobada' && $campoDirector->updated_at) {
+            $fechas['revision_director'] = $campoDirector->updated_at->format('d/m/Y, H:i');
+        }
+        
+        // 3. Revisión evaluador - estado_evaluador_fase4 (solo si fue aprobado)
+        $campoEvaluador = $practica->valoresCampos->where('campo.name', 'estado_evaluador_fase4')->first();
+        if ($campoEvaluador && $campoEvaluador->valor === 'Aprobada' && $campoEvaluador->updated_at) {
+            $fechas['revision_evaluador'] = $campoEvaluador->updated_at->format('d/m/Y, H:i');
+        }
+        
+        return $fechas;
     }
-    
-    // 2. Revisión director - estado_director_fase3 (solo si fue aprobado)
-    $campoDirector = $practica->valoresCampos->where('campo.name', 'estado_director_fase3')->first();
-    if ($campoDirector && $campoDirector->valor === 'Aprobada' && $campoDirector->updated_at) {
-        $fechas['revision_director'] = $campoDirector->updated_at->format('d/m/Y, H:i');
-    }
-    
-    // 3. Revisión evaluador - estado_evaluador_fase4 (solo si fue aprobado)
-    $campoEvaluador = $practica->valoresCampos->where('campo.name', 'estado_evaluador_fase4')->first();
-    if ($campoEvaluador && $campoEvaluador->valor === 'Aprobada' && $campoEvaluador->updated_at) {
-        $fechas['revision_evaluador'] = $campoEvaluador->updated_at->format('d/m/Y, H:i');
-    }
-    
-    return $fechas;
-}
 
-private function getFechasInforme($practica)
-{
-    $fechas = [
-        'envio_estudiante' => 'No disponible',
-        'revision_director' => 'No disponible',
-        'revision_evaluador' => 'No disponible'
-    ];
-    
-    // 1. Envío de informe (estudiante) - submited_fase5
-    $campoEnvio = $practica->valoresCampos->where('campo.name', 'submited_fase5')->first();
-    if ($campoEnvio && $campoEnvio->valor === 'true' && $campoEnvio->updated_at) {
-        $fechas['envio_estudiante'] = $campoEnvio->updated_at->format('d/m/Y, H:i');
+    private function getFechasInforme($practica)
+    {
+        $fechas = [
+            'envio_estudiante' => 'No disponible',
+            'revision_director' => 'No disponible',
+            'revision_evaluador' => 'No disponible'
+        ];
+        
+        // 1. Envío de informe (estudiante) - submited_fase5
+        $campoEnvio = $practica->valoresCampos->where('campo.name', 'submited_fase5')->first();
+        if ($campoEnvio && $campoEnvio->valor === 'true' && $campoEnvio->updated_at) {
+            $fechas['envio_estudiante'] = $campoEnvio->updated_at->format('d/m/Y, H:i');
+        }
+        
+        // 2. Revisión director - estado_director_fase5 (solo si fue aprobado)
+        $campoDirector = $practica->valoresCampos->where('campo.name', 'estado_director_fase5')->first();
+        if ($campoDirector && $campoDirector->valor == 'Aprobada' && $campoDirector->updated_at) {
+            $fechas['revision_director'] = $campoDirector->updated_at->format('d/m/Y, H:i');
+        }
+        
+        // 3. Revisión evaluador - estado_evaluador_fase6 (solo si fue aprobado)
+        $campoEvaluador = $practica->valoresCampos->where('campo.name', 'estado_evaluador_fase6')->first();
+        if ($campoEvaluador && $campoEvaluador->valor == 'Aprobada' && $campoEvaluador->updated_at) {
+            $fechas['revision_evaluador'] = $campoEvaluador->updated_at->format('d/m/Y, H:i');
+        }
+        
+        return $fechas;
     }
-    
-    // 2. Revisión director - estado_director_fase5 (solo si fue aprobado)
-    $campoDirector = $practica->valoresCampos->where('campo.name', 'estado_director_fase5')->first();
-    if ($campoDirector && $campoDirector->valor == 'Aprobada' && $campoDirector->updated_at) {
-        $fechas['revision_director'] = $campoDirector->updated_at->format('d/m/Y, H:i');
-    }
-    
-    // 3. Revisión evaluador - estado_evaluador_fase6 (solo si fue aprobado)
-    $campoEvaluador = $practica->valoresCampos->where('campo.name', 'estado_evaluador_fase6')->first();
-    if ($campoEvaluador && $campoEvaluador->valor == 'Aprobada' && $campoEvaluador->updated_at) {
-        $fechas['revision_evaluador'] = $campoEvaluador->updated_at->format('d/m/Y, H:i');
-    }
-    
-    return $fechas;
-}
 
     public function generarReportePracticas(Request $request)
-{
-    try {
-        $validator = Validator::make($request->all(), [
-            'periodo_reporte' => 'required',
-        ], [
-            'periodo_reporte.required' => 'El campo periodo es obligatorio',
-        ]);
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'periodo_reporte' => 'required',
+            ], [
+                'periodo_reporte.required' => 'El campo periodo es obligatorio',
+            ]);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
 
-        $periodo = $request->periodo_reporte;
-        
-        // Crear directorio si no existe
-        $formatosPath = public_path('formatos');
-        if (!file_exists($formatosPath)) {
-            mkdir($formatosPath, 0777, true);
-        }
-        
-        $formato_reporte = $formatosPath . '/informe_practicas.xlsx';
+            $periodo = $request->periodo_reporte;
+            
+            // Crear directorio si no existe
+            $formatosPath = public_path('formatos');
+            if (!file_exists($formatosPath)) {
+                mkdir($formatosPath, 0777, true);
+            }
+            
+            $formato_reporte = $formatosPath . '/informe_practicas.xlsx';
 
-        // Si no existe el formato, crear uno nuevo
-        if (!file_exists($formato_reporte)) {
-            $spreadsheet = new Spreadsheet();
+            // Si no existe el formato, crear uno nuevo
+            if (!file_exists($formato_reporte)) {
+                $spreadsheet = new Spreadsheet();
+                $sheet = $spreadsheet->getActiveSheet();
+                
+                // Título
+                $sheet->mergeCells('A1:R1');
+                $sheet->setCellValue('A1', 'Unidades Tecnológicas de Santander');
+                $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+                $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                
+                $sheet->mergeCells('A2:R2');
+                $sheet->setCellValue('A2', 'Informe de prácticas empresariales');
+                $sheet->getStyle('A2')->getFont()->setBold(true)->setSize(12);
+                $sheet->getStyle('A2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                
+                $sheet->mergeCells('A3:R3');
+                $sheet->setCellValue('A3', 'Ingeniería de sistemas');
+                $sheet->getStyle('A3')->getFont()->setBold(true)->setSize(12);
+                $sheet->getStyle('A3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                
+                // Encabezados
+                $headers = [
+                    'ID', 'Código modalidad', 'Título del proyecto', 'Modalidad', 
+                    'Nivel académico', 'Línea de investigación', 'Tipo de idea', 
+                    'Estado', 'Integrantes', 'Documento', 'Correo electrónico', 
+                    'Celular', 'Director', 'Evaluador', 'Actas de registro', 
+                    'Inicio Práctica', 'Aprobación Propuesta', 'Fin Práctica'
+                ];
+                
+                $col = 'A';
+                foreach ($headers as $header) {
+                    $sheet->setCellValue($col . '5', $header);
+                    $sheet->getStyle($col . '5')->getFont()->setBold(true);
+                    $sheet->getStyle($col . '5')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                    $sheet->getColumnDimension($col)->setWidth(20);
+                    $col++;
+                }
+                
+                // Guardar el formato
+                $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+                $writer->save($formato_reporte);
+            }
+
+            // Cargar el archivo de Excel existente
+            $spreadsheet = IOFactory::load($formato_reporte);
             $sheet = $spreadsheet->getActiveSheet();
-            
-            // Título
-            $sheet->mergeCells('A1:R1');
-            $sheet->setCellValue('A1', 'Unidades Tecnológicas de Santander');
-            $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
-            $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            
-            $sheet->mergeCells('A2:R2');
-            $sheet->setCellValue('A2', 'Informe de prácticas empresariales');
-            $sheet->getStyle('A2')->getFont()->setBold(true)->setSize(12);
-            $sheet->getStyle('A2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            
-            $sheet->mergeCells('A3:R3');
-            $sheet->setCellValue('A3', 'Ingeniería de sistemas');
-            $sheet->getStyle('A3')->getFont()->setBold(true)->setSize(12);
-            $sheet->getStyle('A3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            
-            // Encabezados
-            $headers = [
-                'ID', 'Código modalidad', 'Título del proyecto', 'Modalidad', 
-                'Nivel académico', 'Línea de investigación', 'Tipo de idea', 
-                'Estado', 'Integrantes', 'Documento', 'Correo electrónico', 
-                'Celular', 'Director', 'Evaluador', 'Actas de registro', 
-                'Inicio Práctica', 'Aprobación Propuesta', 'Fin Práctica'
-            ];
-            
-            $col = 'A';
-            foreach ($headers as $header) {
-                $sheet->setCellValue($col . '5', $header);
-                $sheet->getStyle($col . '5')->getFont()->setBold(true);
-                $sheet->getStyle($col . '5')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-                $sheet->getColumnDimension($col)->setWidth(20);
-                $col++;
-            }
-            
-            // Guardar el formato
-            $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
-            $writer->save($formato_reporte);
-        }
+            $fila = 6;
 
-        // Cargar el archivo de Excel existente
-        $spreadsheet = IOFactory::load($formato_reporte);
-        $sheet = $spreadsheet->getActiveSheet();
-        $fila = 6;
-
-        // ============ CONSULTA SIMPLIFICADA ============
-        // Traer TODAS las prácticas con estados válidos
-        $practicas = Practica::with(['user', 'user.nivel', 'valoresCampos.campo'])
-            ->whereIn('estado', ['Fase 2', 'Fase 3', 'Fase 4', 'Fase 5', 'Fase 6', 'Finalizado'])
-            ->get();
-
-        foreach ($practicas as $practica) {
-            $campos = $practica->valoresCampos->pluck('valor', 'campo.name')->toArray();
-
-            // Obtener el periodo de la práctica
-            $periodoPractica = $campos['periodo'] ?? 'No disponible';
-            
-            // Si la práctica no tiene el periodo seleccionado o no coincide con el filtro, la saltamos
-            if ($periodoPractica !== $periodo) {
-                continue;
-            }
-
-            $id = 'GRA-00' . $practica->id;
-            $codigo_modalidad = $campos['codigo_modalidad'] ?? 'No disponible';
-            $titulo = mb_strtoupper($this->getTituloPractica($practica)) ?? 'No disponible';
-            
-            $modalidad = 'Prácticas empresariales';
-            $nivel = $practica->user->nivel->nombre ?? 'No disponible';
-            $linea_investigacion = $campos['linea_investigacion'] ?? 'No disponible';
-            $tipo_idea = $campos['tipo_idea'] ?? 'No disponible';
-            
-            $estado = $practica->estado ?? 'No disponible';
-            if ($practica->vencido) $estado .= ' (Vencido)';
-            if ($practica->deshabilitado) $estado .= ' (Deshabilitado)';
-
-            // Integrantes
-            $integrante_1_id = $practica->user_id;
-            $integrante_2_id = $campos['id_integrante_2'] ?? null;
-
-            $beneficiarios_icfes = $campos['beneficiarios_icfes_practicas'] ?? '[]';
-            $beneficiarios_icfes = json_decode($beneficiarios_icfes, true) ?? [];
-
-            $integrantes = '';
-            $documentos = '';
-            $emails = '';
-            $nros_celulares = '';
-
-            // Integrante 1
-            if ($integrante_1_id) {
-                $integrante_1 = User::find($integrante_1_id);
-                if ($integrante_1) {
-                    $tipo_documento = TipoDocumento::find($integrante_1->tipo_documento_id);
-                    $documento = ($tipo_documento ? $tipo_documento->tag : 'CC') . " " . ($integrante_1->nro_documento ?? 'N/A');
-                    
-                    $integrantes = mb_strtoupper($integrante_1->name);
-                    $documentos = $documento;
-                    $emails = $integrante_1->email ?? 'N/A';
-                    $nros_celulares = $integrante_1->nro_celular ?? 'N/A';
-
-                    if ($beneficiarios_icfes && in_array($integrante_1->id, $beneficiarios_icfes)) {
-                        $integrantes .= ' - BENEFICIARIO ICFES';
-                    }
-                }
-            }
-
-            // Integrante 2
-            if ($integrante_2_id) {
-                $integrante_2 = User::find($integrante_2_id);
-                if ($integrante_2) {
-                    $tipo_documento = TipoDocumento::find($integrante_2->tipo_documento_id);
-                    $documento = ($tipo_documento ? $tipo_documento->tag : 'CC') . " " . ($integrante_2->nro_documento ?? 'N/A');
-                    
-                    $integrantes .= "\n" . mb_strtoupper($integrante_2->name);
-                    $documentos .= "\n" . $documento;
-                    $emails .= "\n" . ($integrante_2->email ?? 'N/A');
-                    $nros_celulares .= "\n" . ($integrante_2->nro_celular ?? 'N/A');
-
-                    if ($beneficiarios_icfes && in_array($integrante_2->id, $beneficiarios_icfes)) {
-                        $integrantes .= ' - BENEFICIARIO ICFES';
-                    }
-                }
-            }
-
-            // Director
-            $director_id = $campos['director_id'] ?? null;
-            $director = 'No disponible';
-            if ($director_id) {
-                $director_user = User::find($director_id);
-                $director = $director_user ? mb_strtoupper($director_user->name) : 'No disponible';
-            }
-
-            // Evaluador
-            $evaluador_id = $campos['evaluador_id'] ?? null;
-            $evaluador = 'No disponible';
-            if ($evaluador_id) {
-                $evaluador_user = User::find($evaluador_id);
-                $evaluador = $evaluador_user ? mb_strtoupper($evaluador_user->name) : 'No disponible';
-            }
-
-            // Actas
-            $actas = ActaPractica::where('practica_id', $practica->id)
-                ->orderBy('numero', 'asc')
+            // ============ CONSULTA SIMPLIFICADA ============
+            // Traer TODAS las prácticas con estados válidos
+            $practicas = Practica::with(['user', 'user.nivel', 'valoresCampos.campo'])
+                ->whereIn('estado', ['Fase 2', 'Fase 3', 'Fase 4', 'Fase 5', 'Fase 6', 'Finalizado'])
                 ->get();
 
-            $actas_registro = $actas->map(function ($acta) {
-                $fecha = Carbon::parse($acta->fecha);
-                return "Nro. {$acta->numero} - Fecha: {$fecha->format('d-m-Y')} - {$acta->descripcion}";
-            })->implode("\n");
+            foreach ($practicas as $practica) {
+                $campos = $practica->valoresCampos->pluck('valor', 'campo.name')->toArray();
 
-            // Fechas
-            $inicio_practica = $actas->firstWhere('descripcion', 'Aprobación del pago de la modalidad');
-            $inicio_practica = $inicio_practica ? Carbon::parse($inicio_practica->fecha)->format('d-m-Y') : 'No disponible';
-            
-            $aprobacion_propuesta = $actas->firstWhere('descripcion', 'Aprobación de la propuesta');
-            $aprobacion_propuesta = $aprobacion_propuesta ? Carbon::parse($aprobacion_propuesta->fecha)->format('d-m-Y') : 'No disponible';
-            
-            $fin_practica = $actas->firstWhere('descripcion', 'Aprobación del informe final');
-            $fin_practica = $fin_practica ? Carbon::parse($fin_practica->fecha)->format('d-m-Y') : 'No disponible';
+                // Obtener el periodo de la práctica
+                $periodoPractica = $campos['periodo'] ?? 'No disponible';
+                
+                // Si la práctica no tiene el periodo seleccionado o no coincide con el filtro, la saltamos
+                if ($periodoPractica !== $periodo) {
+                    continue;
+                }
 
-            // Insertar valores
-            $sheet->setCellValue("A{$fila}", $id);
-            $sheet->setCellValue("B{$fila}", $codigo_modalidad);
-            $sheet->setCellValue("C{$fila}", $titulo);
-            $sheet->setCellValue("D{$fila}", $modalidad);
-            $sheet->setCellValue("E{$fila}", $nivel);
-            $sheet->setCellValue("F{$fila}", $linea_investigacion);
-            $sheet->setCellValue("G{$fila}", $tipo_idea);
-            $sheet->setCellValue("H{$fila}", $estado);
-            $sheet->setCellValue("I{$fila}", $integrantes);
-            $sheet->setCellValue("J{$fila}", $documentos);
-            $sheet->setCellValue("K{$fila}", $emails);
-            $sheet->setCellValue("L{$fila}", $nros_celulares);
-            $sheet->setCellValue("M{$fila}", $director);
-            $sheet->setCellValue("N{$fila}", $evaluador);
-            $sheet->setCellValue("O{$fila}", $actas_registro);
-            $sheet->setCellValue("P{$fila}", $inicio_practica);
-            $sheet->setCellValue("Q{$fila}", $aprobacion_propuesta);
-            $sheet->setCellValue("R{$fila}", $fin_practica);
+                $id = 'GRA-00' . $practica->id;
+                $codigo_modalidad = $campos['codigo_modalidad'] ?? 'No disponible';
+                $titulo = mb_strtoupper($this->getTituloPractica($practica)) ?? 'No disponible';
+                
+                $modalidad = 'Prácticas empresariales';
+                $nivel = $practica->user->nivel->nombre ?? 'No disponible';
+                $linea_investigacion = $campos['linea_investigacion'] ?? 'No disponible';
+                $tipo_idea = $campos['tipo_idea'] ?? 'No disponible';
+                
+                $estado = $practica->estado ?? 'No disponible';
+                if ($practica->vencido) $estado .= ' (Vencido)';
+                if ($practica->deshabilitado) $estado .= ' (Deshabilitado)';
 
-            // Aplicar estilos
-            foreach (range('A', 'R') as $col) {
-                $sheet->getStyle("{$col}{$fila}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
-                $sheet->getStyle("{$col}{$fila}")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
-                $sheet->getStyle("{$col}{$fila}")->getAlignment()->setWrapText(true);
+                // Integrantes
+                $integrante_1_id = $practica->user_id;
+                $integrante_2_id = $campos['id_integrante_2'] ?? null;
+
+                $beneficiarios_icfes = $campos['beneficiarios_icfes_practicas'] ?? '[]';
+                $beneficiarios_icfes = json_decode($beneficiarios_icfes, true) ?? [];
+
+                $integrantes = '';
+                $documentos = '';
+                $emails = '';
+                $nros_celulares = '';
+
+                // Integrante 1
+                if ($integrante_1_id) {
+                    $integrante_1 = User::find($integrante_1_id);
+                    if ($integrante_1) {
+                        $tipo_documento = TipoDocumento::find($integrante_1->tipo_documento_id);
+                        $documento = ($tipo_documento ? $tipo_documento->tag : 'CC') . " " . ($integrante_1->nro_documento ?? 'N/A');
+                        
+                        $integrantes = mb_strtoupper($integrante_1->name);
+                        $documentos = $documento;
+                        $emails = $integrante_1->email ?? 'N/A';
+                        $nros_celulares = $integrante_1->nro_celular ?? 'N/A';
+
+                        if ($beneficiarios_icfes && in_array($integrante_1->id, $beneficiarios_icfes)) {
+                            $integrantes .= ' - BENEFICIARIO ICFES';
+                        }
+                    }
+                }
+
+                // Integrante 2
+                if ($integrante_2_id) {
+                    $integrante_2 = User::find($integrante_2_id);
+                    if ($integrante_2) {
+                        $tipo_documento = TipoDocumento::find($integrante_2->tipo_documento_id);
+                        $documento = ($tipo_documento ? $tipo_documento->tag : 'CC') . " " . ($integrante_2->nro_documento ?? 'N/A');
+                        
+                        $integrantes .= "\n" . mb_strtoupper($integrante_2->name);
+                        $documentos .= "\n" . $documento;
+                        $emails .= "\n" . ($integrante_2->email ?? 'N/A');
+                        $nros_celulares .= "\n" . ($integrante_2->nro_celular ?? 'N/A');
+
+                        if ($beneficiarios_icfes && in_array($integrante_2->id, $beneficiarios_icfes)) {
+                            $integrantes .= ' - BENEFICIARIO ICFES';
+                        }
+                    }
+                }
+
+                // Director
+                $director_id = $campos['director_id'] ?? null;
+                $director = 'No disponible';
+                if ($director_id) {
+                    $director_user = User::find($director_id);
+                    $director = $director_user ? mb_strtoupper($director_user->name) : 'No disponible';
+                }
+
+                // Evaluador
+                $evaluador_id = $campos['evaluador_id'] ?? null;
+                $evaluador = 'No disponible';
+                if ($evaluador_id) {
+                    $evaluador_user = User::find($evaluador_id);
+                    $evaluador = $evaluador_user ? mb_strtoupper($evaluador_user->name) : 'No disponible';
+                }
+
+                // Actas
+                $actas = ActaPractica::where('practica_id', $practica->id)
+                    ->orderBy('numero', 'asc')
+                    ->get();
+
+                $actas_registro = $actas->map(function ($acta) {
+                    $fecha = Carbon::parse($acta->fecha);
+                    return "Nro. {$acta->numero} - Fecha: {$fecha->format('d-m-Y')} - {$acta->descripcion}";
+                })->implode("\n");
+
+                // Fechas
+                $inicio_practica = $actas->firstWhere('descripcion', 'Aprobación del pago de la modalidad');
+                $inicio_practica = $inicio_practica ? Carbon::parse($inicio_practica->fecha)->format('d-m-Y') : 'No disponible';
+                
+                $aprobacion_propuesta = $actas->firstWhere('descripcion', 'Aprobación de la propuesta');
+                $aprobacion_propuesta = $aprobacion_propuesta ? Carbon::parse($aprobacion_propuesta->fecha)->format('d-m-Y') : 'No disponible';
+                
+                $fin_practica = $actas->firstWhere('descripcion', 'Aprobación del informe final');
+                $fin_practica = $fin_practica ? Carbon::parse($fin_practica->fecha)->format('d-m-Y') : 'No disponible';
+
+                // Insertar valores
+                $sheet->setCellValue("A{$fila}", $id);
+                $sheet->setCellValue("B{$fila}", $codigo_modalidad);
+                $sheet->setCellValue("C{$fila}", $titulo);
+                $sheet->setCellValue("D{$fila}", $modalidad);
+                $sheet->setCellValue("E{$fila}", $nivel);
+                $sheet->setCellValue("F{$fila}", $linea_investigacion);
+                $sheet->setCellValue("G{$fila}", $tipo_idea);
+                $sheet->setCellValue("H{$fila}", $estado);
+                $sheet->setCellValue("I{$fila}", $integrantes);
+                $sheet->setCellValue("J{$fila}", $documentos);
+                $sheet->setCellValue("K{$fila}", $emails);
+                $sheet->setCellValue("L{$fila}", $nros_celulares);
+                $sheet->setCellValue("M{$fila}", $director);
+                $sheet->setCellValue("N{$fila}", $evaluador);
+                $sheet->setCellValue("O{$fila}", $actas_registro);
+                $sheet->setCellValue("P{$fila}", $inicio_practica);
+                $sheet->setCellValue("Q{$fila}", $aprobacion_propuesta);
+                $sheet->setCellValue("R{$fila}", $fin_practica);
+
+                // Aplicar estilos
+                foreach (range('A', 'R') as $col) {
+                    $sheet->getStyle("{$col}{$fila}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+                    $sheet->getStyle("{$col}{$fila}")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+                    $sheet->getStyle("{$col}{$fila}")->getAlignment()->setWrapText(true);
+                }
+
+                $fila++;
             }
 
-            $fila++;
+            // Definir el nombre del archivo a descargar
+            $fileName = "Informe - Prácticas empresariales ({$periodo}).xlsx";
+
+            // Guardar en un stream para descargar
+            $response = new StreamedResponse(function () use ($spreadsheet) {
+                $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+                $writer->save('php://output');
+            });
+
+            $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            $response->headers->set('Content-Disposition', "attachment; filename=\"{$fileName}\"");
+
+            return $response;
+            
+        } catch (Exception $e) {
+            Log::error('Error en generarReportePracticas: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            return response()->json(['message' => 'Ha ocurrido un error: ' . $e->getMessage()], 500);
         }
+    }
 
-        // Definir el nombre del archivo a descargar
-        $fileName = "Informe - Prácticas empresariales ({$periodo}).xlsx";
-
-        // Guardar en un stream para descargar
-        $response = new StreamedResponse(function () use ($spreadsheet) {
-            $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
-            $writer->save('php://output');
-        });
-
-        $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        $response->headers->set('Content-Disposition', "attachment; filename=\"{$fileName}\"");
-
-        return $response;
+    private function getTituloPractica($practica)
+    {
+        $campos = $practica->valoresCampos->pluck('valor', 'campo.name')->toArray();
         
-    } catch (Exception $e) {
-        Log::error('Error en generarReportePracticas: ' . $e->getMessage());
-        Log::error('Stack trace: ' . $e->getTraceAsString());
-        return response()->json(['message' => 'Ha ocurrido un error: ' . $e->getMessage()], 500);
+        if (isset($campos['titulo_propuesta_fase4']) && !empty($campos['titulo_propuesta_fase4'])) {
+            return $campos['titulo_propuesta_fase4'];
+        } elseif (isset($campos['titulo_propuesta_director_fase3']) && !empty($campos['titulo_propuesta_director_fase3'])) {
+            return $campos['titulo_propuesta_director_fase3'];
+        } elseif (isset($campos['titulo']) && !empty($campos['titulo'])) {
+            return $campos['titulo'];
+        }
+        
+        return 'No disponible';
     }
-}
-
-private function getTituloPractica($practica)
-{
-    $campos = $practica->valoresCampos->pluck('valor', 'campo.name')->toArray();
-    
-    if (isset($campos['titulo_propuesta_fase4']) && !empty($campos['titulo_propuesta_fase4'])) {
-        return $campos['titulo_propuesta_fase4'];
-    } elseif (isset($campos['titulo_propuesta_director_fase3']) && !empty($campos['titulo_propuesta_director_fase3'])) {
-        return $campos['titulo_propuesta_director_fase3'];
-    } elseif (isset($campos['titulo']) && !empty($campos['titulo'])) {
-        return $campos['titulo'];
-    }
-    
-    return 'No disponible';
-}
 
 }
 

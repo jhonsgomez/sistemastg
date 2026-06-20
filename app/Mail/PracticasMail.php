@@ -55,6 +55,10 @@ class PracticasMail extends Mailable implements ShouldQueue
 
     public function attachments(): array
     {
+        if (($this->data['adjuntar_archivos'] ?? false) !== true) {
+            return [];
+        }
+
         $attachments = [];
 
         Log::info('INICIO attachments PracticasMail', [
@@ -64,12 +68,6 @@ class PracticasMail extends Mailable implements ShouldQueue
 
         if (!empty($this->data['adjuntos'])) {
             foreach ($this->data['adjuntos'] as $archivo) {
-
-                Log::info('Revisando adjunto PracticasMail', [
-                    'archivo' => $archivo,
-                    'exists' => Storage::disk('public')->exists($archivo),
-                    'size' => Storage::disk('public')->exists($archivo) ? Storage::disk('public')->size($archivo) : null,
-                ]);
 
                 if (empty($archivo)) {
                     continue;
@@ -83,8 +81,7 @@ class PracticasMail extends Mailable implements ShouldQueue
                 }
 
                 $attachments[] = Attachment::fromStorageDisk('public', $archivo)
-                    ->as(basename($archivo))
-                    ->withMime('application/pdf');
+                    ->as(basename($archivo));
             }
         }
 
@@ -94,7 +91,6 @@ class PracticasMail extends Mailable implements ShouldQueue
 
         return $attachments;
     }
-
     
 
 

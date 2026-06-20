@@ -56,13 +56,13 @@ class CamposPracticasSeeder extends Seeder
             // 7. Hoja de vida (PDF)
             Campo::updateOrCreate(
                 ['tipo_solicitud_id' => $practicas_fase_0->id, 'name' => 'hoja_vida'],
-                ['label' => 'Hoja de vida (PDF)', 'type' => 'file', 'required' => false, 'instructions' => 'Suba la hoja de vida si NO cuenta con empresa.']
+                ['label' => 'Hoja de vida integrante 1:', 'type' => 'file', 'required' => false, 'instructions' => 'Suba la hoja de vida si NO cuenta con empresa.']
             );
 
             // 7.1 Hoja de vida segundo integrante
             Campo::updateOrCreate(
                 ['tipo_solicitud_id' => $practicas_fase_0->id,'name' => 'hoja_vida_2'],
-                ['label' => 'Hoja de vida segundo integrante (PDF)','type' => 'file','required' => false,'instructions' => 'Suba la hoja de vida del segundo integrante si NO cuenta con empresa.']
+                ['label' => 'Hoja de vida integrante 2:','type' => 'file','required' => false,'instructions' => 'Suba la hoja de vida del segundo integrante si NO cuenta con empresa.']
             );
 
             // 8. Título de la práctica
@@ -107,7 +107,7 @@ class CamposPracticasSeeder extends Seeder
             // 1. Documento F-DC-126
             Campo::updateOrCreate(
                 ['tipo_solicitud_id' => $practicas_fase_1->id, 'name' => 'doc_fdc126'],
-                ['label' => 'Formato F-DC-126', 'type' => 'file', 'required' => true, 'instructions' => 'Suba el formato F-DC-126 diligenciado (Word, máx 5MB).']
+                ['label' => 'Formato F-DC-126', 'type' => 'file', 'required' => true, 'instructions' => 'Suba el formato F-DC-126 diligenciado en formato Word o PDF (.doc, .docx o .pdf), con un tamaño máximo de 8 MB.']
             );
 
             // 2. ¿Es práctica institucional? (checkbox)
@@ -286,7 +286,7 @@ class CamposPracticasSeeder extends Seeder
                     'label' => 'Formato F-DC-195',
                     'type' => 'file',
                     'required' => true,
-                    'instructions' => '<p>Suba el Formato de acta de inicio F-DC-195 en formato <strong>WORD</strong> (máx. 5 MB).</p>'
+                    'instructions' => '<p>Suba el Formato de acta de inicio F-DC-195 en formato <strong>Word o PDF</strong> (.doc, .docx o .pdf), con un tamaño máximo de 5 MB.</p>'
                 ]
             );
 

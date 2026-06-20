@@ -30,11 +30,11 @@
 
     <p>Buen día,</p>
 
-    <p>Estimado usuario, en este correo se le informa el envío de lasolicitud de prácticas empresariales en <strong>FASE1.</strong></p>
+    <p>Estimado usuario, en este correo se le informa el envío de la solicitud de prácticas <strong>FASE 1.</strong></p>
 
     <ul>
         <li><strong>Estado: </strong>{{ $data['cuerpo_correo']['estado'] ?? '' }}</li>
-        <li><strong>¿Es práctica institucional?: </strong>{{ $data['cuerpo_correo']['practica_institucional'] ?? 'No' }}</li>
+        <li><strong>Práctica institucional: </strong>{{ $data['cuerpo_correo']['practica_institucional'] ?? 'No' }}</li>
         <li><strong>Empresa: </strong>{{ $data['cuerpo_correo']['empresa'] ?? 'No registra' }}</li>
     </ul>
 
