@@ -212,7 +212,7 @@ function closeFase4EvaluadorModal() {
     );
     fileList.append(`
         <li class="mb-2 mt-4">
-            <div class="text-gray-600 text-sm mb-1">
+            <div class="text-gray-600 text-sm  mb-2">
                 ${file.name}
             </div>
             <div class="text-sm text-gray-600">
@@ -578,7 +578,7 @@ $(document).ready(function() {
 
     fileList.append(`
         <li class="mb-2 mt-4">
-            <div class="text-gray-600 text-sm mb-1">
+            <div class="text-gray-600 text-sm  mb-2">
                 ${file.name}
             </div>
             <div class="text-sm text-gray-600">

@@ -128,7 +128,7 @@ const fileSizeMB2 = parseFloat(
     
 fileList.append(`
     <li class="mb-2 mt-4">
-        <div class="text-gray-600 text-sm mb-1">
+        <div class="text-gray-600 text-sm  mb-2">
             ${escapeHtml(file.name)}
         </div>
         <div class="text-sm text-gray-600">
@@ -197,7 +197,7 @@ if (file.size > maxSizeBytes) {
     
 fileList.append(`
     <li class="mb-2 mt-4">
-        <div class="text-gray-600 text-sm mb-1">
+        <div class="text-gray-600 text-sm mb-2">
             ${escapeHtml(file.name)}
         </div>
         <div class="text-sm text-gray-600">
@@ -261,7 +261,7 @@ if (file.size > maxSizeBytes){
     
 fileList.append(`
     <li class="mb-2 mt-4">
-        <div class="text-gray-600 text-sm mb-1">
+        <div class="text-gray-600 text-sm  mb-2">
             ${escapeHtml(file.name)}
         </div>
         <div class="text-sm text-gray-600">
@@ -426,7 +426,7 @@ if (file.size > maxSizeBytes){
     
 fileList.append(`
     <li class="mb-2 mt-4">
-        <div class="text-gray-600 text-sm mb-1">
+        <div class="text-gray-600 text-sm  mb-2">
             ${escapeHtml(file.name)}
         </div>
         <div class="text-sm text-gray-600">
@@ -484,7 +484,7 @@ if (file.size > maxSizeBytes) {
     
 fileList.append(`
     <li class="mb-2 mt-4">
-        <div class="text-gray-600 text-sm mb-1">
+        <div class="text-gray-600 text-sm mb-2">
             ${escapeHtml(file.name)}
         </div>
         <div class="text-sm text-gray-600">
@@ -542,7 +542,7 @@ if (file.size > maxSizeBytes) {
     
 fileList.append(`
     <li class="mb-2 mt-4">
-        <div class="text-gray-600 text-sm mb-1">
+        <div class="text-gray-600 text-sm mb-2">
             ${escapeHtml(file.name)}
         </div>
         <div class="text-sm text-gray-600">

@@ -412,7 +412,7 @@ $('#liquidacion_pago').on('change', function (e) {
     
 fileList.append(`
     <li class="mb-2 mt-4">
-        <div class="text-gray-600 text-sm mb-1">
+        <div class="text-gray-600 text-sm  mb-2">
             ${escapeHtml(file.name)}
         </div>
         <div class="text-sm text-gray-600">
@@ -471,7 +471,7 @@ $('#soporte_pago').on('change', function (e) {
     
 fileList.append(`
     <li class="mb-2 mt-4">
-        <div class="text-gray-600 text-sm mb-1">
+        <div class="text-gray-600 text-sm mb-2">
             ${escapeHtml(file.name)}
         </div>
         <div class="text-sm text-gray-600">

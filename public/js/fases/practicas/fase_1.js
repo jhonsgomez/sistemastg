@@ -511,7 +511,7 @@ $('#fase1AdminForm').on('submit', function(e) {
     
 fileList.append(`
     <li class="mb-2 mt-4">
-        <div class="text-gray-600 text-sm mb-1">
+        <div class="text-gray-600 text-sm mb-2">
             ${escapeHtml(file.name)}
         </div>
 

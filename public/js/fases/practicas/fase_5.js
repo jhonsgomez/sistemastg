@@ -123,7 +123,7 @@ $('#fdc128_fase5').on('change', function(e) {
 
     fileList.append(`
         <li class="mb-2 mt-4">
-            <div class="text-gray-600 text-sm mb-1">
+            <div class="text-gray-600 text-sm mb-2">
                 ${file.name}
             </div>
             <div class="text-sm text-gray-600">
@@ -182,7 +182,7 @@ $('#fdc129_fase5').on('change', function(e) {
 
     fileList.append(`
         <li class="mb-2 mt-4">
-            <div class="text-gray-600 text-sm mb-1">
+            <div class="text-gray-600 text-sm  mb-2">
                 ${file.name}
             </div>
             <div class="text-sm text-gray-600">
@@ -242,7 +242,7 @@ $('#fdc196_fase5').on('change', function(e) {
 
     fileList.append(`
         <li class="mb-2 mt-4">
-            <div class="text-gray-600 text-sm mb-1">
+            <div class="text-gray-600 text-sm  mb-2">
                 ${file.name}
             </div>
             <div class="text-sm text-gray-600">
@@ -301,7 +301,7 @@ $('#turnitin_fase5').on('change', function(e) {
 
     fileList.append(`
         <li class="mb-2 mt-4">
-            <div class="text-gray-600 text-sm mb-1">
+            <div class="text-gray-600 text-sm  mb-2">
                 ${file.name}
             </div>
             <div class="text-sm text-gray-600">
@@ -356,7 +356,7 @@ $('#doc_fdc128').on('change', function(e) {
 
     fileList.append(`
         <li class="mb-2 mt-4">
-            <div class="text-gray-600 text-sm mb-1">
+            <div class="text-gray-600 text-sm mb-2">
                 ${file.name}
             </div>
             <div class="text-sm text-gray-600">
@@ -412,7 +412,7 @@ $('#doc_fdc129').on('change', function(e) {
 
     fileList.append(`
         <li class="mb-2 mt-4">
-            <div class="text-gray-600 text-sm mb-1">
+            <div class="text-gray-600 text-sm  mb-2">
                 ${file.name}
             </div>
             <div class="text-sm text-gray-600">
@@ -468,7 +468,7 @@ $('#doc_fdc196').on('change', function(e) {
 
     fileList.append(`
         <li class="mb-2 mt-4">
-            <div class="text-gray-600 text-sm mb-1">
+            <div class="text-gray-600 text-sm mb-2">
                 ${file.name}
             </div>
             <div class="text-sm text-gray-600">
