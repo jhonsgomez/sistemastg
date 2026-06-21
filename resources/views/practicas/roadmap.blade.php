@@ -1129,7 +1129,7 @@
                                 <div class="flex items-center gap-1 mb-2">
                                     <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
                                     <span class="text-red-500">*</span></label>
-                                    <label class="block font-medium text-sm text-gray-700">Nombre de la empresa</label>
+                                    <label class="block font-medium text-sm text-gray-700">Nombre de la empresa: </label>
                                     <div class="relative inline-block">
                                         <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
                                             data-tooltip="tooltip-empresa"></i>
@@ -1150,7 +1150,7 @@
                                 <div class="flex items-center gap-1 mb-2">
                                     <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
                                     <span class="text-red-500">*</span>
-                                    <label class="block font-medium text-sm text-gray-700">Formato F-DC-126 </label>
+                                    <label class="block font-medium text-sm text-gray-700">Formato F-DC-126: </label>
                                     <div class="relative inline-block">
                                         <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
                                             data-tooltip="tooltip-fdc126"></i>
@@ -1224,7 +1224,6 @@
         </div>
     </div>
     
-
     <!-- MODAL FASE 1 - Detalles (Ver información enviada) -->
     <div id="fase1DetailsModal" class="fixed z-50 inset-0 overflow-y-auto">
         <div class="modal-overlay absolute inset-0" onclick="closeFase1DetailsModal()">
@@ -1399,14 +1398,15 @@
                                 <div class="flex items-center gap-2 mb-2">
                                     <label class="block font-medium text-sm text-gray-700">
                                         <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
-                                        <span class="text-red-500">*</span> Liquidación de pago
+                                        <span class="text-red-500">*</span> Liquidación de pago: 
                                     </label>
+
                                     <div class="relative inline-block">
                                         <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
                                             data-tooltip="tooltip-liquidacion-fase2"></i>
 
                                         <div id="tooltip-liquidacion-fase2"
-                                            class="tooltip-content hidden absolute left-6 top-0 z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
+                                            class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg w-64">
                                             Suba la liquidación generada del pago de modalidad. El documento debe incluir la
                                             marca de agua correspondiente.
                                         </div>
@@ -1449,14 +1449,14 @@
                                 <div class="flex items-center gap-2 mb-2">
                                     <label class="block font-medium text-sm text-gray-700">
                                         <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i><span
-                                            class="text-red-500">*</span> Soporte de pago
+                                            class="text-red-500">*</span> Soporte de pago: 
                                     </label>
                                     <div class="relative inline-block">
                                         <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
                                             data-tooltip="tooltip-soporte-fase2"></i>
 
                                         <div id="tooltip-soporte-fase2"
-                                            class="tooltip-content hidden absolute left-6 top-0 z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
+                                            class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg w-64">
                                             Suba el soporte de pago correspondiente a la liquidación.
                                         </div>
                                     </div>
@@ -1757,13 +1757,13 @@
                                 <i class="fa-regular fa-bookmark mr-1 text-gray-500 text-sm"></i>
                                 <p class="font-medium text-gray-700 flex items-center gap-2 text-sm">
                                     <span class="text-red-500">*</span>
-                                    Documentos de la propuesta de prácticas
+                                    Documentos de la propuesta de prácticas:
                                 </p>
                             </div>
 
                             <ul class="space-y-2 text-sm mb-4 list-disc pl-5 text-gray-500">
                                 <li class="flex items-center gap-2 flex-wrap">
-                                    <span class="text-gray-600">ARL:</span>
+                                    <span class="text-gray-600">Certificado ARL:</span>
                                     <span class="text-gray-500">Archivo en formato PDF.</span>
                                 </li>
 
@@ -1785,20 +1785,32 @@
                         <div class="mb-6">
                             <div class="flex items-center gap-2 mb-2 mt-6">
                                 <label class="block font-medium text-sm text-gray-700">
-                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i><span class="text-red-500">*</span> Certificado ARL: 
+                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                    <span class="text-red-500">*</span> Certificado ARL:
                                 </label>
+
                                 <div class="relative inline-block">
                                     <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
                                         data-tooltip="tooltip-arl-fase3"></i>
+
+                                    <div id="tooltip-arl-fase3"  class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg w-64">
+                                        Suba el certificado de afiliación de la Administradora de Riesgos Laborales (ARL). 
+                                        El documento debe incluir la información completa y legible.
+                                    </div>
                                 </div>
                             </div>
+
                             <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
                                 <div class="grid gap-2 text-center">
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                    <h2 class="text-center text-gray-400 text-xs">Solo archivos de PDF de máximo {{ config('practicas.peso_maximo_propuesta') }} MB</h2>
+                                    <h2 class="text-center text-gray-400 text-xs">
+                                        Solo archivos de PDF de máximo {{ config('practicas.peso_maximo_propuesta') }} MB
+                                    </h2>
                                 </div>
 
                                 <div class="text-center">
+                                      <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
+
                                     <input type="file" name="arl" id="arl"
                                         class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                                         accept=".pdf" />
@@ -1808,36 +1820,43 @@
                                     </div>
                                 </div>
                             </div>
+
                             <div class="mt-4 mb-4">
                                 <span id="arlError" class="block text-red-500 text-sm mb-2"></span>
-
                                 <ul id="file-list-arl" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
                             </div>
-
-                            <div id="tooltip-arl-fase3"
-                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                                Suba el certificado de afiliación de la Administradora de Riesgos Laborales (ARL). El documento debe incluir la información completa y legible.
-                            </div>
                         </div>
+
 
                         <!-- Campo F-DC-127 -->
                         <div class="mb-6">
                             <div class="flex items-center gap-2 mb-2">
                                 <label class="block font-medium text-sm text-gray-700">
-                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i><span class="text-red-500">*</span>Formato F-DC-127:
+                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                    <span class="text-red-500">*</span> Formato F-DC-127: 
                                 </label>
+
                                 <div class="relative inline-block">
                                     <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
                                         data-tooltip="tooltip-fdc127-fase3"></i>
+
+                                    <div id="tooltip-fdc127-fase3"  class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg w-64">
+                                        Suba el documento F-DC-127 en formato WORD.
+                                    </div>
                                 </div>
                             </div>
+
                             <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
                                 <div class="grid gap-2 text-center">
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                    <h2 class="text-center text-gray-400 text-xs">Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_propuesta') }} MB</h2>
+                                    <h2 class="text-center text-gray-400 text-xs">
+                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_propuesta') }} MB
+                                    </h2>
                                 </div>
 
                                 <div class="text-center">
+                                      <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
+
                                     <input type="file" name="doc_fdc127" id="doc_fdc127"
                                         class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                                         accept=".doc,.docx" />
@@ -1847,15 +1866,10 @@
                                     </div>
                                 </div>
                             </div>
+
                             <div class="mt-4 mb-4">
                                 <span id="doc_fdc127Error" class="block text-red-500 text-sm mb-2"></span>
-
                                 <ul id="file-list-fdc127" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
-                            </div>
-
-                            <div id="tooltip-fdc127-fase3"
-                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                                Suba el documento F-DC-127 en WORD
                             </div>
                         </div>
 
@@ -1863,20 +1877,31 @@
                         <div class="mb-6">
                             <div class="flex items-center gap-2 mb-2">
                                 <label class="block font-medium text-sm text-gray-700">
-                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i><span class="text-red-500">*</span>Formato F-DC-195:
+                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                    <span class="text-red-500">*</span> Formato F-DC-195:
                                 </label>
+
                                 <div class="relative inline-block">
                                     <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
                                         data-tooltip="tooltip-fdc195-fase3"></i>
+
+                                    <div id="tooltip-fdc195-fase3"  class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg w-64">
+                                        Suba el documento F-DC-195 en formato WORD o PDF.
+                                    </div>
                                 </div>
                             </div>
+
                             <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
                                 <div class="grid gap-2 text-center">
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                    <h2 class="text-center text-gray-400 text-xs">Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_propuesta') }} MB</h2>
+                                    <h2 class="text-center text-gray-400 text-xs">
+                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_propuesta') }} MB
+                                    </h2>
                                 </div>
 
                                 <div class="text-center">
+                                      <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
+
                                     <input type="file" name="doc_fdc195" id="doc_fdc195"
                                         class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                                         accept=".doc,.docx,.pdf" />
@@ -1886,15 +1911,10 @@
                                     </div>
                                 </div>
                             </div>
+
                             <div class="mt-4 mb-4">
                                 <span id="doc_fdc195Error" class="block text-red-500 text-sm mb-2"></span>
-
                                 <ul id="file-list-fdc195" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
-                            </div>
-
-                            <div id="tooltip-fdc195-fase3"
-                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                                Suba el documento F-DC-195 en WORD o PDF
                             </div>
                         </div>
 
@@ -1985,6 +2005,7 @@
                             <span id="estado_fase3_dirError" class="text-red-500 text-sm"></span>
                         </div>
 
+
                         <!-- F-DC-127 -->
                         <div class="mb-4">
                             <div class="flex items-center gap-2 mb-2">
@@ -1992,37 +2013,44 @@
                                     <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
                                     Formato F-DC-127:
                                 </label>
+
                                 <div class="relative inline-block">
                                     <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
                                         data-tooltip="tooltip-fdc127-dir-fase3"></i>
+
+                                    <div id="tooltip-fdc127-dir-fase3"
+                                        class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg w-64">
+                                        Suba el documento F-DC-127 firmado o con comentarios del director.
+                                    </div>
                                 </div>
                             </div>
+
                             <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
                                 <div class="grid gap-1 text-center">
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
                                     <h2 class="text-center text-gray-400 text-xs">
-                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_propuesta')}} MB
+                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_propuesta') }} MB
                                     </h2>
                                 </div>
+
                                 <div class="text-center">
-                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
+                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">
+                                        Arrastra o carga tus archivos aquí
+                                    </h4>
 
                                     <input type="file" name="fdc127" id="fdc127_fase3"
-                                        class="absolute inset-0 opacity-0 cursor-pointer w-full"
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                                         accept=".doc,.docx" />
+
                                     <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
                                         Cargar
                                     </div>
                                 </div>
                             </div>
+
                             <div class="mt-4 mb-4">
                                 <span id="fdc127_fase3Error" class="block text-red-500 text-sm mb-2"></span>
                                 <ul id="file-list-fdc127-fase3" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
-                            </div>
-
-                            <div id="tooltip-fdc127-dir-fase3"
-                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                                Suba el documento F-DC-127 firmado o con comentarios del director.
                             </div>
                         </div>
 
@@ -2033,37 +2061,44 @@
                                     <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
                                     Formato F-DC-195:
                                 </label>
+
                                 <div class="relative inline-block">
                                     <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
                                         data-tooltip="tooltip-fdc195-dir-fase3"></i>
+
+                                    <div id="tooltip-fdc195-dir-fase3"
+                                        class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg w-64">
+                                        Suba el acta de inicio F-DC-195 firmada o con comentarios.
+                                    </div>
                                 </div>
                             </div>
+
                             <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
                                 <div class="grid gap-1 text-center">
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
                                     <h2 class="text-center text-gray-400 text-xs">
-                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_propuesta')}} MB
+                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_propuesta') }} MB
                                     </h2>
                                 </div>
+
                                 <div class="text-center">
-                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
+                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">
+                                        Arrastra o carga tus archivos aquí
+                                    </h4>
 
                                     <input type="file" name="fdc195" id="fdc195_fase3"
-                                        class="absolute inset-0 opacity-0 cursor-pointer w-full"
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                                         accept=".doc,.docx" />
+
                                     <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
                                         Cargar
                                     </div>
                                 </div>
                             </div>
+
                             <div class="mt-4 mb-4">
                                 <span id="fdc195_fase3Error" class="block text-red-500 text-sm mb-2"></span>
                                 <ul id="file-list-fdc195-fase3" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
-                            </div>
-
-                            <div id="tooltip-fdc195-dir-fase3"
-                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                                Suba el acta de inicio F-DC-195 firmada o con comentarios.
                             </div>
                         </div>
 
@@ -2072,13 +2107,20 @@
                             <div class="flex items-center gap-2 mb-2">
                                 <label class="block font-medium text-sm text-gray-700">
                                     <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
-                                    Informe de plagio (Turnitin)
+                                    Informe de plagio (Turnitin):
                                 </label>
+
                                 <div class="relative inline-block">
                                     <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
                                         data-tooltip="tooltip-turnitin-dir-fase3"></i>
+
+                                    <div id="tooltip-turnitin-dir-fase3"
+                                        class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg w-64">
+                                        Suba el informe de similitud generado por Turnitin en formato PDF.
+                                    </div>
                                 </div>
                             </div>
+
                             <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
                                 <div class="grid gap-1 text-center">
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
@@ -2086,25 +2128,25 @@
                                         Solo archivos de PDF de máximo {{ config('practicas.peso_maximo_propuesta') }} MB
                                     </h2>
                                 </div>
+
                                 <div class="text-center">
-                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
+                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">
+                                        Arrastra o carga tus archivos aquí
+                                    </h4>
 
                                     <input type="file" name="turnitin" id="turnitin_fase3"
-                                        class="absolute inset-0 opacity-0 cursor-pointer w-full"
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                                         accept=".pdf" />
+
                                     <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
                                         Cargar
                                     </div>
                                 </div>
                             </div>
+
                             <div class="mt-4 mb-4">
                                 <span id="turnitin_fase3Error" class="block text-red-500 text-sm mb-2"></span>
-
                                 <ul id="file-list-turnitin-fase3" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
-                            </div>
-                            <div id="tooltip-turnitin-dir-fase3"
-                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                                Suba el informe de similitud generado por Turnitin en formato PDF.
                             </div>
                         </div>
 
@@ -2184,38 +2226,44 @@
                                     <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
                                     Formato F-DC-127:
                                 </label>
+
                                 <div class="relative inline-block">
                                     <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
                                         data-tooltip="tooltip-fdc127-evaluador-fase4"></i>
+
+                                    <div id="tooltip-fdc127-evaluador-fase4"
+                                        class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg w-64">
+                                        Suba el documento F-DC-127 firmado o con comentarios del evaluador.
+                                    </div>
                                 </div>
                             </div>
+
                             <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
                                 <div class="grid gap-1 text-center">
-                                    
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
                                     <h2 class="text-center text-gray-400 text-xs">
                                         Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_propuesta') }} MB
                                     </h2>
                                 </div>
+
                                 <div class="text-center">
-                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
+                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">
+                                        Arrastra o carga tus archivos aquí
+                                    </h4>
 
                                     <input type="file" name="fdc127" id="fdc127_fase4"
-                                        class="absolute inset-0 opacity-0 cursor-pointer w-full"
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                                         accept=".doc,.docx" />
+
                                     <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
                                         Cargar
                                     </div>
                                 </div>
                             </div>
+
                             <div class="mt-4 mb-4">
                                 <span id="fdc127_fase4Error" class="block text-red-500 text-sm mb-2"></span>
                                 <ul id="file-list-fdc127-fase4" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
-                            </div>
-
-                            <div id="tooltip-fdc127-evaluador-fase4"
-                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                                Suba el documento F-DC-127 firmado o con comentarios del evaluador.
                             </div>
                         </div>
 
@@ -2328,38 +2376,44 @@
                                     <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
                                     Formato F-DC-127:
                                 </label>
+
                                 <div class="relative inline-block">
                                     <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
                                         data-tooltip="tooltip-fdc127-comite-fase4"></i>
+
+                                    <div id="tooltip-fdc127-comite-fase4"
+                                        class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg w-64">
+                                        Suba el documento F-DC-127 firmado o con comentarios del comité.
+                                    </div>
                                 </div>
                             </div>
+
                             <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
                                 <div class="grid gap-1 text-center">
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
                                     <h2 class="text-center text-gray-400 text-xs">
-                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_propuesta')}} MB
+                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_propuesta') }} MB
                                     </h2>
                                 </div>
+
                                 <div class="text-center">
-                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
+                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">
+                                        Arrastra o carga tus archivos aquí
+                                    </h4>
 
                                     <input type="file" name="fdc127" id="fdc127_fase4_comite"
-                                        class="absolute inset-0 opacity-0 cursor-pointer w-full"
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                                         accept=".doc,.docx" />
+
                                     <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
                                         Cargar
                                     </div>
                                 </div>
                             </div>
+
                             <div class="mt-4 mb-4">
                                 <span id="fdc127_fase4_comiteError" class="block text-red-500 text-sm mb-2"></span>
-
                                 <ul id="file-list-fdc127-fase4-comite" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
-                            </div>
-
-                            <div id="tooltip-fdc127-comite-fase4"
-                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                                Suba el documento F-DC-127 firmado o con comentarios del comité.
                             </div>
                         </div>
 
@@ -2448,140 +2502,151 @@
                         </p>
                             <br>
 
-                        <!-- F-DC-128 -->
-                        <div class="mb-6">
-                            <div class="flex items-center gap-2 mb-2">
-                                <label class="block font-medium text-sm text-gray-700 mb-2">
-                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
-                                    <span class="text-red-500">*</span> Formato F-DC-128:
-                                </label>
-                                <div class="relative inline-block">
-                                    <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
-                                        data-tooltip="tooltip-fdc128-fase5"></i>
-                                </div>
-                            </div>
+                            <!-- F-DC-128 -->
+                            <div class="mb-6">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <label class="block font-medium text-sm text-gray-700 mb-2">
+                                        <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                        <span class="text-red-500">*</span> Formato F-DC-128:
+                                    </label>
 
-                            <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
-                                <div class="grid gap-1 text-center">
-                                    <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                    <h2 class="text-gray-400 text-xs">Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_informe') }} MB</h2>
-                                </div>
+                                    <div class="relative inline-block">
+                                        <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                            data-tooltip="tooltip-fdc128-fase5"></i>
 
-                                <div class="text-center">
-                                     <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
-
-                                    <input type="file" name="doc_fdc128" id="doc_fdc128"
-                                        class="absolute inset-0 opacity-0 cursor-pointer w-full"
-                                        accept=".doc,.docx" />
-
-                                    <div
-                                        class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
-                                        Cargar
+                                        <div id="tooltip-fdc128-fase5"
+                                            class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg w-64">
+                                            Suba el Informe Final F-DC-128. El documento debe incluir la información completa y legible.
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="mt-4 mb-4">
-                                <span id="doc_fdc128Error" class="block text-red-500 text-sm mb-2"></span>
 
-                                <ul id="file-list-doc-fdc128" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
-                            </div>
-                            <div id="tooltip-fdc128-fase5"
-                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                                Suba el Informe Final F-DC-128. El documento debe incluir la información completa y legible.
-                            </div>
-                        
-                        </div>
+                                <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+                                    <div class="grid gap-1 text-center">
+                                        <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                        <h2 class="text-gray-400 text-xs">
+                                            Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_informe') }} MB
+                                        </h2>
+                                    </div>
 
-                        <!-- F-DC-129 -->
-                        <div class="mb-6">
-                            <div class="flex items-center gap-2 mb-2">
-                                <label class="block font-medium text-sm text-gray-700 mb-2">
-                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
-                                    <span class="text-red-500">*</span>Formato F-DC-129:
-                                </label>
-                                <div class="relative inline-block">
-                                    <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
-                                        data-tooltip="tooltip-fdc129-fase5"></i>
-                                </div>
-                            </div>
+                                    <div class="text-center">
+                                        <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">
+                                            Arrastra o carga tus archivos aquí
+                                        </h4>
 
-                            <div
-                                class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+                                        <input type="file" name="doc_fdc128" id="doc_fdc128"
+                                            class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                                            accept=".doc,.docx" />
 
-                                <div class="grid gap-1 text-center">
-                                    <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                    <h2 class="text-gray-400 text-xs">Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_informe') }} MB</h2>
-                                </div>
-
-                                <div class="text-center">
-                                     <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
-
-                                    <input type="file" name="doc_fdc129" id="doc_fdc129"
-                                        class="absolute inset-0 opacity-0 cursor-pointer w-full"
-                                        accept=".doc,.docx" />
-
-                                    <div
-                                        class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
-                                        Cargar
+                                        <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                            Cargar
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="mt-4 mb-4">
-                                <span id="doc_fdc129Error" class="block text-red-500 text-sm mb-2"></span>
-
-                                <ul id="file-list-doc-fdc129" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
-                            </div>
-                                <div id="tooltip-fdc129-fase5"
-                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                                Suba el documento F-DC-129 en word
-                            </div>
-                        </div>
-
-                        <!-- F-DC-196 -->
-                        <div class="mb-6">
-                            <div class="flex items-center gap-2 mb-2">
-                                <label class="block font-medium text-sm text-gray-700 mb-2">
-                                    <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
-                                    <span class="text-red-500">*</span> Formato F-DC-196:
-                                </label>
-                                <div class="relative inline-block">
-                                    <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
-                                        data-tooltip="tooltip-fdc196-fase5"></i>
+                                <div class="mt-4 mb-4">
+                                    <span id="doc_fdc128Error" class="block text-red-500 text-sm mb-2"></span>
+                                    <ul id="file-list-doc-fdc128" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
                                 </div>
                             </div>
 
-                            <div
-                                class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
 
-                                <div class="grid gap-1 text-center">
-                                    <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                    <h2 class="text-gray-400 text-xs">Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_informe') }} MB</h2>
-                                </div>
+                            <!-- F-DC-129 -->
+                            <div class="mb-6">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <label class="block font-medium text-sm text-gray-700 mb-2">
+                                        <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                        <span class="text-red-500">*</span> Formato F-DC-129:
+                                    </label>
 
-                                <div class="text-center">
-                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
-                                    <input type="file" name="doc_fdc196" id="doc_fdc196"
-                                        class="absolute inset-0 opacity-0 cursor-pointer w-full"
-                                        accept=".doc,.docx" />
+                                    <div class="relative inline-block">
+                                        <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                            data-tooltip="tooltip-fdc129-fase5"></i>
 
-                                    <div
-                                        class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
-                                        Cargar
+                                        <div id="tooltip-fdc129-fase5"
+                                            class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg w-64">
+                                            Suba el documento F-DC-129 en formato WORD.
+                                        </div>
                                     </div>
                                 </div>
+
+                                <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+                                    <div class="grid gap-1 text-center">
+                                        <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                        <h2 class="text-gray-400 text-xs">
+                                            Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_informe') }} MB
+                                        </h2>
+                                    </div>
+
+                                    <div class="text-center">
+                                        <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">
+                                            Arrastra o carga tus archivos aquí
+                                        </h4>
+
+                                        <input type="file" name="doc_fdc129" id="doc_fdc129"
+                                            class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                                            accept=".doc,.docx" />
+
+                                        <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                            Cargar
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-4 mb-4">
+                                    <span id="doc_fdc129Error" class="block text-red-500 text-sm mb-2"></span>
+                                    <ul id="file-list-doc-fdc129" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
+                                </div>
                             </div>
 
-                            <div class="mt-4 mb-4">
-                                <span id="doc_fdc196Error" class="block text-red-500 text-sm mb-2"></span>
 
-                                <ul id="file-list-doc-fdc196" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
+                            <!-- F-DC-196 -->
+                            <div class="mb-6">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <label class="block font-medium text-sm text-gray-700 mb-2">
+                                        <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
+                                        <span class="text-red-500">*</span> Formato F-DC-196:
+                                    </label>
+
+                                    <div class="relative inline-block">
+                                        <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                            data-tooltip="tooltip-fdc196-fase5"></i>
+
+                                        <div id="tooltip-fdc196-fase5"
+                                            class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg w-64">
+                                            Suba el documento F-DC-196 en formato WORD.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+                                    <div class="grid gap-1 text-center">
+                                        <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                        <h2 class="text-gray-400 text-xs">
+                                            Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_informe') }} MB
+                                        </h2>
+                                    </div>
+
+                                    <div class="text-center">
+                                        <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">
+                                            Arrastra o carga tus archivos aquí
+                                        </h4>
+
+                                        <input type="file" name="doc_fdc196" id="doc_fdc196"
+                                            class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                                            accept=".doc,.docx" />
+
+                                        <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                            Cargar
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-4 mb-4">
+                                    <span id="doc_fdc196Error" class="block text-red-500 text-sm mb-2"></span>
+                                    <ul id="file-list-doc-fdc196" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
+                                </div>
                             </div>
-                            <div id="tooltip-fdc196-fase5"
-                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                                Suba el documento F-DC-196 en word
-                            </div>
-                        </div>
 
                         <!-- Botones -->
                         <div class="flex justify-end space-x-3 mt-6 pt-4">
@@ -2613,7 +2678,6 @@
             </div>
         </div>
     </div>
-
 
     <!-- MODAL FASE 5 - Detalles -->
     <div id="fase5DetailsModal" class="fixed z-50 inset-0 overflow-y-auto hidden" >
@@ -2751,72 +2815,56 @@
 
                         <!-- F-DC-128 -->
                         <div class="mb-4">
-
                             <div class="flex items-center gap-2 mb-2">
-
                                 <label class="block font-medium text-sm text-gray-700">
                                     <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
-                                   Formato F-DC-128:
+                                    Formato F-DC-128:
                                 </label>
 
                                 <div class="relative inline-block">
                                     <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
                                         data-tooltip="tooltip-fdc128-dir-fase5"></i>
-                                </div>
 
+                                    <div id="tooltip-fdc128-dir-fase5"
+                                        class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg w-64">
+                                        Suba el documento F-DC-128 firmado o con comentarios.
+                                    </div>
+                                </div>
                             </div>
 
-                            <div
-                                class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
-
+                            <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
                                 <div class="grid gap-1 text-center">
-                                  
-                                    <i
-                                        class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                    <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
 
                                     <h2 class="text-center text-gray-400 text-xs">
                                         Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_informe') }} MB
                                     </h2>
-
                                 </div>
 
                                 <div class="text-center">
-                                       <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
+                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">
+                                        Arrastra o carga tus archivos aquí
+                                    </h4>
 
-                                    <input
-                                        type="file"
-                                        name="fdc128"
-                                        id="fdc128_fase5"
-                                        class="absolute inset-0 opacity-0 cursor-pointer w-full"
+                                    <input type="file" name="fdc128" id="fdc128_fase5"
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                                         accept=".doc,.docx" />
 
-                                    <div
-                                        class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                    <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
                                         Cargar
                                     </div>
-
                                 </div>
-
                             </div>
 
                             <div class="mt-4 mb-4">
                                 <span id="fdc128_fase5Error" class="block text-red-500 text-sm mb-2"></span>
-
                                 <ul id="file-list-fdc128-fase5" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
                             </div>
-
-                            <div id="tooltip-fdc128-dir-fase5"
-                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                                Suba el documento F-DC-128 firmado o con comentarios.
-                            </div>
-
                         </div>
 
                         <!-- F-DC-129 -->
                         <div class="mb-4">
-
                             <div class="flex items-center gap-2 mb-2">
-
                                 <label class="block font-medium text-sm text-gray-700">
                                     <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
                                     <span class="text-red-500">*</span>
@@ -2826,182 +2874,144 @@
                                 <div class="relative inline-block">
                                     <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
                                         data-tooltip="tooltip-fdc129-dir-fase5"></i>
-                                </div>
 
+                                    <div id="tooltip-fdc129-dir-fase5"
+                                        class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg w-64">
+                                        Suba el documento F-DC-129 firmado o con comentarios.
+                                    </div>
+                                </div>
                             </div>
 
-                            <div
-                                class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
-
+                            <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
                                 <div class="grid gap-1 text-center">
-                                    
-                                    <i
-                                        class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                    <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
 
                                     <h2 class="text-center text-gray-400 text-xs">
                                         Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_informe') }} MB
                                     </h2>
-
                                 </div>
 
                                 <div class="text-center">
-                                       <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
+                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">
+                                        Arrastra o carga tus archivos aquí
+                                    </h4>
 
-                                    <input
-                                        type="file"
-                                        name="fdc129"
-                                        id="fdc129_fase5"
-                                        class="absolute inset-0 opacity-0 cursor-pointer w-full"
+                                    <input type="file" name="fdc129" id="fdc129_fase5"
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                                         accept=".doc,.docx" />
 
-                                    <div
-                                        class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                    <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
                                         Cargar
                                     </div>
-
                                 </div>
-
                             </div>
 
                             <div class="mt-4 mb-4">
                                 <span id="fdc129_fase5Error" class="block text-red-500 text-sm mb-2"></span>
-
                                 <ul id="file-list-fdc129-fase5" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
                             </div>
-
-                            <div id="tooltip-fdc129-dir-fase5"
-                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                                Suba el documento F-DC-129 firmado o con comentarios.
-                            </div>
-
                         </div>
 
                         <!-- F-DC-196 -->
                         <div class="mb-4">
-
                             <div class="flex items-center gap-2 mb-2">
-
                                 <label class="block font-medium text-sm text-gray-700">
                                     <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
                                     <span class="text-red-500">*</span>
-                                   Formato F-DC-196:
+                                    Formato F-DC-196:
                                 </label>
 
                                 <div class="relative inline-block">
                                     <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
                                         data-tooltip="tooltip-fdc196-dir-fase5"></i>
-                                </div>
 
+                                    <div id="tooltip-fdc196-dir-fase5"
+                                        class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg w-64">
+                                        Suba el documento F-DC-196 firmado o con comentarios.
+                                    </div>
+                                </div>
                             </div>
 
-                            <div
-                                class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
-
+                            <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
                                 <div class="grid gap-1 text-center">
-
-                                    <i
-                                        class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                    <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
 
                                     <h2 class="text-center text-gray-400 text-xs">
                                         Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_informe') }} MB
                                     </h2>
-
                                 </div>
 
                                 <div class="text-center">
-                                       <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
+                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">
+                                        Arrastra o carga tus archivos aquí
+                                    </h4>
 
-                                    <input
-                                        type="file"
-                                        name="fdc196"
-                                        id="fdc196_fase5"
-                                        class="absolute inset-0 opacity-0 cursor-pointer w-full"
+                                    <input type="file" name="fdc196" id="fdc196_fase5"
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                                         accept=".doc,.docx" />
 
-                                    <div
-                                        class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                    <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
                                         Cargar
                                     </div>
-
                                 </div>
-
                             </div>
 
                             <div class="mt-4 mb-4">
                                 <span id="fdc196_fase5Error" class="block text-red-500 text-sm mb-2"></span>
-
                                 <ul id="file-list-fdc196-fase5" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
                             </div>
-
-                            <div id="tooltip-fdc196-dir-fase5"
-                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                                Suba el documento F-DC-196 firmado o con comentarios.
-                            </div>
-
                         </div>
+
 
                         <!-- TURNITIN -->
                         <div class="mb-4">
-
                             <div class="flex items-center gap-2 mb-2">
-
                                 <label class="block font-medium text-sm text-gray-700">
-                                <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                                    <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
                                     Informe de plagio (Turnitin)
                                 </label>
 
                                 <div class="relative inline-block">
                                     <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
                                         data-tooltip="tooltip-turnitin-dir-fase5"></i>
-                                </div>
 
+                                    <div id="tooltip-turnitin-dir-fase5"
+                                        class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg w-64">
+                                        Suba el informe de similitud generado por Turnitin en PDF.
+                                    </div>
+                                </div>
                             </div>
 
-                            <div
-                                class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
-
+                            <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
                                 <div class="grid gap-1 text-center">
-
-                                    <i
-                                        class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+                                    <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
 
                                     <h2 class="text-center text-gray-400 text-xs">
                                         Solo archivos de PDF de máximo {{ config('practicas.peso_maximo_informe') }} MB
                                     </h2>
-
                                 </div>
 
                                 <div class="text-center">
-                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
+                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">
+                                        Arrastra o carga tus archivos aquí
+                                    </h4>
 
-                                    <input
-                                        type="file"
-                                        name="turnitin"
-                                        id="turnitin_fase5"
-                                        class="absolute inset-0 opacity-0 cursor-pointer w-full"
+                                    <input type="file" name="turnitin" id="turnitin_fase5"
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                                         accept=".pdf" />
 
-                                    <div
-                                        class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                    <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
                                         Cargar
                                     </div>
-
                                 </div>
-
                             </div>
 
                             <div class="mt-4 mb-4">
                                 <span id="turnitin_fase5Error" class="block text-red-500 text-sm mb-2"></span>
-
                                 <ul id="file-list-turnitin-fase5" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
                             </div>
-
-                            <div id="tooltip-turnitin-dir-fase5"
-                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                                Suba el informe de similitud generado por Turnitin en PDF.
-                            </div>
-
                         </div>
+
 
                         <!-- RESPUESTA -->
                         <div class="mb-4">
@@ -3011,21 +3021,12 @@
                                 Comentarios de la respuesta:
                             </label>
 
-                            <div id="txt-editor-fase5-dir"
-                                class="shadow txt-editor-quill"
-                                style="height: 200px; background: white;">
-                            </div>
+                            <div id="txt-editor-fase5-dir" class="shadow txt-editor-quill"style="height: 200px; background: white;"></div>
 
-                            <textarea
-                                name="respuesta"
-                                id="respuesta_fase5_dir"
-                                class="hidden"></textarea>
+                            <textarea name="respuesta"id="respuesta_fase5_dir"class="hidden"></textarea>
 
-                            <span id="respuesta_fase5_dirError"
-                                class="text-red-500 text-sm"></span>
-
+                            <span id="respuesta_fase5_dirError"class="text-red-500 text-sm"></span>
                         </div>
-
                         <!-- BOTONES -->
                         <div class="flex justify-end space-x-2 mt-4">
 
@@ -3035,7 +3036,6 @@
                                 class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">
                                 Cancelar
                             </button>
-
                             <button
                                 type="submit"
                                 class="flex bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg">
@@ -3045,32 +3045,22 @@
                                     class="hidden text-gray-300 animate-spin w-4 h-4"
                                     viewBox="0 0 64 64"
                                     fill="none">
-
                                     <path
                                         d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
                                         stroke="currentColor"
                                         stroke-width="5"></path>
-
                                     <path
                                         d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
                                         stroke="currentColor"
                                         stroke-width="5"
                                         class="text-white"></path>
-
                                 </svg>
-
                                 Responder
-
                             </button>
-
                         </div>
-
                     </form>
-
                 </div>
-
             </div>
-
         </div>
     </div>
 
@@ -3123,67 +3113,21 @@
                             <div class="flex items-center gap-2 mb-2">
                                 <label class="block font-medium text-sm text-gray-700">
                                     <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
-                                  Formato  F-DC-128:
+                                    Formato F-DC-128:
                                 </label>
 
                                 <div class="relative inline-block">
                                     <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
                                         data-tooltip="tooltip-fdc128-evaluador-fase6"></i>
-                                </div>
-                            </div>
 
-                            <div
-                                class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
-                                <div class="grid gap-1 text-center">
-                                    <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-
-                                    <h2 class="text-center text-gray-400 text-xs">
-                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_informe')}} MB
-                                    </h2>
-                                </div>
-
-                                <div class="text-center">
-                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
-                                    <input type="file" name="fdc128" id="fdc128_fase6"
-                                        class="absolute inset-0 opacity-0 cursor-pointer w-full"
-                                        accept=".doc,.docx" />
-
-                                    <div
-                                        class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
-                                        Cargar
+                                    <div id="tooltip-fdc128-evaluador-fase6"
+                                        class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg w-64">
+                                        Suba el documento F-DC-128 firmado o con comentarios del evaluador.
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="mt-4 mb-4">
-                                <span id="fdc128_fase6Error" class="block text-red-500 text-sm mb-2"></span>
-
-                                <ul id="file-list-fdc128-fase6" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
-                            </div>
-
-
-                            <div id="tooltip-fdc128-evaluador-fase6"
-                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                                Suba el documento F-DC-128 firmado o con comentarios del evaluador.
-                            </div>
-                        </div>
-
-                        <!-- F-DC-129 -->
-                        <div class="mb-4">
-                            <div class="flex items-center gap-2 mb-2">
-                                <label class="block font-medium text-sm text-gray-700">
-                                <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
-                                  Formato  F-DC-129:
-                                </label>
-
-                                <div class="relative inline-block">
-                                    <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
-                                        data-tooltip="tooltip-fdc129-evaluador-fase6"></i>
-                                </div>
-                            </div>
-
-                            <div
-                                class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+                            <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
                                 <div class="grid gap-1 text-center">
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
 
@@ -3193,29 +3137,75 @@
                                 </div>
 
                                 <div class="text-center">
-                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
-                                    <input type="file" name="fdc129" id="fdc129_fase6"
-                                        class="absolute inset-0 opacity-0 cursor-pointer w-full"
+                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">
+                                        Arrastra o carga tus archivos aquí
+                                    </h4>
+
+                                    <input type="file" name="fdc128" id="fdc128_fase6"
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                                         accept=".doc,.docx" />
 
-                                    <div
-                                        class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                    <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
                                         Cargar
                                     </div>
                                 </div>
                             </div>
+
                             <div class="mt-4 mb-4">
-                                <span id="fdc129_fase6Error" class="block text-red-500 text-sm mb-2"></span>
-
-                                <ul id="file-list-fdc129-fase6" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
-                            </div>
-
-                            <div id="tooltip-fdc129-evaluador-fase6"
-                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                                Suba el documento F-DC-129 firmado o con comentarios del evaluador.
+                                <span id="fdc128_fase6Error" class="block text-red-500 text-sm mb-2"></span>
+                                <ul id="file-list-fdc128-fase6" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
                             </div>
                         </div>
 
+
+                        <!-- F-DC-129 -->
+                        <div class="mb-4">
+                            <div class="flex items-center gap-2 mb-2">
+                                <label class="block font-medium text-sm text-gray-700">
+                                    <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                                    Formato F-DC-129:
+                                </label>
+
+                                <div class="relative inline-block">
+                                    <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                        data-tooltip="tooltip-fdc129-evaluador-fase6"></i>
+
+                                    <div id="tooltip-fdc129-evaluador-fase6"
+                                        class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg w-64">
+                                        Suba el documento F-DC-129 firmado o con comentarios del evaluador.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
+                                <div class="grid gap-1 text-center">
+                                    <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
+
+                                    <h2 class="text-center text-gray-400 text-xs">
+                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_informe') }} MB
+                                    </h2>
+                                </div>
+
+                                <div class="text-center">
+                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">
+                                        Arrastra o carga tus archivos aquí
+                                    </h4>
+
+                                    <input type="file" name="fdc129" id="fdc129_fase6"
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                                        accept=".doc,.docx" />
+
+                                    <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                        Cargar
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 mb-4">
+                                <span id="fdc129_fase6Error" class="block text-red-500 text-sm mb-2"></span>
+                                <ul id="file-list-fdc129-fase6" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
+                            </div>
+                        </div>
                         <!-- RESPUESTA -->
                         <div class="mb-4">
                             <label class="block font-medium text-sm text-gray-700 mb-2">
@@ -3436,13 +3426,24 @@
 
                         <!-- F-DC-128 -->
                         <div class="mb-4">
-                            <label class="block font-medium text-sm text-gray-700 mb-2">
-                                <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
-                               Formato F-DC-128:
-                            </label>
+                            <div class="flex items-center gap-2 mb-2">
+                                <label class="block font-medium text-sm text-gray-700">
+                                    <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                                    Formato F-DC-128:
+                                </label>
+
+                                <div class="relative inline-block">
+                                    <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                        data-tooltip="tooltip-fdc128-comite-fase6"></i>
+
+                                    <div id="tooltip-fdc128-comite-fase6"
+                                        class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg w-64">
+                                        Suba el documento F-DC-128 firmado o con comentarios del comité.
+                                    </div>
+                                </div>
+                            </div>
 
                             <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
-
                                 <div class="grid gap-1 text-center">
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
 
@@ -3452,38 +3453,49 @@
                                 </div>
 
                                 <div class="text-center">
-                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
+                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">
+                                        Arrastra o carga tus archivos aquí
+                                    </h4>
+
                                     <input type="file"
                                         name="fdc128"
                                         id="fdc128_fase6_comite"
-                                        class="absolute inset-0 opacity-0 cursor-pointer w-full"
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                                         accept=".doc,.docx">
 
-                                    <div
-                                        class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                    <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
                                         Cargar
                                     </div>
                                 </div>
-
                             </div>
 
                             <div class="mt-4 mb-4">
                                 <span id="fdc128_fase6_comiteError" class="block text-red-500 text-sm mb-2"></span>
-
                                 <ul id="file-list-fdc128-fase6-comite" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
                             </div>
-
                         </div>
+
 
                         <!-- F-DC-129 -->
                         <div class="mb-4">
-                            <label class="block font-medium text-sm text-gray-700 mb-2">
-                                <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
-                              Formato  F-DC-129:
-                            </label>
+                            <div class="flex items-center gap-2 mb-2">
+                                <label class="block font-medium text-sm text-gray-700">
+                                    <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
+                                    Formato F-DC-129:
+                                </label>
+
+                                <div class="relative inline-block">
+                                    <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                        data-tooltip="tooltip-fdc129-comite-fase6"></i>
+
+                                    <div id="tooltip-fdc129-comite-fase6"
+                                        class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg w-64">
+                                        Suba el documento F-DC-129 firmado o con comentarios del comité.
+                                    </div>
+                                </div>
+                            </div>
 
                             <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
-
                                 <div class="grid gap-1 text-center">
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
 
@@ -3493,24 +3505,24 @@
                                 </div>
 
                                 <div class="text-center">
-                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
+                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">
+                                        Arrastra o carga tus archivos aquí
+                                    </h4>
+
                                     <input type="file"
                                         name="fdc129"
                                         id="fdc129_fase6_comite"
-                                        class="absolute inset-0 opacity-0 cursor-pointer w-full"
+                                        class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                                         accept=".doc,.docx">
 
-                                    <div
-                                        class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
+                                    <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
                                         Cargar
                                     </div>
                                 </div>
-
                             </div>
 
                             <div class="mt-4 mb-4">
                                 <span id="fdc129_fase6_comiteError" class="block text-red-500 text-sm mb-2"></span>
-
                                 <ul id="file-list-fdc129-fase6-comite" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
                             </div>
                         </div>
@@ -3786,8 +3798,11 @@
                                                 <span class="text-red-600 mr-1 text-lg">*</span>Evidencias de resultados pruebas TyT/Pro
                                             </label>
                                             <div class="relative inline-block">
-                                                <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon" data-tooltip="tooltip-doc_icfes_practicas"></i>
-                                                <div id="tooltip-doc_icfes_practicas" style="width: 10rem; left: -100px;" class="hidden absolute z-10 max-w-[90vw] px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg left-1/2 -translate-x-1/2 bottom-full mb-2 sm:translate-x-0">
+                                                <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
+                                                    data-tooltip="tooltip-doc_icfes_practicas"></i>
+
+                                                <div id="tooltip-doc_icfes_practicas"
+                                                    class="hidden absolute z-10 px-5 py-4 bg-gray-500 text-white text-sm rounded-lg shadow-lg w-64">
                                                     <p class="uppercase font-bold mb-2">Instrucciones:</p>
                                                     Solo se debe subir un archivo en formato PDF.
                                                 </div>
@@ -4275,6 +4290,7 @@
                 width: 100% !important;
             }
 
+       
             /* Tooltips */
             [id^="tooltip-"] {
                 background-color: #4b5563;
@@ -4289,6 +4305,15 @@
                 box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             }
 
+            .relative.inline-block [id^="tooltip-"] {
+                position: absolute !important;
+                bottom: calc(100% + 8px) !important;
+                left: 50% !important;
+                top: auto !important;
+                transform: translateX(-50%) !important;
+                z-index: 9999 !important;
+            }
+
             [id^="tooltip-"]::before {
                 content: '';
                 position: absolute;
@@ -4299,7 +4324,6 @@
                 border-style: solid;
                 border-color: #4b5563 transparent transparent transparent;
             }
-
             .show {
                 display: block !important;
             }
