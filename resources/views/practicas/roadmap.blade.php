@@ -312,6 +312,23 @@
                     <span class="text-center font-bold text-lg">Fase 1: F-DC-126</span>
                     <p class="text-center mt-2 text-sm mx-4">El estudiante envía el formato de solicitud de practicantes.</p>
 
+                    @php
+                    $tieneEmpresa = false;
+
+                    foreach ($practica->camposConValores() as $campo) {
+
+                        if (($campo['campo'] ?? null) === 'tiene_empresa') {
+
+                            $tieneEmpresa = filter_var(
+                                $campo['valor'],
+                                FILTER_VALIDATE_BOOLEAN
+                            );
+
+                            break;
+                        }
+                    }
+                    @endphp
+                    
                     @if ($fase_actual == 1)
                         @php
                             $user = auth()->user();
@@ -323,7 +340,8 @@
                         @if ($esEstudiante && !$yaEnvio)
                             <!-- Estudiante: Mostrar botón para enviar SOLO si no ha enviado o fue rechazado -->
                             <div class="flex justify-center items-center mt-3">
-                                <button type="button" onclick="openFase1EstudianteModal()"
+                                <button type="button" onclick="openFase1EstudianteModal(this)"
+                                    data-tiene-empresa="{{ $tieneEmpresa ? 1 : 0 }}"
                                     class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white px-3 py-1 rounded-lg relative inline-flex items-center justify-center">
                                     <i class="fa-solid fa-user-pen"></i>
                                 </button>
@@ -1084,7 +1102,7 @@
 
                         <div class="grid grid-cols-1 gap-6 mb-4">
                             <!-- Checkbox Práctica institucional -->
-                            <div>
+                            <div id="contenedorPracticaInstitucional">
                                 <div class="flex items-center gap-1">
                                     <label class="flex items-center gap-1">
                                         <i class="fa-regular fa-bookmark mr-1 text-gray-500"></i>
@@ -1263,9 +1281,9 @@
                             <select name="estado" id="estado_fase1"
                                 class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
                                 <option value="">Seleccione un estado</option>
-                                <option value="Aprobada">Aprobar</option>
+                                <option value="Aprobada">Aprobada</option>
                                 <option value="Aplazada">Aplazada</option>
-                                <option value="Rechazada">Rechazar</option>
+                                <option value="Rechazada">Rechazada</option>
                             </select>
                             <span id="estado_fase1Error" class="text-red-500 text-sm"></span>
                         </div>
@@ -1346,8 +1364,11 @@
                                 liquidación de pago y el soporte correspondiente.</p>
                         </div>
 
-                        <p class="text-sm text-gray-950"><strong>NOTA: </strong>Por cada integrante del proyecto se
-                            debe cargar la liquidación y los respectivos soportes de pago.</p>
+                        <p class="text-red-600 text-sm mb-4">
+                            <i class="fa-solid fa-circle-info mr-1"></i>
+                           <strong>NOTA: </strong>Por cada integrante del proyecto se
+                            debe cargar la liquidación y los respectivos soportes de pago en un mismo documento respectivamente.
+                        </p>
 
                         <!-- Documentos y enlaces informativos -->
                         <div class="flex items-center my-5">
@@ -1371,7 +1392,7 @@
                         </ul>
 
                         <!-- Campos en GRID para desktop (2 columnas) -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                             <!-- Campo Liquidación de pago -->
                             <div>
@@ -1464,7 +1485,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="mt-4 mb-4">
+                                <div class="mt-4">
                                     <span id="soporte_pagoError" class="block text-red-500 text-sm mb-2"></span>
 
                                     <ul id="file-list-soporte" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
@@ -1474,8 +1495,8 @@
 
                         </div>
 
-                        <div class="flex items-start mb-4 mt-6">
-                            <p class="font-medium text-sm text-gray-700 mb-6">
+                        <div class="flex items-start">
+                            <p class="font-medium text-sm text-gray-700">
                             <span class="mr-1 mt-1 inline-block align-middle">
                                 <i class="fa-solid fa-circle-info text-uts-500 text-xl"></i>
                             </span>    
@@ -1490,7 +1511,7 @@
                         </div>
 
                         <!-- Botones -->
-                        <div class="flex justify-end space-x-3 mt-6 pt-4">
+                        <div class="flex justify-end space-x-3 mt-6">
                             <button type="button" onclick="closeFase2EstudianteModal()"
                                 class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-5 py-2 rounded-lg transition">Cancelar</button>
                             <button type="submit"
@@ -1568,9 +1589,9 @@
                             <select name="estado" id="estado_fase2"
                                 class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
                                 <option value="">Seleccione un estado</option>
-                                <option value="Aprobada">Aprobar</option>
+                                <option value="Aprobada">Aprobada</option>
                                 <option value="Aplazada">Aplazada</option>
-                                <option value="Rechazada">Rechazar</option>
+                                <option value="Rechazada">Rechazada</option>
                             </select>
                             <span id="estado_fase2Error" class="text-red-500 text-sm"></span>
                         </div>
@@ -1604,7 +1625,6 @@
                             </label>
                             <input type="text" name="codigo_modalidad" id="codigo_modalidad_fase2"
                                 class="bg-gray-100 border-gray-300 rounded-md shadow-sm mt-1 block w-full focus:ring-uts-500 focus:border-uts-500 cursor-default"
-                                readonly
                                 value="{{ $codigo_modalidad_generado ?? '' }}"
                                 placeholder="Se generará automáticamente">
                             <span id="codigo_modalidad_fase2Error" class="text-red-500 text-sm"></span>
@@ -1759,7 +1779,7 @@
                             </ul>
                         </div>
 
-                        <p class="text-sm text-gray-950"><strong>NOTA: </strong>El formato F-DC-127 y F-DC-195 debe estar debidamente diligenciado, firmado y no debe superar los {{ config('practicas.peso_maximo_archivos') }} MB en formato Word.</p>
+                        <p class="text-sm text-gray-950"><strong>NOTA: </strong>El formato F-DC-127 y F-DC-195 debe estar debidamente diligenciado, firmado y no debe superar los {{ config('practicas.peso_maximo_propuesta') }} MB en formato Word.</p>
 
                         <!-- Campo ARL -->
                         <div class="mb-6">
@@ -1775,7 +1795,7 @@
                             <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
                                 <div class="grid gap-2 text-center">
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                    <h2 class="text-center text-gray-400 text-xs">Solo archivos de PDF de máximo {{ config('practicas.peso_maximo_archivos') }} MB</h2>
+                                    <h2 class="text-center text-gray-400 text-xs">Solo archivos de PDF de máximo {{ config('practicas.peso_maximo_propuesta') }} MB</h2>
                                 </div>
 
                                 <div class="text-center">
@@ -1814,7 +1834,7 @@
                             <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
                                 <div class="grid gap-2 text-center">
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                    <h2 class="text-center text-gray-400 text-xs">Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_archivos') }} MB</h2>
+                                    <h2 class="text-center text-gray-400 text-xs">Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_propuesta') }} MB</h2>
                                 </div>
 
                                 <div class="text-center">
@@ -1853,7 +1873,7 @@
                             <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
                                 <div class="grid gap-2 text-center">
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                    <h2 class="text-center text-gray-400 text-xs">Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_archivos') }} MB</h2>
+                                    <h2 class="text-center text-gray-400 text-xs">Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_propuesta') }} MB</h2>
                                 </div>
 
                                 <div class="text-center">
@@ -1958,9 +1978,9 @@
                             <select name="estado" id="estado_fase3_dir"
                                 class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
                                 <option value="">Seleccione un estado</option>
-                                <option value="Aprobada">Aprobar</option>
+                                <option value="Aprobada">Aprobada</option>
                                 <option value="Aplazada">Aplazada</option>
-                                <option value="Rechazada">Rechazar</option>
+                                <option value="Rechazada">Rechazada</option>
                             </select>
                             <span id="estado_fase3_dirError" class="text-red-500 text-sm"></span>
                         </div>
@@ -2149,9 +2169,9 @@
                             <select name="estado" id="estado_fase4"
                                 class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
                                 <option value="">Seleccione un estado</option>
-                                <option value="Aprobada">Aprobar</option>
+                                <option value="Aprobada">Aprobada</option>
                                 <option value="Aplazada">Aplazada</option>
-                                <option value="Rechazada">Rechazar</option>
+                                <option value="Rechazada">Rechazada</option>
                                 
                             </select>
                             <span id="estado_fase4Error" class="text-red-500 text-sm"></span>
@@ -2196,47 +2216,6 @@
                             <div id="tooltip-fdc127-evaluador-fase4"
                                 class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
                                 Suba el documento F-DC-127 firmado o con comentarios del evaluador.
-                            </div>
-                        </div>
-
-                        <!-- F-DC-195 -->
-                        <div class="mb-4">
-                            <div class="flex items-center gap-2 mb-2">
-                                <label class="block font-medium text-sm text-gray-700">
-                                    <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
-                                   Formato F-DC-195:
-                                </label>
-                                <div class="relative inline-block">
-                                    <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
-                                        data-tooltip="tooltip-fdc195-evaluador-fase4"></i>
-                                </div>
-                            </div>
-                            <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
-                                <div class="grid gap-1 text-center">
-                                    <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                    <h2 class="text-center text-gray-400 text-xs">
-                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_propuesta')}} MB
-                                    </h2>
-                                </div>
-                                <div class="text-center">
-                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
-                                    <input type="file" name="fdc195" id="fdc195_fase4"
-                                        class="absolute inset-0 opacity-0 cursor-pointer w-full"
-                                        accept=".doc,.docx" />
-                                    <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
-                                        Cargar
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="mt-4 mb-4">
-                                <span id="fdc195_fase4Error" class="block text-red-500 text-sm mb-2"></span>
-                                <ul id="file-list-fdc195-fase4" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
-
-                            </div>
-
-                            <div id="tooltip-fdc195-evaluador-fase4"
-                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                                Suba el acta de inicio F-DC-195 firmada o con comentarios del evaluador.
                             </div>
                         </div>
 
@@ -2298,9 +2277,9 @@
                             <select name="estado" id="estado_fase4_comite"
                                 class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
                                 <option value="">Seleccione un estado</option>
-                                <option value="Aprobada">Aprobar</option>
+                                <option value="Aprobada">Aprobada</option>
                                 <option value="Aplazada">Aplazada</option>
-                                <option value="Rechazada">Rechazar</option>
+                                <option value="Rechazada">Rechazada</option>
                             </select>
                             <span id="estado_fase4_comiteError" class="text-red-500 text-sm"></span>
                         </div>
@@ -2381,45 +2360,6 @@
                             <div id="tooltip-fdc127-comite-fase4"
                                 class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
                                 Suba el documento F-DC-127 firmado o con comentarios del comité.
-                            </div>
-                        </div>
-                        <div class="mb-4">
-                            <div class="flex items-center gap-2 mb-2">
-                                <label class="block font-medium text-sm text-gray-700">
-                                    <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
-                                  Formato  F-DC-195:
-                                </label>
-                                <div class="relative inline-block">
-                                    <i class="fa-solid fa-circle-question text-uts-500 cursor-pointer tooltip-icon"
-                                        data-tooltip="tooltip-fdc195-comite-fase4"></i>
-                                </div>
-                            </div>
-                            <div class="w-full mt-1 relative py-8 bg-gray-50 rounded-xl border-2 border-gray-300 gap-3 grid border-dashed">
-                                <div class="grid gap-1 text-center">
-                                    <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
-                                    <h2 class="text-center text-gray-400 text-xs">
-                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_propuesta') }} MB
-                                    </h2>
-                                </div>
-                                <div class="text-center">
-                                    <h4 class="text-center text-gray-900 text-sm font-medium leading-snug">Arrastra o carga tus archivos aquí</h4>
-
-                                    <input type="file" name="fdc195" id="fdc195_fase4_comite"
-                                        class="absolute inset-0 opacity-0 cursor-pointer w-full"
-                                        accept=".doc,.docx" />
-                                    <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
-                                        Cargar
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="mt-4 mb-4">
-                                <span id="fdc195_fase4_comiteError" class="block text-red-500 text-sm mb-2"></span>
-
-                                <ul id="file-list-fdc195-fase4-comite" class="text-gray-600 text-sm list-disc pl-5 m-0"></ul>
-                            </div>
-                            <div id="tooltip-fdc195-comite-fase4"
-                                class="tooltip-content hidden absolute z-10 px-4 py-3 bg-gray-700 text-white text-xs rounded-lg shadow-lg w-56">
-                                Suba el acta de inicio F-DC-195 firmada o con comentarios del comité.
                             </div>
                         </div>
 
@@ -2799,9 +2739,9 @@
                                 class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
 
                                 <option value="">Seleccione un estado</option>
-                                <option value="Aprobada">Aprobar</option>
+                                <option value="Aprobada">Aprobada</option>
                                 <option value="Aplazada">Aplazada</option>
-                                <option value="Rechazada">Rechazar</option>
+                                <option value="Rechazada">Rechazada</option>
 
                             </select>
 
@@ -3170,9 +3110,9 @@
                             <select name="estado" id="estado_fase6"
                                 class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
                                 <option value="">Seleccione un estado</option>
-                                <option value="Aprobada">Aprobar</option>
+                                <option value="Aprobada">Aprobada</option>
                                 <option value="Aplazada">Aplazada</option>
-                                <option value="Rechazada">Rechazar</option>
+                                <option value="Rechazada">Rechazada</option>
                             </select>
 
                             <span id="estado_fase6Error" class="text-red-500 text-sm"></span>
@@ -3450,9 +3390,9 @@
                             <select name="estado" id="estado_fase6_comite"
                                 class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500">
                                 <option value="">Seleccione un estado</option>
-                                <option value="Aprobada">Aprobar</option>
+                                <option value="Aprobada">Aprobada</option>
                                 <option value="Aplazada">Aplazada</option>
-                                <option value="Rechazada">Rechazar</option>
+                                <option value="Rechazada">Rechazada</option>
                             </select>
 
                             <span id="estado_fase6_comiteError" class="text-red-500 text-sm"></span>
@@ -3715,15 +3655,13 @@
             <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5);" onclick="closeCalendarModal()">
                 <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
                     <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative" style="width: 100% !important; padding: 2rem 2rem !important;" onclick="event.stopPropagation()">
-                        
-                        <button class="modal-close-btn-custom" onclick="closeCalendarModal()" style="position: absolute !important; top: 10px !important; right: 28px !important; background: none !important; border: none !important; cursor: pointer !important; color: #6b7280 !important;">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
+
+                        <button class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500 mt-2"
+                            onclick="closeCalendarModal()">&times;
                         </button>
-                        
+
                         <div class="p-6 mt-2">
-                            <p class="text-2xl font-bold text-gray-800 mb-4">Calendario de la <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Práctica</span></p>
+                            <p class="text-2xl font-bold text-gray-800 mb-4">Calendario de <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Prácticas</span></p>
                             <p class="font-medium text-md text-gray-700 mb-2">Aquí podrá visualizar algunas fechas importantes de la práctica en curso.</p>
                             
                             <div class="overflow-x-auto mb-4">
@@ -3735,15 +3673,8 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr class="bg-white">
-                                            <td class="px-4 py-3 border border-gray-300">Propuestas en banco de ideas</td>
-                                            <td class="px-4 py-3 border border-gray-300">
-                                                Desde <span class="font-semibold" style="font-size: 0.9rem;">{{ $fechas['fecha_inicio_banco'] ?? 'No definida' }}</span> 
-                                                hasta <span class="font-semibold" style="font-size: 0.9rem;">{{ $fechas['fecha_fin_banco'] ?? 'No definida' }}</span>
-                                            </td>
-                                        </tr>
                                         <tr class="bg-gray-50">
-                                            <td class="px-4 py-3 border border-gray-300">Propuesta de proyectos de grado</td>
+                                            <td class="px-4 py-3 border border-gray-300">Propuesta de prácticas</td>
                                             <td class="px-4 py-3 border border-gray-300">
                                                 Desde <span class="font-semibold" style="font-size: 0.9rem;">{{ $fechas['fecha_inicio_proyectos'] ?? 'No definida' }}</span> 
                                                 hasta <span class="font-semibold" style="font-size: 0.9rem;">{{ $fechas['fecha_fin_proyectos'] ?? 'No definida' }}</span>

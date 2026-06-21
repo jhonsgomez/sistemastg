@@ -64,10 +64,10 @@ fileSizeContainer.empty();
 
 fileSizeContainer.append(`
     <li class="mb-2 ms-4 mt-4">
-        <div class="text-gray-600 text-sm mb-4">
+        <div class="text-gray-600 text-sm mb-1">
             ${file.name}
         </div>
-        <div class="text-sm text-gray-900">
+        <div class="text-sm text-gray-600">
             Tamaño total: ${fileSizeMB} MB de ${MAX_FILE_SIZE_HV} MB permitidos
         </div>
     </li>

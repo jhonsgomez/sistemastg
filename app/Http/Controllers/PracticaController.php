@@ -1396,7 +1396,7 @@ if ($request->has('search') && $search = $request->input('search.value')) {
             // ============ CONSULTA SIMPLIFICADA ============
             // Traer TODAS las prácticas con estados válidos
             $practicas = Practica::with(['user', 'user.nivel', 'valoresCampos.campo'])
-                ->whereIn('estado', ['Fase 2', 'Fase 3', 'Fase 4', 'Fase 5', 'Fase 6', 'Finalizado'])
+                ->whereIn('estado', ['Fase 1','Fase 2', 'Fase 3', 'Fase 4', 'Fase 5', 'Fase 6', 'Pendiente', 'Finalizado', 'vencida', 'retirado'])
                 ->get();
 
             foreach ($practicas as $practica) {

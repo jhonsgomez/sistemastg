@@ -1438,7 +1438,6 @@ class RoadMapPracticaController extends Controller
                 'practica_id' => 'required|exists:practicas,id',
                 'estado' => 'required|in:Aprobada,Rechazada,Aplazada',
                 'fdc127' => 'nullable|file|mimes:doc,docx|max:5120',
-                'fdc195' => 'nullable|file|mimes:doc,docx|max:5120',
                 'respuesta' => 'nullable|string'
             ]);
 
@@ -1494,23 +1493,6 @@ class RoadMapPracticaController extends Controller
                 PracticaValorCampo::updateOrCreate(
                     ['practica_id' => $practica->id, 'campo_id' => $campoDoc->id],
                     ['valor' => $fdc127Path]
-                );
-            }
-        }
-
-        if ($request->hasFile('fdc195')) {
-            $fdc195Path = $request->file('fdc195')->store('practicas/fase4', 'public');
-            
-            $campoDoc = Campo::where('name', 'doc_fdc195')->first();
-            if ($campoDoc) {
-                $valorExistente = PracticaValorCampo::where('practica_id', $practica->id)
-                    ->where('campo_id', $campoDoc->id)->first();
-                if ($valorExistente && $valorExistente->valor) {
-                    Storage::disk('public')->delete($valorExistente->valor);
-                }
-                PracticaValorCampo::updateOrCreate(
-                    ['practica_id' => $practica->id, 'campo_id' => $campoDoc->id],
-                    ['valor' => $fdc195Path]
                 );
             }
         }
@@ -1626,7 +1608,6 @@ class RoadMapPracticaController extends Controller
                 'nro_acta' => 'required_if:estado,Aprobada|string',
                 'fecha_acta' => 'required_if:estado,Aprobada|date',
                 'fdc127' => 'nullable|file|mimes:doc,docx|max:5120',
-                'fdc195' => 'nullable|file|mimes:doc,docx|max:5120',
                 'respuesta' => 'nullable|string'
             ]);
 
@@ -1688,23 +1669,6 @@ class RoadMapPracticaController extends Controller
                 PracticaValorCampo::updateOrCreate(
                     ['practica_id' => $practica->id, 'campo_id' => $campoDoc->id],
                     ['valor' => $fdc127Path]
-                );
-            }
-        }
-
-        if ($request->hasFile('fdc195')) {
-            $fdc195Path = $request->file('fdc195')->store('practicas/fase4/comite/documentos', 'public');
-            
-            $campoDoc = Campo::where('name', 'doc_fdc195')->first();
-            if ($campoDoc) {
-                $valorExistente = PracticaValorCampo::where('practica_id', $practica->id)
-                    ->where('campo_id', $campoDoc->id)->first();
-                if ($valorExistente && $valorExistente->valor) {
-                    Storage::disk('public')->delete($valorExistente->valor);
-                }
-                PracticaValorCampo::updateOrCreate(
-                    ['practica_id' => $practica->id, 'campo_id' => $campoDoc->id],
-                    ['valor' => $fdc195Path]
                 );
             }
         }

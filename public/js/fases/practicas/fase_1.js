@@ -1,5 +1,4 @@
 function openFase1EstudianteModal(btn) {
-    // Mostrar spinner y ocultar icono en el botón
     if (btn) {
         const icon = btn.querySelector('i');
         const spinner = btn.querySelector('.loading-spinner');
@@ -10,9 +9,20 @@ function openFase1EstudianteModal(btn) {
     
     const modal = document.getElementById('fase1EstudianteModal');
     modal.classList.add('show');
-    toggleNombreEmpresa();
-    
-    // Restaurar el botón después de abrir el modal
+    const tieneEmpresa = $(btn).data('tiene-empresa');
+
+    if (tieneEmpresa == 1) {
+        $('#contenedorPracticaInstitucional').hide();
+        $('#es_institucional').prop('checked', false);
+        $('#nombre_empresa_container').show();
+        $('#nombre_empresa').prop('required', true);
+    } else {
+        $('#contenedorPracticaInstitucional').show();
+        toggleNombreEmpresa();
+    }
+
+    configurarFormularioEmpresa(tieneEmpresa);
+
     if (btn) {
         setTimeout(() => {
             const icon = btn.querySelector('i');
@@ -29,14 +39,30 @@ function closeFase1EstudianteModal() {
     $('#fase1EstudianteModal').removeClass('show');
 
     $('#doc_fdc126').val('');
-
     $('#nombre_empresa').val('');
-    
     $('#file-list-fase1').empty();
-    
     $('#doc_fdc126Error').text('');
 
+    $('#contenedorPracticaInstitucional').show();
+    $('#es_institucional').prop('checked', false);
+    
 }
+
+    function configurarFormularioEmpresa(tieneEmpresa) {
+
+        if (tieneEmpresa == 1) {
+
+            $('#es_institucional_container').hide();
+            $('#es_institucional').prop('checked', false);
+            $('#nombre_empresa_container').show();
+            $('#nombre_empresa').prop('required', true);
+            $('#nombre_empresa').prop('readonly', false);
+
+        } else {
+            $('#es_institucional_container').show();
+            toggleNombreEmpresa();
+        }
+    }
 
 // ========== FUNCIONES PARA FASE 1 ==========
 
@@ -50,14 +76,11 @@ function toggleNombreEmpresa() {
     }
 }
 
-// Función para cerrar el modal de detalles
 function closeFase1DetailsModal() {
     $('#fase1DetailsModal').removeClass('show');
 }
 
-// Abrir modal de detalles con spinner en el botón
 function openFase1DetailsModal(btn) {
-    // Mostrar spinner y ocultar icono en el botón
     if (btn) {
         const icon = btn.querySelector('i');
         const spinner = btn.querySelector('.loading-spinner');
@@ -106,7 +129,6 @@ function openFase1DetailsModal(btn) {
             showToast('No se pudieron cargar los detalles', 'error');
         },
         complete: function() {
-            // Restaurar el botón: ocultar spinner y mostrar icono
             if (btn) {
                 const icon = btn.querySelector('i');
                 const spinner = btn.querySelector('.loading-spinner');
@@ -118,12 +140,10 @@ function openFase1DetailsModal(btn) {
     });
 }
 
-// Función para abrir modal de administrador (responder) con spinner
 
 let quillFase1 = null;
 
 function openFase1AdminModal(btn) {
-    // Mostrar spinner y ocultar icono en el botón
     if (btn) {
         const icon = btn.querySelector('i');
         const spinner = btn.querySelector('.loading-spinner');
@@ -141,12 +161,9 @@ function openFase1AdminModal(btn) {
     $('#estado_fase1Error').text('');
     $('#respuesta_fase1Error').text('');
     
-    // PRIMERO abrir el modal
     $('#fase1AdminModal').addClass('show');
     
-    // ESPERAR a que el modal esté visible y luego inicializar Quill
     setTimeout(function() {
-        // Verificar si el elemento existe
         if ($('#txt-editor-fase1').length > 0) {
             if (!window.quillFase1) {
                 window.quillFase1 = new Quill('#txt-editor-fase1', {
@@ -175,14 +192,12 @@ function openFase1AdminModal(btn) {
                 quillFase1.root.innerHTML = '';
                 quillFase1 = window.quillFase1;
             }
-            // Forzar actualización
             quillFase1.update();
         } else {
             console.error('No se encontró el elemento #txt-editor-fase1');
         }
     }, 200);
     
-    // Restaurar el botón después de abrir el modal
     if (btn) {
         setTimeout(() => {
             const icon = btn.querySelector('i');

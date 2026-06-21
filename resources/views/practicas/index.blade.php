@@ -1165,10 +1165,8 @@ $mes_actual = Carbon::now()->month;
                 <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
                     <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content relative" style="width: 100% !important; padding: 2rem 2rem !important;" onclick="event.stopPropagation()">
                         
-                        <button class="modal-close-btn-custom" onclick="closeCalendarModal()" style="position: absolute !important; top: 30px !important; right: 28px !important; background: none !important; border: none !important; cursor: pointer !important; color: #6b7280 !important;">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
+                        <button class="modal-close-btn-custom absolute top-2 right-4 text-2xl text-gray-500 hover:text-red-500 mt-2"
+                            onclick="closeCalendarModal()">&times;
                         </button>
                         
                         <div class="p-6 mt-2">
@@ -1184,15 +1182,8 @@ $mes_actual = Carbon::now()->month;
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr class="bg-white">
-                                            <td class="px-4 py-3 border border-gray-300">Propuestas en banco de ideas</td>
-                                            <td class="px-4 py-3 border border-gray-300">
-                                                Desde <span class="font-semibold" style="font-size: 0.9rem;">{{ $fechas['fecha_inicio_banco'] ?? 'No definida' }}</span> 
-                                                hasta <span class="font-semibold" style="font-size: 0.9rem;">{{ $fechas['fecha_fin_banco'] ?? 'No definida' }}</span>
-                                            </td>
-                                        </tr>
                                         <tr class="bg-gray-50">
-                                            <td class="px-4 py-3 border border-gray-300">Propuesta de proyectos de grado</td>
+                                            <td class="px-4 py-3 border border-gray-300">Propuesta de prácticas</td>
                                             <td class="px-4 py-3 border border-gray-300">
                                                 Desde <span class="font-semibold" style="font-size: 0.9rem;">{{ $fechas['fecha_inicio_proyectos'] ?? 'No definida' }}</span> 
                                                 hasta <span class="font-semibold" style="font-size: 0.9rem;">{{ $fechas['fecha_fin_proyectos'] ?? 'No definida' }}</span>
@@ -1626,11 +1617,9 @@ function toggleHojaVida() {
 
     const integrante2 = document.getElementById('id_integrante_2');
 
-    // PRIMERA HOJA DE VIDA
     const container1 = document.getElementById('hojaVidaContainer');
     const label1 = document.getElementById('hojaVidaLabel');
 
-    // SEGUNDA HOJA DE VIDA
     const container2 = document.getElementById('hojaVidaContainer2');
     const label2 = document.getElementById('hojaVidaLabel2');
 

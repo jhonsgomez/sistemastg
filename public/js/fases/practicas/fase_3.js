@@ -131,8 +131,8 @@ fileList.append(`
         <div class="text-gray-600 text-sm mb-1">
             ${escapeHtml(file.name)}
         </div>
-        <div class="text-sm ml-6 text-gray-900">
-            Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_MB} MB permitidos
+        <div class="text-sm text-gray-600">
+            Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_PR} MB permitidos
         </div>
     </li>
 `);
@@ -200,8 +200,8 @@ fileList.append(`
         <div class="text-gray-600 text-sm mb-1">
             ${escapeHtml(file.name)}
         </div>
-        <div class="text-sm ml-6 text-gray-900">
-            Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_MB} MB permitidos
+        <div class="text-sm text-gray-600">
+            Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_PR} MB permitidos
         </div>
     </li>
 `);
@@ -264,8 +264,8 @@ fileList.append(`
         <div class="text-gray-600 text-sm mb-1">
             ${escapeHtml(file.name)}
         </div>
-        <div class="text-sm ml-6 text-gray-900">
-            Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_MB} MB permitidos
+        <div class="text-sm text-gray-600">
+            Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_PR} MB permitidos
         </div>
     </li>
 `);
@@ -429,8 +429,8 @@ fileList.append(`
         <div class="text-gray-600 text-sm mb-1">
             ${escapeHtml(file.name)}
         </div>
-        <div class="text-sm ml-6 text-gray-900">
-            Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_MB} MB permitidos
+        <div class="text-sm text-gray-600">
+            Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_PR} MB permitidos
         </div>
     </li>
 `);
@@ -487,8 +487,8 @@ fileList.append(`
         <div class="text-gray-600 text-sm mb-1">
             ${escapeHtml(file.name)}
         </div>
-        <div class="text-sm ml-6 text-gray-900">
-            Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_MB} MB permitidos
+        <div class="text-sm text-gray-600">
+            Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_PR} MB permitidos
         </div>
     </li>
 `);
@@ -545,8 +545,8 @@ fileList.append(`
         <div class="text-gray-600 text-sm mb-1">
             ${escapeHtml(file.name)}
         </div>
-        <div class="text-sm ml-6 text-gray-900">
-            Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_MB} MB permitidos
+        <div class="text-sm text-gray-600">
+            Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_PR} MB permitidos
         </div>
     </li>
 `);

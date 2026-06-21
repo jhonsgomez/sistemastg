@@ -123,10 +123,10 @@ $('#fdc128_fase5').on('change', function(e) {
 
     fileList.append(`
         <li class="mb-2 mt-4">
-            <div class="text-gray-600 text-sm mb-4">
+            <div class="text-gray-600 text-sm mb-1">
                 ${file.name}
             </div>
-            <div class="text-sm text-gray-900">
+            <div class="text-sm text-gray-600">
                 Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_IN} MB permitidos
             </div>
         </li>
@@ -185,7 +185,7 @@ $('#fdc129_fase5').on('change', function(e) {
             <div class="text-gray-600 text-sm mb-1">
                 ${file.name}
             </div>
-            <div class="text-sm text-gray-900">
+            <div class="text-sm text-gray-600">
                 Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_IN} MB permitidos
             </div>
         </li>
@@ -245,7 +245,7 @@ $('#fdc196_fase5').on('change', function(e) {
             <div class="text-gray-600 text-sm mb-1">
                 ${file.name}
             </div>
-            <div class="text-sm text-gray-900">
+            <div class="text-sm text-gray-600">
                 Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_IN} MB permitidos
             </div>
         </li>
@@ -304,7 +304,7 @@ $('#turnitin_fase5').on('change', function(e) {
             <div class="text-gray-600 text-sm mb-1">
                 ${file.name}
             </div>
-            <div class="text-sm text-gray-900">
+            <div class="text-sm text-gray-600">
                 Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_IN} MB permitidos
             </div>
         </li>
@@ -359,7 +359,7 @@ $('#doc_fdc128').on('change', function(e) {
             <div class="text-gray-600 text-sm mb-1">
                 ${file.name}
             </div>
-            <div class="text-sm text-gray-900">
+            <div class="text-sm text-gray-600">
                 Tamaño total: ${fileSizeMB} MB de ${MAX_FILE_SIZE_IN} MB permitidos
             </div>
         </li>
@@ -415,7 +415,7 @@ $('#doc_fdc129').on('change', function(e) {
             <div class="text-gray-600 text-sm mb-1">
                 ${file.name}
             </div>
-            <div class="text-sm text-gray-900">
+            <div class="text-sm text-gray-600">
                 Tamaño total: ${fileSizeMB} MB de ${MAX_FILE_SIZE_IN} MB permitidos
             </div>
         </li>
@@ -471,7 +471,7 @@ $('#doc_fdc196').on('change', function(e) {
             <div class="text-gray-600 text-sm mb-1">
                 ${file.name}
             </div>
-            <div class="text-sm text-gray-900">
+            <div class="text-sm text-gray-600">
                 Tamaño total: ${fileSizeMB} MB de ${MAX_FILE_SIZE_IN} MB permitidos
             </div>
         </li>

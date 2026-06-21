@@ -19,7 +19,6 @@ function openFase4EvaluadorModal(btn) {
     $('#fecha_acta_fase4').val('');
     $('#respuesta_fase4').val('');
     $('#fdc127_fase4').val('');
-    $('#fdc195_fase4').val('');
 
     // ================= LIMPIAR ERRORES =================
     $('#estado_fase4Error').text('');
@@ -27,16 +26,13 @@ function openFase4EvaluadorModal(btn) {
     $('#fecha_acta_fase4Error').text('');
     $('#respuesta_fase4Error').text('');
     $('#fdc127_fase4Error').text('');
-    $('#fdc195_fase4Error').text('');
 
     // ================= LIMPIAR LISTAS =================
     $('#file-list-fdc127-fase4').html('');
-    $('#file-list-fdc195-fase4').html('');
 
     // ================= ABRIR MODAL =================
     $('#fase4EvaluadorModal').addClass('show');
 
-    // ================= QUILL =================
     setTimeout(function () {
         if ($('#txt-editor-fase4-evaluador').length > 0) {
             if (quillFase4Evaluador === null) {
@@ -69,7 +65,6 @@ function openFase4EvaluadorModal(btn) {
         }
     }, 200);
 
-    // ================= RESTAURAR BOTÓN =================
     if (btn) {
         setTimeout(() => {
             const icon = btn.querySelector('i');
@@ -220,65 +215,7 @@ function closeFase4EvaluadorModal() {
             <div class="text-gray-600 text-sm mb-1">
                 ${file.name}
             </div>
-            <div class="text-sm text-gray-900">
-                Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_PR} MB permitidos
-            </div>
-        </li>
-    `);
-});
-
-    // FDC195
-
-    $('#fdc195_fase4').on('change', function(e) {
-
-    const file = e.target.files[0];
-    const fileList = $('#file-list-fdc195-fase4');
-
-    fileList.empty();
-
-    if (!file) return;
-
-    const maxSizeBytes = MAX_FILE_SIZE_PR * 1024 * 1024;
-
-    if (file.size > maxSizeBytes) {
-
-        Swal.fire({
-            icon: 'error',
-            title: 'Archivo demasiado grande',
-            text: `El archivo no puede superar los ${MAX_FILE_SIZE_PR} MB.`,
-            confirmButtonColor: '#C1D631',
-            confirmButtonText: 'Aceptar'
-        });
-
-        $(this).val('');
-        return;
-    }
-
-    const extension = file.name.split('.').pop().toLowerCase();
-
-    if (!['doc', 'docx'].includes(extension)) {
-
-        Swal.fire({
-            icon: 'error',
-            title: 'Archivo inválido',
-            text: 'Solo se permiten archivos .DOC, .DOCX.',
-            confirmButtonColor: '#C1D631',
-            confirmButtonText: 'Aceptar'
-        });
-
-        $(this).val('');
-        return;
-    }
-
-    const fileSizeMB2 = parseFloat(
-        (file.size / (1024 * 1024)).toFixed(2)
-    );
-    fileList.append(`
-        <li class="mb-2 mt-4">
-            <div class="text-gray-600 text-sm mb-1">
-                ${file.name}
-            </div>
-            <div class="text-sm text-gray-900">
+            <div class="text-sm text-gray-600">
                 Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_PR} MB permitidos
             </div>
         </li>
@@ -400,10 +337,9 @@ Swal.fire({
                     if (errors.fecha_acta) $('#fecha_acta_fase4Error').text(errors.fecha_acta[0]);
                     if (errors.respuesta) $('#respuesta_fase4Error').text(errors.respuesta[0]);
                     if (errors.fdc127) $('#fdc127_fase4Error').text(errors.fdc127[0]);
-                    if (errors.fdc195) $('#fdc195_fase4Error').text(errors.fdc195[0]);
                     
                     setTimeout(() => {
-                        $('#estado_fase4Error, #nro_acta_fase4Error, #fecha_acta_fase4Error, #respuesta_fase4Error, #fdc127_fase4Error, #fdc195_fase4Error').text('');
+                        $('#estado_fase4Error, #nro_acta_fase4Error, #fecha_acta_fase4Error, #respuesta_fase4Error, #fdc127_fase4Error').text('');
                     }, 5000);
                 } else {
                     showToast(xhr.responseJSON?.error || 'Error al enviar respuesta', 'error');
@@ -454,7 +390,6 @@ function openFase4ComiteModal(btn) {
     $('#fecha_acta_fase4_comite').val('');
     $('#respuesta_fase4_comite').val('');
     $('#fdc127_fase4_comite').val('');
-    $('#fdc195_fase4_comite').val('');
     $('#file-list-fdc127-fase4-comite').empty();
     $('#file-list-fdc195-fase4-comite').empty();
     $('#estado_fase4_comiteError').text('');
@@ -463,7 +398,6 @@ function openFase4ComiteModal(btn) {
     $('#fecha_acta_fase4_comiteError').text('');
     $('#respuesta_fase4_comiteError').text('');
     $('#fdc127_fase4_comiteError').text('');
-    $('#fdc195_fase4_comiteError').text('');
     
     $('#fase4ComiteModal').addClass('show');
     
@@ -647,67 +581,12 @@ $(document).ready(function() {
             <div class="text-gray-600 text-sm mb-1">
                 ${file.name}
             </div>
-            <div class="text-sm text-gray-900">
+            <div class="text-sm text-gray-600">
                 Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_PR} MB permitidos
             </div>
         </li>
     `);
 });
-    
-    $('#fdc195_fase4_comite').on('change', function(e) {
-        const file = e.target.files[0];
-        const fileList = $('#file-list-fdc195-fase4-comite');
-        fileList.empty();
-        
-        if (file) {
-            const maxSizeBytes = MAX_FILE_SIZE_PR * 1024 * 1024;
-
-    if (file.size > maxSizeBytes) {
-
-        Swal.fire({
-            icon: 'error',
-            title: 'Archivo demasiado grande',
-            text: `El archivo no puede superar los ${MAX_FILE_SIZE_PR} MB.`,
-            confirmButtonColor: '#C1D631',
-            confirmButtonText: 'Aceptar'
-        });
-
-        $(this).val('');
-        return;
-    }
-
-    const extension = file.name.split('.').pop().toLowerCase();
-
-    if (!['doc', 'docx'].includes(extension)) {
-
-        Swal.fire({
-            icon: 'error',
-            title: 'Archivo inválido',
-            text: 'Solo se permiten archivos .DOC, .DOCX.',
-            confirmButtonColor: '#C1D631',
-            confirmButtonText: 'Aceptar'
-        });
-
-        $(this).val('');
-        return;
-    }
-
-    const fileSizeMB2 = parseFloat(
-        (file.size / (1024 * 1024)).toFixed(2)
-    );
-
-    fileList.append(`
-        <li class="mb-2 mt-4">
-            <div class="text-gray-600 text-sm mb-4">
-                ${file.name}
-            </div>
-            <div class="text-sm text-gray-900">
-                Tamaño total: ${fileSizeMB2} MB de ${MAX_FILE_SIZE_PR} MB permitidos
-            </div>
-        </li>
-    `);
-        }
-    });
 
     // ENVIO FORMULARIO
 
@@ -803,7 +682,6 @@ $(document).ready(function() {
                             if (errors.nro_acta) $('#nro_acta_fase4_comiteError').text(errors.nro_acta[0]);
                             if (errors.fecha_acta) $('#fecha_acta_fase4_comiteError').text(errors.fecha_acta[0]);
                             if (errors.fdc127) $('#fdc127_fase4_comiteError').text(errors.fdc127[0]);
-                            if (errors.fdc195) $('#fdc195_fase4_comiteError').text(errors.fdc195[0]);
                             if (errors.respuesta) $('#respuesta_fase4_comiteError').text(errors.respuesta[0]);
                         } else {
                             showToast(xhr.responseJSON?.error || 'Error al enviar respuesta', 'error');
