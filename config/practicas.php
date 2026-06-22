@@ -11,6 +11,9 @@ return [
     'peso_maximo_propuesta' => env('PESO_MAXIMO_PROPUESTA', 4),
     'peso_maximo_informe' => env('PESO_MAXIMO_ARCHIVO', 6),
     'peso_maximo_hojavida' => env('PESO_MAXIMO_HOJAVIDA', 9),
+
+    'creditos_tecnologia' => env('CREDITOS_TECNOLOGIA', 97),
+    'creditos_profesional' => env('CREDITOS_PROFESIONAL', 65),
     
     'correos' => [
 

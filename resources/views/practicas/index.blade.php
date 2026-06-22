@@ -583,11 +583,11 @@ $mes_actual = Carbon::now()->month;
                     <form id="practicasForm" class="p-6 mt-2" method="POST" enctype="multipart/form-data">
                         @csrf
                         <p class="text-2xl font-bold mb-6" id="formTitle"></p>
-                        <p class="text-md mb-2">
+                        <p class="text-md mb-6">
                             En este formulario, el estudiante registrará la información necesaria para realizar la solicitud de prácticas empresariales.
                         </p>
 
-                        <p class="text-sm text-gray-600 mb-6">
+                        <p class="text-md text-gray-700 mb-6">
                             <i class="fa-solid fa-circle-info mr-1 text-uts-500"></i>
                             Tener en cuenta que la solicitud de prácticas empresariales es individual.
                         </p>
@@ -887,7 +887,10 @@ $mes_actual = Carbon::now()->month;
                            Si selecciona un segundo integrante, el comité evaluará si la propuesta puede realizarse entre dos estudiantes. Luego, aprobará o rechazará la solicitud.
                         </p>
                         
-                        <p class="text-sm mb-6"><strong>NOTA: </strong>El estudiante debe tener aprobado el <strong>90%</strong> de los créditos (Tecnología: 97 / Profesional: 65).</p>
+                        <p class="text-sm mb-6"><strong>NOTA: </strong>Para los estudiantes con pensum 2019-1, cada estudiante debe tener aprobado el <strong>90%</strong> de los créditos (Tecnología: 97 / Profesional: 65).
+                        <br>
+                        Para los estudiantes con Pensum 2025-2, El estudiante debe tener aprobado el <strong>90%</strong> de los créditos (Tecnología: {{ config('practicas.creditos_tecnologia') }} / Profesional: {{ config('practicas.creditos_profesional') }}).
+                        </p>
                         <p class="text-sm mb-6"><strong>NOTA: </strong>Verifique si la empresa tiene convenio vigente en la pagina de la Oficina de Relaciones Interinstitucionales (ORI) :<a href="https://oriapp.uts.edu.co/activities_guest" target="_blank" class="text-uts-500 underline hover:text-uts-800"> Consultar convenios aquí </a></p>
 
                         <div class="flex justify-end space-x-2">
