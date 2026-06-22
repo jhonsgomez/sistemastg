@@ -3795,7 +3795,7 @@
 
                                         <div class="flex items-start my-4">
                                             <p class="font-medium text-sm text-red-700 text-justify">
-                                                <i class="fa-solid fa-circle-info text-red-500 text-xl mr-2 mt-1"></i><strong>IMPORTANTE:</strong> Una vez aprobados los documentos de la propuesta de prácticas empresariales (ARL, FDC-127, FDC195) <strong>SOLO en esa etapa</strong>, el estudiante podrá aplicar al beneficio, y de acuerdo a la desición tomada por coordinación, el estudiante será eximido de la entrega de los documentos finales, <strong>Sin embargo, deberá terminar las 600 horas prácticas en la empresa. </strong>
+                                                <i class="fa-solid fa-circle-info text-red-500 text-xl mr-2 mt-1"></i><strong>IMPORTANTE:</strong> Una vez aprobados los documentos de la propuesta de prácticas empresariales (ARL, FDC-127, FDC195) <strong>SOLO en esa etapa</strong>, el estudiante podrá aplicar al beneficio, y de acuerdo a la desición tomada por coordinación, el estudiante será eximido de la entrega de los documentos finales, <strong>Sin embargo, deberá terminar las 600 horas prácticas en la empresa. </strong> <br> Los requisitos para ser aprobado el Beneficio saber TYT/PRO son los siguientes:  <br> 1. Cuando se certifique por parte de una E.P.S. una enfermedad grave del estudiante que le impida continuar con su práctica. <br> 2. Cuando la empresa solicita el aplazamiento de la práctica por motivos ajenos al desarrollo de su actividad económica.
                                             </p>
                                         </div>
 
