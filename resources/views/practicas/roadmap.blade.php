@@ -284,11 +284,21 @@
                 @endif
 
                 <!-- Botón Volver (Verde) -->
-                <a href="{{ route('practicas.index') }}"
-                    class=" bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg transition flex items-center">
-                    <i class="fa-solid fa-arrow-rotate-left mr-2"></i>
-                    <span>Volver</span>
-                </a>
+@php
+    $rutaVolver = route('practicas.index'); // Ruta por defecto
+    
+    if (auth()->user()->hasRole('director_practica')) {
+        $rutaVolver = route('director.practicas.index');
+    } elseif (auth()->user()->hasRole('evaluador_practica')) {
+        $rutaVolver = route('evaluador.practicas.index');
+    }
+@endphp
+
+<a href="{{ $rutaVolver }}"
+    class="bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg transition flex items-center">
+    <i class="fa-solid fa-arrow-rotate-left mr-2"></i>
+    <span>Volver</span>
+</a>
             </div>
         </div>
         
@@ -1895,7 +1905,7 @@
                                 <div class="grid gap-2 text-center">
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
                                     <h2 class="text-center text-gray-400 text-xs">
-                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_propuesta') }} MB
+                                        Solo archivos de WORD y PDF de máximo {{ config('practicas.peso_maximo_propuesta') }} MB
                                     </h2>
                                 </div>
 
@@ -2077,7 +2087,7 @@
                                 <div class="grid gap-1 text-center">
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
                                     <h2 class="text-center text-gray-400 text-xs">
-                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_propuesta') }} MB
+                                        Solo archivos de WORD y PDF de máximo {{ config('practicas.peso_maximo_propuesta') }} MB
                                     </h2>
                                 </div>
 
@@ -2088,7 +2098,7 @@
 
                                     <input type="file" name="fdc195" id="fdc195_fase3"
                                         class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                                        accept=".doc,.docx" />
+                                        accept=".pdf,.doc,.docx" />
 
                                     <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
                                         Cargar
@@ -2623,7 +2633,7 @@
                                     <div class="grid gap-1 text-center">
                                         <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
                                         <h2 class="text-gray-400 text-xs">
-                                            Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_informe') }} MB
+                                            Solo archivos de WORD y PDF de máximo {{ config('practicas.peso_maximo_informe') }} MB
                                         </h2>
                                     </div>
 
@@ -2634,7 +2644,7 @@
 
                                         <input type="file" name="doc_fdc196" id="doc_fdc196"
                                             class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                                            accept=".doc,.docx" />
+                                            accept=".pdf,.doc,.docx" />
 
                                         <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
                                             Cargar
@@ -2937,7 +2947,7 @@
                                     <i class="mx-auto text-3xl text-uts-500 fa-solid fa-cloud-arrow-up"></i>
 
                                     <h2 class="text-center text-gray-400 text-xs">
-                                        Solo archivos de WORD de máximo {{ config('practicas.peso_maximo_informe') }} MB
+                                        Solo archivos de WORD y PDF de máximo {{ config('practicas.peso_maximo_informe') }} MB
                                     </h2>
                                 </div>
 
@@ -2948,7 +2958,7 @@
 
                                     <input type="file" name="fdc196" id="fdc196_fase5"
                                         class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                                        accept=".doc,.docx" />
+                                        accept=".pdf,.doc,.docx" />
 
                                     <div class="inline-flex w-28 h-8 bg-uts-500 rounded-full shadow text-white text-sm font-semibold items-center justify-center cursor-pointer hover:bg-uts-600 transition">
                                         Cargar
@@ -3766,7 +3776,7 @@
 @if ($fase_actual >= 5 && $fase_actual <= 6)
     
     {{-- Modal Estudiante (solo visible cuando el estudiante no ha enviado) --}}
-    @if (!$yaEnvio && !$esBeneficiario)
+    
         <div id="icfesEstudianteModal" class="fixed z-50 inset-0 overflow-y-auto">
                     <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeIcfesEstudianteModal()">
                         <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
@@ -3840,7 +3850,7 @@
                         </div>
                     </div>
                 </div>
-    @endif
+    
     
     {{-- Modal Admin (SIEMPRE debe existir en el DOM) --}}
 <div id="icfesAdminModal" class="fixed z-50 inset-0 overflow-y-auto">
@@ -3874,12 +3884,21 @@
                             <i class="fa-solid fa-flag-checkered mr-2 text-gray-500"></i>
                             Integrante de la práctica:
                         </label>
-                        <select name="estudiante_id" id="estudiante_id_practicas" lang="es" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full focus:ring-uts-500 focus:border-uts-500">
-                            <option value="" selected disabled>Selecciona un estudiante</option>
+                        <select name="estudiante_id"
+                                id="estudiante_id_practicas"
+                                class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full focus:ring-uts-500 focus:border-uts-500">
+
+                            <option value="" selected disabled>
+                                Selecciona un estudiante
+                            </option>
+
                             @foreach ($solicitudesEnviadas as $estudiante)
-                                <option value="{{ $estudiante->id }}">{{ $estudiante->name }}</option>
+                                <option value="{{ $estudiante->id }}">
+                                    {{ $estudiante->name }}
+                                </option>
                             @endforeach
                         </select>
+
                         <span id="estudiante_id_practicasError" class="text-red-500 text-sm"></span>
                     </div>
 
@@ -4802,9 +4821,19 @@
 
         $('#icfesAdminTitle').html(`Beneficio saber <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">TYT/PRO</span>`);
 
+        // Inicializar Select2 una sola vez
+        if (!$('#estudiante_id_practicas').hasClass("select2-hidden-accessible")) {
+            $('#estudiante_id_practicas').select2({
+                dropdownParent: $('#icfesAdminModal'),
+                placeholder: 'Buscar estudiante',
+                allowClear: true,
+                width: '100%'
+            });
+        }
+        
         // Limpiar campos
         $('#estado_icfes_practicas').val('').trigger('change');
-        $('#estudiante_id_practicas').val('').trigger('change');
+        $('#estudiante_id_practicas').val(null).trigger('change');
         $('#nro_acta_icfes_practicas').val('');
         $('#fecha_acta_icfes_practicas').val('');
         $('#respuesta_icfes_practicas').val('');

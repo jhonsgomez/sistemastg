@@ -481,8 +481,6 @@ $mes_actual = Carbon::now()->month;
                         </path>
                     </svg>
                 </button>
-                @endif
-                @endif
 
             @if (auth()->user()->hasRole(['estudiante']))
                 @can('create_proyecto_grado')
@@ -505,6 +503,10 @@ $mes_actual = Carbon::now()->month;
                     </button>
                 @endcan
             @endif
+
+            @endif
+                @endif
+
             @if (auth()->user()->hasRole(['super_admin', 'admin', 'coordinador']))
                 <button type="button" id="reporte" onclick="openReporteModal()"
                     class="btn-action shadow bg-green-700 hover:bg-green-800 text-white px-3 py-1 rounded-lg relative">

@@ -171,12 +171,12 @@ if (file.size > maxSizeBytes) {
             .pop()
             .toLowerCase();
 
-        if (!['doc', 'docx'].includes(extension)) {
+        if (!['pdf', 'doc', 'docx'].includes(extension)) {
 
         Swal.fire({
             icon: 'error',
             title: 'Archivo inválido',
-            text: 'Solo se permiten archivos .DOC, .DOCX.',
+            text: 'Solo se permiten archivos .DOC, .DOCX., .PDF',
             confirmButtonColor: '#C1D631',
             confirmButtonText: 'Aceptar'
         });

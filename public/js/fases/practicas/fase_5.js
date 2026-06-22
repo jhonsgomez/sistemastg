@@ -222,12 +222,12 @@ $('#fdc196_fase5').on('change', function(e) {
 
     const extension = file.name.split('.').pop().toLowerCase();
 
-    if (!['doc', 'docx'].includes(extension)) {
+    if (!['pdf', 'doc', 'docx'].includes(extension)) {
 
         Swal.fire({
             icon: 'error',
             title: 'Archivo inválido',
-            text: 'Solo se permiten archivos .DOC, .DOCX.',
+            text: 'Solo se permiten archivos .DOC, .DOCX. .PDF',
             confirmButtonColor: '#C1D631',
             confirmButtonText: 'Aceptar'
         });
@@ -451,12 +451,12 @@ $('#doc_fdc196').on('change', function(e) {
 
     const extension = file.name.split('.').pop().toLowerCase();
 
-    if (!['doc', 'docx'].includes(extension)) {
+    if (!['pdf', 'doc', 'docx'].includes(extension)) {
 
         Swal.fire({
             icon: 'error',
             title: 'Archivo inválido',
-            text: 'Solo se permiten archivos .DOC y .DOCX.',
+            text: 'Solo se permiten archivos .DOC y .DOCX. .PDF',
             confirmButtonColor: '#C1D631'
         });
 
