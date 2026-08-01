@@ -9,8 +9,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('practicas', function (Blueprint $table) {
-        $table->dropColumn('data');
-    });
+            $table->dropColumn('data');
+        });
     }
     public function down(): void
     {

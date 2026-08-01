@@ -51,8 +51,6 @@ class PracticasMail extends Mailable implements ShouldQueue
         );
     }
 
-
-
     public function attachments(): array
     {
         if (($this->data['adjuntar_archivos'] ?? false) !== true) {
@@ -91,7 +89,4 @@ class PracticasMail extends Mailable implements ShouldQueue
 
         return $attachments;
     }
-    
-
-
 }
