@@ -134,7 +134,7 @@
             Estimado estudiante, en este correo se le informa la respuesta de su solicitud
             correspondiente a la <strong>FASE 2</strong> de prácticas empresariales
             @if($estado === 'Aprobada')
-                ha pasado a <strong>{{ strtoupper($nuevoEstado) }}</strong>
+                ha pasado a <strong>FASE 3</strong>
             @elseif($estado === 'Aplazada')
                 ha sido <strong>APLAZADA</strong>
             @elseif($estado === 'Rechazada')

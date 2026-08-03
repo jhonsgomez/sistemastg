@@ -1,12 +1,12 @@
 
-    @php
-use Carbon\Carbon;
+@php
+    use Carbon\Carbon;
 
-$fechaActual = Carbon::now()->format('Y-m-d');
+    $fechaActual = Carbon::now()->format('Y-m-d');
 
-$anio_inicio = 2025;
-$anio_actual = Carbon::now()->year;
-$mes_actual = Carbon::now()->month;
+    $anio_inicio = 2025;
+    $anio_actual = Carbon::now()->year;
+    $mes_actual = Carbon::now()->month;
 @endphp
 
 <!---Este es el que trae el menu -->
@@ -202,6 +202,10 @@ $mes_actual = Carbon::now()->month;
                 border: none !important;
                 font-size: 1.5rem !important;
                 color: #333 !important;
+                cursor: pointer !important;
+            }
+
+            .radio-verde {
                 cursor: pointer !important;
             }
 
@@ -461,51 +465,49 @@ $mes_actual = Carbon::now()->month;
             </button>
 
             <!-- Botón Calendario (Verde) -->
-                <!--- AQUI SOLO VA LA VARIABLE $fechas--->
+            <!--- AQUI SOLO VA LA VARIABLE $fechas--->
 
-                @if ($fechas)
+            @if (isset($fechas))
                 @if ($fechaActual >= $fechas['fecha_inicio_proyectos'] && $fechaActual <= $fechas['fecha_fin_proyectos'])
-
-                <button type="button" id="calendar" onclick="openCalendarModal(this)"
-                    class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white px-3 py-1 rounded-lg relative">
-                    <i class="fa-regular fa-calendar"></i>
-                    <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none"
-                        xmlns="http://www.w3.org/2000/svg" width="24" height="24">
-                        <path
-                            d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
-                            stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
-                        <path
-                            d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
-                            stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"
-                            class="text-white">
-                        </path>
-                    </svg>
-                </button>
-
-            @if (auth()->user()->hasRole(['estudiante']))
-                @can('create_proyecto_grado')
-                    <button onclick="openCreateModal()" id="openCreateModalButton"
-                        class="bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg flex items-center shadow transition">
-                        <i class="fas fa-plus mr-2"></i>
-                        <svg id="loadingSpinner-crear" style="margin: 4px 10px 4px 0"
-                            class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64" fill="none"
+                    <button type="button" id="calendar" onclick="openCalendarModal(this)"
+                        class="btn-action shadow bg-gray-500 hover:bg-gray-700 text-white px-3 py-1 rounded-lg relative">
+                        <i class="fa-regular fa-calendar"></i>
+                        <svg class="loading-spinner hidden w-4 h-4 text-white animate-spin absolute" viewBox="0 0 64 64" fill="none"
                             xmlns="http://www.w3.org/2000/svg" width="24" height="24">
                             <path
                                 d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
-                                stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
-                            </path>
+                                stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
                             <path
                                 d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
                                 stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"
                                 class="text-white">
                             </path>
-                        </svg> Solicitar
+                        </svg>
                     </button>
-                @endcan
+                    @if (auth()->user()->hasRole(['estudiante']))
+                        @can('create_proyecto_grado')
+                            <button onclick="openCreateModal()" id="openCreateModalButton"
+                                class="bg-uts-500 hover:bg-uts-800 text-white px-4 py-2 rounded-lg flex items-center shadow transition">
+                                <i class="fas fa-plus mr-2"></i>
+                                <svg id="loadingSpinner-crear" style="margin: 4px 10px 4px 0"
+                                    class="hidden w-4 h-4 text-gray-300 animate-spin" viewBox="0 0 64 64" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                                    <path
+                                        d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
+                                        stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+                                    </path>
+                                    <path
+                                        d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
+                                        stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"
+                                        class="text-white">
+                                    </path>
+                                </svg> Nueva Práctica
+                            </button>
+                        @endcan
+                    @endif
+                @endif
             @endif
 
-            @endif
-                @endif
 
             @if (auth()->user()->hasRole(['super_admin', 'admin', 'coordinador']))
                 <button type="button" id="reporte" onclick="openReporteModal()"
@@ -882,16 +884,15 @@ $mes_actual = Carbon::now()->month;
 
                         </div>
 
-                        <p class="text-red-600 text-mb mb-6">
+                        <p class="text-red-600 text-sm mb-6 text-justify">
                             <i class="fa-solid fa-circle-info mr-1"></i>
                            Si selecciona un segundo integrante, el comité evaluará si la propuesta puede realizarse entre dos estudiantes. Luego, aprobará o rechazará la solicitud.
                         </p>
                         
-                        <p class="text-sm mb-6"><strong>NOTA: </strong>Para los estudiantes con pensum 2019-1, cada estudiante debe tener aprobado el <strong>90%</strong> de los créditos (Tecnología: 97 / Profesional: 65).
-                        <br>
-                        Para los estudiantes con Pensum 2025-2, El estudiante debe tener aprobado el <strong>90%</strong> de los créditos (Tecnología: {{ config('practicas.creditos_tecnologia') }} / Profesional: {{ config('practicas.creditos_profesional') }}).
+                        <p class="text-sm mb-6 text-blue-500 text-justify"><i class="fa-solid fa-circle-info mr-1"></i> Para los estudiantes con pensum 2019-1, cada estudiante debe tener aprobado el <strong>90%</strong> de los créditos (Tecnología: 97 / Profesional: 65).
+                        Para los estudiantes con Pensum 2026-1, El estudiante debe tener aprobado el <strong>90%</strong> de los créditos (Tecnología: {{ config('practicas.creditos_tecnologia') }} / Profesional: {{ config('practicas.creditos_profesional') }}).
                         </p>
-                        <p class="text-sm mb-6"><strong>NOTA: </strong>Verifique si la empresa tiene convenio vigente en la pagina de la Oficina de Relaciones Interinstitucionales (ORI) :<a href="https://oriapp.uts.edu.co/activities_guest" target="_blank" class="text-uts-500 underline hover:text-uts-800"> Consultar convenios aquí </a></p>
+                        <p class="text-sm mb-6"><strong>NOTA: </strong>Verifique si la empresa tiene convenio vigente en la pagina de la Oficina de Relaciones Interinstitucionales (ORI): <a href="https://oriapp.uts.edu.co/activities_guest" target="_blank" class="text-uts-500 underline hover:text-uts-800"> Consultar convenios aquí </a></p>
 
                         <div class="flex justify-end space-x-2">
                             <button type="button" onclick="closeCreateModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cancelar</button>

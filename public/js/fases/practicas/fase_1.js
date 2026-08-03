@@ -100,7 +100,7 @@ function openFase1DetailsModal(btn) {
 
             let html = `
                 <div class="flex flex-col space-y-3">
-                    <div class="flex flex-col sm:flex-row items-start justify-between p-3 bg-gray-50 rounded-lg">
+                    <div class="flex flex-col sm:flex-row items-start justify-between p-3 bg-gray-50 rounded-lg mt-3">
                         <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">¿Es práctica institucional?:</p>
                         <span class="items-details text-gray-800 w-full sm:flex-1 sm:ml-2">
                                 ${response.es_institucional == 1 ? 'Sí' : 'No'}
@@ -108,11 +108,11 @@ function openFase1DetailsModal(btn) {
                         
 
                     </div>
-                    <div class="flex flex-col sm:flex-row items-start justify-between p-3 bg-gray-50 rounded-lg">
+                    <div class="flex flex-col sm:flex-row items-start justify-between p-3 bg-gray-50 rounded-lg mt-3">
                         <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Empresa:</p>
                         <span class="items-details text-gray-800 w-full sm:flex-1 sm:ml-2">${escapeHtml(response.nombre_empresa)}</span>
                     </div>
-                    <div class="flex flex-col sm:flex-row items-start justify-between p-3 bg-gray-50 rounded-lg">
+                    <div class="flex flex-col sm:flex-row items-start justify-between p-3 bg-gray-50 rounded-lg mt-3">
                         <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">Formato F-DC-126:</p>
                         ${response.doc_fdc126 ? 
                             `<div class="items-details text-gray-800 w-full sm:flex-1 sm:ml-2" ><i class="fa-regular fa-file-word text-blue-500 mr-2"></i> <a href="/storage/${response.doc_fdc126}" target="_blank" class="text-blue-500 underline hover:text-blue-800">Ver F-DC-126</a></div>` : 
@@ -336,7 +336,7 @@ $('#fase1EstudianteForm').on('submit', function(e) {
                 contentType: false,
                 success: function(response) {
                     closeFase1EstudianteModal();
-                    showToast('Datos enviados correctamente', 'success');
+                    showToast('Información enviada, tendrá respuesta en los proximos 5 días hábiles', 'success');
                     // Esperar 3 segundos (duración del toast) antes de recargar
                     setTimeout(() => {
                         location.reload();

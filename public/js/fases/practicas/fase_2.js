@@ -61,7 +61,7 @@ function openFase2DetailsModal(btn) {
         success: function(response) {
            let html = `
             <div class="flex flex-col space-y-3">
-                <div class="flex flex-col sm:flex-row items-start justify-between p-3 bg-gray-50 rounded-lg">
+                <div class="flex flex-col sm:flex-row items-start justify-between p-3 bg-gray-50 rounded-lg mt-3">
                     <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">
                         Liquidación de pago:
                     </p>
@@ -84,7 +84,7 @@ function openFase2DetailsModal(btn) {
                     }
                 </div>
 
-                <div class="flex flex-col sm:flex-row items-start justify-between p-3 bg-gray-50 rounded-lg">
+                <div class="flex flex-col sm:flex-row items-start justify-between p-3 bg-gray-50 rounded-lg mt-3">
                     <p class="font-semibold text-gray-700 w-1/3 min-w-[100px] mb-2 sm:mb-0">
                         Soporte de pago:
                     </p>
@@ -538,7 +538,7 @@ $(document).ready(function() {
                     contentType: false,
                     success: function(response) {
                         closeFase2EstudianteModal();
-                        showToast('Datos enviados correctamente. Recibirá respuesta en los próximos 5 días hábiles.', 'success');
+                        showToast('Información enviada, tendrá respuesta en los proximos 5 días hábiles', 'success');
                         setTimeout(() => {
                             location.reload();
                         }, 3000);

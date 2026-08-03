@@ -91,7 +91,7 @@ Route::middleware([
     // Ruta para obtener directores
     Route::prefix('director')->group(function () {
         Route::get('/{id}', [ProyectoGradoController::class, 'getDirector'])->whereNumber('id')->name('proyectos.director');
-        });
+    });
 
     // Ruta para obtener evaluadores
     Route::prefix('evaluador')->group(function () {
@@ -103,8 +103,6 @@ Route::middleware([
     Route::prefix('codirector')->group(function () {
         Route::get('/{id}', [ProyectoGradoController::class, 'getCodirector'])->whereNumber('id')->name('proyectos.codirector');
     });
-
-
 
     // Ruta para obtener fechas de un proyecto
     Route::prefix('fechas-propuesta')->group(function () {
@@ -232,7 +230,6 @@ Route::middleware([
             Route::post('/reportar-problema', [PracticaController::class, 'reportarProblema'])->name('practicas.reportar_problema');
             Route::post('/quill/upload', [PracticaController::class, 'uploadQuillImage'])->name('practicas.quill.upload');
 
-
             // Rutas para Fase 1 del roadmap
             Route::post('/fase1/store', [RoadMapPracticaController::class, 'storeFase1'])->name('practicas.fase1.store');
             Route::post('/fase1/details', [RoadMapPracticaController::class, 'getFase1Details'])->name('practicas.fase1.details');
@@ -242,29 +239,28 @@ Route::middleware([
             Route::post('/fase2/store', [RoadMapPracticaController::class, 'storeFase2'])->name('practicas.fase2.store');
             Route::post('/fase2/details', [RoadMapPracticaController::class, 'getFase2Details'])->name('practicas.fase2.details');
             Route::post('/fase2/reply', [RoadMapPracticaController::class, 'replyFase2'])->name('practicas.fase2.reply');
-            
+
             // Rutas para Fase 3 del roadmap
-            Route::post('/fase3/store',[RoadMapPracticaController::class, 'storeFase3'])->name('practicas.fase3.store');
-            Route::post('/fase3/details',[RoadMapPracticaController::class, 'getFase3Details'])->name('practicas.fase3.details');
-            Route::post('/fase3/reply',[RoadMapPracticaController::class, 'replyFase3'])->name('practicas.fase3.reply');
+            Route::post('/fase3/store', [RoadMapPracticaController::class, 'storeFase3'])->name('practicas.fase3.store');
+            Route::post('/fase3/details', [RoadMapPracticaController::class, 'getFase3Details'])->name('practicas.fase3.details');
+            Route::post('/fase3/reply', [RoadMapPracticaController::class, 'replyFase3'])->name('practicas.fase3.reply');
 
             // Rutas para Fase 4 del roadmap
-
             Route::post('/fase4/reply', [RoadMapPracticaController::class, 'replyFase4'])->name('practicas.fase4.reply');
             Route::post('/fase4/comite/reply', [RoadMapPracticaController::class, 'replyFase4Comite'])->name('practicas.fase4.comite.reply');
 
             //Rutas para fase 5
-            Route::post('/fase5/store',[RoadMapPracticaController::class, 'storeFase5'])->name('practicas.fase5.store');
-            Route::post('/fase5/details',[RoadMapPracticaController::class, 'getFase5Details'])->name('practicas.fase5.details');
-            Route::post('/fase5/reply',[RoadMapPracticaController::class, 'replyFase5'])->name('practicas.fase5.reply');
+            Route::post('/fase5/store', [RoadMapPracticaController::class, 'storeFase5'])->name('practicas.fase5.store');
+            Route::post('/fase5/details', [RoadMapPracticaController::class, 'getFase5Details'])->name('practicas.fase5.details');
+            Route::post('/fase5/reply', [RoadMapPracticaController::class, 'replyFase5'])->name('practicas.fase5.reply');
 
             //Rutas para Fase 6
             Route::post('/fase6/reply', [RoadMapPracticaController::class, 'replyFase6'])->name('practicas.fase6.reply');
             Route::post('/fase6/comite/reply', [RoadMapPracticaController::class, 'replyFase6Comite'])->name('practicas.fase6.comite.reply');
-            Route::post('/fase6/details',[RoadMapPracticaController::class, 'getFase6Details'])->name('practicas.fase6.details');
+            Route::post('/fase6/details', [RoadMapPracticaController::class, 'getFase6Details'])->name('practicas.fase6.details');
 
             //Ruta fase final
-            Route::post('/fase7/details',[RoadMapPracticaController::class, 'getFase7Details'])->name('practicas.fase7.details');
+            Route::post('/fase7/details', [RoadMapPracticaController::class, 'getFase7Details'])->name('practicas.fase7.details');
 
             // Rutas para estímulo ICFES en prácticas
             Route::post('/icfes', [RoadMapPracticaController::class, 'storeIcfesSolicitud'])->name('practicas.icfes.store');
@@ -275,104 +271,109 @@ Route::middleware([
             Route::post('/configurar/admin', [RoadMapPracticaController::class, 'configAdmin'])->name('practicas.configurar_admin');
 
             // Informe de reporte
-            
             Route::post('/practicas/reporte', [PracticaController::class, 'generarReportePracticas'])->name('practicas.reporte');
-        
-            
-            // Rutas POST para seguimiento (sin duplicar)
+
+            // Rutas POST para seguimiento
             Route::post('/seguimiento', [RoadMapPracticaController::class, 'index'])->name('practicas.roadmap');
             Route::get('/seguimiento', function () {
                 return redirect()->route('practicas.index');
             })->name('practicas.roadmap.get');
-            
+
             // Rutas con parámetros (van al final)
             Route::get('/{id}/detalle', [PracticaController::class, 'getDetalle'])->name('practicas.detalle');
             Route::get('/{id}', [PracticaController::class, 'show'])->name('practicas.show');
         });
 
-        // Rutas para base documental
-        Route::prefix('base-documental')->group(function () {
-            Route::get('/', [BaseDocumentalController::class, 'index'])->name('documental.index');
+    // Rutas para base documental
+    Route::prefix('base-documental')->group(function () {
+        Route::get('/', [BaseDocumentalController::class, 'index'])->name('documental.index');
+    });
+
+    // Rutas para modulo historico
+    Route::middleware('permission:view_historico')->prefix('historico')->group(function () {
+        Route::get('/', [HistoricoController::class, 'index'])->name('historico.index');
+        Route::post('/', [HistoricoController::class, 'store'])->name('historico.store');
+        Route::post('/masivo', [HistoricoController::class, 'storeMasivo'])->name('historico.store.masivo');
+        Route::get('/data', [HistoricoController::class, 'getData'])->name('historico.data');
+        Route::get('/{id}', [HistoricoController::class, 'edit'])->name('historico.edit');
+        Route::put('/{id}', [HistoricoController::class, 'update'])->name('historico.update');
+        Route::delete('/{id}', [HistoricoController::class, 'destroy'])->name('historico.destroy');
+
+        Route::prefix('reporte')->group(function () {
+            Route::post('/', [HistoricoController::class, 'generarReporte'])->name('historico.reporte');
         });
+    });
 
-        // Rutas para modulo historico
-        Route::middleware('permission:view_historico')->prefix('historico')->group(function () {
-            Route::get('/', [HistoricoController::class, 'index'])->name('historico.index');
-            Route::post('/', [HistoricoController::class, 'store'])->name('historico.store');
-            Route::post('/masivo', [HistoricoController::class, 'storeMasivo'])->name('historico.store.masivo');
-            Route::get('/data', [HistoricoController::class, 'getData'])->name('historico.data');
-            Route::get('/{id}', [HistoricoController::class, 'edit'])->name('historico.edit');
-            Route::put('/{id}', [HistoricoController::class, 'update'])->name('historico.update');
-            Route::delete('/{id}', [HistoricoController::class, 'destroy'])->name('historico.destroy');
+    // Rutas para reportes
+    Route::prefix('reportes')->group(function () {
+        Route::post('/enviar', [ReporteController::class, 'enviarReporte'])->name('reportes.enviar');
+    });
 
-            Route::prefix('reporte')->group(function () {
-                Route::post('/', [HistoricoController::class, 'generarReporte'])->name('historico.reporte');
-            });
-        });
+    // Rutas para ajustes
+    Route::prefix('ajustes')->group(function () {
+        Route::get('/', [AjustesController::class, 'index'])->name('ajustes.index');
+        Route::post('/fechas', [AjustesController::class, 'fechas'])->name('ajustes.fechas');
+        Route::post('/backups', [AjustesController::class, 'backups'])->name('ajustes.backups');
+    });
 
-        // Rutas para reportes
-        Route::prefix('reportes')->group(function () {
-            Route::post('/enviar', [ReporteController::class, 'enviarReporte'])->name('reportes.enviar');
-        });
+    // Rutas para fechas
+    Route::prefix('fechas')->group(function () {
+        Route::get('/{periodo}', [FechasController::class, 'getFechas'])->name('fechas.info');
+    });
 
-        // Rutas para ajustes
-        Route::prefix('ajustes')->group(function () {
-            Route::get('/', [AjustesController::class, 'index'])->name('ajustes.index');
-            Route::post('/fechas', [AjustesController::class, 'fechas'])->name('ajustes.fechas');
-            Route::post('/backups', [AjustesController::class, 'backups'])->name('ajustes.backups');
-        });
-
-        // Rutas para fechas
-        Route::prefix('fechas')->group(function () {
-            Route::get('/{periodo}', [FechasController::class, 'getFechas'])->name('fechas.info');
-        });
-
-
-        // Rutas para directores
 
     // Rutas para directores
     Route::prefix('director')->group(function () {
+        Route::get('/', [ProyectoGradoController::class, 'index'])->name('director.index');
 
-        Route::get('/', [ProyectoGradoController::class, 'index'])
-            ->name('director.index');
+        // Rutas para RoadMap
+        Route::post('/seguimiento', [RoadMapController::class, 'index'])->name('director.roadmap');
+        Route::get('/seguimiento', function () {
+            return redirect()->route('dashboard');
+        })->name('director.roadmap.get');
 
+        // Rutas para prácticas
         Route::prefix('practicas')->group(function () {
             Route::get('/', [RoadMapPracticaController::class, 'indexDirector'])
                 ->name('director.practicas.index');
 
             Route::get('/data', [PracticaController::class, 'getData'])
                 ->name('director.practicas.data');
+
+            Route::post('/seguimiento', [RoadMapPracticaController::class, 'index'])
+                ->name('director.practicas.roadmap');
+
+            Route::get('/seguimiento', function () {
+                return redirect()->route('director.practicas.index');
+            })->name('director.practicas.roadmap.get');
         });
-
-        Route::post('/seguimiento', [RoadMapPracticaController::class, 'index'])
-            ->name('director.roadmap');
-
-        Route::get('/seguimiento', function () {
-            return redirect()->route('director.practicas.index');
-        })->name('director.roadmap.get');
     });
 
-        // Rutas para evaluadores
-
+    // Rutas para evaluadores
     Route::prefix('evaluador')->group(function () {
+        Route::get('/', [ProyectoGradoController::class, 'index'])->name('evaluador.index');
 
-        Route::get('/', [ProyectoGradoController::class, 'index'])
-            ->name('evaluador.index');
+        // Rutas para RoadMap
+        Route::post('/seguimiento', [RoadMapController::class, 'index'])->name('evaluador.roadmap');
 
+        Route::get('/seguimiento', function () {
+            return redirect()->route('dashboard');
+        })->name('evaluador.roadmap.get');
+
+        // Rutas para prácticas
         Route::prefix('practicas')->group(function () {
             Route::get('/', [RoadMapPracticaController::class, 'indexEvaluador'])
                 ->name('evaluador.practicas.index');
 
             Route::get('/data', [PracticaController::class, 'getData'])
                 ->name('evaluador.practicas.data');
+
+            Route::post('/seguimiento', [RoadMapPracticaController::class, 'index'])
+                ->name('evaluador.practicas.roadmap');
+
+            Route::get('/seguimiento', function () {
+                return redirect()->route('evaluador.practicas.index');
+            })->name('evaluador.practicas.roadmap.get');
         });
-
-        Route::post('/seguimiento', [RoadMapPracticaController::class, 'index'])
-            ->name('evaluador.roadmap');
-
-        Route::get('/seguimiento', function () {
-            return redirect()->route('evaluador.practicas.index');
-        })->name('evaluador.roadmap.get');
     });
-
 });

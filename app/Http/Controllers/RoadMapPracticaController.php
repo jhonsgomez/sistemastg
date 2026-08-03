@@ -14,21 +14,19 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\Fecha;
 use App\Services\PracticaMailService;
 use App\Services\PracticaService;
 use App\Mail\PracticasMail;
+use App\Models\ValorCampo;
 use Illuminate\Support\Facades\Mail;
 
 
 class RoadMapPracticaController extends Controller
 {
     /* Obtener el tipo de solicitud por nombre */
-
     protected $practicaMailService;
-
     protected $practicaService;
 
     public function __construct(
@@ -47,13 +45,23 @@ class RoadMapPracticaController extends Controller
         return TipoSolicitud::where('nombre', $nombre)->firstOrFail();
     }
 
+    public function getPeriodoActual()
+    {
+        $anio_actual = date('Y');
+        $mes_actual = date('n');
+
+        $periodo_actual = ($mes_actual <= 6) ? "$anio_actual-1" : "$anio_actual-2";
+
+        return $periodo_actual;
+    }
+
     public function index(Request $request)
     {
         $rol_especifico = $request->input('rol_especifico');
 
-        if ($request->routeIs('director.roadmap')) {
+        if ($request->routeIs('director.practicas.roadmap')) {
             $rol_especifico = 'director_practica';
-        } elseif ($request->routeIs('evaluador.roadmap')) {
+        } elseif ($request->routeIs('evaluador.practicas.roadmap')) {
             $rol_especifico = 'evaluador_practica';
         }
 
@@ -67,13 +75,13 @@ class RoadMapPracticaController extends Controller
             $rutaRetorno = 'evaluador.practicas.index';
         }
         // Obtener el periodo actual
-        $periodoActual = session('periodo_academico', '2026-1');
+        $periodoActual = $this->getPeriodoActual();
 
         // Buscar las fechas para el periodo actual
         $fechasData = Fecha::where('periodo', $periodoActual)->first();
 
         $fechas = [];
-        
+
         if ($fechasData) {
             $fechasArray = $fechasData->fechas;
             $fechas = [
@@ -92,13 +100,13 @@ class RoadMapPracticaController extends Controller
                 'fecha_aprobacion_propuesta' => '2026-09-30',
             ];
         }
-        
+
         try {
             $practica = Practica::with('user.nivel', 'valoresCampos.campo')->findOrFail($request->practica_id);
 
             // Generar el código de modalidad (sin guardar aún) - SOLO UNA VEZ
             $codigo_modalidad_generado = $this->generarCodigoModalidadPractica($practica->id);
-            
+
             $codigo_practica = 'PRA-' . str_pad($practica->id, 5, '0', STR_PAD_LEFT);
 
             if ($practica->deshabilitado) {
@@ -112,12 +120,10 @@ class RoadMapPracticaController extends Controller
             if ($estado === 'Finalizado') {
 
                 $fase_actual = 7;
-
             } elseif (str_contains($estado, 'Fase')) {
 
                 $estado_array = explode(' ', $estado);
                 $fase_actual = (int) $estado_array[1];
-
             } else {
 
                 $fase_actual = 0;
@@ -125,7 +131,7 @@ class RoadMapPracticaController extends Controller
 
             if (in_array($estado, ['Pendiente', 'Rechazada', 'Aplazada'])) {
                 return redirect()->route($rutaRetorno)
-                ->with('info', 'La práctica aún no ha sido aprobada para iniciar el seguimiento.');
+                    ->with('info', 'La práctica aún no ha sido aprobada para iniciar el seguimiento.');
             }
 
             // Cargar TODOS los valores de campos
@@ -136,97 +142,97 @@ class RoadMapPracticaController extends Controller
 
             $rol_especifico = null;
 
-            if ($request->routeIs('director.roadmap')) {
+            if ($request->routeIs('director.practicas.roadmap')) {
                 $rol_especifico = 'director_practica';
-            } elseif ($request->routeIs('evaluador.roadmap')) {
+            } elseif ($request->routeIs('evaluador.practicas.roadmap')) {
                 $rol_especifico = 'evaluador_practica';
             } else {
                 $rol_especifico = $request->input('rol_especifico');
             }
 
-        // ========== INTEGRANTES PARA EL SELECT ICFES (MÁXIMO 2) ==========
-        $integrante_1 = User::find($practica->user_id);
-        $integrante_2 = null;
+            // ========== INTEGRANTES PARA EL SELECT ICFES (MÁXIMO 2) ==========
+            $integrante_1 = User::find($practica->user_id);
+            $integrante_2 = null;
 
-        if (isset($valores['id_integrante_2']) && $valores['id_integrante_2']) {
-            $integrante_2 = User::find($valores['id_integrante_2']);
-        }
-
-        $lista_integrantes = [];
-        if ($integrante_1) $lista_integrantes[] = $integrante_1;
-        if ($integrante_2) $lista_integrantes[] = $integrante_2;
-
-        // ========== NUEVAS VARIABLES ICFES POR ESTUDIANTE ==========
-
-        // 1. Obtener datos de submited (quién ha enviado solicitud)
-        $submited_icfes_practicas = $valores['submited_icfes_practicas'] ?? '{}';
-        $submitedData = json_decode($submited_icfes_practicas, true) ?: [];
-
-        // Asegurar que sea un array (por si acaso hay valores booleanos antiguos)
-        if (!is_array($submitedData)) {
-            $submitedData = [];
-        }
-
-        // 2. Obtener beneficiarios (quienes fueron aprobados)
-        $beneficiarios_icfes_practicas = $valores['beneficiarios_icfes_practicas'] ?? '[]';
-        $beneficiariosData = json_decode($beneficiarios_icfes_practicas, true) ?: [];
-
-        // Asegurar que sea un array
-        if (!is_array($beneficiariosData)) {
-            $beneficiariosData = [];
-        }
-
-        // 3. Verificar si el usuario actual ya envió solicitud
-        $userId = (string) auth()->id();
-        $yaEnvio = isset($submitedData[$userId]) && $submitedData[$userId] === true;
-
-        // 4. Verificar si el usuario actual es beneficiario
-        $beneficiariosDataInt = array_map('intval', $beneficiariosData);
-        $esBeneficiario = in_array((int) auth()->id(), $beneficiariosDataInt);
-
-        // 5. Obtener estudiantes que han enviado solicitud (para el select del admin)
-        $solicitudesEnviadas = [];
-        if (is_array($submitedData) && !empty($submitedData)) {
-            $idsEnviaron = array_keys(array_filter($submitedData));
-            if (!empty($idsEnviaron)) {
-                $solicitudesEnviadas = User::whereIn('id', $idsEnviaron)->get();
+            if (isset($valores['id_integrante_2']) && $valores['id_integrante_2']) {
+                $integrante_2 = User::find($valores['id_integrante_2']);
             }
-        }
-        
-        // 6. Obtener documentos PDF por estudiante
-        $doc_icfes_practicas = $valores['doc_icfes_practicas'] ?? '{}';
-        $docData = json_decode($doc_icfes_practicas, true) ?: [];
 
-        // Después de obtener $valores, agregar:
-        $carta_prorroga = $valores['carta_prorroga'] ?? null;
-        $liquidacion_prorroga = $valores['liquidacion_prorroga'] ?? null;
-        $soporte_prorroga = $valores['soporte_prorroga'] ?? null;
-        $carta_retiro = $valores['carta_retiro'] ?? null;
+            $lista_integrantes = [];
+            if ($integrante_1) $lista_integrantes[] = $integrante_1;
+            if ($integrante_2) $lista_integrantes[] = $integrante_2;
+
+            // ========== NUEVAS VARIABLES ICFES POR ESTUDIANTE ==========
+
+            // 1. Obtener datos de submited (quién ha enviado solicitud)
+            $submited_icfes_practicas = $valores['submited_icfes_practicas'] ?? '{}';
+            $submitedData = json_decode($submited_icfes_practicas, true) ?: [];
+
+            // Asegurar que sea un array (por si acaso hay valores booleanos antiguos)
+            if (!is_array($submitedData)) {
+                $submitedData = [];
+            }
+
+            // 2. Obtener beneficiarios (quienes fueron aprobados)
+            $beneficiarios_icfes_practicas = $valores['beneficiarios_icfes_practicas'] ?? '[]';
+            $beneficiariosData = json_decode($beneficiarios_icfes_practicas, true) ?: [];
+
+            // Asegurar que sea un array
+            if (!is_array($beneficiariosData)) {
+                $beneficiariosData = [];
+            }
+
+            // 3. Verificar si el usuario actual ya envió solicitud
+            $userId = (string) auth()->id();
+            $yaEnvio = isset($submitedData[$userId]) && $submitedData[$userId] === true;
+
+            // 4. Verificar si el usuario actual es beneficiario
+            $beneficiariosDataInt = array_map('intval', $beneficiariosData);
+            $esBeneficiario = in_array((int) auth()->id(), $beneficiariosDataInt);
+
+            // 5. Obtener estudiantes que han enviado solicitud (para el select del admin)
+            $solicitudesEnviadas = [];
+            if (is_array($submitedData) && !empty($submitedData)) {
+                $idsEnviaron = array_keys(array_filter($submitedData));
+                if (!empty($idsEnviaron)) {
+                    $solicitudesEnviadas = User::whereIn('id', $idsEnviaron)->get();
+                }
+            }
+
+            // 6. Obtener documentos PDF por estudiante
+            $doc_icfes_practicas = $valores['doc_icfes_practicas'] ?? '{}';
+            $docData = json_decode($doc_icfes_practicas, true) ?: [];
+
+            // Después de obtener $valores, agregar:
+            $carta_prorroga = $valores['carta_prorroga'] ?? null;
+            $liquidacion_prorroga = $valores['liquidacion_prorroga'] ?? null;
+            $soporte_prorroga = $valores['soporte_prorroga'] ?? null;
+            $carta_retiro = $valores['carta_retiro'] ?? null;
 
             // En el método index, después de obtener $valores:
 
-        // ========== VERIFICAR SI EL ESTUDIANTE ESTÁ RETIRADO ==========
-        $campoRetirados = Campo::where('name', 'retirados_practica')
-            ->where('tipo_solicitud_id', $practica->tipo_solicitud_id)
-            ->first();
-
-        $estudiantesRetirados = [];
-        if ($campoRetirados) {
-            $valor = $practica->valoresCampos
-                ->where('campo_id', $campoRetirados->id)
+            // ========== VERIFICAR SI EL ESTUDIANTE ESTÁ RETIRADO ==========
+            $campoRetirados = Campo::where('name', 'retirados_practica')
+                ->where('tipo_solicitud_id', $practica->tipo_solicitud_id)
                 ->first();
-            if ($valor && $valor->valor) {
-                $estudiantesRetirados = json_decode($valor->valor, true) ?: [];
+
+            $estudiantesRetirados = [];
+            if ($campoRetirados) {
+                $valor = $practica->valoresCampos
+                    ->where('campo_id', $campoRetirados->id)
+                    ->first();
+                if ($valor && $valor->valor) {
+                    $estudiantesRetirados = json_decode($valor->valor, true) ?: [];
+                }
             }
-        }
 
-        $estaRetirado = in_array(auth()->id(), $estudiantesRetirados);
+            $estaRetirado = in_array(auth()->id(), $estudiantesRetirados);
 
-        // Redirigir si está retirado
-        if (auth()->user()->hasRole('estudiante') && $estaRetirado) {
-            return redirect()->route('practicas.index')
-                ->with('error', 'Has sido retirado de esta práctica. No puedes acceder al seguimiento.');
-        } 
+            // Redirigir si está retirado
+            if (auth()->user()->hasRole('estudiante') && $estaRetirado) {
+                return redirect()->route('practicas.index')
+                    ->with('error', 'Has sido retirado de esta práctica. No puedes acceder al seguimiento.');
+            }
             // Variables para Fase 1, 2, 3, 4, 5 y 6
             $submited_fase1 = $valores['submited_fase1'] ?? 'false';
             $submited_fase2 = $valores['submited_fase2'] ?? 'false';
@@ -234,12 +240,12 @@ class RoadMapPracticaController extends Controller
             $submited_fase4 = $valores['submited_fase4'] ?? 'false';
             $submited_fase5 = $valores['submited_fase5'] ?? 'false';
             $submited_fase6 = $valores['submited_fase6'] ?? 'false';
-            
+
             // Variables para Fase 3 - Director
             $estado_director_fase3 = $valores['estado_director_fase3'] ?? '';
 
             $estado_director_fase5 = $valores['estado_director_fase5'] ?? '';
-            
+
             // Variables para Fase 4 y Fase 6 - Evaluador
             $estado_evaluador_fase4 = $valores['estado_evaluador_fase4'] ?? '';
 
@@ -248,74 +254,54 @@ class RoadMapPracticaController extends Controller
             $director_actual = $valores['director_id'] ?? null;
             $evaluador_actual = $valores['evaluador_id'] ?? null;
             $docentes = User::role('docente')->get();
-            
-
-            // Log para depuración
-            \Log::info('Roadmap - Variables cargadas:', [
-                'practica_id' => $practica->id,
-                'estado' => $practica->estado,
-                'fase_actual' => $fase_actual,
-                'submited_fase3' => $submited_fase3,
-                'estado_director_fase3' => $estado_director_fase3,
-                'submited_fase4' => $submited_fase4,
-                'estado_evaluador_fase4' => $estado_evaluador_fase4,
-                'estado_director_fase5' => $estado_director_fase5,
-                'submited_fase5' => $submited_fase5,
-                'estado_evaluador_fase6' => $estado_evaluador_fase6,
-                'submited_fase6' => $submited_fase6,
-            ]);
 
             return view('practicas.roadmap', compact(
-                'practica', 
-                'fase_actual', 
+                'practica',
+                'fase_actual',
                 'valores',
-                'submited_fase1', 
-                'submited_fase2', 
+                'submited_fase1',
+                'submited_fase2',
                 'submited_fase3',
-                'submited_fase4', 
+                'submited_fase4',
                 'submited_fase5',
                 'submited_fase6',
                 'estado_director_fase5',
                 'estado_director_fase3',
                 'estado_evaluador_fase4',
                 'estado_evaluador_fase6',
-                'director_actual', 
-                'evaluador_actual', 
+                'director_actual',
+                'evaluador_actual',
                 'docentes',
-                'codigo_practica', 
+                'codigo_practica',
                 'fechas',
-                'codigo_modalidad_generado',  
+                'codigo_modalidad_generado',
                 'rol_especifico',
                 'lista_integrantes',
-            // NUEVAS VARIABLES
-            'yaEnvio',
-            'esBeneficiario',
-            'solicitudesEnviadas',
-            'docData',
-            'submitedData',
+                // NUEVAS VARIABLES
+                'yaEnvio',
+                'esBeneficiario',
+                'solicitudesEnviadas',
+                'docData',
+                'submitedData',
 
-            'carta_prorroga',
-            'liquidacion_prorroga',
-            'soporte_prorroga',
-            'carta_retiro',
+                'carta_prorroga',
+                'liquidacion_prorroga',
+                'soporte_prorroga',
+                'carta_retiro',
 
                 // En el compact, agregar:
-            'estudiantesRetirados',
-            'estaRetirado',
-            
+                'estudiantesRetirados',
+                'estaRetirado',
+
 
             ));
-            
         } catch (Exception $e) {
-            \Log::error('Error en roadmap: ' . $e->getMessage());
-
             return redirect()->route($rutaRetorno)
                 ->with('error', 'No se pudo cargar el seguimiento.');
         }
     }
 
-    // En app/Http/Controllers/RoadMapPracticaController.php
-    // Función auxiliar para generar el código
+
     public static function generarCodigoModalidadPractica($practicaId)
     {
         $practica = Practica::with('user.nivel')->findOrFail($practicaId);
@@ -329,13 +315,15 @@ class RoadMapPracticaController extends Controller
 
         $anioActual = Carbon::now()->year;
 
-        $ultimoCodigo = PracticaValorCampo::whereHas('campo', function ($query) {
+        // Buscar valores anteriores con campo 'codigo_modalidad' en el año actual
+        $ultimoCodigo = ValorCampo::whereHas('campo', function ($query) {
             $query->where('name', 'codigo_modalidad');
         })
             ->whereYear('created_at', $anioActual)
             ->orderBy('created_at', 'desc')
             ->pluck('valor')
             ->map(function ($valor) {
+                // Extraer el número del formato XXX-YYYY-ZZZ
                 if (preg_match('/\d{2,3}-\d{4}-(\d+)/', $valor, $matches)) {
                     return intval($matches[1]);
                 }
@@ -351,7 +339,7 @@ class RoadMapPracticaController extends Controller
 
     public function indexDirector()
     {
-        $periodoActual = session('periodo_academico', '2026-1');
+        $periodoActual = $this->getPeriodoActual();
 
         $fechasData = Fecha::where('periodo', $periodoActual)->first();
 
@@ -387,7 +375,7 @@ class RoadMapPracticaController extends Controller
 
     public function indexEvaluador()
     {
-        $periodoActual = session('periodo_academico', '2026-1');
+        $periodoActual = $this->getPeriodoActual();
 
         $fechasData = Fecha::where('periodo', $periodoActual)->first();
 
@@ -421,13 +409,13 @@ class RoadMapPracticaController extends Controller
         ]);
     }
 
-    // Si también necesitas para codirector
     public function indexCodirector()
     {
         return view('practicas.index', [
             'rol_especifico' => 'codirector_practica'
         ]);
     }
+
     /*FASE 1 - Estudiante: Envío del formato F-DC-126*/
     public function storeFase1(Request $request)
     {
@@ -456,11 +444,11 @@ class RoadMapPracticaController extends Controller
             $valorExistente = PracticaValorCampo::where('practica_id', $practica->id)
                 ->where('campo_id', $campoDoc->id)
                 ->first();
-            
+
             if ($valorExistente && $valorExistente->valor) {
                 Storage::disk('public')->delete($valorExistente->valor);
             }
-            
+
             $path = $request->file('doc_fdc126')->store('practicas/fase1', 'public');
             PracticaValorCampo::updateOrCreate(
                 ['practica_id' => $practica->id, 'campo_id' => $campoDoc->id],
@@ -510,7 +498,7 @@ class RoadMapPracticaController extends Controller
         }
 
         // ENVIAR CORREO  FASE 1 
-         $this->practicaMailService->sendFase1($practica);
+        $this->practicaMailService->sendFase1($practica);
 
         return response()->json(['success' => 'Documentos enviados correctamente']);
     }
@@ -591,15 +579,15 @@ class RoadMapPracticaController extends Controller
         if ($request->estado === 'Aprobada') {
             //  APROBADA: Cambiar a Fase 2
             $practica->estado = 'Fase 2';
-            
+
             // Cambiar el tipo_solicitud_id a Fase 2
             $tipoFase2 = TipoSolicitud::where('nombre', 'practicas_fase_2')->first();
             if ($tipoFase2) {
                 $practica->tipo_solicitud_id = $tipoFase2->id;
             }
-            
+
             $practica->save();
-            
+
             // Enviar correo de aprobación al estudiante
             $this->practicaMailService->sendRespuestaFase1($practica, $request);
         } else {
@@ -607,32 +595,30 @@ class RoadMapPracticaController extends Controller
             $practica->estado = 'Fase 1';
             // NO cambiar tipo_solicitud_id, sigue siendo Fase 1
             $practica->save();
-            
+
             // IMPORTANTE: Resetear submited_fase1 a 'false' para que el estudiante pueda enviar de nuevo
             $tipo_fase1 = $this->getType('practicas_fase_1');
             $campoSubmited = Campo::where('tipo_solicitud_id', $tipo_fase1->id)
                 ->where('name', 'submited_fase1')
                 ->first();
-            
+
             if ($campoSubmited) {
                 PracticaValorCampo::updateOrCreate(
                     ['practica_id' => $practica->id, 'campo_id' => $campoSubmited->id],
                     ['valor' => 'false']  // ← Resetear para que pueda enviar de nuevo
                 );
             }
-            
+
             // Enviar correo de rechazo al estudiante
             $this->practicaMailService->sendRespuestaFase1($practica, $request);
-        
         }
 
         return response()->json([
-            'success' => 'Respuesta enviada correctamente', 
+            'success' => 'Respuesta enviada correctamente',
             'nuevo_estado' => $practica->estado,
             'tipo_solicitud_id' => $practica->tipo_solicitud_id
         ]);
     }
-
 
     /* FASE 2 - Estudiante: Envío de documentos de pago*/
     public function storeFase2(Request $request)
@@ -667,15 +653,15 @@ class RoadMapPracticaController extends Controller
         // 1. Guardar liquidación de pago
         if ($request->hasFile('liquidacion_pago')) {
             $campoLiquidacion = $campos_fase2->where('name', 'liquidacion_pago')->first();
-            
+
             $valorExistente = PracticaValorCampo::where('practica_id', $practica->id)
                 ->where('campo_id', $campoLiquidacion->id)
                 ->first();
-            
+
             if ($valorExistente && $valorExistente->valor) {
                 Storage::disk('public')->delete($valorExistente->valor);
             }
-            
+
             $path = $request->file('liquidacion_pago')->store('practicas/fase2', 'public');
             PracticaValorCampo::updateOrCreate(
                 ['practica_id' => $practica->id, 'campo_id' => $campoLiquidacion->id],
@@ -686,15 +672,15 @@ class RoadMapPracticaController extends Controller
         // 2. Guardar soporte de pago
         if ($request->hasFile('soporte_pago')) {
             $campoSoporte = $campos_fase2->where('name', 'soporte_pago')->first();
-            
+
             $valorExistente = PracticaValorCampo::where('practica_id', $practica->id)
                 ->where('campo_id', $campoSoporte->id)
                 ->first();
-            
+
             if ($valorExistente && $valorExistente->valor) {
                 Storage::disk('public')->delete($valorExistente->valor);
             }
-            
+
             $path = $request->file('soporte_pago')->store('practicas/fase2', 'public');
             PracticaValorCampo::updateOrCreate(
                 ['practica_id' => $practica->id, 'campo_id' => $campoSoporte->id],
@@ -712,12 +698,8 @@ class RoadMapPracticaController extends Controller
         // 4. Actualizar timestamp (no cambiar estado, solo tocar updated_at)
         $practica->touch();
 
-        Log::info('Fase 2 - Documentos enviados', [
-            'practica_id' => $practica->id,
-            'user_id' => auth()->id()
-        ]);
         //Envio de correo
-         $this->practicaMailService->sendFase2($practica);
+        $this->practicaMailService->sendFase2($practica);
 
         return response()->json(['success' => 'Documentos de pago enviados correctamente']);
     }
@@ -736,7 +718,7 @@ class RoadMapPracticaController extends Controller
             $liquidacionPago = $valores['liquidacion_pago'] ?? null;
             $soportePago = $valores['soporte_pago'] ?? null;
             $respuestaComite = $valores['respuesta_comite_fase2'] ?? null;
-            
+
             // Obtener URLs públicas de los archivos
             $liquidacionUrl = $liquidacionPago ? Storage::disk('public')->url($liquidacionPago) : null;
             $soporteUrl = $soportePago ? Storage::disk('public')->url($soportePago) : null;
@@ -751,22 +733,13 @@ class RoadMapPracticaController extends Controller
                 'fecha_envio' => $practica->updated_at->format('d/m/Y H:i')
             ]);
         } catch (Exception $e) {
-            Log::error('Error en getFase2Details: ' . $e->getMessage());
             return response()->json(['error' => 'Error al cargar los detalles'], 500);
         }
     }
 
     /* FASE 2 - Comité/Admin: Responder solicitud (con asignación de director/evaluador/codirector)*/
-
     public function replyFase2(Request $request)
     {
-            Log::info('DIRECTOR DATA', [
-            'director_id' => $request->director_id,
-            'evaluador_id' => $request->evaluador_id,
-        ]);
-
-        Log::info('=== replyFase2 INICIO ===', $request->all());
-    
         $validator = Validator::make($request->all(), [
             'practica_id' => 'required|exists:practicas,id',
             'estado' => 'required|in:Aprobada,Rechazada,Aplazada',
@@ -814,9 +787,9 @@ class RoadMapPracticaController extends Controller
         // ========== LÓGICA PRINCIPAL ==========
         if ($request->estado === 'Aprobada') {
             // APROBADA: Asignar docentes y cambiar a Fase 3
-            
+
             // Asignar director
-        
+
             $campoDirector = Campo::where('tipo_solicitud_id', $tipo_fase2->id)
                 ->where('name', 'director_id')
                 ->first();
@@ -885,7 +858,7 @@ class RoadMapPracticaController extends Controller
                 $campoCodigo = Campo::where('tipo_solicitud_id', $tipo_fase2->id)
                     ->where('name', 'codigo_modalidad')
                     ->first();
-                
+
                 if ($campoCodigo) {
                     PracticaValorCampo::updateOrCreate(
                         ['practica_id' => $practica->id, 'campo_id' => $campoCodigo->id],
@@ -893,44 +866,35 @@ class RoadMapPracticaController extends Controller
                     );
                 }
             }
-            
+
             // Cambiar a Fase 3
             $practica->estado = 'Fase 3';
-            
+
             $tipoFase3 = TipoSolicitud::where('nombre', 'practicas_fase_3')->first();
             if ($tipoFase3) {
                 $practica->tipo_solicitud_id = $tipoFase3->id;
             }
-            
+
             $practica->save();
-            
-            Log::info('Fase 2 - Aprobada, asignados', [
-                'director_id' => $request->director_id,
-                'evaluador_id' => $request->evaluador_id,
-                'codirector_id' => $request->codirector_id ?? null
-            ]);
-            
         } else {
             // RECHAZADA: Resetear submited_fase2 a 'false' para que el estudiante pueda reenviar
-            
+
             $campoSubmited = Campo::where('tipo_solicitud_id', $tipo_fase2->id)
                 ->where('name', 'submited_fase2')
                 ->first();
-            
+
             if ($campoSubmited) {
                 PracticaValorCampo::updateOrCreate(
                     ['practica_id' => $practica->id, 'campo_id' => $campoSubmited->id],
                     ['valor' => 'false']
                 );
             }
-            
+
             // NO cambiar estado, sigue en Fase 2
             $practica->touch();
-            
-            Log::info('Fase 2 - Rechazada');
         }
 
-       $this->practicaMailService->sendRespuestaFase2($practica, [
+        $this->practicaMailService->sendRespuestaFase2($practica, [
             'estado' => $request->estado,
             'respuesta' => $request->respuesta,
             'director_id' => $request->director_id,
@@ -939,12 +903,11 @@ class RoadMapPracticaController extends Controller
         ]);
 
         return response()->json([
-            'success' => 'Respuesta enviada correctamente', 
+            'success' => 'Respuesta enviada correctamente',
             'nuevo_estado' => $practica->estado,
             'tipo_solicitud_id' => $practica->tipo_solicitud_id
         ]);
     }
-
 
     /*FASE 3 - Estudiante: Envío de documentos*/
     public function storeFase3(Request $request)
@@ -982,7 +945,6 @@ class RoadMapPracticaController extends Controller
             return response()->json([
                 'error' => 'La práctica no está en la fase correspondiente'
             ], 422);
-
         }
 
         $tipo_fase3 = $this->getType('practicas_fase_3');
@@ -999,9 +961,9 @@ class RoadMapPracticaController extends Controller
                 ->first();
 
             $valorExistente = PracticaValorCampo::where(
-                    'practica_id',
-                    $practica->id
-                )
+                'practica_id',
+                $practica->id
+            )
                 ->where('campo_id', $campoArl->id)
                 ->first();
 
@@ -1032,16 +994,15 @@ class RoadMapPracticaController extends Controller
                 ->where('name', 'doc_fdc127')
                 ->first();
             $valorExistente = PracticaValorCampo::where(
-                    'practica_id',
-                    $practica->id
-                )
+                'practica_id',
+                $practica->id
+            )
                 ->where('campo_id', $campo127->id)
                 ->first();
 
             if ($valorExistente && $valorExistente->valor) {
                 Storage::disk('public')
                     ->delete($valorExistente->valor);
-
             }
             $path = $request
                 ->file('doc_fdc127')
@@ -1068,16 +1029,15 @@ class RoadMapPracticaController extends Controller
                 ->first();
 
             $valorExistente = PracticaValorCampo::where(
-                    'practica_id',
-                    $practica->id
-                )
+                'practica_id',
+                $practica->id
+            )
                 ->where('campo_id', $campo195->id)
                 ->first();
 
             if ($valorExistente && $valorExistente->valor) {
                 Storage::disk('public')
                     ->delete($valorExistente->valor);
-
             }
 
             $path = $request
@@ -1114,15 +1074,9 @@ class RoadMapPracticaController extends Controller
 
         // Actualizar timestamp
         $practica->touch();
-        Log::info('Fase 3 - Documentos enviados', [
-            'practica_id' => $practica->id,
-            'user_id' => auth()->id()
-
-        ]);
 
         // Envío correo
         $this->practicaMailService->sendFase3($practica);
-        
 
         return response()->json([
             'success' => 'Documentos enviados correctamente'
@@ -1190,28 +1144,23 @@ class RoadMapPracticaController extends Controller
                 // Fecha
                 'fecha_envio' => $practica->updated_at->format('d/m/Y H:i')
             ]);
-
         } catch (Exception $e) {
-
-            Log::error('Error en getFase3Details: ' . $e->getMessage());
-            dd($practica->valoresCampos);
             return response()->json([
                 'error' => 'Error al cargar los detalles'
             ], 500);
         }
     }
-    /* Fase 3 - Respuesta director */ 
+
+    /* Fase 3 - Respuesta director */
     public function replyFase3(Request $request)
     {
         try {
-            Log::info('=== replyFase3 INICIO ===', $request->all());
-            
             $tipo_fase3 = TipoSolicitud::where('nombre', 'practicas_fase_3')->first();
-            
+
             if (!$tipo_fase3) {
                 return response()->json(['error' => 'Configuración de fase no encontrada'], 500);
             }
-            
+
             $validator = Validator::make($request->all(), [
                 'practica_id' => 'required|exists:practicas,id',
                 'estado' => 'required|in:Aprobada,Rechazada,Aplazada',
@@ -1255,185 +1204,159 @@ class RoadMapPracticaController extends Controller
             }
 
             // ================= GUARDAR DOCUMENTOS - ACTUALIZAR LOS CAMPOS EXISTENTES =================
-        if ($request->hasFile('fdc127')) {
-            $fdc127Path = $request->file('fdc127')->store('practicas/fase3/documentos', 'public');
-            
-            // Buscar el campo existente doc_fdc127 (no el del director)
-            $campoDoc = Campo::where('name', 'doc_fdc127')->first();
-            if ($campoDoc) {
-                // Eliminar archivo anterior si existe
-                $valorExistente = PracticaValorCampo::where('practica_id', $practica->id)
-                    ->where('campo_id', $campoDoc->id)->first();
-                if ($valorExistente && $valorExistente->valor) {
-                    Storage::disk('public')->delete($valorExistente->valor);
+            if ($request->hasFile('fdc127')) {
+                $fdc127Path = $request->file('fdc127')->store('practicas/fase3/documentos', 'public');
+
+                // Buscar el campo existente doc_fdc127 (no el del director)
+                $campoDoc = Campo::where('name', 'doc_fdc127')->first();
+                if ($campoDoc) {
+                    // Eliminar archivo anterior si existe
+                    $valorExistente = PracticaValorCampo::where('practica_id', $practica->id)
+                        ->where('campo_id', $campoDoc->id)->first();
+                    if ($valorExistente && $valorExistente->valor) {
+                        Storage::disk('public')->delete($valorExistente->valor);
+                    }
+                    PracticaValorCampo::updateOrCreate(
+                        ['practica_id' => $practica->id, 'campo_id' => $campoDoc->id],
+                        ['valor' => $fdc127Path]
+                    );
                 }
-                PracticaValorCampo::updateOrCreate(
-                    ['practica_id' => $practica->id, 'campo_id' => $campoDoc->id],
-                    ['valor' => $fdc127Path]
-                );
             }
-        }
 
-        if ($request->hasFile('fdc195')) {
-            $fdc195Path = $request->file('fdc195')->store('practicas/fase3/documentos', 'public');
-            
-            $campoDoc = Campo::where('name', 'doc_fdc195')->first();
-            if ($campoDoc) {
-                $valorExistente = PracticaValorCampo::where('practica_id', $practica->id)
-                    ->where('campo_id', $campoDoc->id)->first();
-                if ($valorExistente && $valorExistente->valor) {
-                    Storage::disk('public')->delete($valorExistente->valor);
+            if ($request->hasFile('fdc195')) {
+                $fdc195Path = $request->file('fdc195')->store('practicas/fase3/documentos', 'public');
+
+                $campoDoc = Campo::where('name', 'doc_fdc195')->first();
+                if ($campoDoc) {
+                    $valorExistente = PracticaValorCampo::where('practica_id', $practica->id)
+                        ->where('campo_id', $campoDoc->id)->first();
+                    if ($valorExistente && $valorExistente->valor) {
+                        Storage::disk('public')->delete($valorExistente->valor);
+                    }
+                    PracticaValorCampo::updateOrCreate(
+                        ['practica_id' => $practica->id, 'campo_id' => $campoDoc->id],
+                        ['valor' => $fdc195Path]
+                    );
                 }
-                PracticaValorCampo::updateOrCreate(
-                    ['practica_id' => $practica->id, 'campo_id' => $campoDoc->id],
-                    ['valor' => $fdc195Path]
-                );
             }
-        }
 
-       if ($request->hasFile('turnitin')) {
-            $turnitinPath = $request->file('turnitin')
-                ->store('practicas/fase3/documentos', 'public');
-            $campoTurnitin = Campo::where(
-                'name',
-                'turnitin_director_fase3'
-            )->first();
+            if ($request->hasFile('turnitin')) {
+                $turnitinPath = $request->file('turnitin')
+                    ->store('practicas/fase3/documentos', 'public');
+                $campoTurnitin = Campo::where(
+                    'name',
+                    'turnitin_director_fase3'
+                )->first();
 
-            if ($campoTurnitin) {
-                $valorExistente = PracticaValorCampo::where(
+                if ($campoTurnitin) {
+                    $valorExistente = PracticaValorCampo::where(
                         'practica_id',
                         $practica->id
                     )
-                    ->where(
-                        'campo_id',
-                        $campoTurnitin->id
-                    )
-                    ->first();
+                        ->where(
+                            'campo_id',
+                            $campoTurnitin->id
+                        )
+                        ->first();
 
-                if ($valorExistente && $valorExistente->valor) {
-                    Storage::disk('public')
-                        ->delete($valorExistente->valor);
+                    if ($valorExistente && $valorExistente->valor) {
+                        Storage::disk('public')
+                            ->delete($valorExistente->valor);
+                    }
+
+                    PracticaValorCampo::updateOrCreate(
+                        [
+                            'practica_id' => $practica->id,
+                            'campo_id' => $campoTurnitin->id
+                        ],
+                        [
+                            'valor' => $turnitinPath
+                        ]
+
+                    );
                 }
-
-                PracticaValorCampo::updateOrCreate(
-                    [
-                        'practica_id' => $practica->id,
-                        'campo_id' => $campoTurnitin->id
-                    ],
-                    [
-                        'valor' => $turnitinPath
-                    ]
-
-                );
-
             }
-        }
 
             // ================= ACTUALIZAR ESTADO DE LA PRÁCTICA =================
-        if ($request->estado === 'Aprobada') {
-            // APROBADA: Cambiar a Fase 4
-            $practica->estado = 'Fase 4';
-            
-            // Cambiar el tipo de solicitud a Fase 4
-            $tipoFase4 = TipoSolicitud::where('nombre', 'practicas_fase_4')->first();
-            if ($tipoFase4) {
-                $practica->tipo_solicitud_id = $tipoFase4->id;
-            }
-            
-            $practica->save();
+            if ($request->estado === 'Aprobada') {
+                // APROBADA: Cambiar a Fase 4
+                $practica->estado = 'Fase 4';
 
-      
-            
-            // ========== GUARDAR submited_fase4 = 'true' PARA QUE EL EVALUADOR SEPA QUE EL DIRECTOR YA ENVIÓ ==========
-            $campoSubmitedFase4 = Campo::where('name', 'submited_fase4')->first();
-            if ($campoSubmitedFase4) {
-                PracticaValorCampo::updateOrCreate(
-                    ['practica_id' => $practica->id, 'campo_id' => $campoSubmitedFase4->id],
-                    ['valor' => 'true']
-                );
-                Log::info('submited_fase4 guardado como true', [
-                    'practica_id' => $practica->id
-                ]);
+                // Cambiar el tipo de solicitud a Fase 4
+                $tipoFase4 = TipoSolicitud::where('nombre', 'practicas_fase_4')->first();
+                if ($tipoFase4) {
+                    $practica->tipo_solicitud_id = $tipoFase4->id;
+                }
+
+                $practica->save();
+
+
+
+                // ========== GUARDAR submited_fase4 = 'true' PARA QUE EL EVALUADOR SEPA QUE EL DIRECTOR YA ENVIÓ ==========
+                $campoSubmitedFase4 = Campo::where('name', 'submited_fase4')->first();
+                if ($campoSubmitedFase4) {
+                    PracticaValorCampo::updateOrCreate(
+                        ['practica_id' => $practica->id, 'campo_id' => $campoSubmitedFase4->id],
+                        ['valor' => 'true']
+                    );
+                }
             } else {
-                Log::error('No se encontró el campo submited_fase4');
+                // ================= RECHAZADA =================
+
+                // 1. Resetear submited_fase3 a 'false' para que el estudiante pueda reenviar
+                $campoSubmited = Campo::where('tipo_solicitud_id', $tipo_fase3->id)
+                    ->where('name', 'submited_fase3')
+                    ->first();
+                if ($campoSubmited) {
+                    PracticaValorCampo::updateOrCreate(
+                        ['practica_id' => $practica->id, 'campo_id' => $campoSubmited->id],
+                        ['valor' => 'false']
+                    );
+                }
+
+                // 2. RESETEAR estado_director_fase3 para que el director pueda volver a responder
+                $campoEstado = Campo::where('tipo_solicitud_id', $tipo_fase3->id)
+                    ->where('name', 'estado_director_fase3')
+                    ->first();
+                if ($campoEstado) {
+                    PracticaValorCampo::updateOrCreate(
+                        ['practica_id' => $practica->id, 'campo_id' => $campoEstado->id],
+                        ['valor' => '']  // Vacío para que no cuente como "ya respondió"
+                    );
+                }
+
+                // 3. RESETEAR también la respuesta del director (opcional, pero recomendado)
+                $campoRespuesta = Campo::where('tipo_solicitud_id', $tipo_fase3->id)
+                    ->where('name', 'respuesta_director_fase3')
+                    ->first();
+                if ($campoRespuesta) {
+                    PracticaValorCampo::updateOrCreate(
+                        ['practica_id' => $practica->id, 'campo_id' => $campoRespuesta->id],
+                        ['valor' => '']
+                    );
+                }
+
+                // NO cambiamos el estado de la práctica, se mantiene en "Fase 3"
+                $practica->touch();
             }
-            
-            Log::info('Fase 3 - Aprobada por director, pasa a Fase 4', [
-                'practica_id' => $practica->id,
+
+            // Envio de correo
+            $this->practicaMailService->sendRespuestaFase3($practica, $request);
+
+            return response()->json([
+                'success' => 'Respuesta enviada correctamente',
                 'nuevo_estado' => $practica->estado,
-                'nuevo_tipo_solicitud_id' => $practica->tipo_solicitud_id
+                'tipo_solicitud_id' => $practica->tipo_solicitud_id
             ]);
-                
-            } else {
-        // ================= RECHAZADA =================
-        
-        // 1. Resetear submited_fase3 a 'false' para que el estudiante pueda reenviar
-        $campoSubmited = Campo::where('tipo_solicitud_id', $tipo_fase3->id)
-            ->where('name', 'submited_fase3')
-            ->first();
-        if ($campoSubmited) {
-            PracticaValorCampo::updateOrCreate(
-                ['practica_id' => $practica->id, 'campo_id' => $campoSubmited->id],
-                ['valor' => 'false']
-            );
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error interno del servidor: ' . $e->getMessage()], 500);
         }
-        
-        // 2. RESETEAR estado_director_fase3 para que el director pueda volver a responder
-        $campoEstado = Campo::where('tipo_solicitud_id', $tipo_fase3->id)
-            ->where('name', 'estado_director_fase3')
-            ->first();
-        if ($campoEstado) {
-            PracticaValorCampo::updateOrCreate(
-                ['practica_id' => $practica->id, 'campo_id' => $campoEstado->id],
-                ['valor' => '']  // Vacío para que no cuente como "ya respondió"
-            );
-        }
-        
-        // 3. RESETEAR también la respuesta del director (opcional, pero recomendado)
-        $campoRespuesta = Campo::where('tipo_solicitud_id', $tipo_fase3->id)
-            ->where('name', 'respuesta_director_fase3')
-            ->first();
-        if ($campoRespuesta) {
-            PracticaValorCampo::updateOrCreate(
-                ['practica_id' => $practica->id, 'campo_id' => $campoRespuesta->id],
-                ['valor' => '']
-            );
-        }
-        
-        // NO cambiamos el estado de la práctica, se mantiene en "Fase 3"
-        $practica->touch();
-
-
-        
-        Log::info('Fase 3 - Rechazada por director, todo reseteado para nuevo ciclo', [
-            'practica_id' => $practica->id
-        ]);
-
-        }
-
-        // Envio de correo
-         $this->practicaMailService->sendRespuestaFase3($practica, $request);
-
-                return response()->json([
-                    'success' => 'Respuesta enviada correctamente', 
-                    'nuevo_estado' => $practica->estado,
-                    'tipo_solicitud_id' => $practica->tipo_solicitud_id
-                ]);
-                
-            } catch (\Exception $e) {
-                Log::error('Error en replyFase3: ' . $e->getMessage());
-                Log::error('Stack trace: ' . $e->getTraceAsString());
-                return response()->json(['error' => 'Error interno del servidor: ' . $e->getMessage()], 500);
-            }
     }
 
-     /* Fase 4 - Respuesta Evaluador */ 
+    /* Fase 4 - Respuesta Evaluador */
     public function replyFase4(Request $request)
     {
-        Log::info('REQUEST FASE 4', $request->all());
         try {
-            Log::info('=== replyFase4 INICIO ===', $request->all());
-            
             $validator = Validator::make($request->all(), [
                 'practica_id' => 'required|exists:practicas,id',
                 'estado' => 'required|in:Aprobada,Rechazada,Aplazada',
@@ -1452,7 +1375,7 @@ class RoadMapPracticaController extends Controller
             }
 
             $tipo_fase4 = TipoSolicitud::where('nombre', 'practicas_fase_4')->first();
-            
+
             if (!$tipo_fase4) {
                 return response()->json(['error' => 'Configuración de fase no encontrada'], 500);
             }
@@ -1480,22 +1403,22 @@ class RoadMapPracticaController extends Controller
             }
 
             // ================= GUARDAR DOCUMENTOS - ACTUALIZAR LOS CAMPOS EXISTENTES =================
-        if ($request->hasFile('fdc127')) {
-            $fdc127Path = $request->file('fdc127')->store('practicas/fase4', 'public');
-            
-            $campoDoc = Campo::where('name', 'doc_fdc127')->first();
-            if ($campoDoc) {
-                $valorExistente = PracticaValorCampo::where('practica_id', $practica->id)
-                    ->where('campo_id', $campoDoc->id)->first();
-                if ($valorExistente && $valorExistente->valor) {
-                    Storage::disk('public')->delete($valorExistente->valor);
+            if ($request->hasFile('fdc127')) {
+                $fdc127Path = $request->file('fdc127')->store('practicas/fase4', 'public');
+
+                $campoDoc = Campo::where('name', 'doc_fdc127')->first();
+                if ($campoDoc) {
+                    $valorExistente = PracticaValorCampo::where('practica_id', $practica->id)
+                        ->where('campo_id', $campoDoc->id)->first();
+                    if ($valorExistente && $valorExistente->valor) {
+                        Storage::disk('public')->delete($valorExistente->valor);
+                    }
+                    PracticaValorCampo::updateOrCreate(
+                        ['practica_id' => $practica->id, 'campo_id' => $campoDoc->id],
+                        ['valor' => $fdc127Path]
+                    );
                 }
-                PracticaValorCampo::updateOrCreate(
-                    ['practica_id' => $practica->id, 'campo_id' => $campoDoc->id],
-                    ['valor' => $fdc127Path]
-                );
             }
-        }
 
             // Actualizar estado
             if ($request->estado === 'Aprobada') {
@@ -1505,102 +1428,88 @@ class RoadMapPracticaController extends Controller
                     $practica->tipo_solicitud_id = $tipoFase4->id;
                 }
                 $practica->save();
-
             } else {
-        // ================= RECHAZADA: Volver a Fase 3 y resetear TODO =================
-        
-        // 1. Cambiar estado a Fase 3
-        $practica->estado = 'Fase 3';
-        
-        $tipoFase3 = TipoSolicitud::where('nombre', 'practicas_fase_3')->first();
-        if ($tipoFase3) {
-            $practica->tipo_solicitud_id = $tipoFase3->id;
-        }
-        $practica->save();
-        
-        // 2. Resetear submited_fase3 a 'false' para que el estudiante pueda reenviar
-        $campoSubmitedFase3 = Campo::where('name', 'submited_fase3')->first();
-        if ($campoSubmitedFase3) {
-            PracticaValorCampo::updateOrCreate(
-                ['practica_id' => $practica->id, 'campo_id' => $campoSubmitedFase3->id],
-                ['valor' => 'false']
-            );
-        }
-        
-        // 3. Resetear estado_director_fase3 a '' para que el director pueda volver a responder
-        $campoEstadoDirector = Campo::where('name', 'estado_director_fase3')->first();
-        if ($campoEstadoDirector) {
-            PracticaValorCampo::updateOrCreate(
-                ['practica_id' => $practica->id, 'campo_id' => $campoEstadoDirector->id],
-                ['valor' => '']
-            );
-        }
-        
-        // 4. Resetear respuesta_director_fase3 a ''
-        $campoRespuestaDirector = Campo::where('name', 'respuesta_director_fase3')->first();
-        if ($campoRespuestaDirector) {
-            PracticaValorCampo::updateOrCreate(
-                ['practica_id' => $practica->id, 'campo_id' => $campoRespuestaDirector->id],
-                ['valor' => '']
-            );
-        }
-        
-        // 5. Resetear submited_fase4 a 'false'
-        $campoSubmitedFase4 = Campo::where('name', 'submited_fase4')->first();
-        if ($campoSubmitedFase4) {
-            PracticaValorCampo::updateOrCreate(
-                ['practica_id' => $practica->id, 'campo_id' => $campoSubmitedFase4->id],
-                ['valor' => 'false']
-            );
-        }
-        
-        // 6. Resetear estado_evaluador_fase4 a ''
-        $campoEstadoEvaluador = Campo::where('name', 'estado_evaluador_fase4')->first();
-        if ($campoEstadoEvaluador) {
-            PracticaValorCampo::updateOrCreate(
-                ['practica_id' => $practica->id, 'campo_id' => $campoEstadoEvaluador->id],
-                ['valor' => '']
-            );
-        }
-        
-        // 7. Resetear respuesta_evaluador_fase4 a ''
-        $campoRespuestaEvaluador = Campo::where('name', 'respuesta_evaluador_fase4')->first();
-        if ($campoRespuestaEvaluador) {
-            PracticaValorCampo::updateOrCreate(
-                ['practica_id' => $practica->id, 'campo_id' => $campoRespuestaEvaluador->id],
-                ['valor' => '']
-            );
-        }
-        
-        Log::info('Fase 4 - Rechazada por evaluador, vuelve a Fase 3 con todo reseteado', [
-            'practica_id' => $practica->id,
-            'nuevo_estado' => $practica->estado
-        ]);
+                // ================= RECHAZADA: Volver a Fase 3 y resetear TODO =================
 
-        }
-                $this->practicaMailService->sendRespuestaFase4Evaluador($practica, $request);
+                // 1. Cambiar estado a Fase 3
+                $practica->estado = 'Fase 3';
 
+                $tipoFase3 = TipoSolicitud::where('nombre', 'practicas_fase_3')->first();
+                if ($tipoFase3) {
+                    $practica->tipo_solicitud_id = $tipoFase3->id;
+                }
+                $practica->save();
 
-                $practica->refresh();
+                // 2. Resetear submited_fase3 a 'false' para que el estudiante pueda reenviar
+                $campoSubmitedFase3 = Campo::where('name', 'submited_fase3')->first();
+                if ($campoSubmitedFase3) {
+                    PracticaValorCampo::updateOrCreate(
+                        ['practica_id' => $practica->id, 'campo_id' => $campoSubmitedFase3->id],
+                        ['valor' => 'false']
+                    );
+                }
 
-                return response()->json([
-                    'success' => 'Respuesta enviada correctamente', 
-                    'nuevo_estado' => $practica->estado
-                ]);
-                
-            } catch (\Exception $e) {
-                Log::error('Error en replyFase4: ' . $e->getMessage());
-                return response()->json(['error' => 'Error interno del servidor: ' . $e->getMessage()], 500);
+                // 3. Resetear estado_director_fase3 a '' para que el director pueda volver a responder
+                $campoEstadoDirector = Campo::where('name', 'estado_director_fase3')->first();
+                if ($campoEstadoDirector) {
+                    PracticaValorCampo::updateOrCreate(
+                        ['practica_id' => $practica->id, 'campo_id' => $campoEstadoDirector->id],
+                        ['valor' => '']
+                    );
+                }
+
+                // 4. Resetear respuesta_director_fase3 a ''
+                $campoRespuestaDirector = Campo::where('name', 'respuesta_director_fase3')->first();
+                if ($campoRespuestaDirector) {
+                    PracticaValorCampo::updateOrCreate(
+                        ['practica_id' => $practica->id, 'campo_id' => $campoRespuestaDirector->id],
+                        ['valor' => '']
+                    );
+                }
+
+                // 5. Resetear submited_fase4 a 'false'
+                $campoSubmitedFase4 = Campo::where('name', 'submited_fase4')->first();
+                if ($campoSubmitedFase4) {
+                    PracticaValorCampo::updateOrCreate(
+                        ['practica_id' => $practica->id, 'campo_id' => $campoSubmitedFase4->id],
+                        ['valor' => 'false']
+                    );
+                }
+
+                // 6. Resetear estado_evaluador_fase4 a ''
+                $campoEstadoEvaluador = Campo::where('name', 'estado_evaluador_fase4')->first();
+                if ($campoEstadoEvaluador) {
+                    PracticaValorCampo::updateOrCreate(
+                        ['practica_id' => $practica->id, 'campo_id' => $campoEstadoEvaluador->id],
+                        ['valor' => '']
+                    );
+                }
+
+                // 7. Resetear respuesta_evaluador_fase4 a ''
+                $campoRespuestaEvaluador = Campo::where('name', 'respuesta_evaluador_fase4')->first();
+                if ($campoRespuestaEvaluador) {
+                    PracticaValorCampo::updateOrCreate(
+                        ['practica_id' => $practica->id, 'campo_id' => $campoRespuestaEvaluador->id],
+                        ['valor' => '']
+                    );
+                }
             }
+            $this->practicaMailService->sendRespuestaFase4Evaluador($practica, $request);
+            $practica->refresh();
+
+            return response()->json([
+                'success' => 'Respuesta enviada correctamente',
+                'nuevo_estado' => $practica->estado
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error interno del servidor: ' . $e->getMessage()], 500);
+        }
     }
 
-     /* Fase 4 - Respuesta comite */ 
+    /* Fase 4 - Respuesta comite */
     public function replyFase4Comite(Request $request)
     {
-
         try {
-            Log::info('=== replyFase4Comite INICIO ===', $request->all());
-            
             $validator = Validator::make($request->all(), [
                 'practica_id' => 'required|exists:practicas,id',
                 'estado' => 'required|in:Aprobada,Rechazada,Aplazada',
@@ -1616,26 +1525,26 @@ class RoadMapPracticaController extends Controller
             }
 
             // Validación manual SOLO cuando APRUEBA
-        if ($request->estado === 'Aprobada') {
-            $errors = [];
-            
-            if (empty(trim($request->titulo_propuesta))) {
-                $errors['titulo_propuesta'] = ['El título de la propuesta es obligatorio cuando se aprueba'];
+            if ($request->estado === 'Aprobada') {
+                $errors = [];
+
+                if (empty(trim($request->titulo_propuesta))) {
+                    $errors['titulo_propuesta'] = ['El título de la propuesta es obligatorio cuando se aprueba'];
+                }
+
+                if (empty(trim($request->nro_acta))) {
+                    $errors['nro_acta'] = ['El número de acta es obligatorio cuando se aprueba'];
+                }
+
+                if (empty($request->fecha_acta)) {
+                    $errors['fecha_acta'] = ['La fecha del acta es obligatoria cuando se aprueba'];
+                }
+
+                if (!empty($errors)) {
+                    return response()->json(['errors' => $errors], 422);
+                }
             }
-            
-            if (empty(trim($request->nro_acta))) {
-                $errors['nro_acta'] = ['El número de acta es obligatorio cuando se aprueba'];
-            }
-            
-            if (empty($request->fecha_acta)) {
-                $errors['fecha_acta'] = ['La fecha del acta es obligatoria cuando se aprueba'];
-            }
-            
-            if (!empty($errors)) {
-                return response()->json(['errors' => $errors], 422);
-            }
-        }
-            
+
             $practica = Practica::findOrFail($request->practica_id);
 
             if ($practica->estado !== 'Fase 4') {
@@ -1656,126 +1565,117 @@ class RoadMapPracticaController extends Controller
             }
 
             // ================= GUARDAR DOCUMENTOS - ACTUALIZAR LOS CAMPOS EXISTENTES =================
-        if ($request->hasFile('fdc127')) {
-            $fdc127Path = $request->file('fdc127')->store('practicas/fase4/comite/documentos', 'public');
-            
-            $campoDoc = Campo::where('name', 'doc_fdc127')->first();
-            if ($campoDoc) {
-                $valorExistente = PracticaValorCampo::where('practica_id', $practica->id)
-                    ->where('campo_id', $campoDoc->id)->first();
-                if ($valorExistente && $valorExistente->valor) {
-                    Storage::disk('public')->delete($valorExistente->valor);
+            if ($request->hasFile('fdc127')) {
+                $fdc127Path = $request->file('fdc127')->store('practicas/fase4/comite/documentos', 'public');
+
+                $campoDoc = Campo::where('name', 'doc_fdc127')->first();
+                if ($campoDoc) {
+                    $valorExistente = PracticaValorCampo::where('practica_id', $practica->id)
+                        ->where('campo_id', $campoDoc->id)->first();
+                    if ($valorExistente && $valorExistente->valor) {
+                        Storage::disk('public')->delete($valorExistente->valor);
+                    }
+                    PracticaValorCampo::updateOrCreate(
+                        ['practica_id' => $practica->id, 'campo_id' => $campoDoc->id],
+                        ['valor' => $fdc127Path]
+                    );
                 }
-                PracticaValorCampo::updateOrCreate(
-                    ['practica_id' => $practica->id, 'campo_id' => $campoDoc->id],
-                    ['valor' => $fdc127Path]
-                );
-            }
-        }
-
-        if ($request->estado === 'Aprobada') {
-            // Guardar título de la propuesta
-            $campoTitulo = Campo::where('tipo_solicitud_id', $tipo_fase4->id)
-                ->where('name', 'titulo_propuesta_fase4')
-                ->first();
-            if ($campoTitulo) {
-                PracticaValorCampo::updateOrCreate(
-                    ['practica_id' => $practica->id, 'campo_id' => $campoTitulo->id],
-                    ['valor' => $request->titulo_propuesta]
-                );
             }
 
+            if ($request->estado === 'Aprobada') {
+                // Guardar título de la propuesta
+                $campoTitulo = Campo::where('tipo_solicitud_id', $tipo_fase4->id)
+                    ->where('name', 'titulo_propuesta_fase4')
+                    ->first();
+                if ($campoTitulo) {
+                    PracticaValorCampo::updateOrCreate(
+                        ['practica_id' => $practica->id, 'campo_id' => $campoTitulo->id],
+                        ['valor' => $request->titulo_propuesta]
+                    );
+                }
 
-            // Crear acta
-            ActaPractica::create([
-                'practica_id' => $practica->id,
-                'numero' => $request->nro_acta,
-                'fecha' => $request->fecha_acta,
-                'descripcion' => $request->respuesta ?? '',
-            ]);
 
-            // Pasar a Fase 5
-            $practica->estado = 'Fase 5';
+                // Crear acta
+                ActaPractica::create([
+                    'practica_id' => $practica->id,
+                    'numero' => $request->nro_acta,
+                    'fecha' => $request->fecha_acta,
+                    'descripcion' => $request->respuesta ?? '',
+                ]);
 
-            $tipoFase5 = TipoSolicitud::where('nombre', 'practicas_fase_5')->first();
+                // Pasar a Fase 5
+                $practica->estado = 'Fase 5';
 
-            if ($tipoFase5) {
-                $practica->tipo_solicitud_id = $tipoFase5->id;
+                $tipoFase5 = TipoSolicitud::where('nombre', 'practicas_fase_5')->first();
+
+                if ($tipoFase5) {
+                    $practica->tipo_solicitud_id = $tipoFase5->id;
+                }
+
+                $practica->save();
+
+                // Guardar fechas DESPUÉS de pasar a Fase 5
+                $this->guardarValorCampo($practica->id, 'fecha_inicio_practica', Carbon::now()->toDateTimeString());
+                $this->guardarValorCampo($practica->id, 'fecha_limite_practica', Carbon::now()->addDays(180)->toDateTimeString());
+                $this->guardarValorCampo($practica->id, 'solicitudes_prorroga', '0');
+            } else {
+                // RECHAZADA: Volver a Fase 3
+                $practica->estado = 'Fase 3';
+                $tipoFase3 = TipoSolicitud::where('nombre', 'practicas_fase_3')->first();
+                if ($tipoFase3) {
+                    $practica->tipo_solicitud_id = $tipoFase3->id;
+                }
+                $practica->save();
+
+                // Resetear submited_fase3
+                $campoSubmited = Campo::where('name', 'submited_fase3')->first();
+                if ($campoSubmited) {
+                    PracticaValorCampo::updateOrCreate(
+                        ['practica_id' => $practica->id, 'campo_id' => $campoSubmited->id],
+                        ['valor' => 'false']
+                    );
+                }
+
+                // ========== NUEVO: BORRAR ESTADOS Y FECHAS ==========
+
+                // 1. Borrar estado del director (fase 3)
+                $campoDirector = Campo::where('name', 'estado_director_fase3')->first();
+                if ($campoDirector) {
+                    PracticaValorCampo::where('practica_id', $practica->id)
+                        ->where('campo_id', $campoDirector->id)
+                        ->delete();
+                }
+
+                // 2. Borrar estado del evaluador (fase 4)
+                $campoEvaluador = Campo::where('name', 'estado_evaluador_fase4')->first();
+                if ($campoEvaluador) {
+                    PracticaValorCampo::where('practica_id', $practica->id)
+                        ->where('campo_id', $campoEvaluador->id)
+                        ->delete();
+                }
+
+                // 3. Borrar respuesta del comité (fase 4)
+                $campoRespuestaComite = Campo::where('name', 'respuesta_comite_fase4')->first();
+                if ($campoRespuestaComite) {
+                    PracticaValorCampo::where('practica_id', $practica->id)
+                        ->where('campo_id', $campoRespuestaComite->id)
+                        ->delete();
+                }
+
+                // 4. Borrar título de la propuesta (fase 4)
+                $campoTitulo = Campo::where('name', 'titulo_propuesta_fase4')->first();
+                if ($campoTitulo) {
+                    PracticaValorCampo::where('practica_id', $practica->id)
+                        ->where('campo_id', $campoTitulo->id)
+                        ->delete();
+                }
             }
 
-            $practica->save();
-
-            // Guardar fechas DESPUÉS de pasar a Fase 5
-            $this->guardarValorCampo($practica->id, 'fecha_inicio_practica', Carbon::now()->toDateTimeString());
-            $this->guardarValorCampo($practica->id, 'fecha_limite_practica', Carbon::now()->addDays(180)->toDateTimeString());
-            $this->guardarValorCampo($practica->id, 'solicitudes_prorroga', '0');
-
-           
-            Log::info('Fase 4 - Comité APROBÓ, pasa a Fase 5');
-            
-        } else {
-            // RECHAZADA: Volver a Fase 3
-            $practica->estado = 'Fase 3';
-            $tipoFase3 = TipoSolicitud::where('nombre', 'practicas_fase_3')->first();
-            if ($tipoFase3) {
-                $practica->tipo_solicitud_id = $tipoFase3->id;
-            }
-            $practica->save();
-            
-            // Resetear submited_fase3
-            $campoSubmited = Campo::where('name', 'submited_fase3')->first();
-            if ($campoSubmited) {
-                PracticaValorCampo::updateOrCreate(
-                    ['practica_id' => $practica->id, 'campo_id' => $campoSubmited->id],
-                    ['valor' => 'false']
-                );
-            }
-
-            // ========== NUEVO: BORRAR ESTADOS Y FECHAS ==========
-    
-    // 1. Borrar estado del director (fase 3)
-    $campoDirector = Campo::where('name', 'estado_director_fase3')->first();
-    if ($campoDirector) {
-        PracticaValorCampo::where('practica_id', $practica->id)
-            ->where('campo_id', $campoDirector->id)
-            ->delete();
-    }
-
-    // 2. Borrar estado del evaluador (fase 4)
-    $campoEvaluador = Campo::where('name', 'estado_evaluador_fase4')->first();
-    if ($campoEvaluador) {
-        PracticaValorCampo::where('practica_id', $practica->id)
-            ->where('campo_id', $campoEvaluador->id)
-            ->delete();
-    }
-
-    // 3. Borrar respuesta del comité (fase 4)
-    $campoRespuestaComite = Campo::where('name', 'respuesta_comite_fase4')->first();
-    if ($campoRespuestaComite) {
-        PracticaValorCampo::where('practica_id', $practica->id)
-            ->where('campo_id', $campoRespuestaComite->id)
-            ->delete();
-    }
-
-    // 4. Borrar título de la propuesta (fase 4)
-    $campoTitulo = Campo::where('name', 'titulo_propuesta_fase4')->first();
-    if ($campoTitulo) {
-        PracticaValorCampo::where('practica_id', $practica->id)
-            ->where('campo_id', $campoTitulo->id)
-            ->delete();
-    }
-            
-            Log::info('Fase 4 - Comité RECHAZÓ, vuelve a Fase 3');
-        }
-
-         $this->practicaMailService
+            $this->practicaMailService
                 ->sendRespuestaFase4Comite($practica, $request);
-            
 
-        return response()->json(['success' => 'Respuesta enviada correctamente']);
-        
+            return response()->json(['success' => 'Respuesta enviada correctamente']);
         } catch (\Exception $e) {
-            Log::error('Error en replyFase4Comite: ' . $e->getMessage());
             return response()->json(['error' => 'Error interno del servidor'], 500);
         }
     }
@@ -1783,16 +1683,12 @@ class RoadMapPracticaController extends Controller
     /* FASE 5 - Estudiante: Envío de documentos finales*/
     public function storeFase5(Request $request)
     {
-
         $validator = Validator::make($request->all(), [
-
             'practica_id' => 'required|exists:practicas,id',
             'doc_fdc196' => 'required|file|mimes:doc,docx,pdf|max:5120',
             'doc_fdc129' => 'required|file|mimes:doc,docx,pdf|max:5120',
             'doc_fdc128' => 'required|file|mimes:doc,docx,pdf|max:10240',
-
         ], [
-
             'doc_fdc196.required' => 'El acta de terminación es obligatoria.',
             'doc_fdc196.mimes' => 'El acta de terminación debe ser PDF o WORD.',
             'doc_fdc196.max' => 'El acta de terminación no puede superar los 5MB.',
@@ -1806,191 +1702,179 @@ class RoadMapPracticaController extends Controller
             'doc_fdc128.max' => 'El informe final no puede superar los 10MB.',
         ]);
 
-            if ($validator->fails()) {
+        if ($validator->fails()) {
 
-                return response()->json([
-                    'errors' => $validator->errors()
-                ], 422);
+            return response()->json([
+                'errors' => $validator->errors()
+            ], 422);
+        }
 
-            }
+        $practica = Practica::findOrFail($request->practica_id);
 
-            $practica = Practica::findOrFail($request->practica_id);
+        // Verificar fase
+        if (!in_array($practica->estado, ['Fase 5'])) {
 
-            // Verificar fase
-            if (!in_array($practica->estado, ['Fase 5'])) {
+            return response()->json([
+                'error' => 'La práctica no está en la fase correspondiente'
+            ], 422);
+        }
 
-                return response()->json([
-                    'error' => 'La práctica no está en la fase correspondiente'
-                ], 422);
+        $tipo_fase5 = $this->getType('practicas_fase_5');
 
-            }
+        $campos_fase5 = Campo::where(
+            'tipo_solicitud_id',
+            $tipo_fase5->id
+        )->get();
 
-            $tipo_fase5 = $this->getType('practicas_fase_5');
+        // ==================== 1. INFORME FINAL ====================
 
-            $campos_fase5 = Campo::where(
-                'tipo_solicitud_id',
-                $tipo_fase5->id
-            )->get();
+        if ($request->hasFile('doc_fdc128')) {
 
-            // ==================== 1. INFORME FINAL ====================
-
-            if ($request->hasFile('doc_fdc128')) {
-
-                $campoInforme = $campos_fase5
-                    ->where('name', 'doc_fdc128')
-                    ->first();
-
-                $valorExistente = PracticaValorCampo::where(
-                        'practica_id',
-                        $practica->id
-                    )
-                    ->where('campo_id', $campoInforme->id)
-                    ->first();
-
-                if ($valorExistente && $valorExistente->valor) {
-
-                    Storage::disk('public')
-                        ->delete($valorExistente->valor);
-
-                }
-
-                $path = $request
-                    ->file('doc_fdc128')
-                    ->store('practicas/fase5', 'public');
-
-                PracticaValorCampo::updateOrCreate(
-
-                    [
-                        'practica_id' => $practica->id,
-                        'campo_id' => $campoInforme->id
-                    ],
-
-                    [
-                        'valor' => $path
-                    ]
-
-                );
-            }
-
-            // ==================== 2. REJILLA EVALUACIÓN ====================
-
-            if ($request->hasFile('doc_fdc129')) {
-
-                $campoRejilla = $campos_fase5
-                    ->where('name', 'doc_fdc129')
-                    ->first();
-
-                $valorExistente = PracticaValorCampo::where(
-                        'practica_id',
-                        $practica->id
-                    )
-                    ->where('campo_id', $campoRejilla->id)
-                    ->first();
-
-                if ($valorExistente && $valorExistente->valor) {
-
-                    Storage::disk('public')
-                        ->delete($valorExistente->valor);
-
-                }
-
-                $path = $request
-                    ->file('doc_fdc129')
-                    ->store('practicas/fase5', 'public');
-
-                PracticaValorCampo::updateOrCreate(
-
-                    [
-                        'practica_id' => $practica->id,
-                        'campo_id' => $campoRejilla->id
-                    ],
-
-                    [
-                        'valor' => $path
-                    ]
-
-                );
-            }
-
-
-
-            // ==================== 3. ACTA TERMINACIÓN ====================
-
-            if ($request->hasFile('doc_fdc196')) {
-
-                $campoActa = $campos_fase5
-                    ->where('name', 'doc_fdc196')
-                    ->first();
-
-                $valorExistente = PracticaValorCampo::where(
-                        'practica_id',
-                        $practica->id
-                    )
-                    ->where('campo_id', $campoActa->id)
-                    ->first();
-
-                if ($valorExistente && $valorExistente->valor) {
-
-                    Storage::disk('public')
-                        ->delete($valorExistente->valor);
-
-                }
-
-                $path = $request
-                    ->file('doc_fdc196')
-                    ->store('practicas/fase5', 'public');
-
-                PracticaValorCampo::updateOrCreate(
-
-                    [
-                        'practica_id' => $practica->id,
-                        'campo_id' => $campoActa->id
-                    ],
-
-                    [
-                        'valor' => $path
-                    ]
-
-                );
-            }
-
-        
-        
-            // ==================== 4. MARCAR ENVÍO ====================
-
-            $campoSubmited = $campos_fase5
-                ->where('name', 'submited_fase5')
+            $campoInforme = $campos_fase5
+                ->where('name', 'doc_fdc128')
                 ->first();
+
+            $valorExistente = PracticaValorCampo::where(
+                'practica_id',
+                $practica->id
+            )
+                ->where('campo_id', $campoInforme->id)
+                ->first();
+
+            if ($valorExistente && $valorExistente->valor) {
+
+                Storage::disk('public')
+                    ->delete($valorExistente->valor);
+            }
+
+            $path = $request
+                ->file('doc_fdc128')
+                ->store('practicas/fase5', 'public');
 
             PracticaValorCampo::updateOrCreate(
 
                 [
                     'practica_id' => $practica->id,
-                    'campo_id' => $campoSubmited->id
+                    'campo_id' => $campoInforme->id
                 ],
 
                 [
-                    'valor' => 'true'
+                    'valor' => $path
                 ]
 
             );
+        }
 
-            // Actualizar timestamp
-            $practica->touch();
+        // ==================== 2. REJILLA EVALUACIÓN ====================
 
-            Log::info('Fase 5 - Documentos finales enviados', [
+        if ($request->hasFile('doc_fdc129')) {
 
+            $campoRejilla = $campos_fase5
+                ->where('name', 'doc_fdc129')
+                ->first();
+
+            $valorExistente = PracticaValorCampo::where(
+                'practica_id',
+                $practica->id
+            )
+                ->where('campo_id', $campoRejilla->id)
+                ->first();
+
+            if ($valorExistente && $valorExistente->valor) {
+
+                Storage::disk('public')
+                    ->delete($valorExistente->valor);
+            }
+
+            $path = $request
+                ->file('doc_fdc129')
+                ->store('practicas/fase5', 'public');
+
+            PracticaValorCampo::updateOrCreate(
+
+                [
+                    'practica_id' => $practica->id,
+                    'campo_id' => $campoRejilla->id
+                ],
+
+                [
+                    'valor' => $path
+                ]
+
+            );
+        }
+
+
+
+        // ==================== 3. ACTA TERMINACIÓN ====================
+
+        if ($request->hasFile('doc_fdc196')) {
+
+            $campoActa = $campos_fase5
+                ->where('name', 'doc_fdc196')
+                ->first();
+
+            $valorExistente = PracticaValorCampo::where(
+                'practica_id',
+                $practica->id
+            )
+                ->where('campo_id', $campoActa->id)
+                ->first();
+
+            if ($valorExistente && $valorExistente->valor) {
+
+                Storage::disk('public')
+                    ->delete($valorExistente->valor);
+            }
+
+            $path = $request
+                ->file('doc_fdc196')
+                ->store('practicas/fase5', 'public');
+
+            PracticaValorCampo::updateOrCreate(
+
+                [
+                    'practica_id' => $practica->id,
+                    'campo_id' => $campoActa->id
+                ],
+
+                [
+                    'valor' => $path
+                ]
+
+            );
+        }
+
+
+
+        // ==================== 4. MARCAR ENVÍO ====================
+
+        $campoSubmited = $campos_fase5
+            ->where('name', 'submited_fase5')
+            ->first();
+
+        PracticaValorCampo::updateOrCreate(
+
+            [
                 'practica_id' => $practica->id,
-                'user_id' => auth()->id()
+                'campo_id' => $campoSubmited->id
+            ],
 
-            ]);
+            [
+                'valor' => 'true'
+            ]
 
-            // Envío correo
-            $this->practicaMailService->sendFase5($practica);
+        );
 
-            return response()->json([
-                'success' => 'Documentos finales enviados correctamente'
-            ]);
+        // Actualizar timestamp
+        $practica->touch();
+
+        // Envío correo
+        $this->practicaMailService->sendFase5($practica);
+
+        return response()->json([
+            'success' => 'Documentos finales enviados correctamente'
+        ]);
     }
 
     /* FASE 5 - Ver detalles de lo enviado (para estudiante, director y comité) */
@@ -2014,7 +1898,7 @@ class RoadMapPracticaController extends Controller
             $actaTerminacion = $valores['doc_fdc196'] ?? null;
             $rejillaEvaluacion = $valores['doc_fdc129'] ?? null;
 
-            
+
 
             // ===============================
             // RESPUESTA DEL DIRECTOR
@@ -2075,188 +1959,129 @@ class RoadMapPracticaController extends Controller
                 : null;
 
             return response()->json([
-
                 'success' => true,
 
                 // ===============================
                 // ESTUDIANTE
                 // ===============================
-
                 'acta_terminacion' => $actaTerminacion,
                 'acta_terminacion_url' => $actaTerminacionUrl,
-
                 'rejilla_evaluacion' => $rejillaEvaluacion,
                 'rejilla_evaluacion_url' => $rejillaEvaluacionUrl,
-
                 'informe_final' => $informeFinal,
                 'informe_final_url' => $informeFinalUrl,
 
                 // ===============================
                 // DIRECTOR
                 // ===============================
-
                 'estado_director' => $estadoDirector,
-
                 'respuesta_director' => $respuestaDirector,
-
                 'informe_final_director' => $informeFinalDirector,
-
                 'informe_final_director_url' => $informeFinalDirectorUrl,
-
                 'turnitin_director' => $turnitinDirector,
-
                 'turnitin_director_url' => $turnitinDirectorUrl,
 
                 // ===============================
                 // EVALUADOR
                 // ===============================
-
                 'estado_evaluador' => $estadoEvaluador,
-
                 'respuesta_evaluador' => $respuestaEvaluador,
-
                 'informe_final_evaluador' => $informeFinalEvaluador,
-
                 'informe_final_evaluador_url' => $informeFinalEvaluadorUrl,
 
                 // ===============================
                 // COMITÉ
                 // ===============================
-
                 'estado_comite' => $estadoComite,
-
                 'respuesta_comite' => $respuestaComite,
 
                 // ===============================
                 // FECHA
                 // ===============================
-
                 'fecha_envio' => $practica->updated_at->format('d/m/Y H:i')
-
             ]);
-
         } catch (Exception $e) {
-
-            Log::error(
-                'Error en getFase5Details: ' . $e->getMessage()
-            );
-
             return response()->json([
                 'error' => 'Error al cargar los detalles'
             ], 500);
         }
     }
 
-     /* Fase 5 - Respuesta director */ 
+    /* Fase 5 - Respuesta director */
     public function replyFase5(Request $request)
     {
         try {
-
-            Log::info('=== replyFase5 INICIO ===', $request->all());
-
             $tipo_fase5 = TipoSolicitud::where(
                 'nombre',
                 'practicas_fase_5'
             )->first();
 
             if (!$tipo_fase5) {
-
                 return response()->json([
                     'error' => 'Configuración de fase no encontrada'
                 ], 500);
-
             }
 
             // ================= VALIDACIÓN =================
-
             $validator = Validator::make($request->all(), [
-
                 'practica_id' => 'required|exists:practicas,id',
-
                 'estado' => 'required|in:Aprobada,Rechazada,Aplazada',
-
                 'fdc128' => 'nullable|file|mimes:doc,docx,pdf|max:10240',
-
                 'fdc129' => 'nullable|file|mimes:doc,docx,pdf|max:5120',
-
                 'fdc196' => 'nullable|file|mimes:doc,docx,pdf|max:5120',
-
                 'turnitin' => 'nullable|file|mimes:pdf|max:5120',
-
                 'respuesta' => 'nullable|string'
-
             ]);
 
             if ($validator->fails()) {
-
                 return response()->json([
                     'errors' => $validator->errors()
                 ], 422);
-
             }
 
             $practica = Practica::findOrFail($request->practica_id);
 
             // ================= VALIDAR FASE =================
-
             if ($practica->estado !== 'Fase 5') {
-
                 return response()->json([
                     'error' => 'La práctica no está en la fase correspondiente'
                 ], 422);
-
             }
 
             // ================= RESPUESTA DIRECTOR =================
-
             $campoRespuesta = Campo::where(
                 'tipo_solicitud_id',
                 $tipo_fase5->id
-            )
-            ->where('name', 'respuesta_director_fase5')
-            ->first();
+            )->where('name', 'respuesta_director_fase5')->first();
 
             if ($campoRespuesta) {
-
                 PracticaValorCampo::updateOrCreate(
-
                     [
                         'practica_id' => $practica->id,
                         'campo_id' => $campoRespuesta->id
                     ],
-
                     [
                         'valor' => $request->respuesta ?? ''
                     ]
-
                 );
-
             }
 
             // ================= ESTADO DIRECTOR =================
-
             $campoEstado = Campo::where(
                 'tipo_solicitud_id',
                 $tipo_fase5->id
-            )
-            ->where('name', 'estado_director_fase5')
-            ->first();
+            )->where('name', 'estado_director_fase5')->first();
 
             if ($campoEstado) {
-
                 PracticaValorCampo::updateOrCreate(
-
                     [
                         'practica_id' => $practica->id,
                         'campo_id' => $campoEstado->id
                     ],
-
                     [
                         'valor' => $request->estado
                     ]
-
                 );
-
             }
 
             // ======================================================
@@ -2264,55 +2089,38 @@ class RoadMapPracticaController extends Controller
             // ======================================================
 
             // ================= FDC128 =================
-
             if ($request->hasFile('fdc128')) {
-
                 $path = $request
                     ->file('fdc128')
                     ->store('practicas/fase5', 'public');
 
-                // IMPORTANTE:
-                // actualiza el MISMO campo del estudiante
-
                 $campoDoc = Campo::where('name', 'doc_fdc128')->first();
 
                 if ($campoDoc) {
-
                     $valorExistente = PracticaValorCampo::where(
-                            'practica_id',
-                            $practica->id
-                        )
-                        ->where('campo_id', $campoDoc->id)
-                        ->first();
+                        'practica_id',
+                        $practica->id
+                    )->where('campo_id', $campoDoc->id)->first();
 
                     if ($valorExistente && $valorExistente->valor) {
-
                         Storage::disk('public')
                             ->delete($valorExistente->valor);
-
                     }
 
                     PracticaValorCampo::updateOrCreate(
-
                         [
                             'practica_id' => $practica->id,
                             'campo_id' => $campoDoc->id
                         ],
-
                         [
                             'valor' => $path
                         ]
-
                     );
-
                 }
-
             }
 
             // ================= FDC129 =================
-
             if ($request->hasFile('fdc129')) {
-
                 $path = $request
                     ->file('fdc129')
                     ->store('practicas/fase5', 'public');
@@ -2320,42 +2128,29 @@ class RoadMapPracticaController extends Controller
                 $campoDoc = Campo::where('name', 'doc_fdc129')->first();
 
                 if ($campoDoc) {
-
                     $valorExistente = PracticaValorCampo::where(
-                            'practica_id',
-                            $practica->id
-                        )
-                        ->where('campo_id', $campoDoc->id)
-                        ->first();
+                        'practica_id',
+                        $practica->id
+                    )->where('campo_id', $campoDoc->id)->first();
 
                     if ($valorExistente && $valorExistente->valor) {
-
-                        Storage::disk('public')
-                            ->delete($valorExistente->valor);
-
+                        Storage::disk('public')->delete($valorExistente->valor);
                     }
 
                     PracticaValorCampo::updateOrCreate(
-
                         [
                             'practica_id' => $practica->id,
                             'campo_id' => $campoDoc->id
                         ],
-
                         [
                             'valor' => $path
                         ]
-
                     );
-
                 }
-
             }
 
             // ================= FDC196 =================
-
             if ($request->hasFile('fdc196')) {
-
                 $path = $request
                     ->file('fdc196')
                     ->store('practicas/fase5', 'public');
@@ -2363,42 +2158,29 @@ class RoadMapPracticaController extends Controller
                 $campoDoc = Campo::where('name', 'doc_fdc196')->first();
 
                 if ($campoDoc) {
-
                     $valorExistente = PracticaValorCampo::where(
-                            'practica_id',
-                            $practica->id
-                        )
-                        ->where('campo_id', $campoDoc->id)
-                        ->first();
+                        'practica_id',
+                        $practica->id
+                    )->where('campo_id', $campoDoc->id)->first();
 
                     if ($valorExistente && $valorExistente->valor) {
-
-                        Storage::disk('public')
-                            ->delete($valorExistente->valor);
-
+                        Storage::disk('public')->delete($valorExistente->valor);
                     }
 
                     PracticaValorCampo::updateOrCreate(
-
                         [
                             'practica_id' => $practica->id,
                             'campo_id' => $campoDoc->id
                         ],
-
                         [
                             'valor' => $path
                         ]
-
                     );
-
                 }
-
             }
 
             // ================= TURNITIN DIRECTOR FASE 5 =================
-
             if ($request->hasFile('turnitin')) {
-
                 $turnitinPath = $request
                     ->file('turnitin')
                     ->store('practicas/fase5', 'public');
@@ -2409,48 +2191,35 @@ class RoadMapPracticaController extends Controller
                 )->first();
 
                 if ($campoTurnitin) {
-
                     $valorExistente = PracticaValorCampo::where(
-                            'practica_id',
-                            $practica->id
-                        )
-                        ->where(
-                            'campo_id',
-                            $campoTurnitin->id
-                        )
-                        ->first();
+                        'practica_id',
+                        $practica->id
+                    )->where(
+                        'campo_id',
+                        $campoTurnitin->id
+                    )->first();
 
                     // Eliminar archivo anterior
                     if ($valorExistente && $valorExistente->valor) {
-
-                        Storage::disk('public')
-                            ->delete($valorExistente->valor);
-
+                        Storage::disk('public')->delete($valorExistente->valor);
                     }
 
                     PracticaValorCampo::updateOrCreate(
-
                         [
                             'practica_id' => $practica->id,
                             'campo_id' => $campoTurnitin->id
                         ],
-
                         [
                             'valor' => $turnitinPath
                         ]
-
                     );
-
                 }
-
             }
 
             // ======================================================
             // APROBADA
             // ======================================================
-
             if ($request->estado === 'Aprobada') {
-
                 // Cambiar estado
                 $practica->estado = 'Fase 6';
 
@@ -2462,151 +2231,89 @@ class RoadMapPracticaController extends Controller
 
                 // Asignar tipo solicitud
                 if ($tipoFase6) {
-
                     $practica->tipo_solicitud_id = $tipoFase6->id;
-
                 }
 
                 // Guardar
                 $practica->save();
-
-                Log::info('Fase 5 aprobada - pasa a Fase 6', [
-
-                    'practica_id' => $practica->id,
-                    'nuevo_estado' => $practica->estado,
-                    'nuevo_tipo_solicitud_id' => $practica->tipo_solicitud_id
-
-                ]);
-
             }
 
             // ======================================================
             // RECHAZADA
             // ======================================================
-
             else {
-
                 // Permitir reenviar al estudiante
-
-                $campoSubmited = Campo::where('name', 'submited_fase5')
-                    ->first();
+                $campoSubmited = Campo::where('name', 'submited_fase5')->first();
 
                 if ($campoSubmited) {
-
                     PracticaValorCampo::updateOrCreate(
-
                         [
                             'practica_id' => $practica->id,
                             'campo_id' => $campoSubmited->id
                         ],
-
                         [
                             'valor' => 'false'
                         ]
-
                     );
-
                 }
 
                 // Reset estado director
-
                 $campoEstadoDirector = Campo::where(
                     'name',
                     'estado_director_fase5'
                 )->first();
 
                 if ($campoEstadoDirector) {
-
                     PracticaValorCampo::updateOrCreate(
-
                         [
                             'practica_id' => $practica->id,
                             'campo_id' => $campoEstadoDirector->id
                         ],
-
                         [
                             'valor' => ''
                         ]
-
                     );
-
                 }
 
                 // Reset respuesta director
-
                 $campoRespuestaDirector = Campo::where(
                     'name',
                     'respuesta_director_fase5'
                 )->first();
 
                 if ($campoRespuestaDirector) {
-
                     PracticaValorCampo::updateOrCreate(
-
                         [
                             'practica_id' => $practica->id,
                             'campo_id' => $campoRespuestaDirector->id
                         ],
-
                         [
                             'valor' => ''
                         ]
-
                     );
-
                 }
 
                 $practica->touch();
-
-                Log::info('Fase 5 rechazada - reinicio para nuevo envío', [
-
-                    'practica_id' => $practica->id
-
-                ]);
-
             }
 
             $this->practicaMailService->sendRespuestaFase5($practica, $request);
 
             return response()->json([
-
                 'success' => 'Respuesta enviada correctamente',
-
                 'nuevo_estado' => $practica->estado
-
             ]);
-
         } catch (\Exception $e) {
-
-            Log::error(
-                'Error en replyFase5: ' . $e->getMessage()
-            );
-
-            Log::error(
-                'Linea: ' . $e->getLine()
-            );
-
-            Log::error(
-                'Archivo: ' . $e->getFile()
-            );
-
             return response()->json([
-
                 'error' => $e->getMessage(),
                 'line' => $e->getLine()
-
             ], 500);
-
         }
     }
 
     /* Fase 6 - Responder evaluador  */
     public function replyFase6(Request $request)
     {
-        Log::info('REQUEST FASE 6', $request->all());
         try {
-            Log::info('=== replyFase6 INICIO ===', $request->all());
-            
             $validator = Validator::make($request->all(), [
                 'practica_id' => 'required|exists:practicas,id',
                 'estado' => 'required|in:Aprobada,Rechazada,Aplazada',
@@ -2619,21 +2326,13 @@ class RoadMapPracticaController extends Controller
                 return response()->json(['errors' => $validator->errors()], 422);
             }
 
-           $practica = Practica::findOrFail($request->practica_id);
-
-            Log::info('PASO A');
+            $practica = Practica::findOrFail($request->practica_id);
 
             if ($practica->estado !== 'Fase 6') {
                 return response()->json(['error' => 'La práctica no está en la fase correspondiente'], 422);
             }
 
-            Log::info('PASO B');
-
             $tipo_fase6 = TipoSolicitud::where('nombre', 'practicas_fase_6')->first();
-
-            Log::info('PASO C', [
-                'tipo_fase6' => $tipo_fase6?->id
-            ]);
 
             // Guardar respuesta del evaluador
             $campoRespuesta = Campo::where('tipo_solicitud_id', $tipo_fase6->id)
@@ -2658,243 +2357,9 @@ class RoadMapPracticaController extends Controller
             }
 
             // ================= GUARDAR DOCUMENTOS - ACTUALIZAR LOS CAMPOS EXISTENTES =================
-        if ($request->hasFile('fdc128')) {
-            $fdc128Path = $request->file('fdc128')->store('practicas/fase6', 'public');
-            
-            $campoDoc = Campo::where('name', 'doc_fdc128')->first();
-            if ($campoDoc) {
-                $valorExistente = PracticaValorCampo::where('practica_id', $practica->id)
-                    ->where('campo_id', $campoDoc->id)->first();
-                if ($valorExistente && $valorExistente->valor) {
-                    Storage::disk('public')->delete($valorExistente->valor);
-                }
-                PracticaValorCampo::updateOrCreate(
-                    ['practica_id' => $practica->id, 'campo_id' => $campoDoc->id],
-                    ['valor' => $fdc128Path]
-                );
-            }
-        }
-
-        if ($request->hasFile('fdc129')) {
-            $fdc129Path = $request->file('fdc129')->store('practicas/fase6', 'public');
-            
-            $campoDoc = Campo::where('name', 'doc_fdc129')->first();
-            if ($campoDoc) {
-                $valorExistente = PracticaValorCampo::where('practica_id', $practica->id)
-                    ->where('campo_id', $campoDoc->id)->first();
-                if ($valorExistente && $valorExistente->valor) {
-                    Storage::disk('public')->delete($valorExistente->valor);
-                }
-                PracticaValorCampo::updateOrCreate(
-                    ['practica_id' => $practica->id, 'campo_id' => $campoDoc->id],
-                    ['valor' => $fdc129Path]
-                );
-            }
-        }
-
-            // Actualizar estado
-            if ($request->estado === 'Aprobada') {
-                $practica->estado = 'Fase 6';
-                $tipoFase6 = TipoSolicitud::where('nombre', 'practicas_fase_6')->first();
-                if ($tipoFase6) {
-                    $practica->tipo_solicitud_id = $tipoFase6->id;
-                }
-                $practica->save();
-            } else {
-            // ================= RECHAZADA: Volver a Fase 5 y resetear TODO =================
-            
-            // 1. Cambiar estado a Fase 5
-            $practica->estado = 'Fase 5';
-            $tipoFase5 = TipoSolicitud::where('nombre', 'practicas_fase_5')->first();
-            if ($tipoFase5) {
-                $practica->tipo_solicitud_id = $tipoFase5->id;
-            }
-            $practica->save();
-            
-            // 2. Resetear submited_fase5 a 'false'
-            $campoSubmitedFase5 = Campo::where('name', 'submited_fase5')->first();
-            if ($campoSubmitedFase5) {
-                PracticaValorCampo::updateOrCreate(
-                    ['practica_id' => $practica->id, 'campo_id' => $campoSubmitedFase5->id],
-                    ['valor' => 'false']
-                );
-            }
-            
-            // 3. Resetear estado_director_fase5 a '' 
-            $campoEstadoDirector = Campo::where('name', 'estado_director_fase5')->first();
-            if ($campoEstadoDirector) {
-                PracticaValorCampo::updateOrCreate(
-                    ['practica_id' => $practica->id, 'campo_id' => $campoEstadoDirector->id],
-                    ['valor' => '']
-                );
-            }
-            
-            // 4. Resetear respuesta_director_fase5 a ''
-            $campoRespuestaDirector = Campo::where('name', 'respuesta_director_fase5')->first();
-            if ($campoRespuestaDirector) {
-                PracticaValorCampo::updateOrCreate(
-                    ['practica_id' => $practica->id, 'campo_id' => $campoRespuestaDirector->id],
-                    ['valor' => '']
-                );
-            }
-            
-            // 5. Resetear estado_evaluador_fase6 a '' (el que puso el evaluador)
-            $campoEstadoEvaluador = Campo::where('name', 'estado_evaluador_fase6')->first();
-            if ($campoEstadoEvaluador) {
-                PracticaValorCampo::updateOrCreate(
-                    ['practica_id' => $practica->id, 'campo_id' => $campoEstadoEvaluador->id],
-                    ['valor' => '']
-                );
-            }
-            
-            // 6. Resetear respuesta_evaluador_fase6 a ''
-            $campoRespuestaEvaluador = Campo::where('name', 'respuesta_evaluador_fase6')->first();
-            if ($campoRespuestaEvaluador) {
-                PracticaValorCampo::updateOrCreate(
-                    ['practica_id' => $practica->id, 'campo_id' => $campoRespuestaEvaluador->id],
-                    ['valor' => '']
-                );
-            }
-            
-            // 7. Resetear estado_comite_fase6 a '' (para que el comité vea pendiente)
-            $campoEstadoComite = Campo::where('name', 'estado_comite_fase6')->first();
-            if ($campoEstadoComite) {
-                PracticaValorCampo::updateOrCreate(
-                    ['practica_id' => $practica->id, 'campo_id' => $campoEstadoComite->id],
-                    ['valor' => '']
-                );
-            }
-            
-            // 8. Resetear respuesta_comite_fase6 a ''
-            $campoRespuestaComite = Campo::where('name', 'respuesta_comite_fase6')->first();
-            if ($campoRespuestaComite) {
-                PracticaValorCampo::updateOrCreate(
-                    ['practica_id' => $practica->id, 'campo_id' => $campoRespuestaComite->id],
-                    ['valor' => '']
-                );
-            }
-            
-            // 9. Resetear estado_evaluador_fase5 a '' (para que el evaluador vea pendiente)
-            $campoEstadoEvaluadorFase5 = Campo::where('name', 'estado_evaluador_fase5')->first();
-            if ($campoEstadoEvaluadorFase5) {
-                PracticaValorCampo::updateOrCreate(
-                    ['practica_id' => $practica->id, 'campo_id' => $campoEstadoEvaluadorFase5->id],
-                    ['valor' => '']
-                );
-            }
-            
-            // 10. Resetear respuesta_evaluador_fase5 a ''
-            $campoRespuestaEvaluadorFase5 = Campo::where('name', 'respuesta_evaluador_fase5')->first();
-            if ($campoRespuestaEvaluadorFase5) {
-                PracticaValorCampo::updateOrCreate(
-                    ['practica_id' => $practica->id, 'campo_id' => $campoRespuestaEvaluadorFase5->id],
-                    ['valor' => '']
-                );
-            }
-            
-            // 11. Borrar documentos si existen
-            $campoDoc128 = Campo::where('name', 'doc_fdc128')->first();
-            if ($campoDoc128) {
-                $doc = PracticaValorCampo::where('practica_id', $practica->id)
-                    ->where('campo_id', $campoDoc128->id)
-                    ->first();
-                if ($doc && $doc->valor) {
-                    Storage::disk('public')->delete($doc->valor);
-                    $doc->delete();
-                }
-            }
-            
-            $campoDoc129 = Campo::where('name', 'doc_fdc129')->first();
-            if ($campoDoc129) {
-                $doc = PracticaValorCampo::where('practica_id', $practica->id)
-                    ->where('campo_id', $campoDoc129->id)
-                    ->first();
-                if ($doc && $doc->valor) {
-                    Storage::disk('public')->delete($doc->valor);
-                    $doc->delete();
-                }
-            }
-            
-            Log::info('Fase 6 - Evaluador RECHAZÓ, vuelve a Fase 5 con todo reseteado', [
-                'practica_id' => $practica->id,
-                'nuevo_estado' => $practica->estado
-            ]);
-        }
-        
-        $this->practicaMailService->sendRespuestaFase6Evaluador($practica, $request);
-
-        $practica->refresh();
-
-        return response()->json([
-            'success' => 'Respuesta enviada correctamente', 
-            'nuevo_estado' => $practica->estado
-        ]);
-        
-    } catch (\Exception $e) {
-        Log::error('Error en replyFase6: ' . $e->getMessage());
-        return response()->json(['error' => 'Error interno del servidor: ' . $e->getMessage()], 500);
-    }
-    }
-    /*Fase 6 - Responder Comite */ 
-    public function replyFase6Comite(Request $request)
-    {
-
-            try {
-                Log::info('=== replyFase6Comite INICIO ===', $request->all());
-                
-                $validator = Validator::make($request->all(), [
-                    'practica_id' => 'required|exists:practicas,id',
-                    'estado' => 'required|in:Aprobada,Rechazada,Aplazada',
-                    'nro_acta' => 'required_if:estado,Aprobada|string',
-                    'fecha_acta' => 'required_if:estado,Aprobada|date',
-                    'fdc128' => 'nullable|file|mimes:doc,docx|max:5120',
-                    'fdc129' => 'nullable|file|mimes:doc,docx|max:5120',
-                    'respuesta' => 'nullable|string'
-                ]);
-
-                if ($validator->fails()) {
-                    return response()->json(['errors' => $validator->errors()], 422);
-                }
-
-                $practica = Practica::findOrFail($request->practica_id);
-
-                if ($practica->estado !== 'Fase 6') {
-                    return response()->json(['error' => 'La práctica no está en la fase correspondiente'], 422);
-                }
-
-            $tipo_fase6 = TipoSolicitud::where('nombre', 'practicas_fase_6')->first();
-
-                // Guardar respuesta del comité
-                $campoRespuesta = Campo::where('tipo_solicitud_id', $tipo_fase6->id)
-                    ->where('name', 'respuesta_comite_fase6')
-                    ->first();
-
-                if ($campoRespuesta) {
-                    PracticaValorCampo::updateOrCreate(
-                        ['practica_id' => $practica->id, 'campo_id' => $campoRespuesta->id],
-                        ['valor' => $request->respuesta ?? '']
-                    );
-                }
-
-                // Guardar estado del comité
-                $campoEstado = Campo::where('tipo_solicitud_id', $tipo_fase6->id)
-                    ->where('name', 'estado_comite_fase6')
-                    ->first();
-
-                if ($campoEstado) {
-                    PracticaValorCampo::updateOrCreate(
-                        ['practica_id' => $practica->id, 'campo_id' => $campoEstado->id],
-                        ['valor' => $request->estado]
-                    );
-                }
-
-
-
-
-                // ================= GUARDAR DOCUMENTOS - ACTUALIZAR LOS CAMPOS EXISTENTES =================
             if ($request->hasFile('fdc128')) {
-                $fdc128Path = $request->file('fdc128')->store('practicas/fase6/comite/documentos', 'public');
-                
+                $fdc128Path = $request->file('fdc128')->store('practicas/fase6', 'public');
+
                 $campoDoc = Campo::where('name', 'doc_fdc128')->first();
                 if ($campoDoc) {
                     $valorExistente = PracticaValorCampo::where('practica_id', $practica->id)
@@ -2910,8 +2375,8 @@ class RoadMapPracticaController extends Controller
             }
 
             if ($request->hasFile('fdc129')) {
-                $fdc129Path = $request->file('fdc129')->store('practicas/fase6/comite/documentos', 'public');
-                
+                $fdc129Path = $request->file('fdc129')->store('practicas/fase6', 'public');
+
                 $campoDoc = Campo::where('name', 'doc_fdc129')->first();
                 if ($campoDoc) {
                     $valorExistente = PracticaValorCampo::where('practica_id', $practica->id)
@@ -2926,9 +2391,228 @@ class RoadMapPracticaController extends Controller
                 }
             }
 
+            // Actualizar estado
             if ($request->estado === 'Aprobada') {
-                
-                
+                $practica->estado = 'Fase 6';
+                $tipoFase6 = TipoSolicitud::where('nombre', 'practicas_fase_6')->first();
+                if ($tipoFase6) {
+                    $practica->tipo_solicitud_id = $tipoFase6->id;
+                }
+                $practica->save();
+            } else {
+                // ================= RECHAZADA: Volver a Fase 5 y resetear TODO =================
+
+                // 1. Cambiar estado a Fase 5
+                $practica->estado = 'Fase 5';
+                $tipoFase5 = TipoSolicitud::where('nombre', 'practicas_fase_5')->first();
+                if ($tipoFase5) {
+                    $practica->tipo_solicitud_id = $tipoFase5->id;
+                }
+                $practica->save();
+
+                // 2. Resetear submited_fase5 a 'false'
+                $campoSubmitedFase5 = Campo::where('name', 'submited_fase5')->first();
+                if ($campoSubmitedFase5) {
+                    PracticaValorCampo::updateOrCreate(
+                        ['practica_id' => $practica->id, 'campo_id' => $campoSubmitedFase5->id],
+                        ['valor' => 'false']
+                    );
+                }
+
+                // 3. Resetear estado_director_fase5 a '' 
+                $campoEstadoDirector = Campo::where('name', 'estado_director_fase5')->first();
+                if ($campoEstadoDirector) {
+                    PracticaValorCampo::updateOrCreate(
+                        ['practica_id' => $practica->id, 'campo_id' => $campoEstadoDirector->id],
+                        ['valor' => '']
+                    );
+                }
+
+                // 4. Resetear respuesta_director_fase5 a ''
+                $campoRespuestaDirector = Campo::where('name', 'respuesta_director_fase5')->first();
+                if ($campoRespuestaDirector) {
+                    PracticaValorCampo::updateOrCreate(
+                        ['practica_id' => $practica->id, 'campo_id' => $campoRespuestaDirector->id],
+                        ['valor' => '']
+                    );
+                }
+
+                // 5. Resetear estado_evaluador_fase6 a '' (el que puso el evaluador)
+                $campoEstadoEvaluador = Campo::where('name', 'estado_evaluador_fase6')->first();
+                if ($campoEstadoEvaluador) {
+                    PracticaValorCampo::updateOrCreate(
+                        ['practica_id' => $practica->id, 'campo_id' => $campoEstadoEvaluador->id],
+                        ['valor' => '']
+                    );
+                }
+
+                // 6. Resetear respuesta_evaluador_fase6 a ''
+                $campoRespuestaEvaluador = Campo::where('name', 'respuesta_evaluador_fase6')->first();
+                if ($campoRespuestaEvaluador) {
+                    PracticaValorCampo::updateOrCreate(
+                        ['practica_id' => $practica->id, 'campo_id' => $campoRespuestaEvaluador->id],
+                        ['valor' => '']
+                    );
+                }
+
+                // 7. Resetear estado_comite_fase6 a '' (para que el comité vea pendiente)
+                $campoEstadoComite = Campo::where('name', 'estado_comite_fase6')->first();
+                if ($campoEstadoComite) {
+                    PracticaValorCampo::updateOrCreate(
+                        ['practica_id' => $practica->id, 'campo_id' => $campoEstadoComite->id],
+                        ['valor' => '']
+                    );
+                }
+
+                // 8. Resetear respuesta_comite_fase6 a ''
+                $campoRespuestaComite = Campo::where('name', 'respuesta_comite_fase6')->first();
+                if ($campoRespuestaComite) {
+                    PracticaValorCampo::updateOrCreate(
+                        ['practica_id' => $practica->id, 'campo_id' => $campoRespuestaComite->id],
+                        ['valor' => '']
+                    );
+                }
+
+                // 9. Resetear estado_evaluador_fase5 a '' (para que el evaluador vea pendiente)
+                $campoEstadoEvaluadorFase5 = Campo::where('name', 'estado_evaluador_fase5')->first();
+                if ($campoEstadoEvaluadorFase5) {
+                    PracticaValorCampo::updateOrCreate(
+                        ['practica_id' => $practica->id, 'campo_id' => $campoEstadoEvaluadorFase5->id],
+                        ['valor' => '']
+                    );
+                }
+
+                // 10. Resetear respuesta_evaluador_fase5 a ''
+                $campoRespuestaEvaluadorFase5 = Campo::where('name', 'respuesta_evaluador_fase5')->first();
+                if ($campoRespuestaEvaluadorFase5) {
+                    PracticaValorCampo::updateOrCreate(
+                        ['practica_id' => $practica->id, 'campo_id' => $campoRespuestaEvaluadorFase5->id],
+                        ['valor' => '']
+                    );
+                }
+
+                // 11. Borrar documentos si existen
+                $campoDoc128 = Campo::where('name', 'doc_fdc128')->first();
+                if ($campoDoc128) {
+                    $doc = PracticaValorCampo::where('practica_id', $practica->id)
+                        ->where('campo_id', $campoDoc128->id)
+                        ->first();
+                    if ($doc && $doc->valor) {
+                        Storage::disk('public')->delete($doc->valor);
+                        $doc->delete();
+                    }
+                }
+
+                $campoDoc129 = Campo::where('name', 'doc_fdc129')->first();
+                if ($campoDoc129) {
+                    $doc = PracticaValorCampo::where('practica_id', $practica->id)
+                        ->where('campo_id', $campoDoc129->id)
+                        ->first();
+                    if ($doc && $doc->valor) {
+                        Storage::disk('public')->delete($doc->valor);
+                        $doc->delete();
+                    }
+                }
+            }
+
+            $this->practicaMailService->sendRespuestaFase6Evaluador($practica, $request);
+            $practica->refresh();
+
+            return response()->json([
+                'success' => 'Respuesta enviada correctamente',
+                'nuevo_estado' => $practica->estado
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error interno del servidor: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /*Fase 6 - Responder Comite */
+    public function replyFase6Comite(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'practica_id' => 'required|exists:practicas,id',
+                'estado' => 'required|in:Aprobada,Rechazada,Aplazada',
+                'nro_acta' => 'required_if:estado,Aprobada|string',
+                'fecha_acta' => 'required_if:estado,Aprobada|date',
+                'fdc128' => 'nullable|file|mimes:doc,docx|max:5120',
+                'fdc129' => 'nullable|file|mimes:doc,docx|max:5120',
+                'respuesta' => 'nullable|string'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
+            $practica = Practica::findOrFail($request->practica_id);
+
+            if ($practica->estado !== 'Fase 6') {
+                return response()->json(['error' => 'La práctica no está en la fase correspondiente'], 422);
+            }
+
+            $tipo_fase6 = TipoSolicitud::where('nombre', 'practicas_fase_6')->first();
+
+            // Guardar respuesta del comité
+            $campoRespuesta = Campo::where('tipo_solicitud_id', $tipo_fase6->id)
+                ->where('name', 'respuesta_comite_fase6')
+                ->first();
+
+            if ($campoRespuesta) {
+                PracticaValorCampo::updateOrCreate(
+                    ['practica_id' => $practica->id, 'campo_id' => $campoRespuesta->id],
+                    ['valor' => $request->respuesta ?? '']
+                );
+            }
+
+            // Guardar estado del comité
+            $campoEstado = Campo::where('tipo_solicitud_id', $tipo_fase6->id)
+                ->where('name', 'estado_comite_fase6')
+                ->first();
+
+            if ($campoEstado) {
+                PracticaValorCampo::updateOrCreate(
+                    ['practica_id' => $practica->id, 'campo_id' => $campoEstado->id],
+                    ['valor' => $request->estado]
+                );
+            }
+
+            // ================= GUARDAR DOCUMENTOS - ACTUALIZAR LOS CAMPOS EXISTENTES =================
+            if ($request->hasFile('fdc128')) {
+                $fdc128Path = $request->file('fdc128')->store('practicas/fase6/comite/documentos', 'public');
+                $campoDoc = Campo::where('name', 'doc_fdc128')->first();
+
+                if ($campoDoc) {
+                    $valorExistente = PracticaValorCampo::where('practica_id', $practica->id)
+                        ->where('campo_id', $campoDoc->id)->first();
+                    if ($valorExistente && $valorExistente->valor) {
+                        Storage::disk('public')->delete($valorExistente->valor);
+                    }
+                    PracticaValorCampo::updateOrCreate(
+                        ['practica_id' => $practica->id, 'campo_id' => $campoDoc->id],
+                        ['valor' => $fdc128Path]
+                    );
+                }
+            }
+
+            if ($request->hasFile('fdc129')) {
+                $fdc129Path = $request->file('fdc129')->store('practicas/fase6/comite/documentos', 'public');
+                $campoDoc = Campo::where('name', 'doc_fdc129')->first();
+
+                if ($campoDoc) {
+                    $valorExistente = PracticaValorCampo::where('practica_id', $practica->id)
+                        ->where('campo_id', $campoDoc->id)->first();
+                    if ($valorExistente && $valorExistente->valor) {
+                        Storage::disk('public')->delete($valorExistente->valor);
+                    }
+                    PracticaValorCampo::updateOrCreate(
+                        ['practica_id' => $practica->id, 'campo_id' => $campoDoc->id],
+                        ['valor' => $fdc129Path]
+                    );
+                }
+            }
+
+            if ($request->estado === 'Aprobada') {
                 // Crear acta
                 ActaPractica::create([
                     'practica_id' => $practica->id,
@@ -2936,7 +2620,7 @@ class RoadMapPracticaController extends Controller
                     'fecha' => $request->fecha_acta,
                     'descripcion' => $request->respuesta ?? '',
                 ]);
-                
+
                 // Finalizar práctica
                 $practica->estado = 'Finalizado';
 
@@ -2950,129 +2634,116 @@ class RoadMapPracticaController extends Controller
                 }
 
                 $practica->save();
-                
-                Log::info('Fase 6 - Comité APROBÓ, práctica finalizada', [
-                    'practica_id' => $practica->id
-                ]);
-                
             } else {
-            // ================= RECHAZADA: Volver a Fase 5 y resetear TODO =================
-            
-            // 1. Cambiar estado a Fase 5
-            $practica->estado = 'Fase 5';
-            $tipoFase5 = TipoSolicitud::where('nombre', 'practicas_fase_5')->first();
-            if ($tipoFase5) {
-                $practica->tipo_solicitud_id = $tipoFase5->id;
-            }
-            $practica->save();
-            
-            // 2. Resetear submited_fase5 a 'false' para que el estudiante pueda reenviar
-            $campoSubmited = Campo::where('name', 'submited_fase5')->first();
-            if ($campoSubmited) {
-                PracticaValorCampo::updateOrCreate(
-                    ['practica_id' => $practica->id, 'campo_id' => $campoSubmited->id],
-                    ['valor' => 'false']
-                );
-            }
-            
-            // 3. Resetear estado_director_fase5 a '' 
-            $campoEstadoDirector = Campo::where('name', 'estado_director_fase5')->first();
-            if ($campoEstadoDirector) {
-                PracticaValorCampo::updateOrCreate(
-                    ['practica_id' => $practica->id, 'campo_id' => $campoEstadoDirector->id],
-                    ['valor' => '']
-                );
-            }
-            
-            // 4. Resetear respuesta_director_fase5 a ''
-            $campoRespuestaDirector = Campo::where('name', 'respuesta_director_fase5')->first();
-            if ($campoRespuestaDirector) {
-                PracticaValorCampo::updateOrCreate(
-                    ['practica_id' => $practica->id, 'campo_id' => $campoRespuestaDirector->id],
-                    ['valor' => '']
-                );
-            }
-            
-            // 5. Resetear estado_evaluador_fase6 a '' (el que puso el evaluador)
-            $campoEstadoEvaluador = Campo::where('name', 'estado_evaluador_fase6')->first();
-            if ($campoEstadoEvaluador) {
-                PracticaValorCampo::updateOrCreate(
-                    ['practica_id' => $practica->id, 'campo_id' => $campoEstadoEvaluador->id],
-                    ['valor' => '']
-                );
-            }
-            
-            // 6. Resetear respuesta_evaluador_fase6 a ''
-            $campoRespuestaEvaluador = Campo::where('name', 'respuesta_evaluador_fase6')->first();
-            if ($campoRespuestaEvaluador) {
-                PracticaValorCampo::updateOrCreate(
-                    ['practica_id' => $practica->id, 'campo_id' => $campoRespuestaEvaluador->id],
-                    ['valor' => '']
-                );
-            }
-            
-            // 7. Resetear respuesta_comite_fase6 a '' (la respuesta del comité)
-            $campoRespuestaComite = Campo::where('name', 'respuesta_comite_fase6')->first();
-            if ($campoRespuestaComite) {
-                PracticaValorCampo::updateOrCreate(
-                    ['practica_id' => $practica->id, 'campo_id' => $campoRespuestaComite->id],
-                    ['valor' => '']
-                );
-            }
-            
-            // 8. Resetear estado_comite_fase6 a '' (el estado que puso el comité)
-            $campoEstadoComite = Campo::where('name', 'estado_comite_fase6')->first();
-            if ($campoEstadoComite) {
-                PracticaValorCampo::updateOrCreate(
-                    ['practica_id' => $practica->id, 'campo_id' => $campoEstadoComite->id],
-                    ['valor' => '']
-                );
-            }
-            
-            // 9. Borrar documentos si existen
-            $campoDoc128 = Campo::where('name', 'doc_fdc128')->first();
-            if ($campoDoc128) {
-                $doc = PracticaValorCampo::where('practica_id', $practica->id)
-                    ->where('campo_id', $campoDoc128->id)
-                    ->first();
-                if ($doc && $doc->valor) {
-                    Storage::disk('public')->delete($doc->valor);
-                    $doc->delete();
-                }
-            }
-            
-            $campoDoc129 = Campo::where('name', 'doc_fdc129')->first();
-            if ($campoDoc129) {
-                $doc = PracticaValorCampo::where('practica_id', $practica->id)
-                    ->where('campo_id', $campoDoc129->id)
-                    ->first();
-                if ($doc && $doc->valor) {
-                    Storage::disk('public')->delete($doc->valor);
-                    $doc->delete();
-                }
-            }
-            
-            Log::info('Fase 6 - Comité RECHAZÓ, vuelve a Fase 5 con todo reseteado', [
-                'practica_id' => $practica->id,
-                'nuevo_estado' => $practica->estado
-            ]);
-        }
-        
-        $this->practicaMailService->sendRespuestaFase6Comite($practica, $request);
+                // ================= RECHAZADA: Volver a Fase 5 y resetear TODO =================
 
-        return response()->json(['success' => 'Respuesta enviada correctamente']);
-        
-    } catch (\Exception $e) {
-        Log::error('Error en replyFase6Comite: ' . $e->getMessage());
-        return response()->json(['error' => 'Error interno del servidor'], 500);
-    }
+                // 1. Cambiar estado a Fase 5
+                $practica->estado = 'Fase 5';
+                $tipoFase5 = TipoSolicitud::where('nombre', 'practicas_fase_5')->first();
+                if ($tipoFase5) {
+                    $practica->tipo_solicitud_id = $tipoFase5->id;
+                }
+                $practica->save();
+
+                // 2. Resetear submited_fase5 a 'false' para que el estudiante pueda reenviar
+                $campoSubmited = Campo::where('name', 'submited_fase5')->first();
+                if ($campoSubmited) {
+                    PracticaValorCampo::updateOrCreate(
+                        ['practica_id' => $practica->id, 'campo_id' => $campoSubmited->id],
+                        ['valor' => 'false']
+                    );
+                }
+
+                // 3. Resetear estado_director_fase5 a '' 
+                $campoEstadoDirector = Campo::where('name', 'estado_director_fase5')->first();
+                if ($campoEstadoDirector) {
+                    PracticaValorCampo::updateOrCreate(
+                        ['practica_id' => $practica->id, 'campo_id' => $campoEstadoDirector->id],
+                        ['valor' => '']
+                    );
+                }
+
+                // 4. Resetear respuesta_director_fase5 a ''
+                $campoRespuestaDirector = Campo::where('name', 'respuesta_director_fase5')->first();
+                if ($campoRespuestaDirector) {
+                    PracticaValorCampo::updateOrCreate(
+                        ['practica_id' => $practica->id, 'campo_id' => $campoRespuestaDirector->id],
+                        ['valor' => '']
+                    );
+                }
+
+                // 5. Resetear estado_evaluador_fase6 a '' (el que puso el evaluador)
+                $campoEstadoEvaluador = Campo::where('name', 'estado_evaluador_fase6')->first();
+                if ($campoEstadoEvaluador) {
+                    PracticaValorCampo::updateOrCreate(
+                        ['practica_id' => $practica->id, 'campo_id' => $campoEstadoEvaluador->id],
+                        ['valor' => '']
+                    );
+                }
+
+                // 6. Resetear respuesta_evaluador_fase6 a ''
+                $campoRespuestaEvaluador = Campo::where('name', 'respuesta_evaluador_fase6')->first();
+                if ($campoRespuestaEvaluador) {
+                    PracticaValorCampo::updateOrCreate(
+                        ['practica_id' => $practica->id, 'campo_id' => $campoRespuestaEvaluador->id],
+                        ['valor' => '']
+                    );
+                }
+
+                // 7. Resetear respuesta_comite_fase6 a '' (la respuesta del comité)
+                $campoRespuestaComite = Campo::where('name', 'respuesta_comite_fase6')->first();
+                if ($campoRespuestaComite) {
+                    PracticaValorCampo::updateOrCreate(
+                        ['practica_id' => $practica->id, 'campo_id' => $campoRespuestaComite->id],
+                        ['valor' => '']
+                    );
+                }
+
+                // 8. Resetear estado_comite_fase6 a '' (el estado que puso el comité)
+                $campoEstadoComite = Campo::where('name', 'estado_comite_fase6')->first();
+                if ($campoEstadoComite) {
+                    PracticaValorCampo::updateOrCreate(
+                        ['practica_id' => $practica->id, 'campo_id' => $campoEstadoComite->id],
+                        ['valor' => '']
+                    );
+                }
+
+                // 9. Borrar documentos si existen
+                $campoDoc128 = Campo::where('name', 'doc_fdc128')->first();
+                if ($campoDoc128) {
+                    $doc = PracticaValorCampo::where('practica_id', $practica->id)
+                        ->where('campo_id', $campoDoc128->id)
+                        ->first();
+                    if ($doc && $doc->valor) {
+                        Storage::disk('public')->delete($doc->valor);
+                        $doc->delete();
+                    }
+                }
+
+                $campoDoc129 = Campo::where('name', 'doc_fdc129')->first();
+                if ($campoDoc129) {
+                    $doc = PracticaValorCampo::where('practica_id', $practica->id)
+                        ->where('campo_id', $campoDoc129->id)
+                        ->first();
+                    if ($doc && $doc->valor) {
+                        Storage::disk('public')->delete($doc->valor);
+                        $doc->delete();
+                    }
+                }
+            }
+
+            $this->practicaMailService->sendRespuestaFase6Comite($practica, $request);
+
+            return response()->json(['success' => 'Respuesta enviada correctamente']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error interno del servidor'], 500);
+        }
     }
 
     /* Detalles Fase 6 */
     public function getFase6Details(Request $request)
     {
         try {
-
             $practica = Practica::with('valoresCampos.campo')
                 ->findOrFail($request->practica_id);
 
@@ -3085,11 +2756,8 @@ class RoadMapPracticaController extends Controller
             // ===============================
             // DOCUMENTOS
             // ===============================
-
             $informeFinal = $valores['doc_fdc128'] ?? null;
-
             $rejillaEvaluacion = $valores['doc_fdc129'] ?? null;
-
             $actaTerminacion = $valores['doc_fdc196'] ?? null;
 
             // OJO: cambia este nombre por el que tengas realmente en el seeder
@@ -3098,7 +2766,6 @@ class RoadMapPracticaController extends Controller
             // ===============================
             // URLS
             // ===============================
-
             $informeFinalUrl = $informeFinal
                 ? asset('storage/' . $informeFinal)
                 : null;
@@ -3116,31 +2783,18 @@ class RoadMapPracticaController extends Controller
                 : null;
 
             return response()->json([
-
                 'success' => true,
-
                 'informe_final' => $informeFinal,
                 'informe_final_url' => $informeFinalUrl,
-
                 'rejilla_evaluacion' => $rejillaEvaluacion,
                 'rejilla_evaluacion_url' => $rejillaEvaluacionUrl,
-
                 'acta_terminacion' => $actaTerminacion,
                 'acta_terminacion_url' => $actaTerminacionUrl,
-
                 'turnitin' => $turnitin,
                 'turnitin_url' => $turnitinUrl,
-
                 'fecha_envio' => $practica->updated_at->format('d/m/Y H:i')
-
             ]);
-
         } catch (Exception $e) {
-
-            Log::error(
-                'Error en getFase6Details: ' . $e->getMessage()
-            );
-
             return response()->json([
                 'error' => 'Error al cargar los detalles'
             ], 500);
@@ -3151,7 +2805,6 @@ class RoadMapPracticaController extends Controller
     public function getFase7Details(Request $request)
     {
         try {
-
             $practica = Practica::with('valoresCampos.campo')
                 ->findOrFail($request->practica_id);
 
@@ -3161,25 +2814,19 @@ class RoadMapPracticaController extends Controller
                 $valores[$vc->campo->name] = $vc->valor;
             }
 
-           // ===============================
+            // ===============================
             // DOCUMENTOS
             // ===============================
-
             $rejillaFdc129 = $valores['doc_fdc129'] ?? null;
-
             $informeFinalFdc128 = $valores['doc_fdc128'] ?? null;
-
             $turnitinFdc128 = $valores['turnitin_director_fase5'] ?? null;
-
             $propuestaFdc127 = $valores['doc_fdc127'] ?? null;
-
             $turnitinFdc127 = $valores['turnitin_director_fase3'] ?? null;
 
             // ===============================
             // URLS
             // ===============================
-
-           $rejillaFdc129Url = $rejillaFdc129
+            $rejillaFdc129Url = $rejillaFdc129
                 ? asset('storage/' . $rejillaFdc129)
                 : null;
 
@@ -3200,35 +2847,19 @@ class RoadMapPracticaController extends Controller
                 : null;
 
             return response()->json([
-
                 'success' => true,
-
                 'rejilla_fdc129_url' => $rejillaFdc129Url,
-
                 'informe_final_fdc128_url' => $informeFinalFdc128Url,
-
                 'turnitin_fdc128_url' => $turnitinFdc128Url,
-
                 'propuesta_fdc127_url' => $propuestaFdc127Url,
-
                 'turnitin_fdc127_url' => $turnitinFdc127Url,
-
             ]);
-
         } catch (Exception $e) {
-
-            Log::error(
-                'Error en getFase7Details: ' . $e->getMessage()
-            );
-
             return response()->json([
                 'error' => 'Error al cargar los detalles'
             ], 500);
         }
     }
-
-
-
 
     /* FASE 5/6 - Estudiante: Envía solicitud de beneficio ICFES*/
     public function storeIcfesSolicitud(Request $request)
@@ -3260,7 +2891,7 @@ class RoadMapPracticaController extends Controller
             $existing = PracticaValorCampo::where('practica_id', $practica->id)
                 ->where('campo_id', $campoSubmited->id)
                 ->first();
-            
+
             if ($existing && $existing->valor) {
                 $submitedData = json_decode($existing->valor, true) ?: [];
             }
@@ -3277,11 +2908,12 @@ class RoadMapPracticaController extends Controller
             ->first();
 
         $docData = [];
+
         if ($campoDoc) {
             $existingDoc = PracticaValorCampo::where('practica_id', $practica->id)
                 ->where('campo_id', $campoDoc->id)
                 ->first();
-            
+
             if ($existingDoc && $existingDoc->valor) {
                 $docData = json_decode($existingDoc->valor, true) ?: [];
             }
@@ -3292,7 +2924,7 @@ class RoadMapPracticaController extends Controller
             $fileName = 'icfes_practicas_' . $practica->id . '_' . $userId . '_' . time() . '.pdf';
             $path = $file->storeAs('icfes_practicas', $fileName, 'public');
             $docData[$userId] = $path;
-            
+
             PracticaValorCampo::updateOrCreate(
                 ['practica_id' => $practica->id, 'campo_id' => $campoDoc->id],
                 ['valor' => json_encode($docData)]
@@ -3301,7 +2933,7 @@ class RoadMapPracticaController extends Controller
 
         // ========== 3. MARCAR ENVIADO ==========
         $submitedData[$userId] = true;
-        
+
         PracticaValorCampo::updateOrCreate(
             ['practica_id' => $practica->id, 'campo_id' => $campoSubmited->id],
             ['valor' => json_encode($submitedData)]
@@ -3347,11 +2979,10 @@ class RoadMapPracticaController extends Controller
         Mail::to($destinatarios)
             ->queue(new PracticasMail($data));
 
-                return response()->json(['success' => 'Solicitud enviada correctamente']);
+        return response()->json(['success' => 'Solicitud enviada correctamente']);
     }
 
-    
-            /* FASE 5/6 - Admin/Comité: Responder solicitud de beneficio ICFES */
+    /* FASE 5/6 - Admin/Comité: Responder solicitud de beneficio ICFES */
     public function responderIcfesSolicitud(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -3392,7 +3023,7 @@ class RoadMapPracticaController extends Controller
             $existing = PracticaValorCampo::where('practica_id', $practica->id)
                 ->where('campo_id', $campoBeneficiario->id)
                 ->first();
-            
+
             if ($existing && $existing->valor) {
                 $beneficiarios = json_decode($existing->valor, true) ?: [];
             }
@@ -3402,7 +3033,7 @@ class RoadMapPracticaController extends Controller
             if (!in_array($estudianteId, $beneficiarios)) {
                 $beneficiarios[] = (int) $estudianteId;
             }
-            
+
             PracticaValorCampo::updateOrCreate(
                 ['practica_id' => $practica->id, 'campo_id' => $campoBeneficiario->id],
                 ['valor' => json_encode($beneficiarios)]
@@ -3412,16 +3043,16 @@ class RoadMapPracticaController extends Controller
             $campoSubmited = Campo::where('name', 'submited_icfes_practicas')
                 ->where('tipo_solicitud_id', $practica->tipo_solicitud_id)
                 ->first();
-            
+
             if ($campoSubmited) {
                 $existing = PracticaValorCampo::where('practica_id', $practica->id)
                     ->where('campo_id', $campoSubmited->id)
                     ->first();
-                
+
                 if ($existing && $existing->valor) {
                     $submitedData = json_decode($existing->valor, true) ?: [];
                     unset($submitedData[$estudianteId]); // Eliminar para que pueda reintentar
-                    
+
                     PracticaValorCampo::updateOrCreate(
                         ['practica_id' => $practica->id, 'campo_id' => $campoSubmited->id],
                         ['valor' => json_encode($submitedData)]
@@ -3613,15 +3244,6 @@ class RoadMapPracticaController extends Controller
     /* Admin responde solicitud*/
     public function configAdmin(Request $request)
     {
-            \Log::info('Datos recibidos configAdmin:', $request->all());
-
-            \Log::info('configAdmin - aprobar_prorroga recibido:', [
-            'valor' => $request->input('aprobar_prorroga'),
-            'all' => $request->all()
-        ]);
-
-        
-        
         $validator = Validator::make($request->all(), [
             'practica_id' => 'required|exists:practicas,id',
             'director_id' => 'nullable|exists:users,id',
@@ -3630,9 +3252,7 @@ class RoadMapPracticaController extends Controller
             'nro_acta_ajustes' => 'required|integer',
             'fecha_acta_ajustes' => 'required|date',
             'comentarios_config_admin' => 'nullable|string',
-
             'aprobar_prorroga' => 'nullable|boolean',
-
         ]);
 
         if ($validator->fails()) {
@@ -3640,9 +3260,7 @@ class RoadMapPracticaController extends Controller
         }
 
         $practica = Practica::findOrFail($request->practica_id);
-
         $cambiosRealizados = false;
-        
         $descripcionActa = '';
 
         $tipoSolicitudCorreo = null;
@@ -3650,29 +3268,17 @@ class RoadMapPracticaController extends Controller
         $nuevoDirectorCorreo = null;
         $nuevoEvaluadorCorreo = null;
         $estudianteRetiradoCorreo = null;
-        
-        // Verificar prórroga
 
+        // Verificar prórroga
         $aprobarProrroga = $request->boolean('aprobar_prorroga');
 
-        \Log::info('configAdmin - aprobar prórroga validado:', [
-            'aprobar_prorroga' => $request->input('aprobar_prorroga'),
-            'boolean' => $aprobarProrroga,
-        ]);
-
         if ($aprobarProrroga) {
-
             $registroFechaLimite = PracticaValorCampo::with('campo')
                 ->where('practica_id', $practica->id)
                 ->whereHas('campo', function ($q) {
                     $q->where('name', 'fecha_limite_practica');
                 })
                 ->first();
-
-            \Log::info('configAdmin - registro fecha límite práctica:', [
-                'existe' => $registroFechaLimite ? true : false,
-                'valor' => $registroFechaLimite->valor ?? null,
-            ]);
 
             if (!$registroFechaLimite || empty($registroFechaLimite->valor)) {
                 return response()->json([
@@ -3681,7 +3287,6 @@ class RoadMapPracticaController extends Controller
             }
 
             $nuevaFechaLimite = Carbon::parse($registroFechaLimite->valor)->addDays(90);
-
             $registroFechaLimite->valor = $nuevaFechaLimite->toDateTimeString();
             $registroFechaLimite->save();
 
@@ -3711,11 +3316,6 @@ class RoadMapPracticaController extends Controller
             $cambiosRealizados = true;
             $tipoSolicitudCorreo = 'prorroga';
             $nuevaFechaLimiteCorreo = $nuevaFechaLimite->format('d/m/Y');
-
-            \Log::info('configAdmin - prórroga aprobada correctamente:', [
-                'practica_id' => $practica->id,
-                'nueva_fecha_limite' => $nuevaFechaLimiteCorreo,
-            ]);
         }
 
         // Guardar acta
@@ -3725,16 +3325,16 @@ class RoadMapPracticaController extends Controller
             'fecha' => $request->fecha_acta_ajustes,
             'descripcion' => $request->comentarios_config_admin ?? ''
         ]);
-        
+
         // Verificar cambio de director
         if ($request->has('director_id') && !empty($request->director_id)) {
             // Buscar el registro existente SIN importar el tipo_solicitud_id
             $registroDirector = PracticaValorCampo::where('practica_id', $practica->id)
-                ->whereHas('campo', function($q) {
+                ->whereHas('campo', function ($q) {
                     $q->where('name', 'director_id');
                 })
                 ->first();
-            
+
             if ($registroDirector) {
                 // Actualizar el registro existente
                 if ($registroDirector->valor != $request->director_id) {
@@ -3743,22 +3343,19 @@ class RoadMapPracticaController extends Controller
                     $cambiosRealizados = true;
                     $tipoSolicitudCorreo = 'cambio_director';
                     $nuevoDirectorCorreo = User::with('tipo_documento')->find($request->director_id);
-                    \Log::info('Director actualizado:', ['anterior' => $registroDirector->getOriginal('valor'), 'nuevo' => $request->director_id]);
                 }
-            } else {
-                \Log::warning('No se encontró registro de director para la práctica ' . $practica->id);
             }
         }
-        
+
         // Verificar cambio de evaluador
         if ($request->has('evaluador_id') && !empty($request->evaluador_id)) {
             // Buscar el registro existente SIN importar el tipo_solicitud_id
             $registroEvaluador = PracticaValorCampo::where('practica_id', $practica->id)
-                ->whereHas('campo', function($q) {
+                ->whereHas('campo', function ($q) {
                     $q->where('name', 'evaluador_id');
                 })
                 ->first();
-            
+
             if ($registroEvaluador) {
                 // Actualizar el registro existente
                 if ($registroEvaluador->valor != $request->evaluador_id) {
@@ -3767,45 +3364,41 @@ class RoadMapPracticaController extends Controller
                     $cambiosRealizados = true;
                     $tipoSolicitudCorreo = 'cambio_evaluador';
                     $nuevoEvaluadorCorreo = User::with('tipo_documento')->find($request->evaluador_id);
-                    \Log::info('Evaluador actualizado:', ['anterior' => $registroEvaluador->getOriginal('valor'), 'nuevo' => $request->evaluador_id]);
                 }
-            } else {
-                \Log::warning('No se encontró registro de evaluador para la práctica ' . $practica->id);
             }
         }
-        
+
         // Verificar retiro de estudiante
         if ($request->has('retirar_estudiante') && !empty($request->retirar_estudiante)) {
             $estudianteId = $request->retirar_estudiante;
-            
+
             // Obtener o crear el campo retirados_practica
             $campoRetirados = Campo::where('name', 'retirados_practica')
                 ->where('tipo_solicitud_id', $practica->tipo_solicitud_id)
                 ->first();
-            
+
             if ($campoRetirados) {
                 $existentes = PracticaValorCampo::where('practica_id', $practica->id)
                     ->where('campo_id', $campoRetirados->id)
                     ->first();
-                
+
                 $retirados = [];
                 if ($existentes && $existentes->valor) {
                     $retirados = json_decode($existentes->valor, true) ?: [];
                 }
-                
+
                 // Agregar el estudiante si no está ya retirado
                 if (!in_array($estudianteId, $retirados)) {
                     $retirados[] = (int) $estudianteId;
-                    
+
                     PracticaValorCampo::updateOrCreate(
                         ['practica_id' => $practica->id, 'campo_id' => $campoRetirados->id],
                         ['valor' => json_encode($retirados)]
                     );
-                    
+
                     $cambiosRealizados = true;
                     $tipoSolicitudCorreo = 'retiro';
                     $estudianteRetiradoCorreo = User::with('tipo_documento')->find($estudianteId);
-                    \Log::info('Estudiante retirado:', ['estudiante_id' => $estudianteId, 'practica_id' => $practica->id]);
                 }
             }
         }
@@ -3815,12 +3408,9 @@ class RoadMapPracticaController extends Controller
         }
 
         $practica->load(['user.tipo_documento', 'valoresCampos.campo']);
-
         $campos = $practica->camposConValores();
-
         $integrante2Id = collect($campos)
             ->firstWhere('campo', 'id_integrante_2')['valor'] ?? null;
-
         $integrante2 = null;
 
         if (!empty($integrante2Id)) {
@@ -3829,7 +3419,6 @@ class RoadMapPracticaController extends Controller
 
         $data = [
             'tipo_correo' => 'respuesta_ajuste_practica',
-
             'cuerpo_correo' => [
                 'estado' => $practica->estado,
                 'tipo_solicitud' => $tipoSolicitudCorreo,
@@ -3844,7 +3433,6 @@ class RoadMapPracticaController extends Controller
                 'estudiante_retirado' => $estudianteRetiradoCorreo,
                 'campos' => $campos,
             ],
-
             'adjuntar_archivos' => false,
         ];
 
@@ -3857,29 +3445,10 @@ class RoadMapPracticaController extends Controller
         }
 
         $destinatarios = array_unique(array_filter($destinatarios));
-
         Mail::to($destinatarios)
             ->queue(new PracticasMail($data));
 
         return response()->json(['success' => 'Respuesta enviada correctamente']);
-    }
-
-    // Agregar esta función auxiliar
-    private function obtenerValorCampo($practicaId, $campoName)
-    {
-        $campo = Campo::where('name', $campoName)
-            ->whereHas('tipoSolicitud', function($q) {
-                $q->where('nombre', 'practicas_fase_5');
-            })
-            ->first();
-
-        if ($campo) {
-            $valor = PracticaValorCampo::where('practica_id', $practicaId)
-                ->where('campo_id', $campo->id)
-                ->first();
-            return $valor ? $valor->valor : null;
-        }
-        return null;
     }
 
     // Funciones auxiliares privadas
@@ -3910,23 +3479,6 @@ class RoadMapPracticaController extends Controller
         );
     }
 
-    private function actualizarCampo($practicaId, $campoName, $valor)
-    {
-        $campo = Campo::where('name', $campoName)
-            ->where('tipo_solicitud_id', function($q) use ($practicaId) {
-                $practica = Practica::find($practicaId);
-                $q->select('id')->from('tipos_solicitudes')->where('nombre', 'practicas_fase_5');
-            })
-            ->first();
-
-        if ($campo) {
-            PracticaValorCampo::updateOrCreate(
-                ['practica_id' => $practicaId, 'campo_id' => $campo->id],
-                ['valor' => $valor]
-            );
-        }
-    }
-
     private function getFaseActual($estado)
     {
         if ($estado === 'Finalizado') return 7;
@@ -3936,5 +3488,4 @@ class RoadMapPracticaController extends Controller
         }
         return 0;
     }
-
 }

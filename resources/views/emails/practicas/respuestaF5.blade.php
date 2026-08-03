@@ -157,7 +157,7 @@
             Estimado estudiante, en este correo se le informa la respuesta del director a los documentos
             correspondientes a la <strong>FASE 5</strong> de prácticas empresariales
                @if($estado === 'Aprobada')
-                    ha pasado a <strong>{{ strtoupper($nuevoEstado) }}</strong>
+                    ha pasado a <strong>FASE 6</strong>
                 @elseif($estado === 'Aplazada')
                     ha sido <strong>APLAZADA</strong>
                 @elseif($estado === 'Rechazada')

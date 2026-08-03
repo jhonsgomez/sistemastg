@@ -112,7 +112,7 @@
 
 </head>
 <body>
-    <div class="container">
+    <div>
 
         <p>Buen día,</p>
 

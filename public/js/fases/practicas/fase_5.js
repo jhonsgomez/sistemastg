@@ -517,7 +517,7 @@ $('#fase5EstudianteForm').on('submit', function (e) {
                   
 
                     closeFase5EstudianteModal();
-                    showToast('Documentos enviados correctamente.', 'success');
+                    showToast('Información enviada, tendrá respuesta en los proximos 5 días hábiles', 'success');
 
                     setTimeout(() => {
                         location.reload();

@@ -182,7 +182,9 @@
                 height: 36px !important;
             }
 
-        
+        [type=checkbox]:checked, [type=radio]:checked {
+            background-color: #C1D631 !important;
+        }
         </style>
     @endPush
     <!-- ==================== ROADMAP LAS FASES ==================== -->
@@ -311,14 +313,7 @@
 
                 <!-- ROADMAP FASE 1 F-DC-126 -->
                 <div id="fase-1" class="relative mx-auto flex flex-col items-center justify-center bg-white text-gray-600 rounded-lg shadow-lg h-60 w-full sm:w-50 border card-fase {{ $fase_actual >= 1 ? 'card-activated' : '' }} {{ $fase_actual == 1 ? 'card-activated-animated' : '' }}">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-10 mb-4">
-                        <path fill-rule="evenodd"
-                            d="M5.625 1.5H9a3.75 3.75 0 0 1 3.75 3.75v1.875c0 1.036.84 1.875 1.875 1.875H16.5a3.75 3.75 0 0 1 3.75 3.75v7.875c0 1.035-.84 1.875-1.875 1.875H5.625a1.875 1.875 0 0 1-1.875-1.875V3.375c0-1.036.84-1.875 1.875-1.875Zm6.905 9.97a.75.75 0 0 0-1.06 0l-3 3a.75.75 0 1 0 1.06 1.06l1.72-1.72V18a.75.75 0 0 0 1.5 0v-4.19l1.72 1.72a.75.75 0 1 0 1.06-1.06l-3-3Z"
-                            clip-rule="evenodd" />
-                        <path
-                            d="M14.25 5.25a5.23 5.23 0 0 0-1.279-3.434 9.768 9.768 0 0 1 6.963 6.963A5.23 5.23 0 0 0 16.5 7.5h-1.875a.375.375 0 0 1-.375-.375V5.25Z" />
-                    </svg>
-
+                    <i class="fa-solid fa-file-word" style="font-size: 36px; margin-bottom: 20px;"></i>
                     <span class="text-center font-bold text-lg">Fase 1: F-DC-126</span>
                     <p class="text-center mt-2 text-sm mx-4">El estudiante envía el formato de solicitud de practicantes.</p>
 
@@ -1199,11 +1194,10 @@
                                 </div>
 
                                 <p class="text-red-600 text-sm mb-4">
-                                    <i class="fa-solid fa-circle-info mr-1"></i>
-                                    <strong>NOTA:</strong> Si selecciona la opción de práctica institucional tenga en cuenta de que previamente debe estar aprobado por la coordinación.
+                                    <i class="fa-solid fa-circle-info mr-1"></i> Si selecciona la opción de práctica institucional tenga en cuenta de que previamente debe estar aprobado por la coordinación.
                                 </p>
 
-                                <p class="text-sm mb-4"><strong>NOTA:</strong> El formato F-DC-126 debe estar debidamente diligenciado y firmado.</p>
+                                <p class="text-sm mb-4 text-gray-600 text-center"><strong>NOTA:</strong> El formato F-DC-126 debe estar debidamente diligenciado y firmado.</p>
                                 
                             </div>
                         </div>
@@ -1355,14 +1349,14 @@
     <!-- MODAL FASE 2 - Estudiante (Enviar documentos de pago) -->
     <div id="fase2EstudianteModal" class="fixed z-50 inset-0 overflow-y-auto">
         <div class="modal-overlay absolute inset-0" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;" onclick="closeFase2EstudianteModal()">
-            <div class="flex items-center justify-center min-h-screen text-center relative">
+            <div class="flex items-center justify-center min-h-screen pt-3 text-center relative">
                 <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full modal-content relative"
                     onclick="event.stopPropagation()" style="max-width: 900px !important; width: 100%;">
                     
-                    <button class="modal-close-btn-custom absolute top-3 right-4 text-gray-400 hover:text-red-500 text-2xl z-10 mt-2"
+                    <button class="modal-close-btn-custom absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl z-10 mt-2"
                         onclick="closeFase2EstudianteModal()">&times;</button>
 
-                    <form class="p-8" id="fase2EstudianteForm" enctype="multipart/form-data">
+                    <form class="p-6 mt-2" id="fase2EstudianteForm" enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" name="practica_id" value="{{ $practica->id }}">
 
@@ -1375,7 +1369,7 @@
 
                         <p class="text-red-600 text-sm mb-4">
                             <i class="fa-solid fa-circle-info mr-1"></i>
-                           <strong>NOTA: </strong>Por cada integrante del proyecto se
+                           Por cada integrante del proyecto se
                             debe cargar la liquidación y los respectivos soportes de pago en un mismo documento respectivamente.
                         </p>
 
@@ -1387,7 +1381,7 @@
                                 Documentos (Liquidaciones y soportes)
                             </p>
                         </div>
-                        <ul class="space-y-2 text-sm mb-4 list-disc pl-5 text-gray-500">
+                        <ul class="space-y-2 text-sm mb-4 list-disc pt-4 text-gray-500">
                             <li class="flex items-center gap-2 flex-wrap">
                                 <span class="text-gray-600">Instructivo para pagar la liquidación:</span>
                                 <a href="{{ asset('ejemplos/fase_1-1.pdf') }}" target="_blank"
@@ -1743,10 +1737,10 @@
                 <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full modal-content relative"
                     onclick="event.stopPropagation()" style="max-width: 900px !important; width: 100%;">
                     
-                    <button class="modal-close-btn-custom absolute top-3 right-4 text-gray-400 hover:text-red-500 text-2xl z-10 mt-2"
+                    <button class="modal-close-btn-custom absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl z-10 mt-2"
                         onclick="closeFase3EstudianteModal()">&times;</button>
 
-                    <form class="p-8" id="fase3EstudianteForm" enctype="multipart/form-data">
+                    <form class="p-6 mt-2" id="fase3EstudianteForm" enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" name="practica_id" value="{{ $practica->id }}">
 
@@ -1758,12 +1752,12 @@
                                 </span>
                             </p>
                  
-                            <p class="text-gray-950 mt-6 text-sm">
+                            <p class="text-gray-950 mt-6 text-sm mb-3">
                                 En este formulario el estudiante podrá cargar los documentos necesarios para continuar con la propuesta de prácticas empresariales.
                             </p>
 
                             <!-- Documentos requeridos para formalizar la propuesta -->
-                            <div class="flex items-center my-5">
+                            <div class="flex items-center my-5 mb-3">
                                 <i class="fa-regular fa-bookmark mr-1 text-gray-500 text-sm"></i>
                                 <p class="font-medium text-gray-700 flex items-center gap-2 text-sm">
                                     <span class="text-red-500">*</span>
@@ -1771,7 +1765,7 @@
                                 </p>
                             </div>
 
-                            <ul class="space-y-2 text-sm mb-4 list-disc pl-5 text-gray-500">
+                            <ul class="space-y-2 text-sm mb-4 list-disc text-gray-500">
                                 <li class="flex items-center gap-2 flex-wrap">
                                     <span class="text-gray-600">Certificado ARL:</span>
                                     <span class="text-gray-500">Archivo en formato PDF.</span>
@@ -2468,10 +2462,10 @@
                     onclick="event.stopPropagation()" style="max-width: 900px !important; width: 100%;">
 
                     <button
-                        class="modal-close-btn-custom absolute top-3 right-4 text-gray-400 hover:text-red-500 text-2xl z-10 mt-2"
+                        class="modal-close-btn-custom absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl z-10 mt-2"
                         onclick="closeFase5EstudianteModal()">&times;</button>
 
-                    <form class="p-8" id="fase5EstudianteForm" enctype="multipart/form-data">
+                    <form class="p-6 mt-2" id="fase5EstudianteForm" enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" name="practica_id" value="{{ $practica->id }}">
 
@@ -3275,7 +3269,6 @@
     </div>
 
     <!-- MODAL FASE 6 Detalles --> 
-
     <div id="fase6DetailsModal" class="fixed z-50 inset-0 overflow-y-auto hidden">
 
         <div class="modal-overlay absolute inset-0 bg-black bg-opacity-50"
@@ -4195,8 +4188,8 @@
                         @if($prorrogas < 2)
                             <div class="mb-4">
                                 <input type="hidden" name="aprobar_prorroga" value="0">
-                                <label class="flex items-center">
-                                    <input type="checkbox" name="aprobar_prorroga_check" id="aprobar_prorroga" class="mr-2" value="1">
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="checkbox" name="aprobar_prorroga_check" id="aprobar_prorroga" class="mr-2 border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500" value="1">
                                     <span>Aprobar prórroga</span>
                                 </label>
                             </div>

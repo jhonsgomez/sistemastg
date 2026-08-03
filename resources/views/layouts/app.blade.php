@@ -195,7 +195,7 @@
                                 <path fill="currentColor" d="M20 6h-4V4a2 2 0 0 0-2-2H10a2 2 0 0 0-2 2v2H4a2 2 0 0 0-2 2v3h20V8a2 2 0 0 0-2-2zM10 4h4v2h-4V4zM2 13v5a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5H2z"></path>
                             </svg>
                             @if (auth()->user()->hasRole('estudiante'))
-                            <span class="nav-text">Prácticas</span>
+                            <span class="nav-text">Mis prácticas</span>
                             @else
                             <span class="nav-text">Prácticas</span>
                             @endif

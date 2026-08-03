@@ -1038,7 +1038,6 @@ class PracticaMailService
     public function sendRespuestaFase5($practica, $respuesta)
     {
         $practica->load(['user.tipo_documento', 'valoresCampos.campo']);
-
         $campos = [];
 
         foreach ($practica->valoresCampos as $valorCampo) {
@@ -1099,7 +1098,6 @@ class PracticaMailService
         }
 
         $destinatariosEstudiantes = array_unique(array_filter($destinatariosEstudiantes));
-
         $dataEstudiantes = $dataBase;
         $dataEstudiantes['cuerpo_correo']['destinatario'] = 'estudiante';
 
