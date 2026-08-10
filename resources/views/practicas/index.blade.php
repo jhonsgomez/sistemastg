@@ -1794,7 +1794,7 @@ var table = $('#practicasTable').DataTable({
     
     $('#detailsTitle').html(`Detalles de la <span class="bg-uts-500 text-lg text-white font-bold me-2 px-2.5 py-0.5 rounded uppercase shadow">Práctica</span>`);
 
-    $.get('/practicas/' + id + '/detalle', function(response) {
+    $.get('/tg/practicas/' + id + '/detalle', function(response) {
         let html = `
             <div class="mt-4">
                 <!-- Título -->
