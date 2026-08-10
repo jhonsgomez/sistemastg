@@ -1845,7 +1845,7 @@ var table = $('#practicasTable').DataTable({
                         <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">
                             <a target="_blank"
                                 class="text-red-600 text-sm underline"
-                                href="/storage/${response.hoja_vida}">
+                                href="/tg/storage/${response.hoja_vida}">
 
                                     <i class="fa-regular fa-file-pdf text-red-600 mr-1"></i>
                                     Documento 1
@@ -1865,7 +1865,7 @@ var table = $('#practicasTable').DataTable({
                         <span class="text-gray-800 w-full sm:flex-1 sm:ml-2">
                             <a target="_blank"
                                 class="text-red-600 text-sm underline"
-                                href="/storage/${response.hoja_vida_2}">
+                                href="/tg/storage/${response.hoja_vida_2}">
                                     <i class="fa-regular fa-file-pdf text-red-600 mr-1"></i>
                                     Documento 2
                             </a>
