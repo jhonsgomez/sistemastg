@@ -3327,46 +3327,56 @@ class RoadMapPracticaController extends Controller
         ]);
 
         // Verificar cambio de director
-        if ($request->has('director_id') && !empty($request->director_id)) {
-            // Buscar el registro existente SIN importar el tipo_solicitud_id
-            $registroDirector = PracticaValorCampo::where('practica_id', $practica->id)
-                ->whereHas('campo', function ($q) {
-                    $q->where('name', 'director_id');
-                })
-                ->first();
+if ($request->has('director_id') && !empty($request->director_id)) {
+    // Buscar el registro existente SIN importar el tipo_solicitud_id
+    $registroDirector = PracticaValorCampo::where('practica_id', $practica->id)
+        ->whereHas('campo', function ($q) {
+            $q->where('name', 'director_id');
+        })
+        ->first();
 
-            if ($registroDirector) {
-                // Actualizar el registro existente
-                if ($registroDirector->valor != $request->director_id) {
-                    $registroDirector->valor = $request->director_id;
-                    $registroDirector->save();
-                    $cambiosRealizados = true;
-                    $tipoSolicitudCorreo = 'cambio_director';
-                    $nuevoDirectorCorreo = User::with('tipo_documento')->find($request->director_id);
-                }
+    if ($registroDirector) {
+        // Actualizar el registro existente
+        if ($registroDirector->valor != $request->director_id) {
+            $registroDirector->valor = $request->director_id;
+            $registroDirector->save();
+            $cambiosRealizados = true;
+            $tipoSolicitudCorreo = 'cambio_director';
+            $nuevoDirectorCorreo = User::with('tipo_documento')->find($request->director_id);
+            
+            // ===== ASIGNAR EL ROL DE DIRECTOR_PRACTICA AL NUEVO DIRECTOR =====
+            if ($nuevoDirectorCorreo && !$nuevoDirectorCorreo->hasRole('director_practica')) {
+                $nuevoDirectorCorreo->assignRole('director_practica');
             }
         }
+    }
+}
 
         // Verificar cambio de evaluador
-        if ($request->has('evaluador_id') && !empty($request->evaluador_id)) {
-            // Buscar el registro existente SIN importar el tipo_solicitud_id
-            $registroEvaluador = PracticaValorCampo::where('practica_id', $practica->id)
-                ->whereHas('campo', function ($q) {
-                    $q->where('name', 'evaluador_id');
-                })
-                ->first();
+if ($request->has('evaluador_id') && !empty($request->evaluador_id)) {
+    // Buscar el registro existente SIN importar el tipo_solicitud_id
+    $registroEvaluador = PracticaValorCampo::where('practica_id', $practica->id)
+        ->whereHas('campo', function ($q) {
+            $q->where('name', 'evaluador_id');
+        })
+        ->first();
 
-            if ($registroEvaluador) {
-                // Actualizar el registro existente
-                if ($registroEvaluador->valor != $request->evaluador_id) {
-                    $registroEvaluador->valor = $request->evaluador_id;
-                    $registroEvaluador->save();
-                    $cambiosRealizados = true;
-                    $tipoSolicitudCorreo = 'cambio_evaluador';
-                    $nuevoEvaluadorCorreo = User::with('tipo_documento')->find($request->evaluador_id);
-                }
+    if ($registroEvaluador) {
+        // Actualizar el registro existente
+        if ($registroEvaluador->valor != $request->evaluador_id) {
+            $registroEvaluador->valor = $request->evaluador_id;
+            $registroEvaluador->save();
+            $cambiosRealizados = true;
+            $tipoSolicitudCorreo = 'cambio_evaluador';
+            $nuevoEvaluadorCorreo = User::with('tipo_documento')->find($request->evaluador_id);
+            
+            // ===== ASIGNAR EL ROL DE EVALUADOR_PRACTICA AL NUEVO EVALUADOR =====
+            if ($nuevoEvaluadorCorreo && !$nuevoEvaluadorCorreo->hasRole('evaluador_practica')) {
+                $nuevoEvaluadorCorreo->assignRole('evaluador_practica');
             }
         }
+    }
+}
 
         // Verificar retiro de estudiante
         if ($request->has('retirar_estudiante') && !empty($request->retirar_estudiante)) {
