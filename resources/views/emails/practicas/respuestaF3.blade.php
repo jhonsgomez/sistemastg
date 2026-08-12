@@ -123,9 +123,13 @@
         <p>
             Estimado estudiante, en este correo se le informa la respuesta del director a los documentos
             correspondientes a la <strong>FASE 3</strong> de prácticas empresariales
-            {!! $estado === 'Aprobada'
-                ? 'ha sido <strong>APROBADA</strong>.'
-                : 'ha sido <strong>RECHAZADA</strong>.' !!}
+            @if ($estado === 'Aprobada')
+                ha sido <strong>APROBADA</strong>.
+            @elseif ($estado === 'Aplazada')
+                ha sido <strong>APLAZADA</strong>.
+            @elseif ($estado === 'Rechazada')
+                ha sido <strong>RECHAZADA</strong>.
+            @endif
         </p>
     @endif
 

@@ -116,34 +116,63 @@
 @if ($remitente === 'evaluador')
 
     @if ($destinatario === 'comite')
+
         <p>
             Estimado comité, en este correo se le informa que el
             <strong class="uppercase">DOCENTE EVALUADOR</strong>
-            ha revisado los documentos de la <strong>FASE 4</strong> de prácticas empresariales
-            y los ha enviado para revisión del comité.
+            ha revisado los documentos de la <strong>FASE 4</strong>
+            de prácticas empresariales y los ha enviado para revisión del comité.
         </p>
+
+    @elseif ($destinatario === 'director')
+
+        <p>
+            Estimado docente director, en este correo se le informa que el
+            <strong class="uppercase">DOCENTE EVALUADOR</strong>
+            ha revisado los documentos correspondientes a la
+            <strong>FASE 4</strong> de prácticas empresariales.
+
+            @if ($estado === 'Aplazada')
+                La solicitud ha sido <strong>APLAZADA</strong>.
+            @elseif ($estado === 'Rechazada')
+                La solicitud ha sido <strong>RECHAZADA</strong>.
+            @endif
+        </p>
+
     @else
+
         <p>
             Estimado estudiante, en este correo se le informa que el
             <strong class="uppercase">DOCENTE EVALUADOR</strong>
-            ha revisado los documentos correspondientes a la <strong>FASE 4</strong>
-            de prácticas empresariales
-            {!! $estado === 'Aprobada'
-                ? 'y los ha enviado al <strong>COMITÉ DE TRABAJOS DE GRADO</strong>.'
-                : 'y los ha <strong>RECHAZADO</strong>.' !!}
-        </p>
-    @endif
+            ha revisado los documentos correspondientes a la
+            <strong>FASE 4</strong> de prácticas empresariales.
 
-@else
+            @if ($estado === 'Aprobada')
+                Los documentos han sido <strong>APROBADOS</strong>
+                y enviados al <strong>COMITÉ DE TRABAJOS DE GRADO</strong>.
+            @elseif ($estado === 'Aplazada')
+                La solicitud ha sido <strong>APLAZADA</strong>.
+            @elseif ($estado === 'Rechazada')
+                La solicitud ha sido <strong>RECHAZADA</strong>.
+            @endif
+        </p>
+
+    @endif
 
     <p>
         Estimado usuario, en este correo se le informa que el
         <strong class="uppercase">COMITÉ DE TRABAJOS DE GRADO</strong>
-        ha revisado los documentos correspondientes a la <strong>FASE 4</strong>
-        de prácticas empresariales
-        {!! $estado === 'Aprobada'
-            ? 'y ha pasado la práctica a <strong>FASE 5</strong>.'
-            : 'y la ha <strong>RECHAZADO</strong>.' !!}
+        ha revisado los documentos correspondientes a la
+        <strong>FASE 4</strong> de prácticas empresariales.
+
+        @if ($estado === 'Aprobada')
+            La práctica ha sido <strong>APROBADA</strong>
+            y ha pasado a <strong>FASE 5</strong>.
+        @elseif ($estado === 'Aplazada')
+            La solicitud ha sido <strong>APLAZADA</strong>.
+        @elseif ($estado === 'Rechazada')
+            La solicitud ha sido <strong>RECHAZADA</strong>.
+        @endif
     </p>
 
 @endif

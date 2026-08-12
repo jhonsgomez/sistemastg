@@ -913,6 +913,8 @@ class RoadMapPracticaController extends Controller
         $this->practicaMailService->sendRespuestaFase2($practica, [
             'estado' => $request->estado,
             'respuesta' => $request->respuesta,
+            'nro_acta' => $request->nro_acta,
+            'fecha_acta' => $request->fecha_acta,
             'director_id' => $request->director_id,
             'evaluador_id' => $request->evaluador_id,
             'codirector_id' => $request->codirector_id,
@@ -1276,9 +1278,10 @@ class RoadMapPracticaController extends Controller
             if ($request->hasFile('turnitin')) {
                 $turnitinPath = $request->file('turnitin')
                 ->store(
-                    "practicas/{$practica->id}/fase3/documentos",
-                    'public'
-                );s
+                        "practicas/{$practica->id}/fase3/documentos",
+                        'public'
+                    );
+
                 $campoTurnitin = Campo::where(
                     'name',
                     'turnitin_director_fase3'
@@ -1396,7 +1399,7 @@ class RoadMapPracticaController extends Controller
             $validator = Validator::make($request->all(), [
                 'practica_id' => 'required|exists:practicas,id',
                 'estado' => 'required|in:Aprobada,Rechazada,Aplazada',
-                'fdc127' => 'nullable|file|mimes:doc,docx|max:5120',
+                'fdc127' => 'required_if:estado,Rechazada,Aplazada|file|mimes:doc,docx|max:5120',
                 'respuesta' => 'nullable|string'
             ]);
 

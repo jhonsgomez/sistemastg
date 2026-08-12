@@ -145,8 +145,25 @@
     @endif
 
     <ul>
-        <li><strong>Estado:</strong> {{ $estado }}</li>
-        <li><strong>Fecha:</strong> {{ now()->format('d/m/Y H:i:s') }}</li>
+        <li>
+            <strong>Estado:</strong>
+            {{ $estado }}
+        </li>
+
+        <li>
+            <strong>Número de acta:</strong>
+            {{ $cuerpo['nro_acta'] ?? 'No registra' }}
+        </li>
+
+        <li>
+            <strong>Fecha del acta:</strong>
+            {{ $cuerpo['fecha_acta'] ?? 'No registra' }}
+        </li>
+
+        <li>
+            <strong>Fecha y hora de respuesta:</strong>
+            {{ now()->format('d/m/Y H:i:s') }}
+        </li>
     </ul>
 
     <p><strong>Integrantes:</strong></p>

@@ -201,22 +201,37 @@
     <p><strong>Fecha y hora de envío: </strong>{{ now()->format('d/m/Y H:i:s') }}</p>
     <br>
 
-    @if (($data['cuerpo_correo']['estado'] ?? '') === 'Aprobada')
-        <p> Su práctica ha avanzado correctamente a la<strong> FASE 2</strong>.</p>
+        @if (($data['cuerpo_correo']['estado'] ?? '') === 'Aprobada')
 
-        <p>Se recomienda ingresar al sistema para continuarel proceso correspondiente.</p>
+            <p>
+                Su práctica ha avanzado correctamente a la <strong>FASE 2</strong>.
+            </p>
 
-    @elseif($estado === 'Aplazada')
-    <p>
-        Se recomienda revisar las observaciones realizadas y enviar nuevamente la información corregida.
-    </p>
-    @elseif($estado === 'Rechazada')
-        <p>
-            La solicitud fue rechazada.
-        </p>
+            <p>
+                Se recomienda ingresar al sistema para continuar el proceso correspondiente.
+            </p>
 
-        <p>Debe ingresar nuevamente al sistema,corregir la información solicitada y reenviar la FASE 1.</p>
-    @endif
+        @elseif (($data['cuerpo_correo']['estado'] ?? '') === 'Aplazada')
+
+            <p>
+                Su solicitud ha sido <strong>APLAZADA</strong>.
+            </p>
+
+            <p>
+                Se recomienda revisar las observaciones realizadas y enviar nuevamente la información corregida.
+            </p>
+
+        @elseif (($data['cuerpo_correo']['estado'] ?? '') === 'Rechazada')
+
+            <p>
+                Su solicitud ha sido <strong>RECHAZADA</strong>.
+            </p>
+
+            <p>
+                Debe ingresar nuevamente al sistema, corregir la información solicitada y reenviar la FASE 1.
+            </p>
+
+        @endif
 
 
     <p> Este es un correo generado automáticamente por el sistema de prácticas,por favor no responder.</p>

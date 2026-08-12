@@ -111,9 +111,13 @@
                 <strong class="uppercase">DOCENTE EVALUADOR</strong>
                 ha revisado los documentos correspondientes a la <strong>FASE 6</strong>
                 de prácticas empresariales
-                {!! $estado === 'Aprobada'
-                    ? 'y los ha enviado al <strong>COMITÉ DE TRABAJOS DE GRADO</strong>.'
-                    : 'y los ha <strong>RECHAZADO</strong>.' !!}
+                @if ($estado === 'Aprobada')
+                    y los ha enviado al <strong>COMITÉ DE TRABAJOS DE GRADO</strong>.
+                @elseif ($estado === 'Aplazada')
+                    y la solicitud ha sido <strong>APLAZADA</strong>.
+                @elseif ($estado === 'Rechazada')
+                    y la solicitud ha sido <strong>RECHAZADA</strong>.
+                @endif
             </p>
         @endif
 
@@ -223,6 +227,12 @@
             <p>
                 A partir de este momento, el proceso de prácticas empresariales ha sido
                 <strong>FINALIZADO</strong> satisfactoriamente.
+            </p>
+
+            <p>
+                <strong>IMPORTANTE:</strong>
+                Los estudiantes, el director y el evaluador son responsables de
+                coordinar y realizar la sustentación de la práctica empresarial.
             </p>
         @else
             <p>
