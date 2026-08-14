@@ -3059,11 +3059,15 @@ class RoadMapPracticaController extends Controller
             auth()->user()->email,
         ];
 
-        if (!empty($integrante2?->email)) {
-            $destinatarios[] = $integrante2->email;
+        $correoComite = config('mail.correo_sistemas');
+
+        if (!empty($correoComite)) {
+            $destinatarios[] = $correoComite;
         }
 
-        $destinatarios = array_unique(array_filter($destinatarios));
+        $destinatarios = array_unique(
+            array_filter($destinatarios)
+        );
 
         Mail::to($destinatarios)
             ->queue(new PracticasMail($data));
@@ -3322,6 +3326,15 @@ class RoadMapPracticaController extends Controller
             $destinatarios[] = $integrante2->email;
         }
 
+        // Las solicitudes de prórroga deben llegar también al comité
+        if ($request->tipo_solicitud === 'prorroga') {
+            $correoComite = config('mail.correo_sistemas');
+
+            if (!empty($correoComite)) {
+                $destinatarios[] = $correoComite;
+            }
+        }
+
         $destinatarios = array_unique(array_filter($destinatarios));
 
         Mail::to($destinatarios)
@@ -3354,57 +3367,111 @@ class RoadMapPracticaController extends Controller
 
         $tipoSolicitudCorreo = null;
         $nuevaFechaLimiteCorreo = null;
+        $resultadoProrrogaCorreo = null;
+
         $nuevoDirectorCorreo = null;
+        $anteriorDirectorCorreo = null;
+
         $nuevoEvaluadorCorreo = null;
+        $anteriorEvaluadorCorreo = null;
+
         $estudianteRetiradoCorreo = null;
 
         // Verificar prórroga
+        $respondioProrroga = $request->has('aprobar_prorroga');
         $aprobarProrroga = $request->boolean('aprobar_prorroga');
 
-        if ($aprobarProrroga) {
-            $registroFechaLimite = PracticaValorCampo::with('campo')
-                ->where('practica_id', $practica->id)
-                ->whereHas('campo', function ($q) {
-                    $q->where('name', 'fecha_limite_practica');
-                })
-                ->first();
-
-            if (!$registroFechaLimite || empty($registroFechaLimite->valor)) {
-                return response()->json([
-                    'error' => 'No se encontró la fecha límite de la práctica para aprobar la prórroga'
-                ], 422);
-            }
-
-            $nuevaFechaLimite = Carbon::parse($registroFechaLimite->valor)->addDays(90);
-            $registroFechaLimite->valor = $nuevaFechaLimite->toDateTimeString();
-            $registroFechaLimite->save();
-
-            $registroProrrogas = PracticaValorCampo::where('practica_id', $practica->id)
-                ->whereHas('campo', function ($q) {
-                    $q->where('name', 'solicitudes_prorroga');
-                })
-                ->first();
-
-            if ($registroProrrogas) {
-                $prorrogas = (int) $registroProrrogas->valor;
-                $registroProrrogas->valor = (string) ($prorrogas + 1);
-                $registroProrrogas->save();
-            } else {
-                $campoProrrogas = Campo::where('name', 'solicitudes_prorroga')
-                    ->first();
-
-                if ($campoProrrogas) {
-                    PracticaValorCampo::create([
-                        'practica_id' => $practica->id,
-                        'campo_id' => $campoProrrogas->id,
-                        'valor' => '1',
-                    ]);
-                }
-            }
+        if ($respondioProrroga) {
 
             $cambiosRealizados = true;
             $tipoSolicitudCorreo = 'prorroga';
-            $nuevaFechaLimiteCorreo = $nuevaFechaLimite->format('d/m/Y');
+
+            if ($aprobarProrroga) {
+
+                $registroFechaLimite = PracticaValorCampo::with('campo')
+                    ->where('practica_id', $practica->id)
+                    ->whereHas('campo', function ($q) {
+                        $q->where('name', 'fecha_limite_practica');
+                    })
+                    ->first();
+
+                if (!$registroFechaLimite || empty($registroFechaLimite->valor)) {
+                    return response()->json([
+                        'error' => 'No se encontró la fecha límite de la práctica para aprobar la prórroga'
+                    ], 422);
+                }
+
+                $nuevaFechaLimite = Carbon::parse(
+                    $registroFechaLimite->valor
+                )->addDays(90);
+
+                $registroFechaLimite->valor =
+                    $nuevaFechaLimite->toDateTimeString();
+
+                $registroFechaLimite->save();
+
+                $registroProrrogas = PracticaValorCampo::where(
+                    'practica_id',
+                    $practica->id
+                )
+                    ->whereHas('campo', function ($q) {
+                        $q->where('name', 'solicitudes_prorroga');
+                    })
+                    ->first();
+
+                if ($registroProrrogas) {
+
+                    $prorrogas = (int) $registroProrrogas->valor;
+
+                    $registroProrrogas->valor =
+                        (string) ($prorrogas + 1);
+
+                    $registroProrrogas->save();
+
+                } else {
+
+                    $campoProrrogas = Campo::where(
+                        'name',
+                        'solicitudes_prorroga'
+                    )->first();
+
+                    if ($campoProrrogas) {
+                        PracticaValorCampo::create([
+                            'practica_id' => $practica->id,
+                            'campo_id' => $campoProrrogas->id,
+                            'valor' => '1',
+                        ]);
+                    }
+                }
+
+                $resultadoProrrogaCorreo = 'Aprobada';
+
+                $nuevaFechaLimiteCorreo =
+                    $nuevaFechaLimite->format('d/m/Y');
+
+            } else {
+
+                // La solicitud fue respondida pero NO se amplía la fecha
+                $resultadoProrrogaCorreo = 'Rechazada';
+                $nuevaFechaLimiteCorreo = null;
+            }
+
+            // Actualizar estado de la solicitud
+            $registroEstadoSolicitud = PracticaValorCampo::where(
+                'practica_id',
+                $practica->id
+            )
+                ->whereHas('campo', function ($q) {
+                    $q->where('name', 'estado_solicitud');
+                })
+                ->first();
+
+            if ($registroEstadoSolicitud) {
+                $registroEstadoSolicitud->valor =
+                    $aprobarProrroga ? 'aprobada' : 'rechazada';
+
+                $registroEstadoSolicitud->save();
+            }
         }
 
         // Guardar acta
@@ -3416,56 +3483,74 @@ class RoadMapPracticaController extends Controller
         ]);
 
         // Verificar cambio de director
-if ($request->has('director_id') && !empty($request->director_id)) {
-    // Buscar el registro existente SIN importar el tipo_solicitud_id
-    $registroDirector = PracticaValorCampo::where('practica_id', $practica->id)
-        ->whereHas('campo', function ($q) {
-            $q->where('name', 'director_id');
-        })
-        ->first();
+        if ($request->has('director_id') && !empty($request->director_id)) {
+            // Buscar el registro existente SIN importar el tipo_solicitud_id
+            $registroDirector = PracticaValorCampo::where('practica_id', $practica->id)
+                ->whereHas('campo', function ($q) {
+                    $q->where('name', 'director_id');
+                })
+                ->first();
 
-    if ($registroDirector) {
-        // Actualizar el registro existente
-        if ($registroDirector->valor != $request->director_id) {
-            $registroDirector->valor = $request->director_id;
-            $registroDirector->save();
-            $cambiosRealizados = true;
-            $tipoSolicitudCorreo = 'cambio_director';
-            $nuevoDirectorCorreo = User::with('tipo_documento')->find($request->director_id);
-            
-            // ===== ASIGNAR EL ROL DE DIRECTOR_PRACTICA AL NUEVO DIRECTOR =====
-            if ($nuevoDirectorCorreo && !$nuevoDirectorCorreo->hasRole('director_practica')) {
-                $nuevoDirectorCorreo->assignRole('director_practica');
-            }
+                if ($registroDirector) {
+
+                    if ($registroDirector->valor != $request->director_id) {
+
+                        $anteriorDirectorCorreo = User::with('tipo_documento')
+                            ->find($registroDirector->valor);
+
+                        $registroDirector->valor = $request->director_id;
+                        $registroDirector->save();
+
+                        $cambiosRealizados = true;
+                        $tipoSolicitudCorreo = 'cambio_director';
+
+                        $nuevoDirectorCorreo = User::with('tipo_documento')
+                            ->find($request->director_id);
+
+                        if (
+                            $nuevoDirectorCorreo &&
+                            !$nuevoDirectorCorreo->hasRole('director_practica')
+                        ) {
+                            $nuevoDirectorCorreo->assignRole('director_practica');
+                        }
+                    }
+                }
         }
-    }
-}
 
         // Verificar cambio de evaluador
-if ($request->has('evaluador_id') && !empty($request->evaluador_id)) {
-    // Buscar el registro existente SIN importar el tipo_solicitud_id
-    $registroEvaluador = PracticaValorCampo::where('practica_id', $practica->id)
-        ->whereHas('campo', function ($q) {
-            $q->where('name', 'evaluador_id');
-        })
-        ->first();
+        if ($request->has('evaluador_id') && !empty($request->evaluador_id)) {
+            // Buscar el registro existente SIN importar el tipo_solicitud_id
+            $registroEvaluador = PracticaValorCampo::where('practica_id', $practica->id)
+                ->whereHas('campo', function ($q) {
+                    $q->where('name', 'evaluador_id');
+                })
+                ->first();
 
-    if ($registroEvaluador) {
-        // Actualizar el registro existente
-        if ($registroEvaluador->valor != $request->evaluador_id) {
-            $registroEvaluador->valor = $request->evaluador_id;
-            $registroEvaluador->save();
-            $cambiosRealizados = true;
-            $tipoSolicitudCorreo = 'cambio_evaluador';
-            $nuevoEvaluadorCorreo = User::with('tipo_documento')->find($request->evaluador_id);
-            
-            // ===== ASIGNAR EL ROL DE EVALUADOR_PRACTICA AL NUEVO EVALUADOR =====
-            if ($nuevoEvaluadorCorreo && !$nuevoEvaluadorCorreo->hasRole('evaluador_practica')) {
-                $nuevoEvaluadorCorreo->assignRole('evaluador_practica');
-            }
+                if ($registroEvaluador) {
+
+                    if ($registroEvaluador->valor != $request->evaluador_id) {
+
+                        $anteriorEvaluadorCorreo = User::with('tipo_documento')
+                            ->find($registroEvaluador->valor);
+
+                        $registroEvaluador->valor = $request->evaluador_id;
+                        $registroEvaluador->save();
+
+                        $cambiosRealizados = true;
+                        $tipoSolicitudCorreo = 'cambio_evaluador';
+
+                        $nuevoEvaluadorCorreo = User::with('tipo_documento')
+                            ->find($request->evaluador_id);
+
+                        if (
+                            $nuevoEvaluadorCorreo &&
+                            !$nuevoEvaluadorCorreo->hasRole('evaluador_practica')
+                        ) {
+                            $nuevoEvaluadorCorreo->assignRole('evaluador_practica');
+                        }
+                    }
+                }
         }
-    }
-}
 
         // Verificar retiro de estudiante
         if ($request->has('retirar_estudiante') && !empty($request->retirar_estudiante)) {
@@ -3527,8 +3612,11 @@ if ($request->has('evaluador_id') && !empty($request->evaluador_id)) {
                 'estudiante' => $practica->user,
                 'integrante_2' => $integrante2,
                 'nueva_fecha_limite' => $nuevaFechaLimiteCorreo,
+                'resultado_prorroga' => $resultadoProrrogaCorreo,
                 'nuevo_director' => $nuevoDirectorCorreo,
+                'anterior_director' => $anteriorDirectorCorreo,
                 'nuevo_evaluador' => $nuevoEvaluadorCorreo,
+                'anterior_evaluador' => $anteriorEvaluadorCorreo,
                 'estudiante_retirado' => $estudianteRetiradoCorreo,
                 'campos' => $campos,
             ],
@@ -3543,7 +3631,30 @@ if ($request->has('evaluador_id') && !empty($request->evaluador_id)) {
             $destinatarios[] = $integrante2->email;
         }
 
-        $destinatarios = array_unique(array_filter($destinatarios));
+
+
+        // Cambio de director
+        if (!empty($anteriorDirectorCorreo?->email)) {
+            $destinatarios[] = $anteriorDirectorCorreo->email;
+        }
+
+        if (!empty($nuevoDirectorCorreo?->email)) {
+            $destinatarios[] = $nuevoDirectorCorreo->email;
+        }
+
+        // Cambio de evaluador
+        if (!empty($anteriorEvaluadorCorreo?->email)) {
+            $destinatarios[] = $anteriorEvaluadorCorreo->email;
+        }
+
+        if (!empty($nuevoEvaluadorCorreo?->email)) {
+            $destinatarios[] = $nuevoEvaluadorCorreo->email;
+        }
+
+        $destinatarios = array_unique(
+            array_filter($destinatarios)
+        );
+
         Mail::to($destinatarios)
             ->queue(new PracticasMail($data));
 

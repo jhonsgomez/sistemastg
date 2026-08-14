@@ -542,31 +542,34 @@ class PracticaMailService
             return;
         }
 
-        // 2. Correo para director
+        // 2. Un solo correo para los docentes asignados
+        $destinatariosDocentes = [];
+
         if (!empty($director?->email)) {
-            $dataDirector = $dataBase;
-            $dataDirector['cuerpo_correo']['destinatario'] = 'director';
-
-            Mail::to($director->email)
-                ->send(new PracticasMail($dataDirector));
+            $destinatariosDocentes[] = $director->email;
         }
 
-        // 3. Correo para evaluador
         if (!empty($evaluador?->email)) {
-            $dataEvaluador = $dataBase;
-            $dataEvaluador['cuerpo_correo']['destinatario'] = 'evaluador';
-
-            Mail::to($evaluador->email)
-                ->send(new PracticasMail($dataEvaluador));
+            $destinatariosDocentes[] = $evaluador->email;
         }
 
-        // 4. Correo para codirector
         if (!empty($codirector?->email)) {
-            $dataCodirector = $dataBase;
-            $dataCodirector['cuerpo_correo']['destinatario'] = 'codirector';
+            $destinatariosDocentes[] = $codirector->email;
+        }
 
-            Mail::to($codirector->email)
-                ->send(new PracticasMail($dataCodirector));
+        $destinatariosDocentes = array_unique(
+            array_filter($destinatariosDocentes)
+        );
+
+        if (!empty($destinatariosDocentes)) {
+
+            $dataDocentes = $dataBase;
+
+            $dataDocentes['cuerpo_correo']['destinatario'] =
+                'docentes';
+
+            Mail::to($destinatariosDocentes)
+                ->queue(new PracticasMail($dataDocentes));
         }
     }
 
