@@ -243,6 +243,7 @@ class PracticaMailService
 
                 'correo' => $user->email,
                 'estudiante' => $user,
+                'celular' => $user->nro_celular ?? '',
 
                 'integrante_2' => $integrante2,
                 'integrante_2_correo' => $integrante2->email ?? null,
