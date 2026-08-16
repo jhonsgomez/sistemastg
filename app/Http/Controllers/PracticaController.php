@@ -713,7 +713,7 @@ class PracticaController extends Controller
                 if (
                     auth()->user()->hasRole('estudiante')
                     && $beneficiarioActual
-                    && !$practicaFinalizadaIcfes
+                    && !$finalizadaPorIcfes
                 ) {
 
                     return $return_html .
@@ -1117,38 +1117,37 @@ class PracticaController extends Controller
     }
 
     private function estudianteRetirado($practica)
-    {
-        if (!auth()->user()->hasRole('estudiante')) {
-            return false;
-        }
-
-        $campoRetirados = Campo::where('name', 'retirados_practica')
-            ->where('tipo_solicitud_id', $practica->tipo_solicitud_id)
-            ->first();
-
-        if (!$campoRetirados) {
-            return false;
-        }
-
-        $valor = $practica->valoresCampos
-            ->where('campo_id', $campoRetirados->id)
-            ->first();
-
-        if (!$valor || !$valor->valor) {
-            return false;
-        }
-
-        $retirados = json_decode($valor->valor, true);
-
-        if (!is_array($retirados)) {
-            return false;
-        }
-
-        $retirados = array_map('intval', $retirados);
-        $userId = (int) auth()->id();
-
-        return in_array($userId, $retirados);
+{
+    if (!auth()->user()->hasRole('estudiante')) {
+        return false;
     }
+
+    // Buscar el campo retirados_practica sin importar el tipo_solicitud_id
+    $campoRetirados = Campo::where('name', 'retirados_practica')->first();
+
+    if (!$campoRetirados) {
+        return false;
+    }
+
+    $valor = $practica->valoresCampos
+        ->where('campo_id', $campoRetirados->id)
+        ->first();
+
+    if (!$valor || !$valor->valor) {
+        return false;
+    }
+
+    $retirados = json_decode($valor->valor, true);
+
+    if (!is_array($retirados)) {
+        return false;
+    }
+
+    $retirados = array_map('intval', $retirados);
+    $userId = (int) auth()->id();
+
+    return in_array($userId, $retirados);
+}
 
     public function buscarEstudiantes(Request $request)
     {

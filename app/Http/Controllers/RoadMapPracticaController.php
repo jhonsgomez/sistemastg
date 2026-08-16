@@ -3379,7 +3379,12 @@ class RoadMapPracticaController extends Controller
 
         // Verificar prórroga
         $respondioProrroga = $request->has('aprobar_prorroga');
-        $aprobarProrroga = $request->boolean('aprobar_prorroga');
+        $aprobarProrroga = $request->input('aprobar_prorroga') == '1';
+
+        // Debug: Registrar el valor para verificar
+        \Log::info('Valor aprobar_prorroga: ' . $request->input('aprobar_prorroga'));
+        \Log::info('respondioProrroga: ' . ($respondioProrroga ? 'true' : 'false'));
+        \Log::info('aprobarProrroga: ' . ($aprobarProrroga ? 'true' : 'false'));
 
         if ($respondioProrroga) {
 
@@ -3553,39 +3558,37 @@ class RoadMapPracticaController extends Controller
         }
 
         // Verificar retiro de estudiante
-        if ($request->has('retirar_estudiante') && !empty($request->retirar_estudiante)) {
-            $estudianteId = $request->retirar_estudiante;
+if ($request->has('retirar_estudiante') && !empty($request->retirar_estudiante)) {
+    $estudianteId = $request->retirar_estudiante;
 
-            // Obtener o crear el campo retirados_practica
-            $campoRetirados = Campo::where('name', 'retirados_practica')
-                ->where('tipo_solicitud_id', $practica->tipo_solicitud_id)
-                ->first();
+    // Obtener el campo retirados_practica sin importar el tipo_solicitud_id
+    $campoRetirados = Campo::where('name', 'retirados_practica')->first();
 
-            if ($campoRetirados) {
-                $existentes = PracticaValorCampo::where('practica_id', $practica->id)
-                    ->where('campo_id', $campoRetirados->id)
-                    ->first();
+    if ($campoRetirados) {
+        $existentes = PracticaValorCampo::where('practica_id', $practica->id)
+            ->where('campo_id', $campoRetirados->id)
+            ->first();
 
-                $retirados = [];
-                if ($existentes && $existentes->valor) {
-                    $retirados = json_decode($existentes->valor, true) ?: [];
-                }
-
-                // Agregar el estudiante si no está ya retirado
-                if (!in_array($estudianteId, $retirados)) {
-                    $retirados[] = (int) $estudianteId;
-
-                    PracticaValorCampo::updateOrCreate(
-                        ['practica_id' => $practica->id, 'campo_id' => $campoRetirados->id],
-                        ['valor' => json_encode($retirados)]
-                    );
-
-                    $cambiosRealizados = true;
-                    $tipoSolicitudCorreo = 'retiro';
-                    $estudianteRetiradoCorreo = User::with('tipo_documento')->find($estudianteId);
-                }
-            }
+        $retirados = [];
+        if ($existentes && $existentes->valor) {
+            $retirados = json_decode($existentes->valor, true) ?: [];
         }
+
+        // Agregar el estudiante si no está ya retirado
+        if (!in_array($estudianteId, $retirados)) {
+            $retirados[] = (int) $estudianteId;
+
+            PracticaValorCampo::updateOrCreate(
+                ['practica_id' => $practica->id, 'campo_id' => $campoRetirados->id],
+                ['valor' => json_encode($retirados)]
+            );
+
+            $cambiosRealizados = true;
+            $tipoSolicitudCorreo = 'retiro';
+            $estudianteRetiradoCorreo = User::with('tipo_documento')->find($estudianteId);
+        }
+    }
+}
 
         if (!$cambiosRealizados) {
             return response()->json(['error' => 'No se realizó ningún cambio'], 422);
