@@ -243,6 +243,7 @@ class PracticaMailService
 
                 'correo' => $user->email,
                 'estudiante' => $user,
+                'celular' => $user->nro_celular ?? '',
 
                 'integrante_2' => $integrante2,
                 'integrante_2_correo' => $integrante2->email ?? null,
@@ -325,6 +326,7 @@ class PracticaMailService
                         : 'No',
 
                 'correo' => $user->email,
+                'celular' => $user->nro_celular ?? '',
                 'estudiante' => $user,
 
                 'integrante_2' => $integrante2,
@@ -494,6 +496,9 @@ class PracticaMailService
                 'estado' => $respuesta['estado'],
                 'respuesta' => $respuesta['respuesta'],
 
+                'nro_acta' => $respuesta['nro_acta'] ?? null,
+                'fecha_acta' => $respuesta['fecha_acta'] ?? null,
+
                 'correo' => $practica->user->email,
                 'estudiante' => $practica->user,
 
@@ -533,36 +538,39 @@ class PracticaMailService
         Mail::to($destinatariosEstudiantes)
             ->send(new PracticasMail($dataEstudiantes));
 
-        // Si fue rechazada, no se envía a docentes
+        // Solo si fue aprobada se notifica a los docentes asignados
         if (($respuesta['estado'] ?? '') !== 'Aprobada') {
             return;
         }
 
-        // 2. Correo para director
+        // 2. Un solo correo para los docentes asignados
+        $destinatariosDocentes = [];
+
         if (!empty($director?->email)) {
-            $dataDirector = $dataBase;
-            $dataDirector['cuerpo_correo']['destinatario'] = 'director';
-
-            Mail::to($director->email)
-                ->send(new PracticasMail($dataDirector));
+            $destinatariosDocentes[] = $director->email;
         }
 
-        // 3. Correo para evaluador
         if (!empty($evaluador?->email)) {
-            $dataEvaluador = $dataBase;
-            $dataEvaluador['cuerpo_correo']['destinatario'] = 'evaluador';
-
-            Mail::to($evaluador->email)
-                ->send(new PracticasMail($dataEvaluador));
+            $destinatariosDocentes[] = $evaluador->email;
         }
 
-        // 4. Correo para codirector
         if (!empty($codirector?->email)) {
-            $dataCodirector = $dataBase;
-            $dataCodirector['cuerpo_correo']['destinatario'] = 'codirector';
+            $destinatariosDocentes[] = $codirector->email;
+        }
 
-            Mail::to($codirector->email)
-                ->send(new PracticasMail($dataCodirector));
+        $destinatariosDocentes = array_unique(
+            array_filter($destinatariosDocentes)
+        );
+
+        if (!empty($destinatariosDocentes)) {
+
+            $dataDocentes = $dataBase;
+
+            $dataDocentes['cuerpo_correo']['destinatario'] =
+                'docentes';
+
+            Mail::to($destinatariosDocentes)
+                ->queue(new PracticasMail($dataDocentes));
         }
     }
 
@@ -786,6 +794,9 @@ class PracticaMailService
         $evaluadorCampo = collect($campos)->firstWhere('campo', 'evaluador_id');
         $codirectorCampo = collect($campos)->firstWhere('campo', 'codirector_id');
 
+        $fdc127Campo = collect($campos)
+            ->firstWhere('campo', 'doc_fdc127');
+
         $integrante2 = !empty($integrante2Campo['valor'])
             ? User::with('tipo_documento')->find($integrante2Campo['valor'])
             : null;
@@ -828,9 +839,22 @@ class PracticaMailService
                 'codirector' => $codirector,
 
                 'campos' => $campos,
-            ],
-            'adjuntar_archivos' => false,
-        ];
+                ],
+
+                'adjuntos' => [
+                    $fdc127Campo['valor'] ?? null,
+                ],
+
+                'adjuntar_archivos' => in_array(
+                    $respuesta->estado ?? '',
+                    ['Rechazada', 'Aplazada'],
+                    true
+                ),
+                ];
+
+                $dataBase['adjuntos'] = array_filter(
+                    $dataBase['adjuntos']
+                );
 
         // Correo a estudiantes
         $destinatariosEstudiantes = [
@@ -846,8 +870,27 @@ class PracticaMailService
         Mail::to($destinatariosEstudiantes)
             ->queue(new PracticasMail($dataBase));
 
+        // Si el evaluador aplaza o rechaza, notificar también al director
+        if (
+            in_array(
+                $respuesta->estado ?? '',
+                ['Rechazada', 'Aplazada'],
+                true
+            )
+            && !empty($director?->email)
+        ) {
+            $dataDirector = $dataBase;
+
+            $dataDirector['cuerpo_correo']['destinatario'] =
+                'director';
+
+            Mail::to($director->email)
+                ->queue(new PracticasMail($dataDirector));
+        }
+
         // Si aprueba, también notifica al comité
         if (($respuesta->estado ?? '') === 'Aprobada') {
+
             $dataComite = $dataBase;
             $dataComite['cuerpo_correo']['destinatario'] = 'comite';
 

@@ -441,6 +441,7 @@ class RoadMapPracticaController extends Controller
         // Guardar archivo (con overwrite)
         if ($request->hasFile('doc_fdc126')) {
             $campoDoc = $campos_fase1->where('name', 'doc_fdc126')->first();
+
             $valorExistente = PracticaValorCampo::where('practica_id', $practica->id)
                 ->where('campo_id', $campoDoc->id)
                 ->first();
@@ -449,10 +450,19 @@ class RoadMapPracticaController extends Controller
                 Storage::disk('public')->delete($valorExistente->valor);
             }
 
-            $path = $request->file('doc_fdc126')->store('practicas/fase1', 'public');
+            $path = $request->file('doc_fdc126')->store(
+                "practicas/{$practica->id}/fase1",
+                'public'
+            );
+
             PracticaValorCampo::updateOrCreate(
-                ['practica_id' => $practica->id, 'campo_id' => $campoDoc->id],
-                ['valor' => $path]
+                [
+                    'practica_id' => $practica->id,
+                    'campo_id' => $campoDoc->id
+                ],
+                [
+                    'valor' => $path
+                ]
             );
         }
 
@@ -662,7 +672,10 @@ class RoadMapPracticaController extends Controller
                 Storage::disk('public')->delete($valorExistente->valor);
             }
 
-            $path = $request->file('liquidacion_pago')->store('practicas/fase2', 'public');
+            $path = $request->file('liquidacion_pago')->store(
+                "practicas/{$practica->id}/fase2",
+                'public'
+            );
             PracticaValorCampo::updateOrCreate(
                 ['practica_id' => $practica->id, 'campo_id' => $campoLiquidacion->id],
                 ['valor' => $path]
@@ -681,7 +694,10 @@ class RoadMapPracticaController extends Controller
                 Storage::disk('public')->delete($valorExistente->valor);
             }
 
-            $path = $request->file('soporte_pago')->store('practicas/fase2', 'public');
+            $path = $request->file('soporte_pago')->store(
+                "practicas/{$practica->id}/fase2",
+                'public'
+            );
             PracticaValorCampo::updateOrCreate(
                 ['practica_id' => $practica->id, 'campo_id' => $campoSoporte->id],
                 ['valor' => $path]
@@ -897,6 +913,8 @@ class RoadMapPracticaController extends Controller
         $this->practicaMailService->sendRespuestaFase2($practica, [
             'estado' => $request->estado,
             'respuesta' => $request->respuesta,
+            'nro_acta' => $request->nro_acta,
+            'fecha_acta' => $request->fecha_acta,
             'director_id' => $request->director_id,
             'evaluador_id' => $request->evaluador_id,
             'codirector_id' => $request->codirector_id,
@@ -974,7 +992,10 @@ class RoadMapPracticaController extends Controller
 
             $path = $request
                 ->file('arl')
-                ->store('practicas/fase3', 'public');
+                ->store(
+                    "practicas/{$practica->id}/fase3",
+                    'public'
+                );
 
             PracticaValorCampo::updateOrCreate(
                 [
@@ -1005,8 +1026,11 @@ class RoadMapPracticaController extends Controller
                     ->delete($valorExistente->valor);
             }
             $path = $request
-                ->file('doc_fdc127')
-                ->store('practicas/fase3', 'public');
+            ->file('doc_fdc127')
+            ->store(
+                "practicas/{$practica->id}/fase3",
+                'public'
+            );
 
             PracticaValorCampo::updateOrCreate(
 
@@ -1042,7 +1066,10 @@ class RoadMapPracticaController extends Controller
 
             $path = $request
                 ->file('doc_fdc195')
-                ->store('practicas/fase3', 'public');
+                ->store(
+                    "practicas/{$practica->id}/fase3",
+                    'public'
+                );
 
             PracticaValorCampo::updateOrCreate(
                 [
@@ -1205,7 +1232,11 @@ class RoadMapPracticaController extends Controller
 
             // ================= GUARDAR DOCUMENTOS - ACTUALIZAR LOS CAMPOS EXISTENTES =================
             if ($request->hasFile('fdc127')) {
-                $fdc127Path = $request->file('fdc127')->store('practicas/fase3/documentos', 'public');
+                $fdc127Path = $request->file('fdc127')
+                ->store(
+                    "practicas/{$practica->id}/fase3/documentos",
+                    'public'
+                );
 
                 // Buscar el campo existente doc_fdc127 (no el del director)
                 $campoDoc = Campo::where('name', 'doc_fdc127')->first();
@@ -1224,7 +1255,11 @@ class RoadMapPracticaController extends Controller
             }
 
             if ($request->hasFile('fdc195')) {
-                $fdc195Path = $request->file('fdc195')->store('practicas/fase3/documentos', 'public');
+                $fdc195Path = $request->file('fdc195')
+                ->store(
+                    "practicas/{$practica->id}/fase3/documentos",
+                    'public'
+                );
 
                 $campoDoc = Campo::where('name', 'doc_fdc195')->first();
                 if ($campoDoc) {
@@ -1242,7 +1277,11 @@ class RoadMapPracticaController extends Controller
 
             if ($request->hasFile('turnitin')) {
                 $turnitinPath = $request->file('turnitin')
-                    ->store('practicas/fase3/documentos', 'public');
+                ->store(
+                        "practicas/{$practica->id}/fase3/documentos",
+                        'public'
+                    );
+
                 $campoTurnitin = Campo::where(
                     'name',
                     'turnitin_director_fase3'
@@ -1360,7 +1399,7 @@ class RoadMapPracticaController extends Controller
             $validator = Validator::make($request->all(), [
                 'practica_id' => 'required|exists:practicas,id',
                 'estado' => 'required|in:Aprobada,Rechazada,Aplazada',
-                'fdc127' => 'nullable|file|mimes:doc,docx|max:5120',
+                'fdc127' => 'required_if:estado,Rechazada,Aplazada|file|mimes:doc,docx|max:5120',
                 'respuesta' => 'nullable|string'
             ]);
 
@@ -1404,7 +1443,11 @@ class RoadMapPracticaController extends Controller
 
             // ================= GUARDAR DOCUMENTOS - ACTUALIZAR LOS CAMPOS EXISTENTES =================
             if ($request->hasFile('fdc127')) {
-                $fdc127Path = $request->file('fdc127')->store('practicas/fase4', 'public');
+
+                $fdc127Path = $request->file('fdc127')->store(
+                    "practicas/{$practica->id}/fase4",
+                    'public'
+                );
 
                 $campoDoc = Campo::where('name', 'doc_fdc127')->first();
                 if ($campoDoc) {
@@ -1566,7 +1609,11 @@ class RoadMapPracticaController extends Controller
 
             // ================= GUARDAR DOCUMENTOS - ACTUALIZAR LOS CAMPOS EXISTENTES =================
             if ($request->hasFile('fdc127')) {
-                $fdc127Path = $request->file('fdc127')->store('practicas/fase4/comite/documentos', 'public');
+                
+                $fdc127Path = $request->file('fdc127')->store(
+                    "practicas/{$practica->id}/fase4/comite/documentos",
+                    'public'
+                );
 
                 $campoDoc = Campo::where('name', 'doc_fdc127')->first();
                 if ($campoDoc) {
@@ -1749,7 +1796,10 @@ class RoadMapPracticaController extends Controller
 
             $path = $request
                 ->file('doc_fdc128')
-                ->store('practicas/fase5', 'public');
+                ->store(
+                    "practicas/{$practica->id}/fase5",
+                    'public'
+                );
 
             PracticaValorCampo::updateOrCreate(
 
@@ -1788,7 +1838,10 @@ class RoadMapPracticaController extends Controller
 
             $path = $request
                 ->file('doc_fdc129')
-                ->store('practicas/fase5', 'public');
+                ->store(
+                    "practicas/{$practica->id}/fase5",
+                    'public'
+                );
 
             PracticaValorCampo::updateOrCreate(
 
@@ -1829,7 +1882,10 @@ class RoadMapPracticaController extends Controller
 
             $path = $request
                 ->file('doc_fdc196')
-                ->store('practicas/fase5', 'public');
+                ->store(
+                    "practicas/{$practica->id}/fase5",
+                    'public'
+                );
 
             PracticaValorCampo::updateOrCreate(
 
@@ -2090,9 +2146,12 @@ class RoadMapPracticaController extends Controller
 
             // ================= FDC128 =================
             if ($request->hasFile('fdc128')) {
-                $path = $request
-                    ->file('fdc128')
-                    ->store('practicas/fase5', 'public');
+            $path = $request
+                ->file('fdc128')
+                ->store(
+                    "practicas/{$practica->id}/fase5",
+                    'public'
+                );
 
                 $campoDoc = Campo::where('name', 'doc_fdc128')->first();
 
@@ -2122,8 +2181,11 @@ class RoadMapPracticaController extends Controller
             // ================= FDC129 =================
             if ($request->hasFile('fdc129')) {
                 $path = $request
-                    ->file('fdc129')
-                    ->store('practicas/fase5', 'public');
+                ->file('fdc129')
+                ->store(
+                    "practicas/{$practica->id}/fase5",
+                    'public'
+                );
 
                 $campoDoc = Campo::where('name', 'doc_fdc129')->first();
 
@@ -2153,7 +2215,10 @@ class RoadMapPracticaController extends Controller
             if ($request->hasFile('fdc196')) {
                 $path = $request
                     ->file('fdc196')
-                    ->store('practicas/fase5', 'public');
+                    ->store(
+                        "practicas/{$practica->id}/fase5",
+                        'public'
+                    );
 
                 $campoDoc = Campo::where('name', 'doc_fdc196')->first();
 
@@ -2182,8 +2247,11 @@ class RoadMapPracticaController extends Controller
             // ================= TURNITIN DIRECTOR FASE 5 =================
             if ($request->hasFile('turnitin')) {
                 $turnitinPath = $request
-                    ->file('turnitin')
-                    ->store('practicas/fase5', 'public');
+                ->file('turnitin')
+                ->store(
+                    "practicas/{$practica->id}/fase5",
+                    'public'
+                );
 
                 $campoTurnitin = Campo::where(
                     'name',
@@ -2358,7 +2426,11 @@ class RoadMapPracticaController extends Controller
 
             // ================= GUARDAR DOCUMENTOS - ACTUALIZAR LOS CAMPOS EXISTENTES =================
             if ($request->hasFile('fdc128')) {
-                $fdc128Path = $request->file('fdc128')->store('practicas/fase6', 'public');
+                $fdc128Path = $request->file('fdc128')
+                ->store(
+                    "practicas/{$practica->id}/fase6",
+                    'public'
+                );
 
                 $campoDoc = Campo::where('name', 'doc_fdc128')->first();
                 if ($campoDoc) {
@@ -2375,7 +2447,11 @@ class RoadMapPracticaController extends Controller
             }
 
             if ($request->hasFile('fdc129')) {
-                $fdc129Path = $request->file('fdc129')->store('practicas/fase6', 'public');
+                $fdc129Path = $request->file('fdc129')
+                    ->store(
+                        "practicas/{$practica->id}/fase6",
+                        'public'
+                    );
 
                 $campoDoc = Campo::where('name', 'doc_fdc129')->first();
                 if ($campoDoc) {
@@ -2579,7 +2655,11 @@ class RoadMapPracticaController extends Controller
 
             // ================= GUARDAR DOCUMENTOS - ACTUALIZAR LOS CAMPOS EXISTENTES =================
             if ($request->hasFile('fdc128')) {
-                $fdc128Path = $request->file('fdc128')->store('practicas/fase6/comite/documentos', 'public');
+                $fdc128Path = $request->file('fdc128')
+                    ->store(
+                        "practicas/{$practica->id}/fase6/comite/documentos",
+                        'public'
+                    );
                 $campoDoc = Campo::where('name', 'doc_fdc128')->first();
 
                 if ($campoDoc) {
@@ -2596,7 +2676,12 @@ class RoadMapPracticaController extends Controller
             }
 
             if ($request->hasFile('fdc129')) {
-                $fdc129Path = $request->file('fdc129')->store('practicas/fase6/comite/documentos', 'public');
+                $fdc129Path = $request->file('fdc129')
+                    ->store(
+                        "practicas/{$practica->id}/fase6/comite/documentos",
+                        'public'
+                    );
+
                 $campoDoc = Campo::where('name', 'doc_fdc129')->first();
 
                 if ($campoDoc) {
@@ -2922,7 +3007,11 @@ class RoadMapPracticaController extends Controller
         if ($request->hasFile('doc_icfes_practicas')) {
             $file = $request->file('doc_icfes_practicas')[0];
             $fileName = 'icfes_practicas_' . $practica->id . '_' . $userId . '_' . time() . '.pdf';
-            $path = $file->storeAs('icfes_practicas', $fileName, 'public');
+            $path = $file->storeAs(
+                "practicas/{$practica->id}/icfes",
+                $fileName,
+                'public'
+            );
             $docData[$userId] = $path;
 
             PracticaValorCampo::updateOrCreate(
@@ -2970,11 +3059,15 @@ class RoadMapPracticaController extends Controller
             auth()->user()->email,
         ];
 
-        if (!empty($integrante2?->email)) {
-            $destinatarios[] = $integrante2->email;
+        $correoComite = config('mail.correo_sistemas');
+
+        if (!empty($correoComite)) {
+            $destinatarios[] = $correoComite;
         }
 
-        $destinatarios = array_unique(array_filter($destinatarios));
+        $destinatarios = array_unique(
+            array_filter($destinatarios)
+        );
 
         Mail::to($destinatarios)
             ->queue(new PracticasMail($data));
@@ -3136,11 +3229,11 @@ class RoadMapPracticaController extends Controller
             if ($request->hasFile('carta_prorroga')) {
                 $file = $request->file('carta_prorroga')[0];
 
-                $path = $file->storeAs(
-                    'practicas/solicitudes',
-                    'carta_prorroga_' . $practica->id . '_' . $userId . '_' . time() . '.pdf',
-                    'public'
-                );
+            $path = $file->storeAs(
+                "practicas/{$practica->id}/solicitudes/prorroga",
+                'carta_prorroga_' . $practica->id . '_' . $userId . '_' . time() . '.pdf',
+                'public'
+            );
 
                 $this->guardarValorCampo($practica->id, 'carta_prorroga', $path);
                 $adjuntosCorreo[] = $path;
@@ -3149,11 +3242,11 @@ class RoadMapPracticaController extends Controller
             if ($request->hasFile('liquidacion_prorroga')) {
                 $file = $request->file('liquidacion_prorroga')[0];
 
-                $path = $file->storeAs(
-                    'practicas/solicitudes',
-                    'liquidacion_prorroga_' . $practica->id . '_' . $userId . '_' . time() . '.pdf',
-                    'public'
-                );
+            $path = $file->storeAs(
+                "practicas/{$practica->id}/solicitudes/prorroga",
+                'liquidacion_prorroga_' . $practica->id . '_' . $userId . '_' . time() . '.pdf',
+                'public'
+            );
 
                 $this->guardarValorCampo($practica->id, 'liquidacion_prorroga', $path);
                 $adjuntosCorreo[] = $path;
@@ -3162,11 +3255,11 @@ class RoadMapPracticaController extends Controller
             if ($request->hasFile('soporte_prorroga')) {
                 $file = $request->file('soporte_prorroga')[0];
 
-                $path = $file->storeAs(
-                    'practicas/solicitudes',
-                    'soporte_prorroga_' . $practica->id . '_' . $userId . '_' . time() . '.pdf',
-                    'public'
-                );
+            $path = $file->storeAs(
+                "practicas/{$practica->id}/solicitudes/prorroga",
+                'soporte_prorroga_' . $practica->id . '_' . $userId . '_' . time() . '.pdf',
+                'public'
+            );
 
                 $this->guardarValorCampo($practica->id, 'soporte_prorroga', $path);
                 $adjuntosCorreo[] = $path;
@@ -3178,7 +3271,7 @@ class RoadMapPracticaController extends Controller
                 $file = $request->file('carta_retiro')[0];
 
                 $path = $file->storeAs(
-                    'practicas/solicitudes',
+                    "practicas/{$practica->id}/solicitudes/retiro",
                     'carta_retiro_' . $practica->id . '_' . $userId . '_' . time() . '.pdf',
                     'public'
                 );
@@ -3233,6 +3326,15 @@ class RoadMapPracticaController extends Controller
             $destinatarios[] = $integrante2->email;
         }
 
+        // Las solicitudes de prórroga deben llegar también al comité
+        if ($request->tipo_solicitud === 'prorroga') {
+            $correoComite = config('mail.correo_sistemas');
+
+            if (!empty($correoComite)) {
+                $destinatarios[] = $correoComite;
+            }
+        }
+
         $destinatarios = array_unique(array_filter($destinatarios));
 
         Mail::to($destinatarios)
@@ -3265,57 +3367,116 @@ class RoadMapPracticaController extends Controller
 
         $tipoSolicitudCorreo = null;
         $nuevaFechaLimiteCorreo = null;
+        $resultadoProrrogaCorreo = null;
+
         $nuevoDirectorCorreo = null;
+        $anteriorDirectorCorreo = null;
+
         $nuevoEvaluadorCorreo = null;
+        $anteriorEvaluadorCorreo = null;
+
         $estudianteRetiradoCorreo = null;
 
         // Verificar prórroga
-        $aprobarProrroga = $request->boolean('aprobar_prorroga');
+        $respondioProrroga = $request->has('aprobar_prorroga');
+        $aprobarProrroga = $request->input('aprobar_prorroga') == '1';
 
-        if ($aprobarProrroga) {
-            $registroFechaLimite = PracticaValorCampo::with('campo')
-                ->where('practica_id', $practica->id)
-                ->whereHas('campo', function ($q) {
-                    $q->where('name', 'fecha_limite_practica');
-                })
-                ->first();
+        // Debug: Registrar el valor para verificar
+        \Log::info('Valor aprobar_prorroga: ' . $request->input('aprobar_prorroga'));
+        \Log::info('respondioProrroga: ' . ($respondioProrroga ? 'true' : 'false'));
+        \Log::info('aprobarProrroga: ' . ($aprobarProrroga ? 'true' : 'false'));
 
-            if (!$registroFechaLimite || empty($registroFechaLimite->valor)) {
-                return response()->json([
-                    'error' => 'No se encontró la fecha límite de la práctica para aprobar la prórroga'
-                ], 422);
-            }
-
-            $nuevaFechaLimite = Carbon::parse($registroFechaLimite->valor)->addDays(90);
-            $registroFechaLimite->valor = $nuevaFechaLimite->toDateTimeString();
-            $registroFechaLimite->save();
-
-            $registroProrrogas = PracticaValorCampo::where('practica_id', $practica->id)
-                ->whereHas('campo', function ($q) {
-                    $q->where('name', 'solicitudes_prorroga');
-                })
-                ->first();
-
-            if ($registroProrrogas) {
-                $prorrogas = (int) $registroProrrogas->valor;
-                $registroProrrogas->valor = (string) ($prorrogas + 1);
-                $registroProrrogas->save();
-            } else {
-                $campoProrrogas = Campo::where('name', 'solicitudes_prorroga')
-                    ->first();
-
-                if ($campoProrrogas) {
-                    PracticaValorCampo::create([
-                        'practica_id' => $practica->id,
-                        'campo_id' => $campoProrrogas->id,
-                        'valor' => '1',
-                    ]);
-                }
-            }
+        if ($respondioProrroga) {
 
             $cambiosRealizados = true;
             $tipoSolicitudCorreo = 'prorroga';
-            $nuevaFechaLimiteCorreo = $nuevaFechaLimite->format('d/m/Y');
+
+            if ($aprobarProrroga) {
+
+                $registroFechaLimite = PracticaValorCampo::with('campo')
+                    ->where('practica_id', $practica->id)
+                    ->whereHas('campo', function ($q) {
+                        $q->where('name', 'fecha_limite_practica');
+                    })
+                    ->first();
+
+                if (!$registroFechaLimite || empty($registroFechaLimite->valor)) {
+                    return response()->json([
+                        'error' => 'No se encontró la fecha límite de la práctica para aprobar la prórroga'
+                    ], 422);
+                }
+
+                $nuevaFechaLimite = Carbon::parse(
+                    $registroFechaLimite->valor
+                )->addDays(90);
+
+                $registroFechaLimite->valor =
+                    $nuevaFechaLimite->toDateTimeString();
+
+                $registroFechaLimite->save();
+
+                $registroProrrogas = PracticaValorCampo::where(
+                    'practica_id',
+                    $practica->id
+                )
+                    ->whereHas('campo', function ($q) {
+                        $q->where('name', 'solicitudes_prorroga');
+                    })
+                    ->first();
+
+                if ($registroProrrogas) {
+
+                    $prorrogas = (int) $registroProrrogas->valor;
+
+                    $registroProrrogas->valor =
+                        (string) ($prorrogas + 1);
+
+                    $registroProrrogas->save();
+
+                } else {
+
+                    $campoProrrogas = Campo::where(
+                        'name',
+                        'solicitudes_prorroga'
+                    )->first();
+
+                    if ($campoProrrogas) {
+                        PracticaValorCampo::create([
+                            'practica_id' => $practica->id,
+                            'campo_id' => $campoProrrogas->id,
+                            'valor' => '1',
+                        ]);
+                    }
+                }
+
+                $resultadoProrrogaCorreo = 'Aprobada';
+
+                $nuevaFechaLimiteCorreo =
+                    $nuevaFechaLimite->format('d/m/Y');
+
+            } else {
+
+                // La solicitud fue respondida pero NO se amplía la fecha
+                $resultadoProrrogaCorreo = 'Rechazada';
+                $nuevaFechaLimiteCorreo = null;
+            }
+
+            // Actualizar estado de la solicitud
+            $registroEstadoSolicitud = PracticaValorCampo::where(
+                'practica_id',
+                $practica->id
+            )
+                ->whereHas('campo', function ($q) {
+                    $q->where('name', 'estado_solicitud');
+                })
+                ->first();
+
+            if ($registroEstadoSolicitud) {
+                $registroEstadoSolicitud->valor =
+                    $aprobarProrroga ? 'aprobada' : 'rechazada';
+
+                $registroEstadoSolicitud->save();
+            }
         }
 
         // Guardar acta
@@ -3335,16 +3496,30 @@ class RoadMapPracticaController extends Controller
                 })
                 ->first();
 
-            if ($registroDirector) {
-                // Actualizar el registro existente
-                if ($registroDirector->valor != $request->director_id) {
-                    $registroDirector->valor = $request->director_id;
-                    $registroDirector->save();
-                    $cambiosRealizados = true;
-                    $tipoSolicitudCorreo = 'cambio_director';
-                    $nuevoDirectorCorreo = User::with('tipo_documento')->find($request->director_id);
+                if ($registroDirector) {
+
+                    if ($registroDirector->valor != $request->director_id) {
+
+                        $anteriorDirectorCorreo = User::with('tipo_documento')
+                            ->find($registroDirector->valor);
+
+                        $registroDirector->valor = $request->director_id;
+                        $registroDirector->save();
+
+                        $cambiosRealizados = true;
+                        $tipoSolicitudCorreo = 'cambio_director';
+
+                        $nuevoDirectorCorreo = User::with('tipo_documento')
+                            ->find($request->director_id);
+
+                        if (
+                            $nuevoDirectorCorreo &&
+                            !$nuevoDirectorCorreo->hasRole('director_practica')
+                        ) {
+                            $nuevoDirectorCorreo->assignRole('director_practica');
+                        }
+                    }
                 }
-            }
         }
 
         // Verificar cambio de evaluador
@@ -3356,52 +3531,64 @@ class RoadMapPracticaController extends Controller
                 })
                 ->first();
 
-            if ($registroEvaluador) {
-                // Actualizar el registro existente
-                if ($registroEvaluador->valor != $request->evaluador_id) {
-                    $registroEvaluador->valor = $request->evaluador_id;
-                    $registroEvaluador->save();
-                    $cambiosRealizados = true;
-                    $tipoSolicitudCorreo = 'cambio_evaluador';
-                    $nuevoEvaluadorCorreo = User::with('tipo_documento')->find($request->evaluador_id);
+                if ($registroEvaluador) {
+
+                    if ($registroEvaluador->valor != $request->evaluador_id) {
+
+                        $anteriorEvaluadorCorreo = User::with('tipo_documento')
+                            ->find($registroEvaluador->valor);
+
+                        $registroEvaluador->valor = $request->evaluador_id;
+                        $registroEvaluador->save();
+
+                        $cambiosRealizados = true;
+                        $tipoSolicitudCorreo = 'cambio_evaluador';
+
+                        $nuevoEvaluadorCorreo = User::with('tipo_documento')
+                            ->find($request->evaluador_id);
+
+                        if (
+                            $nuevoEvaluadorCorreo &&
+                            !$nuevoEvaluadorCorreo->hasRole('evaluador_practica')
+                        ) {
+                            $nuevoEvaluadorCorreo->assignRole('evaluador_practica');
+                        }
+                    }
                 }
-            }
         }
 
         // Verificar retiro de estudiante
-        if ($request->has('retirar_estudiante') && !empty($request->retirar_estudiante)) {
-            $estudianteId = $request->retirar_estudiante;
+if ($request->has('retirar_estudiante') && !empty($request->retirar_estudiante)) {
+    $estudianteId = $request->retirar_estudiante;
 
-            // Obtener o crear el campo retirados_practica
-            $campoRetirados = Campo::where('name', 'retirados_practica')
-                ->where('tipo_solicitud_id', $practica->tipo_solicitud_id)
-                ->first();
+    // Obtener el campo retirados_practica sin importar el tipo_solicitud_id
+    $campoRetirados = Campo::where('name', 'retirados_practica')->first();
 
-            if ($campoRetirados) {
-                $existentes = PracticaValorCampo::where('practica_id', $practica->id)
-                    ->where('campo_id', $campoRetirados->id)
-                    ->first();
+    if ($campoRetirados) {
+        $existentes = PracticaValorCampo::where('practica_id', $practica->id)
+            ->where('campo_id', $campoRetirados->id)
+            ->first();
 
-                $retirados = [];
-                if ($existentes && $existentes->valor) {
-                    $retirados = json_decode($existentes->valor, true) ?: [];
-                }
-
-                // Agregar el estudiante si no está ya retirado
-                if (!in_array($estudianteId, $retirados)) {
-                    $retirados[] = (int) $estudianteId;
-
-                    PracticaValorCampo::updateOrCreate(
-                        ['practica_id' => $practica->id, 'campo_id' => $campoRetirados->id],
-                        ['valor' => json_encode($retirados)]
-                    );
-
-                    $cambiosRealizados = true;
-                    $tipoSolicitudCorreo = 'retiro';
-                    $estudianteRetiradoCorreo = User::with('tipo_documento')->find($estudianteId);
-                }
-            }
+        $retirados = [];
+        if ($existentes && $existentes->valor) {
+            $retirados = json_decode($existentes->valor, true) ?: [];
         }
+
+        // Agregar el estudiante si no está ya retirado
+        if (!in_array($estudianteId, $retirados)) {
+            $retirados[] = (int) $estudianteId;
+
+            PracticaValorCampo::updateOrCreate(
+                ['practica_id' => $practica->id, 'campo_id' => $campoRetirados->id],
+                ['valor' => json_encode($retirados)]
+            );
+
+            $cambiosRealizados = true;
+            $tipoSolicitudCorreo = 'retiro';
+            $estudianteRetiradoCorreo = User::with('tipo_documento')->find($estudianteId);
+        }
+    }
+}
 
         if (!$cambiosRealizados) {
             return response()->json(['error' => 'No se realizó ningún cambio'], 422);
@@ -3428,8 +3615,11 @@ class RoadMapPracticaController extends Controller
                 'estudiante' => $practica->user,
                 'integrante_2' => $integrante2,
                 'nueva_fecha_limite' => $nuevaFechaLimiteCorreo,
+                'resultado_prorroga' => $resultadoProrrogaCorreo,
                 'nuevo_director' => $nuevoDirectorCorreo,
+                'anterior_director' => $anteriorDirectorCorreo,
                 'nuevo_evaluador' => $nuevoEvaluadorCorreo,
+                'anterior_evaluador' => $anteriorEvaluadorCorreo,
                 'estudiante_retirado' => $estudianteRetiradoCorreo,
                 'campos' => $campos,
             ],
@@ -3444,7 +3634,30 @@ class RoadMapPracticaController extends Controller
             $destinatarios[] = $integrante2->email;
         }
 
-        $destinatarios = array_unique(array_filter($destinatarios));
+
+
+        // Cambio de director
+        if (!empty($anteriorDirectorCorreo?->email)) {
+            $destinatarios[] = $anteriorDirectorCorreo->email;
+        }
+
+        if (!empty($nuevoDirectorCorreo?->email)) {
+            $destinatarios[] = $nuevoDirectorCorreo->email;
+        }
+
+        // Cambio de evaluador
+        if (!empty($anteriorEvaluadorCorreo?->email)) {
+            $destinatarios[] = $anteriorEvaluadorCorreo->email;
+        }
+
+        if (!empty($nuevoEvaluadorCorreo?->email)) {
+            $destinatarios[] = $nuevoEvaluadorCorreo->email;
+        }
+
+        $destinatarios = array_unique(
+            array_filter($destinatarios)
+        );
+
         Mail::to($destinatarios)
             ->queue(new PracticasMail($data));
 

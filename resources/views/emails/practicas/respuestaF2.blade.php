@@ -110,8 +110,15 @@
     @endphp
 
     <p>Buen día,</p>
+    @if ($destinatario === 'docentes')
 
-    @if ($destinatario === 'director')
+    <p>
+        Estimados docentes, en este correo se informa la asignación de
+        <strong class="uppercase">DIRECTOR, EVALUADOR Y/O CODIRECTOR</strong>
+        correspondiente a la práctica empresarial.
+    </p>
+
+    @elseif ($destinatario === 'director')
         <p>
             Estimado docente, en este correo se le informa que ha sido asignado como
             <strong class="uppercase">DIRECTOR DE PRÁCTICAS EMPRESARIALES</strong>.
@@ -145,8 +152,25 @@
     @endif
 
     <ul>
-        <li><strong>Estado:</strong> {{ $estado }}</li>
-        <li><strong>Fecha:</strong> {{ now()->format('d/m/Y H:i:s') }}</li>
+        <li>
+            <strong>Estado:</strong>
+            {{ $estado }}
+        </li>
+
+        <li>
+            <strong>Número de acta:</strong>
+            {{ $cuerpo['nro_acta'] ?? 'No registra' }}
+        </li>
+
+        <li>
+            <strong>Fecha del acta:</strong>
+            {{ $cuerpo['fecha_acta'] ?? 'No registra' }}
+        </li>
+
+        <li>
+            <strong>Fecha y hora de respuesta:</strong>
+            {{ now()->format('d/m/Y H:i:s') }}
+        </li>
     </ul>
 
     <p><strong>Integrantes:</strong></p>
@@ -188,8 +212,33 @@
     @endif
 
     @if ($estado === 'Aprobada')
+        @if ($destinatario === 'docentes')
 
-        @if ($destinatario === 'director')
+        @if (!empty($cuerpo['director']))
+            <p><strong>Director asignado:</strong></p>
+            <ul>
+                <li><strong>Nombre:</strong> {{ $cuerpo['director']->name ?? '' }}</li>
+                <li><strong>Correo:</strong> {{ $cuerpo['director']->email ?? '' }}</li>
+            </ul>
+        @endif
+
+        @if (!empty($cuerpo['evaluador']))
+            <p><strong>Evaluador asignado:</strong></p>
+            <ul>
+                <li><strong>Nombre:</strong> {{ $cuerpo['evaluador']->name ?? '' }}</li>
+                <li><strong>Correo:</strong> {{ $cuerpo['evaluador']->email ?? '' }}</li>
+            </ul>
+        @endif
+
+        @if (!empty($cuerpo['codirector']))
+            <p><strong>Codirector asignado:</strong></p>
+            <ul>
+                <li><strong>Nombre:</strong> {{ $cuerpo['codirector']->name ?? '' }}</li>
+                <li><strong>Correo:</strong> {{ $cuerpo['codirector']->email ?? '' }}</li>
+            </ul>
+        @endif
+
+    @elseif ($destinatario === 'director')
 
             @if (!empty($cuerpo['codirector']))
                 <p><strong>Codirector asignado:</strong></p>

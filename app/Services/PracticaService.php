@@ -71,23 +71,26 @@ class PracticaService
 
                         break;
 
-                    case 'file':
+                        case 'file':
 
-                       if (
-                            in_array($campo->name, ['hoja_vida', 'hoja_vida_2']) &&
-                            $tieneEmpresa
-                        ) {
-                            continue 2;
-                        }
+                            if (
+                                in_array($campo->name, ['hoja_vida', 'hoja_vida_2']) &&
+                                $tieneEmpresa
+                            ) {
+                                continue 2;
+                            }
 
-                        if ($request->hasFile($campo->name)) {
+                            if ($request->hasFile($campo->name)) {
 
-                            $valor = $request
-                                ->file($campo->name)
-                                ->store('practicas', 'public');
-                        }
+                                $valor = $request
+                                    ->file($campo->name)
+                                    ->store(
+                                        "practicas/{$practica->id}/fase0",
+                                        'public'
+                                    );
+                            }
 
-                        break;
+                            break;
 
                     default:
 

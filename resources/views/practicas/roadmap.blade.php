@@ -4187,11 +4187,17 @@
 
                         @if($prorrogas < 2)
                             <div class="mb-4">
-                                <input type="hidden" name="aprobar_prorroga" value="0">
-                                <label class="flex items-center cursor-pointer">
-                                    <input type="checkbox" name="aprobar_prorroga_check" id="aprobar_prorroga" class="mr-2 border-gray-300 rounded-md shadow-sm focus:ring-uts-500 focus:border-uts-500" value="1">
-                                    <span>Aprobar prórroga</span>
-                                </label>
+                                <div class="flex items-center gap-4">
+                                    <label class="flex items-center cursor-pointer">
+                                        <input type="radio" name="aprobar_prorroga_radio" id="aprobar_prorroga_si" class="mr-2" value="1">
+                                        <span>Aprobar prórroga</span>
+                                    </label>
+                                    <label class="flex items-center cursor-pointer">
+                                        <input type="radio" name="aprobar_prorroga_radio" id="aprobar_prorroga_no" class="mr-2" value="0">
+                                        <span>Rechazar prórroga</span>
+                                    </label>
+                                </div>
+                                <input type="hidden" name="aprobar_prorroga" id="aprobar_prorroga" value="0">
                             </div>
                         @else
                             <div class="mb-4 p-3 border rounded-lg bg-gray-100">
@@ -5148,7 +5154,7 @@ function openConfigAdminModal() {
     directorOriginalGlobal = $('#director_id-config').val();
     evaluadorOriginalGlobal = $('#evaluador_id-config').val();
 
-        prorrogaOriginalValue = $('#aprobar_prorroga').is(':checked');
+        prorrogaOriginalValue = $('input[name="aprobar_prorroga_radio"]:checked').val();
 
     // Limpiar otros campos
     $('#retirar_estudiante').val('').trigger('change');
@@ -5178,7 +5184,12 @@ $('#configAdminForm').on('submit', function(e) {
     var estudianteRetiro = $('#retirar_estudiante').val();
     var nroActa = $('#nro_acta_ajustes').val();
     var fechaActa = $('#fecha_acta_ajustes').val();
-    var prorrogaActual = $('#aprobar_prorroga').is(':checked');
+    
+    // ===== CAMBIO AQUÍ =====
+    var prorrogaActual = $('input[name="aprobar_prorroga_radio"]:checked').val();
+    // Detectar si hay cambio en la prórroga (aprobación o rechazo)
+    var hayProrroga = (prorrogaActual !== null && prorrogaActual !== '' && prorrogaActual !== prorrogaOriginalValue);
+    // ===== FIN CAMBIO =====
 
     // Obtener comentarios del Quill
     var quill = Quill.find(document.querySelector('#txt-editor-config-admin'));
@@ -5199,7 +5210,6 @@ $('#configAdminForm').on('submit', function(e) {
     var hayCambioDirector = (directorActual !== directorOriginalGlobal);
     var hayCambioEvaluador = (evaluadorActual !== evaluadorOriginalGlobal);
     var hayRetiro = (estudianteRetiro !== null && estudianteRetiro !== '');
-    var hayProrroga = (prorrogaActual === true);
 
     if (!hayCambioDirector && !hayCambioEvaluador && !hayRetiro && !hayProrroga) {
         Swal.fire({
@@ -5216,7 +5226,14 @@ $('#configAdminForm').on('submit', function(e) {
     if (hayCambioDirector) mensajeCambios += '- Cambio de director\n';
     if (hayCambioEvaluador) mensajeCambios += '- Cambio de evaluador\n';
     if (hayRetiro) mensajeCambios += '- Retiro de estudiante\n';
-    if (hayProrroga) mensajeCambios += '- Aprobación de prórroga (+90 días)\n';
+    if (hayProrroga) {
+        var radioValor = $('input[name="aprobar_prorroga_radio"]:checked').val();
+        if (radioValor === '1') {
+            mensajeCambios += '- Aprobación de prórroga (+90 días)\n';
+        } else {
+            mensajeCambios += '- Rechazo de prórroga\n';
+        }
+    }
     
     Swal.fire({
         heightAuto: false,
@@ -5236,22 +5253,16 @@ $('#configAdminForm').on('submit', function(e) {
             button.prop('disabled', true);
             spinner.removeClass('hidden');
             
-            // ========== CORRECCIÓN: Sincronizar checkbox ANTES de FormData ==========
-            if ($('#aprobar_prorroga').is(':checked')) {
-                $('input[name="aprobar_prorroga"]').val('1');
-            } else {
-                $('input[name="aprobar_prorroga"]').val('0');
-            }
+            // ========== Sincronizar radio button con el campo hidden ==========
+            var valorRadio = $('input[name="aprobar_prorroga_radio"]:checked').val();
+            $('input[name="aprobar_prorroga"]').val(valorRadio || '0');
             // ========================================================================
             
             var formData = new FormData(this);
             formData.set('comentarios_config_admin', comentarios);
 
-                                                
-            
-            // Después de sincronizar, ANTES de crear FormData
             console.log('Valor del campo hidden aprobar_prorroga:', $('input[name="aprobar_prorroga"]').val());
-            console.log('Checkbox marcado:', $('#aprobar_prorroga').is(':checked'));
+            console.log('Radio seleccionado:', $('input[name="aprobar_prorroga_radio"]:checked').val());
 
             $.ajax({
                 url: '{{ route("practicas.configurar_admin") }}',

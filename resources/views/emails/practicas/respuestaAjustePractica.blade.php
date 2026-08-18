@@ -123,8 +123,12 @@
     $nroActa = $cuerpo['nro_acta'] ?? '';
     $fechaActa = $cuerpo['fecha_acta'] ?? '';
     $nuevaFechaLimite = $cuerpo['nueva_fecha_limite'] ?? null;
+    $resultadoProrroga = $cuerpo['resultado_prorroga'] ?? null;
     $nuevoDirector = $cuerpo['nuevo_director'] ?? null;
+    $anteriorDirector = $cuerpo['anterior_director'] ?? null;
+
     $nuevoEvaluador = $cuerpo['nuevo_evaluador'] ?? null;
+    $anteriorEvaluador = $cuerpo['anterior_evaluador'] ?? null;
     $estudianteRetirado = $cuerpo['estudiante_retirado'] ?? null;
 @endphp
 
@@ -144,6 +148,16 @@
     <li><strong>Fecha de acta:</strong> {{ $fechaActa }}</li>
 </ul>
 
+@if($tipoSolicitud === 'prorroga' && $resultadoProrroga)
+    <p>
+        <strong>Estado de la solicitud de prórroga:</strong>
+        <span class="uppercase">
+            {{ $resultadoProrroga }}
+        </span>
+    </p>
+@endif
+
+
 @if($nuevaFechaLimite)
     <p>
         <strong>Nueva fecha límite de la práctica:</strong>
@@ -151,11 +165,27 @@
     </p>
 @endif
 
+@if($anteriorDirector)
+    <p><strong>Director anterior:</strong></p>
+    <ul>
+        <li>{{ $anteriorDirector->name }}</li>
+        <li>{{ $anteriorDirector->email }}</li>
+    </ul>
+@endif
+
 @if($nuevoDirector)
     <p><strong>Nuevo director asignado:</strong></p>
     <ul>
         <li>{{ $nuevoDirector->name }}</li>
         <li>{{ $nuevoDirector->email }}</li>
+    </ul>
+@endif
+
+@if($anteriorEvaluador)
+    <p><strong>Evaluador anterior:</strong></p>
+    <ul>
+        <li>{{ $anteriorEvaluador->name }}</li>
+        <li>{{ $anteriorEvaluador->email }}</li>
     </ul>
 @endif
 

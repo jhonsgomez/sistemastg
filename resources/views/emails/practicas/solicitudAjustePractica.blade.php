@@ -161,19 +161,10 @@
     </div>
 @endif
 
-@endif
+
 
 <br>
 
-@if(!empty($data['adjuntos']))
-    <p><strong>Documentos adjuntos:</strong></p>
-    <ul>
-        @foreach($data['adjuntos'] as $adjunto)
-            <li>{{ basename($adjunto) }}</li>
-        @endforeach
-    </ul>
-@endif
-<br>
 
 <p>
     La solicitud queda pendiente de revisión por parte del comité.
