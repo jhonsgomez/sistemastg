@@ -1122,8 +1122,10 @@ class PracticaController extends Controller
         return false;
     }
 
-    // Buscar el campo retirados_practica sin importar el tipo_solicitud_id
-    $campoRetirados = Campo::where('name', 'retirados_practica')->first();
+    // Buscar el campo retirados_practica
+    $campoRetirados = Campo::where('name', 'retirados_practica')
+        ->where('tipo_solicitud_id', $practica->tipo_solicitud_id)
+        ->first();
 
     if (!$campoRetirados) {
         return false;
@@ -1137,6 +1139,7 @@ class PracticaController extends Controller
         return false;
     }
 
+    // Decodificar el valor
     $retirados = json_decode($valor->valor, true);
 
     if (!is_array($retirados)) {
@@ -1146,6 +1149,7 @@ class PracticaController extends Controller
     $retirados = array_map('intval', $retirados);
     $userId = (int) auth()->id();
 
+    // Verificar si el usuario está en la lista de retirados
     return in_array($userId, $retirados);
 }
 
