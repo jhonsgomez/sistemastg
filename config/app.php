@@ -16,6 +16,8 @@ return [
     */
 
     'name' => env('APP_NAME', 'Laravel'),
+    'nombre_institucion' => env('NOMBRE_INSTITUCION', '[NOMBRE DE LA INSTITUCIÓN]'),
+    'nombre_programa' => env('NOMBRE_PROGRAMA', '[NOMBRE DEL PROGRAMA]'),
 
     /*
     |--------------------------------------------------------------------------

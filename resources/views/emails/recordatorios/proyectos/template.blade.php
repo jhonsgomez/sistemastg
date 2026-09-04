@@ -77,8 +77,8 @@
             <p>Atentamente,</p>
 
             <p>Comité de Trabajos de Grado<br>
-                Programa de Tecnología en Desarrollo de Sistemas Informáticos e Ingeniería de Sistemas<br>
-                Unidades Tecnológicas de Santander</p>
+                {{ config('app.nombre_programa') }}<br>
+                {{ config('app.nombre_institucion') }}</p>
         </div>
     </main>
 </body>
